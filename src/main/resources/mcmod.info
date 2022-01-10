@@ -8,7 +8,7 @@
   "url": "https://github.com/FalsePattern/Triangulator",
   "authorList": ["FalsePattern"],
   "parent": "",
-  "dependencies": [],
+  "dependencies": ["spongemixins"],
   "useDependencyInformation": true
 }
 ]
