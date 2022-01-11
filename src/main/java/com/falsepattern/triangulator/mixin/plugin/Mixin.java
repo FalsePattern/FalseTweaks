@@ -14,7 +14,8 @@ import static com.falsepattern.triangulator.mixin.plugin.TargetedMod.VANILLA;
 
 public enum Mixin {
     ClientTessellatorMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "TessellatorMixin")),
-    ClientQuadComparatorMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "QuadComparatorMixin"));
+    ClientQuadComparatorMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "QuadComparatorMixin")),
+    ClientRenderBlocksMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "RenderBlocksMixin"));
 
     public final MixinUnit[] units;
     public final Set<TargetedMod> targetedMods;

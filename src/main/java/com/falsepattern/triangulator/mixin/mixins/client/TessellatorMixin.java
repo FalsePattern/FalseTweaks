@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client;
 
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
+import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.lib.Opcodes;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 @Mixin(Tessellator.class)
-public abstract class TessellatorMixin {
+public abstract class TessellatorMixin implements ITessellatorMixin {
     @Shadow
     private int drawMode;
 
@@ -24,6 +25,7 @@ public abstract class TessellatorMixin {
 
     private boolean hackedQuadRendering = false;
     private boolean drawingTris = false;
+    private boolean alternativeTriangulation = false;
     private int quadVerticesPutIntoBuffer = 0;
 
     @Inject(method = "reset",
@@ -73,10 +75,21 @@ public abstract class TessellatorMixin {
                 }
             }
             //Current vertex layout: ABCD
-            //Target vertex layout: ABCACD
-            System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex + 8, 8);
-            System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex, 8);
-            System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex - 8, 8);
+            if (alternativeTriangulation) {
+                //Target vertex layout: BCDBDA
+                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex + 8, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex - 8, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex - 32, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex - 24, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - 16, 8);
+                alternativeTriangulation = false;
+            } else {
+                //Target vertex layout: ABCACD
+                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex + 8, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex - 8, 8);
+            }
             vertexCount += 2;
             rawBufferIndex += 16;
         }
@@ -100,5 +113,10 @@ public abstract class TessellatorMixin {
                     require = 1)
     private int hackQuadCounting(int constant) {
         return constant - 8;
+    }
+
+    @Override
+    public void setAlternativeTriangulation() {
+        alternativeTriangulation = true;
     }
 }
