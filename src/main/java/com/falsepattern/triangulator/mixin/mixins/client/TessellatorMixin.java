@@ -1,5 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client;
 
+import com.falsepattern.triangulator.Triangulator;
+import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import net.minecraft.client.renderer.Tessellator;
@@ -14,7 +16,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 @Mixin(Tessellator.class)
-public abstract class TessellatorMixin implements ITessellatorMixin {
+public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableTessellator {
     @Shadow
     private int drawMode;
 
@@ -26,6 +28,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin {
     private boolean hackedQuadRendering = false;
     private boolean drawingTris = false;
     private boolean alternativeTriangulation = false;
+    private boolean quadTriangulationTemporarilySuspended = false;
     private int quadVerticesPutIntoBuffer = 0;
 
     @Inject(method = "reset",
@@ -34,6 +37,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin {
     private void resetState(CallbackInfo ci) {
         drawingTris = false;
         hackedQuadRendering = false;
+        quadTriangulationTemporarilySuspended = false;
+        alternativeTriangulation = false;
         quadVerticesPutIntoBuffer = 0;
     }
 
@@ -57,7 +62,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin {
             at = @At(value = "RETURN"),
             require = 1)
     private void hackVertex(CallbackInfo ci) {
-        if (!hackedQuadRendering) return;
+        if (!hackedQuadRendering || quadTriangulationTemporarilySuspended) return;
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             quadVerticesPutIntoBuffer = 0;
@@ -118,5 +123,15 @@ public abstract class TessellatorMixin implements ITessellatorMixin {
     @Override
     public void setAlternativeTriangulation() {
         alternativeTriangulation = true;
+    }
+
+    @Override
+    public void suspendQuadTriangulation() {
+        quadTriangulationTemporarilySuspended = true;
+    }
+
+    @Override
+    public void resumeQuadTriangulation() {
+        quadTriangulationTemporarilySuspended = false;
     }
 }
