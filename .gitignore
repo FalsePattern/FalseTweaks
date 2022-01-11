@@ -149,3 +149,5 @@ gradle-app.setting
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,gradle,forgegradle,java
+
+srgmap.cfg
