@@ -81,19 +81,15 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             }
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
-                //Target vertex layout: BCDBDA
-                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex + 8, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex - 8, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex - 32, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex - 24, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - 16, 8);
+                //Target vertex layout: ABD DBC
+                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex + 8, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex - 16, 8);
                 alternativeTriangulation = false;
             } else {
-                //Target vertex layout: ABCACD
-                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex + 8, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex - 8, 8);
+                //Target vertex layout: ABC DAC
+                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex + 8, 8);
             }
             vertexCount += 2;
             rawBufferIndex += 16;
