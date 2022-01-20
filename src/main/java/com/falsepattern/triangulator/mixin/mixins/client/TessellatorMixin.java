@@ -66,8 +66,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
-                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex + 8, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex, 8);
+                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex, 16);
                 System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex - 16, 8);
                 alternativeTriangulation = false;
             } else {
