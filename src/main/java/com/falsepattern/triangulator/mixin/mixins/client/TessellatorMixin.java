@@ -1,6 +1,5 @@
 package com.falsepattern.triangulator.mixin.mixins.client;
 
-import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
