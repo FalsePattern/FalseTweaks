@@ -51,9 +51,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
     // This method return a List<String> of mixins. Every mixins in this list will be loaded.
     @Override
     public List<String> getMixins() {
-        final boolean isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+        val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-        List<TargetedMod> loadedMods =
+        val loadedMods =
                 Arrays.stream(TargetedMod.values())
                       .filter(mod -> mod == TargetedMod.VANILLA
                                      || (mod.loadInDevelopment && isDevelopmentEnvironment)
@@ -69,8 +69,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
             }
         }
 
-        List<String> mixins = new ArrayList<>();
-        for (Mixin mixin : Mixin.values()) {
+        val mixins = new ArrayList<String>();
+        for (val mixin : Mixin.values()) {
             if (mixin.shouldLoad(loadedMods)) {
                 val mixinClass = mixin.getBestAlternativeForTier(CompatibilityTier.InjectCancel); //TODO read this from config
                 if (mixinClass == null) throw new MixinException("Failed to select alternative for mixin: " + mixin.name());
@@ -83,7 +83,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     private boolean loadJarOf(final TargetedMod mod) {
         try {
-            File jar = findJarOf(mod);
+            val jar = findJarOf(mod);
             if(jar == null) {
                 LOG.info("Jar not found for " + mod);
                 return false;

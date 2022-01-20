@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.plugin;
 
 import com.google.common.io.Files;
+import lombok.val;
 
 import java.nio.file.Path;
 
@@ -23,9 +24,9 @@ public enum TargetedMod {
 
     @SuppressWarnings("UnstableApiUsage")
     public boolean isMatchingJar(Path path) {
-        final String pathString = path.toString();
-        final String nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();
-        final String fileExtension = Files.getFileExtension(pathString);
+        val pathString = path.toString();
+        val nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();
+        val fileExtension = Files.getFileExtension(pathString);
 
         return "jar".equals(fileExtension) && nameLowerCase.startsWith(jarNamePrefixLowercase) && nameLowerCase.contains(jarNameContainsLowercase);
     }

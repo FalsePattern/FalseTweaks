@@ -1,7 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client;
 
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
-import net.minecraft.block.Block;
+import lombok.val;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,12 +54,12 @@ public abstract class RenderBlocksMixin {
             },
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
-        float avgTopLeft = (colorRedTopLeft + colorGreenTopLeft + colorBlueTopLeft) / 3.0f;
-        float avgBottomLeft = (colorRedBottomLeft + colorGreenBottomLeft + colorBlueBottomLeft) / 3.0f;
-        float avgBottomRight = (colorRedBottomRight + colorGreenBottomRight + colorBlueBottomRight) / 3.0f;
-        float avgTopRight = (colorRedTopRight + colorGreenTopRight + colorBlueTopRight) / 3.0f;
-        float mainDiagonalDiff = Math.abs(avgTopLeft - avgBottomRight);
-        float altDiagonalDiff = Math.abs(avgBottomLeft - avgTopRight);
+        val avgTopLeft = (colorRedTopLeft + colorGreenTopLeft + colorBlueTopLeft) / 3.0f;
+        val avgBottomLeft = (colorRedBottomLeft + colorGreenBottomLeft + colorBlueBottomLeft) / 3.0f;
+        val avgBottomRight = (colorRedBottomRight + colorGreenBottomRight + colorBlueBottomRight) / 3.0f;
+        val avgTopRight = (colorRedTopRight + colorGreenTopRight + colorBlueTopRight) / 3.0f;
+        val mainDiagonalDiff = Math.abs(avgTopLeft - avgBottomRight);
+        val altDiagonalDiff = Math.abs(avgBottomLeft - avgTopRight);
         if (altDiagonalDiff < mainDiagonalDiff) {
             ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
         }
