@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 @Mixin(Tessellator.class)
@@ -20,7 +19,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private int drawMode;
 
     @Shadow private int rawBufferIndex;
-    @Shadow(remap = false) private int rawBufferSize;
     @Shadow private int[] rawBuffer;
     @Shadow private int vertexCount;
 
@@ -65,19 +63,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             quadVerticesPutIntoBuffer = 0;
-            if (rawBufferIndex >= rawBufferSize - 64)
-            {
-                if (rawBufferSize == 0)
-                {
-                    rawBufferSize = 0x10000;
-                    rawBuffer = new int[rawBufferSize];
-                }
-                else
-                {
-                    rawBufferSize *= 2;
-                    rawBuffer = Arrays.copyOf(rawBuffer, rawBufferSize);
-                }
-            }
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
