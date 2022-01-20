@@ -60,7 +60,13 @@ public abstract class RenderBlocksMixin {
         val avgTopRight = (colorRedTopRight + colorGreenTopRight + colorBlueTopRight) / 3.0f;
         val mainDiagonalDiff = Math.abs(avgTopLeft - avgBottomRight);
         val altDiagonalDiff = Math.abs(avgBottomLeft - avgTopRight);
-        if (altDiagonalDiff < mainDiagonalDiff) {
+        if (Math.abs(mainDiagonalDiff - altDiagonalDiff) < 0.01) {
+            val mainDiagonalAvg = (avgTopLeft + avgBottomRight) * 0.5F;
+            val altDiagonalAvg = (avgBottomLeft + avgTopRight) * 0.5F;
+            if (mainDiagonalAvg < altDiagonalAvg) {
+                ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
+            }
+        } else if (altDiagonalDiff < mainDiagonalDiff) {
             ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
         }
     }
