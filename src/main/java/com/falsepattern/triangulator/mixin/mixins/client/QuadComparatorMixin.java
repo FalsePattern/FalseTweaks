@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client;
 
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
+import lombok.val;
 import net.minecraft.client.util.QuadComparator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,7 +19,29 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
 
     @Shadow private int[] field_147627_d;
 
-    private boolean triMode = false;
+    private boolean triMode;
+
+    private static float getCenter(float x, float y, float z, int[] vertexData, int i) {
+        val ax = Float.intBitsToFloat(vertexData[i]) - x;
+        val ay = Float.intBitsToFloat(vertexData[i + 1]) - y;
+        val az = Float.intBitsToFloat(vertexData[i + 2]) - z;
+        val bx = Float.intBitsToFloat(vertexData[i + 8]) - x;
+        val by = Float.intBitsToFloat(vertexData[i + 9]) - y;
+        val bz = Float.intBitsToFloat(vertexData[i + 10]) - z;
+        val cx = Float.intBitsToFloat(vertexData[i + 16]) - x;
+        val cy = Float.intBitsToFloat(vertexData[i + 17]) - y;
+        val cz = Float.intBitsToFloat(vertexData[i + 18]) - z;
+
+        val xAvg = (ax + bx + cx) / 3f;
+        val yAvg = (ay + by + cy) / 3f;
+        val zAvg = (az + bz + cz) / 3f;
+
+        return xAvg * xAvg + yAvg * yAvg + zAvg * zAvg;
+    }
+
+    private static int compare(int a, int b, float x, float y, float z, int[] vertexData) {
+        return Float.compare(getCenter(x, y, z, vertexData, b), getCenter(x, y, z, vertexData, a));
+    }
 
     @Inject(method = "compare(Ljava/lang/Integer;Ljava/lang/Integer;)I",
             at = @At(value = "HEAD"),
@@ -26,39 +49,7 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
             require = 1)
     private void triCompare(Integer aObj, Integer bObj, CallbackInfoReturnable<Integer> cir) {
         if (!triMode) return;
-        int a = aObj;
-        int b = bObj;
-        float x = this.field_147630_a;
-        float y = this.field_147628_b;
-        float z = this.field_147629_c;
-        int[] vertexData = this.field_147627_d;
-        float a0x = Float.intBitsToFloat(vertexData[a]) - x;
-        float a0y = Float.intBitsToFloat(vertexData[a + 1]) - y;
-        float a0z = Float.intBitsToFloat(vertexData[a + 2]) - z;
-        float a1x = Float.intBitsToFloat(vertexData[a + 8]) - x;
-        float a1y = Float.intBitsToFloat(vertexData[a + 9]) - y;
-        float a1z = Float.intBitsToFloat(vertexData[a + 10]) - z;
-        float a2x = Float.intBitsToFloat(vertexData[a + 16]) - x;
-        float a2y = Float.intBitsToFloat(vertexData[a + 17]) - y;
-        float a2z = Float.intBitsToFloat(vertexData[a + 18]) - z;
-        float b0x = Float.intBitsToFloat(vertexData[b]) - x;
-        float b0y = Float.intBitsToFloat(vertexData[b + 1]) - y;
-        float b0z = Float.intBitsToFloat(vertexData[b + 2]) - z;
-        float b1x = Float.intBitsToFloat(vertexData[b + 8]) - x;
-        float b1y = Float.intBitsToFloat(vertexData[b + 9]) - y;
-        float b1z = Float.intBitsToFloat(vertexData[b + 10]) - z;
-        float b2x = Float.intBitsToFloat(vertexData[b + 16]) - x;
-        float b2y = Float.intBitsToFloat(vertexData[b + 17]) - y;
-        float b2z = Float.intBitsToFloat(vertexData[b + 18]) - z;
-        float axAvg = (a0x + a1x + a2x) / 3f;
-        float ayAvg = (a0y + a1y + a2y) / 3f;
-        float azAvg = (a0z + a1z + a2z) / 3f;
-        float bxAvg = (b0x + b1x + b2x) / 3f;
-        float byAvg = (b0y + b1y + b2y) / 3f;
-        float bzAvg = (b0z + b1z + b2z) / 3f;
-        float aAvg = axAvg * axAvg + ayAvg * ayAvg + azAvg * azAvg;
-        float bAvg = bxAvg * bxAvg + byAvg * byAvg + bzAvg * bzAvg;
-        cir.setReturnValue(Float.compare(bAvg, aAvg));
+        cir.setReturnValue(compare(aObj, bObj, this.field_147630_a, this.field_147628_b, this.field_147629_c, this.field_147627_d));
     }
 
     @Override
