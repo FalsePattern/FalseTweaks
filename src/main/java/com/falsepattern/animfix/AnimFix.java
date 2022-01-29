@@ -1,5 +1,6 @@
 package com.falsepattern.animfix;
 
+import com.falsepattern.animfix.proxy.CommonProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
@@ -9,11 +10,13 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = Tags.MODID,
      version = Tags.VERSION,
      name = Tags.MODNAME,
-     acceptedMinecraftVersions = "[1.7.10]")
+     acceptedMinecraftVersions = "[1.7.10]",
+     dependencies = "required-after:Forge@[10.13.4.1614,);" +
+                    "required-after:spongemixins@[1.3.3,)")
 public class AnimFix {
 
-    @SidedProxy(clientSide = Tags.GROUPNAME + ".ClientProxy",
-                serverSide = Tags.GROUPNAME + ".CommonProxy")
+    @SidedProxy(clientSide = Tags.GROUPNAME + "." + Tags.MODID + ".ClientProxy",
+                serverSide = Tags.GROUPNAME + "." + Tags.MODID + ".CommonProxy")
     public static CommonProxy proxy;
     private static final Logger LOG = LogManager.getLogger(Tags.MODID);
 
