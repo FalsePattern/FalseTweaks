@@ -461,37 +461,13 @@ artifacts {
     }
 }
 
-// publishing
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifact source: jar
-            artifact source: sourcesJar, classifier: "src"
-            artifact source: devJar, classifier: "dev"
-            if (apiPackage) {
-                artifact source: apiJar, classifier: "api"
-            }
-
-            groupId = System.getenv("ARTIFACT_GROUP_ID") ?: group
-            artifactId = System.getenv("ARTIFACT_ID") ?: project.name
-            version = System.getenv("ARTIFACT_VERSION") ?: project.version
-        }
-    }
-    
-    repositories {
-        maven {
-            String owner = System.getenv("REPOSITORY_OWNER") ?: "Unknown"
-            String repositoryName = System.getenv("REPOSITORY_NAME") ?: "Unknown"
-            String githubRepositoryUrl = "https://maven.pkg.github.com/$owner/$repositoryName"
-            name = "GitHubPackages"
-            url = githubRepositoryUrl
-            credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: "NONE"
-                password = System.getenv("GITHUB_TOKEN") ?: "NONE"
-            }
-        }
-    }
+// NODELETE
+// This is used for invoking the publishing script. We cannot use addon.gradle,
+// as it is included too early in the buildscript. We need this below artifacts{}
+if(file("publishing.gradle").exists()) {
+    apply from: "publishing.gradle"
 }
+
 
 // Updating
 task updateBuildScript {
