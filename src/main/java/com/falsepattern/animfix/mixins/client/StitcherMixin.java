@@ -57,22 +57,31 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
     private void doStitch_0(CallbackInfo ci) {
         if (!skipRecursion) {
             animatedHolders = new HashSet<>();
+
+            //Extract animated sprites that are smaller than the max size
             setStitchHolders.forEach((holder) -> {
                 TextureAtlasSprite sprite = holder.getAtlasSprite();
-                if ( sprite.getIconWidth() > Config.maximumBatchedTextureSize ||sprite.getIconHeight() > Config.maximumBatchedTextureSize) return;
+                if ( sprite.getIconWidth() > Config.maximumBatchedTextureSize || sprite.getIconHeight() > Config.maximumBatchedTextureSize) return;
                 if (holder.getAtlasSprite().hasAnimationMetadata()) {
 
                     animatedHolders.add(holder);
                 }
             });
+
+            //Bailout if there aren't any animated textures
             if (animatedHolders.size() == 0) {
                 skipRecursion = true;
             } else {
+
                 setStitchHolders.removeAll(animatedHolders);
+
+                //Put animated textures into a "block"
                 Stitcher recursiveStitcher = new Stitcher(maxWidth, maxHeight, forcePowerOf2, maxTileDimension, mipmapLevelStitcher);
                 ((IRecursiveStitcher) recursiveStitcher).doNotRecurse();
                 animatedHolders.forEach((holder) -> recursiveStitcher.addSprite(holder.getAtlasSprite()));
                 recursiveStitcher.doStitch();
+
+                //Replace the textures with a placeholder in the atlas
                 animatedSlots = ((IRecursiveStitcher) recursiveStitcher).getSlots();
                 megaTexture = new MegaTexture();
                 megaTexture.setIconWidth(recursiveStitcher.getCurrentWidth());
@@ -87,6 +96,7 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
             require = 1)
     private void doStitch_1(CallbackInfo ci) {
         if (!skipRecursion) {
+            //Find our placeholder in the atlas
             Stitcher.Slot megaTextureSlot = null;
             for (Stitcher.Slot slot : stitchSlots) {
                 megaTextureSlot = removeMegaSlotRecursive(slot);
@@ -95,6 +105,8 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
             if (megaTextureSlot == null) {
                 throw new IllegalStateException("Failed to extract animated texture stitching slot!");
             }
+
+            //Clear the texture from the placeholder, and populate it with the animated textures
             Stitcher.Holder megaHolder = megaTextureSlot.getStitchHolder();
             setStitchHolders.remove(megaHolder);
             ((IStitcherSlotMixin) megaTextureSlot).insertHolder(null);

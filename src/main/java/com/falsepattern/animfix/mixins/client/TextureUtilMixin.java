@@ -26,12 +26,16 @@ public abstract class TextureUtilMixin {
         }
         theProfiler.startSection("uploadTextureSub");
         if (AnimationUpdateBatcher.batcher != null) {
-            theProfiler.startSection("batchUpload");
+            theProfiler.startSection("copyToBatch");
             if (AnimationUpdateBatcher.batcher.batchUpload(mipMapLevel, texture, width, height, xOffset, yOffset)) {
                 ci.cancel();
+                theProfiler.endSection();
+                theProfiler.endSection();
+                return;
             }
             theProfiler.endSection();
         }
+        theProfiler.startSection("setup");
     }
 
     @Inject(method = "uploadTextureSub",
@@ -39,15 +43,16 @@ public abstract class TextureUtilMixin {
                      target = "Lnet/minecraft/client/renderer/texture/TextureUtil;copyToBufferPos([III)V"),
             require = 1)
     private static void uploadTextureSub1(CallbackInfo ci) {
-        theProfiler.endStartSection("buffercopy");
+        theProfiler.endStartSection("copyToNative");
     }
 
     @Inject(method = "uploadTextureSub",
             at = @At(value = "INVOKE",
-                     target = "Lorg/lwjgl/opengl/GL11;glTexSubImage2D(IIIIIIIILjava/nio/IntBuffer;)V"),
+                     target = "Lorg/lwjgl/opengl/GL11;glTexSubImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
+                     remap = false),
             require = 1)
     private static void uploadTextureSub2(CallbackInfo ci) {
-        theProfiler.endStartSection("upload");
+        theProfiler.endStartSection("uploadToGPU");
     }
 
     @Inject(method = "uploadTextureSub",

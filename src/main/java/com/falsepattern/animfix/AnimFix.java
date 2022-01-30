@@ -12,11 +12,11 @@ import org.apache.logging.log4j.Logger;
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
      dependencies = "required-after:Forge@[10.13.4.1614,);" +
-                    "required-after:spongemixins@[1.3.3,)")
+                    "required-after:spongemixins@[1.3.0,)")
 public class AnimFix {
 
-    @SidedProxy(clientSide = Tags.GROUPNAME + "." + Tags.MODID + ".ClientProxy",
-                serverSide = Tags.GROUPNAME + "." + Tags.MODID + ".CommonProxy")
+    @SidedProxy(clientSide = Tags.GROUPNAME + "." + Tags.MODID + ".proxy.ClientProxy",
+                serverSide = Tags.GROUPNAME + "." + Tags.MODID + ".proxy.CommonProxy")
     public static CommonProxy proxy;
     private static final Logger LOG = LogManager.getLogger(Tags.MODID);
 
