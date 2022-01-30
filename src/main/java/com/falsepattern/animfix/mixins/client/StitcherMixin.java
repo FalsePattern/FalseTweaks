@@ -57,16 +57,16 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
     private void doStitch_0(CallbackInfo ci) {
         if (!skipRecursion) {
             animatedHolders = new HashSet<>();
+            int maxSize = Config.maximumBatchedTextureSize;
 
             //Extract animated sprites that are smaller than the max size
-            setStitchHolders.forEach((holder) -> {
-                TextureAtlasSprite sprite = holder.getAtlasSprite();
-                if ( sprite.getIconWidth() > Config.maximumBatchedTextureSize || sprite.getIconHeight() > Config.maximumBatchedTextureSize) return;
-                if (holder.getAtlasSprite().hasAnimationMetadata()) {
-
-                    animatedHolders.add(holder);
+            for (Stitcher.Holder setStitchHolder : setStitchHolders) {
+                TextureAtlasSprite sprite = setStitchHolder.getAtlasSprite();
+                if (sprite.getIconWidth() > maxSize || sprite.getIconHeight() > maxSize) continue;
+                if (setStitchHolder.getAtlasSprite().hasAnimationMetadata()) {
+                    animatedHolders.add(setStitchHolder);
                 }
-            });
+            }
 
             //Bailout if there aren't any animated textures
             if (animatedHolders.size() == 0) {
@@ -78,7 +78,9 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
                 //Put animated textures into a "block"
                 Stitcher recursiveStitcher = new Stitcher(maxWidth, maxHeight, forcePowerOf2, maxTileDimension, mipmapLevelStitcher);
                 ((IRecursiveStitcher) recursiveStitcher).doNotRecurse();
-                animatedHolders.forEach((holder) -> recursiveStitcher.addSprite(holder.getAtlasSprite()));
+                for (Stitcher.Holder holder : animatedHolders) {
+                    recursiveStitcher.addSprite(holder.getAtlasSprite());
+                }
                 recursiveStitcher.doStitch();
 
                 //Replace the textures with a placeholder in the atlas

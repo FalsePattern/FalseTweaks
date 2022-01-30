@@ -8,7 +8,10 @@ import java.io.File;
 public class Config {
     public static int maximumBatchedTextureSize = 32;
 
+    private static File configFile;
+
     public static void syncronizeConfiguration(File configFile) {
+        Config.configFile = configFile;
         val configuration = new Configuration(configFile);
         configuration.load();
 
@@ -17,5 +20,9 @@ public class Config {
         if(configuration.hasChanged()) {
             configuration.save();
         }
+    }
+
+    public static void reload() {
+        syncronizeConfiguration(configFile);
     }
 }
