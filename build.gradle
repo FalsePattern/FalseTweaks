@@ -1,9 +1,9 @@
-//version: 29197fa3cf1ea6ef5c07884a613171d01c026d1d
+//version: 1641429628-falsepattern
 /*
 DO NOT CHANGE THIS FILE!
 
 Also, you may replace this file at any time if there is an update available.
-Please check https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/build.gradle for updates.
+Please check https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/build.gradle for updates.
  */
 
 
@@ -32,7 +32,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.4'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.5'
     }
 }
 
@@ -87,6 +87,11 @@ checkPropertyExists("coreModClass")
 checkPropertyExists("containsMixinsAndOrCoreModOnly")
 checkPropertyExists("usesShadowedDependencies")
 checkPropertyExists("developmentEnvironmentUserName")
+
+checkPropertyExists("repositoryURL")
+checkPropertyExists("repositoryName")
+checkPropertyExists("mavenGroupId")
+checkPropertyExists("mavenArtifactId")
 
 
 String javaSourceDir = "src/main/java/"
@@ -156,7 +161,7 @@ try {
     version = gitVersion() + "-mc" + minecraftVersion
 }
 catch (Exception e) {
-    throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!")
+    throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!");
 }
 
 group = modGroup
@@ -195,7 +200,9 @@ if(file("addon.gradle").exists()) {
 apply from: 'repositories.gradle'
 
 configurations {
-    implementation.extendsFrom(shadowImplementation)
+    implementation.extendsFrom(shadowImplementation)  // TODO: remove after all uses are refactored
+    implementation.extendsFrom(shadowCompile)
+    implementation.extendsFrom(shadeCompile)
 }
 
 repositories {
@@ -261,16 +268,28 @@ task relocateShadowJar(type: ConfigureShadowRelocation) {
 }
 
 shadowJar {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     manifest {
         attributes(getManifestAttributes())
     }
 
     minimize()  // This will only allow shading for actually used classes
-    configurations = [project.configurations.shadowImplementation]
+    configurations = [project.configurations.shadowImplementation, project.configurations.shadowCompile]
     dependsOn(relocateShadowJar)
 }
 
 jar {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     manifest {
         attributes(getManifestAttributes())
     }
@@ -401,6 +420,12 @@ task sourcesJar(type: Jar) {
 }
 
 task shadowDevJar(type: ShadowJar) {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     from sourceSets.main.output
     getArchiveClassifier().set("dev")
 
@@ -409,7 +434,7 @@ task shadowDevJar(type: ShadowJar) {
     }
 
     minimize()  // This will only allow shading for actually used classes
-    configurations = [project.configurations.shadowImplementation]
+    configurations = [project.configurations.shadowImplementation, project.configurations.shadowCompile]
 }
 
 task relocateShadowDevJar(type: ConfigureShadowRelocation) {
@@ -424,6 +449,12 @@ task circularResolverJar(type: Jar) {
 }
 
 task devJar(type: Jar) {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     from sourceSets.main.output
     getArchiveClassifier().set("dev")
 
@@ -461,13 +492,54 @@ artifacts {
     }
 }
 
-// NODELETE
-// This is used for invoking the publishing script. We cannot use addon.gradle,
-// as it is included too early in the buildscript. We need this below artifacts{}
-if(file("publishing.gradle").exists()) {
-    apply from: "publishing.gradle"
+// publishing
+
+def getMavenSettingsCredentials = {
+    String userHome = System.getProperty( "user.home" );
+    File mavenSettings = new File(userHome, ".m2/settings.xml")
+    def xmlSlurper = new XmlSlurper()
+    def output = xmlSlurper.parse(mavenSettings)
+    return output."servers"."server"
 }
 
+def getCredentials = {
+    def entries = getMavenSettingsCredentials()
+    for (entry in entries) {
+        if ( entry."id".text() == repositoryName ) {
+            return [username: entry.username.text(), password: entry.password.text()]
+        }
+    }
+}
+
+//Publishing
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: jar
+            artifact source: sourcesJar, classifier: "src"
+            artifact source: devJar, classifier: "dev"
+            if (apiPackage) {
+                artifact source: apiJar, classifier: "api"
+            }
+
+            groupId = mavenGroupId
+            artifactId = mavenArtifactId
+            version = gitVersion()
+        }
+    }
+
+    repositories {
+        maven {
+            name = repositoryName
+            url = repositoryURL
+            def creds = getCredentials()
+            credentials {
+                username = creds == null ? "none" : creds.username
+                password = creds == null ? "none" : creds.password
+            }
+        }
+    }
+}
 
 // Updating
 task updateBuildScript {
@@ -487,7 +559,7 @@ if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
 }
 
 static URL availableBuildScriptUrl() {
-    new URL("https://raw.githubusercontent.com/SinTh0r4s/ExampleMod1.7.10/main/build.gradle")
+    new URL("https://raw.githubusercontent.com/FalsePattern/ExampleMod1.7.10/main/build.gradle")
 }
 
 boolean performBuildScriptUpdate(String projectDir) {
@@ -529,7 +601,7 @@ configure(updateBuildScript) {
 
 def checkPropertyExists(String propertyName) {
     if (project.hasProperty(propertyName) == false) {
-        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/gradle.properties")
+        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/gradle.properties")
     }
 }
 
