@@ -16,50 +16,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class TextureUtilMixin {
     private static Profiler theProfiler;
 
-    @Inject(method = "uploadTextureSub",
+    @Inject(method = "uploadTextureMipmap",
             at = @At(value = "HEAD"),
             cancellable = true,
             require = 1)
-    private static void uploadTextureSub0(int mipMapLevel, int[] texture, int width, int height, int xOffset, int yOffset, boolean magLinear, boolean clamped, boolean minLinear, CallbackInfo ci) {
+    private static void uploadTextureBatchable(int[][] texture, int width, int height, int xOffset, int yOffset, boolean ignored1, boolean ignored2, CallbackInfo ci) {
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
-        theProfiler.startSection("uploadTextureSub");
         if (AnimationUpdateBatcher.batcher != null) {
             theProfiler.startSection("copyToBatch");
-            if (AnimationUpdateBatcher.batcher.batchUpload(mipMapLevel, texture, width, height, xOffset, yOffset)) {
+            boolean ended = AnimationUpdateBatcher.batcher.batchUpload(texture, width, height, xOffset, yOffset);
+            theProfiler.endSection();
+            if (ended) {
                 ci.cancel();
-                theProfiler.endSection();
-                theProfiler.endSection();
                 return;
             }
-            theProfiler.endSection();
         }
-        theProfiler.startSection("setup");
+        theProfiler.startSection("uploadUnbatched");
     }
 
-    @Inject(method = "uploadTextureSub",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/texture/TextureUtil;copyToBufferPos([III)V"),
-            require = 1)
-    private static void uploadTextureSub1(CallbackInfo ci) {
-        theProfiler.endStartSection("copyToNative");
-    }
-
-    @Inject(method = "uploadTextureSub",
-            at = @At(value = "INVOKE",
-                     target = "Lorg/lwjgl/opengl/GL11;glTexSubImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
-                     remap = false),
-            require = 1)
-    private static void uploadTextureSub2(CallbackInfo ci) {
-        theProfiler.endStartSection("uploadToGPU");
-    }
-
-    @Inject(method = "uploadTextureSub",
+    @Inject(method = "uploadTextureMipmap",
             at = @At(value = "RETURN"),
             require = 1)
-    private static void uploadTextureSub3(CallbackInfo ci) {
-        theProfiler.endSection();
+    private static void uploadUnbatchedEnd(CallbackInfo ci) {
         theProfiler.endSection();
     }
 }
