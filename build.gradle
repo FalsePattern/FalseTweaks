@@ -1,9 +1,9 @@
-//version: 8fa7883b6196c1765266f4e6ddf3118d5043aafb
+//version: 1641429628falsepattern5
 /*
 DO NOT CHANGE THIS FILE!
 
 Also, you may replace this file at any time if there is an update available.
-Please check https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/build.gradle for updates.
+Please check https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/build.gradle for updates.
  */
 
 
@@ -32,7 +32,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.4'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
     }
 }
 
@@ -87,6 +87,13 @@ checkPropertyExists("coreModClass")
 checkPropertyExists("containsMixinsAndOrCoreModOnly")
 checkPropertyExists("usesShadowedDependencies")
 checkPropertyExists("developmentEnvironmentUserName")
+
+//Properties added in fork
+checkPropertyExists("skipBuildScriptUpdateCheck")
+checkPropertyExists("repositoryURL")
+checkPropertyExists("repositoryName")
+checkPropertyExists("mavenGroupId")
+checkPropertyExists("mavenArtifactId")
 
 
 String javaSourceDir = "src/main/java/"
@@ -153,7 +160,7 @@ configurations.all {
 'git config core.fileMode false'.execute()
 // Pulls version from git tag
 try {
-    version = minecraftVersion + "-" + gitVersion()
+    version = gitVersion()
 }
 catch (Exception e) {
     throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!");
@@ -166,6 +173,7 @@ if(project.hasProperty("customArchiveBaseName") && customArchiveBaseName) {
 else {
     archivesBaseName = modId
 }
+archivesBaseName += "-mc" + minecraftVersion
 
 minecraft {
     version = minecraftVersion + "-" + forgeVersion + "-" + minecraftVersion
@@ -185,6 +193,33 @@ minecraft {
         if(gradleTokenGroupName) {
             replace gradleTokenGroupName, modGroup
         }
+    }
+
+    def arguments = []
+    def jvmArguments = []
+
+    if(usesMixins.toBoolean()) {
+        arguments += [
+                "--mods=../build/libs/$modId-${version}.jar".toString(),
+                "--tweakClass org.spongepowered.asm.launch.MixinTweaker".toString()
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true".toString()
+        ]
+    }
+
+    clientRunConfig {
+        args(arguments)
+        jvmArgs(jvmArguments)
+
+        if(developmentEnvironmentUserName) {
+            args("--username", developmentEnvironmentUserName)
+        }
+    }
+
+    serverRunConfig {
+        args(arguments)
+        jvmArgs(jvmArguments)
     }
 }
 
@@ -314,39 +349,6 @@ afterEvaluate {
             ]
         }
     }
-}
-
-runClient {
-    def arguments = []
-
-    if(usesMixins.toBoolean()) {
-        arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
-        ]
-    }
-
-    if(developmentEnvironmentUserName) {
-        arguments += [
-                "--username",
-                developmentEnvironmentUserName
-        ]
-    }
-
-    args(arguments)
-}
-
-runServer {
-    def arguments = []
-
-    if (usesMixins.toBoolean()) {
-        arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
-        ]
-    }
-
-    args(arguments)
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -488,6 +490,7 @@ artifacts {
 }
 
 // publishing
+
 def getMavenSettingsCredentials = {
     String userHome = System.getProperty( "user.home" );
     File mavenSettings = new File(userHome, ".m2/settings.xml")
@@ -497,14 +500,19 @@ def getMavenSettingsCredentials = {
 }
 
 def getCredentials = {
-    def entries = getMavenSettingsCredentials()
-    for (entry in entries) {
-        if ( entry."id".text() == "mavenpattern" ) {
-            return [username: entry.username.text(), password: entry.password.text()]
+    try {
+        def entries = getMavenSettingsCredentials()
+        for (entry in entries) {
+            if (entry."id".text() == repositoryName) {
+                return [username: entry.username.text(), password: entry.password.text()]
+            }
         }
+    } catch (Exception ignored) {
+        return [username: "none", password: "none"]
     }
 }
 
+//Publishing
 publishing {
     publications {
         maven(MavenPublication) {
@@ -515,16 +523,16 @@ publishing {
                 artifact source: apiJar, classifier: "api"
             }
 
-            groupId = group
-            artifactId = modId
-            version = project.version
+            groupId = mavenGroupId
+            artifactId = mavenArtifactId + "-mc" + minecraftVersion
+            version = gitVersion()
         }
     }
-    
+
     repositories {
         maven {
-            name = "mavenpattern"
-            url = "https://maven.falsepattern.com/"
+            name = repositoryName
+            url = repositoryURL
             def creds = getCredentials()
             credentials {
                 username = creds == null ? "none" : creds.username
@@ -543,7 +551,7 @@ task updateBuildScript {
     }
 }
 
-if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
+if (!skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
     if (autoUpdateBuildScript.toBoolean()) {
         performBuildScriptUpdate(projectDir.toString())
     } else {
@@ -552,7 +560,7 @@ if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
 }
 
 static URL availableBuildScriptUrl() {
-    new URL("https://raw.githubusercontent.com/SinTh0r4s/ExampleMod1.7.10/main/build.gradle")
+    new URL("https://raw.githubusercontent.com/FalsePattern/ExampleMod1.7.10/main/build.gradle")
 }
 
 boolean performBuildScriptUpdate(String projectDir) {
@@ -594,7 +602,7 @@ configure(updateBuildScript) {
 
 def checkPropertyExists(String propertyName) {
     if (project.hasProperty(propertyName) == false) {
-        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/gradle.properties")
+        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/gradle.properties")
     }
 }
 
