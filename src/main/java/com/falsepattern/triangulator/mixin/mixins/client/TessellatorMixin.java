@@ -49,6 +49,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         if (value == GL11.GL_QUADS) {
             value = GL11.GL_TRIANGLES;
             hackedQuadRendering = true;
+        } else {
+            hackedQuadRendering = false;
         }
         if (value == GL11.GL_TRIANGLES) {
             drawingTris = true;
