@@ -54,20 +54,32 @@ public abstract class RenderBlocksMixin {
             },
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
-        val avgTopLeft = (colorRedTopLeft + colorGreenTopLeft + colorBlueTopLeft) / 3.0f;
-        val avgBottomLeft = (colorRedBottomLeft + colorGreenBottomLeft + colorBlueBottomLeft) / 3.0f;
-        val avgBottomRight = (colorRedBottomRight + colorGreenBottomRight + colorBlueBottomRight) / 3.0f;
-        val avgTopRight = (colorRedTopRight + colorGreenTopRight + colorBlueTopRight) / 3.0f;
-        val mainDiagonalDiff = Math.abs(avgTopLeft - avgBottomRight);
-        val altDiagonalDiff = Math.abs(avgBottomLeft - avgTopRight);
+        val avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
+        val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
+        val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
+        val avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
+        val mainDiagonalDiff= diff(avgTopLeft, avgBottomRight);
+        val altDiagonalDiff = diff(avgBottomLeft, avgTopRight);
         if (Math.abs(mainDiagonalDiff - altDiagonalDiff) < 0.01) {
-            val mainDiagonalAvg = (avgTopLeft + avgBottomRight) * 0.5F;
-            val altDiagonalAvg = (avgBottomLeft + avgTopRight) * 0.5F;
+            val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
+            val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (mainDiagonalAvg < altDiagonalAvg) {
                 ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
             ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
         }
+    }
+
+    private static float avg(final float a, final float b) {
+        return (a + b) * 0.5F;
+    }
+
+    private static float avg(final float r, final float g, final float b) {
+        return (r + g + b) * 0.3333333333333333F;
+    }
+
+    private static float diff(final float a, final float b) {
+        return Math.abs(a - b);
     }
 }
