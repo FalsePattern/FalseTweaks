@@ -13,29 +13,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
 
-    @Shadow public float colorRedTopLeft;
+    @Shadow(aliases = "colorRedTopLeftF") public float colorRedTopLeft;
 
-    @Shadow public float colorGreenTopLeft;
+    @Shadow(aliases = "colorGreenTopLeftF") public float colorGreenTopLeft;
 
-    @Shadow public float colorBlueTopLeft;
+    @Shadow(aliases = "colorBlueTopLeftF") public float colorBlueTopLeft;
 
-    @Shadow public float colorRedBottomLeft;
+    @Shadow(aliases = "colorRedBottomLeftF") public float colorRedBottomLeft;
 
-    @Shadow public float colorGreenBottomLeft;
+    @Shadow(aliases = "colorGreenBottomLeftF") public float colorGreenBottomLeft;
 
-    @Shadow public float colorBlueBottomLeft;
+    @Shadow(aliases = "colorBlueBottomLeftF") public float colorBlueBottomLeft;
 
-    @Shadow public float colorRedBottomRight;
+    @Shadow(aliases = "colorRedBottomRightF") public float colorRedBottomRight;
 
-    @Shadow public float colorGreenBottomRight;
+    @Shadow(aliases = "colorGreenBottomRightF") public float colorGreenBottomRight;
 
-    @Shadow public float colorBlueBottomRight;
+    @Shadow(aliases = "colorBlueBottomRightF") public float colorBlueBottomRight;
 
-    @Shadow public float colorRedTopRight;
+    @Shadow(aliases = "colorRedTopRightF") public float colorRedTopRight;
 
-    @Shadow public float colorGreenTopRight;
+    @Shadow(aliases = "colorGreenTopRightF") public float colorGreenTopRight;
 
-    @Shadow public float colorBlueTopRight;
+    @Shadow(aliases = "colorBlueTopRightF") public float colorBlueTopRight;
 
     @Inject(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
             at = {
