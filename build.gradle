@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern5
+//version: 1641429628falsepattern8
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -32,7 +32,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.5'
     }
 }
 
@@ -194,33 +194,6 @@ minecraft {
             replace gradleTokenGroupName, modGroup
         }
     }
-
-    def arguments = []
-    def jvmArguments = []
-
-    if(usesMixins.toBoolean()) {
-        arguments += [
-                "--mods=../build/libs/$modId-${version}.jar".toString(),
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker".toString()
-        ]
-        jvmArguments += [
-                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true".toString()
-        ]
-    }
-
-    clientRunConfig {
-        args(arguments)
-        jvmArgs(jvmArguments)
-
-        if(developmentEnvironmentUserName) {
-            args("--username", developmentEnvironmentUserName)
-        }
-    }
-
-    serverRunConfig {
-        args(arguments)
-        jvmArgs(jvmArguments)
-    }
 }
 
 if(file("addon.gradle").exists()) {
@@ -349,6 +322,49 @@ afterEvaluate {
             ]
         }
     }
+}
+
+runClient {
+    def arguments = []
+    def jvmArguments = []
+
+    if(usesMixins.toBoolean()) {
+        arguments += [
+                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
+        ]
+    }
+
+    if(developmentEnvironmentUserName) {
+        arguments += [
+                "--username",
+                developmentEnvironmentUserName
+        ]
+    }
+
+    args(arguments)
+    jvmArgs(jvmArguments)
+}
+
+runServer {
+    def arguments = []
+    def jvmArguments = []
+
+    if (usesMixins.toBoolean()) {
+        arguments += [
+                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
+        ]
+    }
+
+    args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 tasks.withType(JavaExec).configureEach {
