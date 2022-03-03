@@ -1,4 +1,4 @@
-//version: 1641429628-falsepattern
+//version: 1641429628falsepattern10
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -28,11 +28,11 @@ buildscript {
         }
         maven {
             name = "jitpack"
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.5'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
     }
 }
 
@@ -88,6 +88,8 @@ checkPropertyExists("containsMixinsAndOrCoreModOnly")
 checkPropertyExists("usesShadowedDependencies")
 checkPropertyExists("developmentEnvironmentUserName")
 
+//Properties added in fork
+checkPropertyExists("skipBuildScriptUpdateCheck")
 checkPropertyExists("repositoryURL")
 checkPropertyExists("repositoryName")
 checkPropertyExists("mavenGroupId")
@@ -158,7 +160,7 @@ configurations.all {
 'git config core.fileMode false'.execute()
 // Pulls version from git tag
 try {
-    version = gitVersion() + "-mc" + minecraftVersion
+    version = gitVersion()
 }
 catch (Exception e) {
     throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!");
@@ -171,6 +173,7 @@ if(project.hasProperty("customArchiveBaseName") && customArchiveBaseName) {
 else {
     archivesBaseName = modId
 }
+archivesBaseName += "-mc" + minecraftVersion
 
 minecraft {
     version = minecraftVersion + "-" + forgeVersion + "-" + minecraftVersion
@@ -213,10 +216,10 @@ repositories {
     if(usesMixins.toBoolean()) {
         maven {
             name = "sponge"
-            url = "https://repo.spongepowered.org/repository/maven-public"
+            url = "https://sponge.falsepattern.com/"
         }
         maven {
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
 }
@@ -323,11 +326,15 @@ afterEvaluate {
 
 runClient {
     def arguments = []
+    def jvmArguments = []
 
     if(usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
@@ -339,19 +346,25 @@ runClient {
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 runServer {
     def arguments = []
+    def jvmArguments = []
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -363,31 +376,31 @@ tasks.withType(JavaExec).configureEach {
 }
 
 processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include 'mcmod.info'
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
 
-                // replace version and mcversion
-                expand "minecraftVersion": project.minecraft.version,
-                        "modVersion": versionDetails().lastTag,
-                        "modId": modId,
-                        "modName": modName
-            }
+        // replace version and mcversion
+        expand "minecraftVersion": project.minecraft.version,
+                "modVersion": versionDetails().lastTag,
+                "modId": modId,
+                "modName": modName
+    }
 
-            if(usesMixins.toBoolean()) {
-                from refMap
-            }
+    if(usesMixins.toBoolean()) {
+        from refMap
+    }
 
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
-        }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
 
 def getManifestAttributes() {
     def manifestAttributes = [:]
@@ -503,11 +516,15 @@ def getMavenSettingsCredentials = {
 }
 
 def getCredentials = {
-    def entries = getMavenSettingsCredentials()
-    for (entry in entries) {
-        if ( entry."id".text() == repositoryName ) {
-            return [username: entry.username.text(), password: entry.password.text()]
+    try {
+        def entries = getMavenSettingsCredentials()
+        for (entry in entries) {
+            if (entry."id".text() == repositoryName) {
+                return [username: entry.username.text(), password: entry.password.text()]
+            }
         }
+    } catch (Exception ignored) {
+        return [username: "none", password: "none"]
     }
 }
 
@@ -523,7 +540,7 @@ publishing {
             }
 
             groupId = mavenGroupId
-            artifactId = mavenArtifactId
+            artifactId = mavenArtifactId + "-mc" + minecraftVersion
             version = gitVersion()
         }
     }
@@ -550,7 +567,7 @@ task updateBuildScript {
     }
 }
 
-if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
+if (!skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
     if (autoUpdateBuildScript.toBoolean()) {
         performBuildScriptUpdate(projectDir.toString())
     } else {
