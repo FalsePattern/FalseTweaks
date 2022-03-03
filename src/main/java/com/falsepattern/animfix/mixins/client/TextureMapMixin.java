@@ -40,7 +40,8 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-                       ordinal = 0))
+                       ordinal = 0),
+              require = 1)
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
         listAnimatedSprites.add(sprite);
