@@ -8,8 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import org.spongepowered.asm.mixin.throwables.MixinException;
-import ru.timeconqueror.spongemixins.MinecraftURLClassPath;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -72,10 +70,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
         val mixins = new ArrayList<String>();
         for (val mixin : Mixin.values()) {
             if (mixin.shouldLoad(loadedMods)) {
-                val mixinClass = mixin.getBestAlternativeForTier(CompatibilityTier.InjectCancel); //TODO read this from config
-                if (mixinClass == null) throw new MixinException("Failed to select alternative for mixin: " + mixin.name());
-                mixins.add(mixinClass);
-                LOG.info("Loading mixin: " + mixinClass);
+                mixins.add(mixin.mixin);
+                LOG.info("Loading mixin: " + mixin.mixin);
             }
         }
         return mixins;

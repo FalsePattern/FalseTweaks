@@ -7,7 +7,8 @@ import java.nio.file.Path;
 
 public enum TargetedMod {
 
-    VANILLA("Minecraft", "", "", true);
+    VANILLA("Minecraft", "", "", true),
+    FOAMFIX("FoamFix", "foamfix", "", false);
 
     public final String modName;
     public final String jarNamePrefixLowercase;

@@ -1,30 +1,29 @@
 package com.falsepattern.triangulator.mixin.plugin;
 
-import com.falsepattern.triangulator.ModInfo;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import lombok.val;
-import org.spongepowered.asm.mixin.throwables.MixinException;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.falsepattern.triangulator.mixin.plugin.TargetedMod.VANILLA;
-
 public enum Mixin {
-    ClientTessellatorMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "TessellatorMixin")),
-    ClientQuadComparatorMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "QuadComparatorMixin")),
-    ClientTileEntityBeaconRendererMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "TileEntityBeaconRendererMixin")),
-    ClientRenderBlocksMixin(builder(Side.CLIENT).unit(CompatibilityTier.Regular, "RenderBlocksMixin"));
+    ClientQuadComparatorMixin(builder(Side.CLIENT).mixin("QuadComparatorMixin")),
+    ClientTileEntityBeaconRendererMixin(builder(Side.CLIENT).mixin("TileEntityBeaconRendererMixin")),
+    ClientRenderBlocksMixin(builder(Side.CLIENT).mixin("RenderBlocksMixin")),
 
-    public final MixinUnit[] units;
+    ClientTessellatorMixin(builder(Side.CLIENT).mixin("TessellatorMixin")),
+    ClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.FOAMFIX).mixin("TessellatorVanillaMixin")),
+    ClientTessellatorFoamFixMixin(builder(Side.CLIENT).target(TargetedMod.FOAMFIX).mixin("TessellatorFoamFixMixin"));
+
+    public final String mixin;
     public final Set<TargetedMod> targetedMods;
+    public final Set<TargetedMod> avoidedMods;
     private final Side side;
 
     Mixin(Builder builder) {
-        this.units = builder.units.toArray(new MixinUnit[0]);
+        this.mixin = builder.mixin;
         this.targetedMods = builder.targetedMods;
+        this.avoidedMods = builder.avoidedMods;
         this.side = builder.side;
     }
 
@@ -32,32 +31,27 @@ public enum Mixin {
         return (side == Side.COMMON
                 || side == Side.SERVER && FMLLaunchHandler.side().isServer()
                 || side == Side.CLIENT && FMLLaunchHandler.side().isClient())
-                && loadedMods.containsAll(targetedMods);
-    }
-
-    public String getBestAlternativeForTier(CompatibilityTier tier) {
-        for (val unit: units) {
-            if (unit.tier.isTierBetterThan(tier)) return unit.mixinClass;
-        }
-        throw new MixinException("Failed to retrieve mixin alternative for " + this.name() + " in mod " + ModInfo.MODID);
+               && loadedMods.containsAll(targetedMods) && avoidedMods.stream().noneMatch(loadedMods::contains);
     }
 
 
+    @SuppressWarnings("SameParameterValue")
     private static Builder builder(Side side) {
-        return new Builder(side).target(VANILLA);
+        return new Builder(side);
     }
 
     private static class Builder {
-        public final ArrayList<MixinUnit> units = new ArrayList<>();
-        public final Side side;
-        public final Set<TargetedMod> targetedMods = new HashSet<>();
+        public String mixin;
+        public Side side;
+        public Set<TargetedMod> targetedMods = new HashSet<>();
+        public final Set<TargetedMod> avoidedMods = new HashSet<>();
 
         public Builder(Side side) {
             this.side = side;
         }
 
-        public Builder unit(CompatibilityTier tier, String mixinClass) {
-            units.add(new MixinUnit(tier, side.name().toLowerCase() + "." + mixinClass));
+        public Builder mixin(String mixinClass) {
+            mixin = side.name().toLowerCase() + "." + mixinClass;
             return this;
         }
 
@@ -65,15 +59,10 @@ public enum Mixin {
             targetedMods.add(mod);
             return this;
         }
-    }
 
-    private static class MixinUnit {
-        public final CompatibilityTier tier;
-        public final String mixinClass;
-
-        public MixinUnit(CompatibilityTier tier, String mixinClass) {
-            this.tier = tier;
-            this.mixinClass = mixinClass;
+        public Builder avoid(TargetedMod mod) {
+            avoidedMods.add(mod);
+            return this;
         }
     }
 

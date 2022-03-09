@@ -23,6 +23,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow private int[] rawBuffer;
     @Shadow private int vertexCount;
 
+    @Shadow public abstract int draw();
+
     private boolean hackedQuadRendering = false;
     private boolean drawingTris = false;
     private boolean alternativeTriangulation = false;
@@ -82,24 +84,9 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         }
     }
 
-    @ModifyArg(method = "getVertexState",
-               at = @At(value = "INVOKE",
-                       target = "Ljava/util/PriorityQueue;<init>(ILjava/util/Comparator;)V",
-                       remap = false),
-               index = 1,
-               require = 1)
-    private Comparator<?> hackQuadComparator(Comparator<?> comparator) {
-        if (drawingTris) {
-            ((IQuadComparatorMixin)comparator).enableTriMode();
-        }
-        return comparator;
-    }
-
-    @ModifyConstant(method = "getVertexState",
-                    constant = @Constant(intValue = 32),
-                    require = 1)
-    private int hackQuadCounting(int constant) {
-        return constant - 8;
+    @Override
+    public boolean drawingTris() {
+        return drawingTris;
     }
 
     @Override
