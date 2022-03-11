@@ -1,4 +1,4 @@
-package com.falsepattern.triangulator.mixin.mixins.client;
+package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.OpenGlHelper;

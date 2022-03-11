@@ -2,18 +2,26 @@ package com.falsepattern.triangulator.mixin.plugin;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public enum Mixin {
-    ClientQuadComparatorMixin(builder(Side.CLIENT).mixin("QuadComparatorMixin")),
-    ClientTileEntityBeaconRendererMixin(builder(Side.CLIENT).mixin("TileEntityBeaconRendererMixin")),
-    ClientRenderBlocksMixin(builder(Side.CLIENT).mixin("RenderBlocksMixin")),
+    //Vanilla
+    VanillaClientQuadComparatorMixin(builder(Side.CLIENT).mixin("vanilla.QuadComparatorMixin")),
+    VanillaClientTileEntityBeaconRendererMixin(builder(Side.CLIENT).mixin("vanilla.TileEntityBeaconRendererMixin")),
+    VanillaClientRenderBlocksMixin(builder(Side.CLIENT).mixin("vanilla.RenderBlocksMixin")),
+    VanillaClientTessellatorMixin(builder(Side.CLIENT).mixin("vanilla.TessellatorMixin")),
 
-    ClientTessellatorMixin(builder(Side.CLIENT).mixin("TessellatorMixin")),
-    ClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.FOAMFIX).mixin("TessellatorVanillaMixin")),
-    ClientTessellatorFoamFixMixin(builder(Side.CLIENT).target(TargetedMod.FOAMFIX).mixin("TessellatorFoamFixMixin"));
+    //FoamFix
+    FoamFixClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.FOAMFIX).mixin("foamfix.TessellatorVanillaMixin")),
+    FoamFixClientTessellatorFoamFixMixin(builder(Side.CLIENT).target(TargetedMod.FOAMFIX).mixin("foamfix.TessellatorFoamFixMixin")),
+
+    //OptiFine
+    OptiFineClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.OPTIFINE).mixin("optifine.TessellatorVanillaMixin")),
+    OptiFineClientTessellatorOptiFineMixin(builder(Side.CLIENT).target(TargetedMod.OPTIFINE).mixin("optifine.TessellatorOptiFineMixin"));
+
 
     public final String mixin;
     public final Set<TargetedMod> targetedMods;
@@ -22,8 +30,8 @@ public enum Mixin {
 
     Mixin(Builder builder) {
         this.mixin = builder.mixin;
-        this.targetedMods = builder.targetedMods;
-        this.avoidedMods = builder.avoidedMods;
+        this.targetedMods = Collections.unmodifiableSet(builder.targetedMods);
+        this.avoidedMods = Collections.unmodifiableSet(builder.avoidedMods);
         this.side = builder.side;
     }
 

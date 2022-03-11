@@ -1,4 +1,4 @@
-package com.falsepattern.triangulator.mixin.mixins.client;
+package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
@@ -19,16 +19,14 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow
     private int drawMode;
 
-    @Shadow private int rawBufferIndex;
     @Shadow private int[] rawBuffer;
+    @Shadow private int rawBufferIndex;
     @Shadow private int vertexCount;
-
-    @Shadow public abstract int draw();
-
     private boolean hackedQuadRendering = false;
     private boolean drawingTris = false;
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;
+    private boolean shaderOn = false;
     private int quadVerticesPutIntoBuffer = 0;
 
     @Inject(method = "reset",
@@ -49,8 +47,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
         if (value == GL11.GL_QUADS) {
-            value = GL11.GL_TRIANGLES;
             hackedQuadRendering = true;
+            value = GL11.GL_TRIANGLES;
         } else {
             hackedQuadRendering = false;
         }
@@ -60,33 +58,14 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         drawMode = value;
     }
 
-    @Inject(method = "addVertex",
-            at = @At(value = "RETURN"),
-            require = 1)
-    private void hackVertex(CallbackInfo ci) {
-        if (!hackedQuadRendering || quadTriangulationTemporarilySuspended) return;
-        quadVerticesPutIntoBuffer++;
-        if (quadVerticesPutIntoBuffer == 4) {
-            quadVerticesPutIntoBuffer = 0;
-            //Current vertex layout: ABCD
-            if (alternativeTriangulation) {
-                //Target vertex layout: ABD DBC
-                System.arraycopy(rawBuffer, rawBufferIndex - 24, rawBuffer, rawBufferIndex, 16);
-                System.arraycopy(rawBuffer, rawBufferIndex - 8, rawBuffer, rawBufferIndex - 16, 8);
-                alternativeTriangulation = false;
-            } else {
-                //Target vertex layout: ABC DAC
-                System.arraycopy(rawBuffer, rawBufferIndex - 32, rawBuffer, rawBufferIndex, 8);
-                System.arraycopy(rawBuffer, rawBufferIndex - 16, rawBuffer, rawBufferIndex + 8, 8);
-            }
-            vertexCount += 2;
-            rawBufferIndex += 16;
-        }
+    @Override
+    public boolean hackedQuadRendering() {
+        return hackedQuadRendering;
     }
 
     @Override
-    public boolean drawingTris() {
-        return drawingTris;
+    public boolean quadTriangulationActive() {
+        return !quadTriangulationTemporarilySuspended;
     }
 
     @Override
@@ -104,7 +83,56 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     }
 
     @Override
+    public void triangulate() {
+        if (!hackedQuadRendering || quadTriangulationTemporarilySuspended) return;
+        quadVerticesPutIntoBuffer++;
+        if (quadVerticesPutIntoBuffer == 4) {
+            int vertexSize = shaderOn() ? 18 : 8;
+            quadVerticesPutIntoBuffer = 0;
+            //Current vertex layout: ABCD
+            if (alternativeTriangulation) {
+                //Target vertex layout: ABD DBC
+                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex, 2 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize), vertexSize);
+                alternativeTriangulation = false;
+            } else {
+                //Target vertex layout: ABC DAC
+                System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize, vertexSize);
+            }
+            vertexCount += 2;
+            rawBufferIndex += 2 * vertexSize;
+        }
+    }
+
+    @Override
     public void resumeQuadTriangulation() {
         quadTriangulationTemporarilySuspended = false;
+    }
+
+    @Override
+    public boolean shaderOn() {
+        return shaderOn;
+    }
+
+    @Override
+    public void shaderOn(boolean state) {
+        shaderOn = state;
+    }
+
+    @Override
+    public Comparator<?> hackQuadComparator(Comparator<?> comparator) {
+        if (drawingTris) {
+            IQuadComparatorMixin comp = (IQuadComparatorMixin) comparator;
+            comp.enableTriMode();
+            if (shaderOn)
+                comp.enableShaderMode();
+        }
+        return comparator;
+    }
+
+    @Override
+    public int hackQuadCounting(int constant) {
+        return (constant / 4) * 3;
     }
 }
