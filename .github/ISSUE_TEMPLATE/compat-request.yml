@@ -1,8 +1,5 @@
 name: Compatibility Request
-description: | 
-  If you tested Triangulator with another mod and it crashes or has weird bugs, you can ask for a compatibility patch through this.
-  
-  Notice: Only ask for a compatibility request if you've narrowed down the exact mod that has issues with Triangulator. Do not request compatibility patches for entire modpacks!
+description: If you tested Triangulator with another mod and it crashes or has weird bugs, you can ask for a compatibility patch through this.
 title: "[Compatibility Request]: "
 labels: ["bug", "compat-request"]
 assignees:

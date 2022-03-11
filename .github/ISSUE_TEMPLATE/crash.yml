@@ -27,7 +27,7 @@ body:
     validations:
       required: true
   - type: input
-    id: description
+    id: modpack
     attributes:
       label: Modpack (Optional)
       description: If you used Triangulator in a public modpack, you should include the pack's exact name and version here to make debugging easier.
