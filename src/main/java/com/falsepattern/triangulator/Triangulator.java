@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = ModInfo.MODID,
      version = ModInfo.VERSION,
      name = ModInfo.MODNAME,
-     dependencies = "required-after:spongemixins@[1.3.3,);")
+     dependencies = "required-after:spongemixins@[1.2.0,);")
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(ModInfo.MODNAME);
 
