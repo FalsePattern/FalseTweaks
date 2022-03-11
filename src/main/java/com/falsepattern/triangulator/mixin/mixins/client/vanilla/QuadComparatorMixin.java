@@ -1,4 +1,4 @@
-package com.falsepattern.triangulator.mixin.mixins.client;
+package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import lombok.val;
@@ -21,16 +21,18 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
 
     private boolean triMode;
 
-    private static float getCenter(float x, float y, float z, int[] vertexData, int i) {
+    private boolean shaderMode;
+
+    private static float getCenter(float x, float y, float z, int[] vertexData, int i, int vertexSize) {
         val ax = Float.intBitsToFloat(vertexData[i]) - x;
         val ay = Float.intBitsToFloat(vertexData[i + 1]) - y;
         val az = Float.intBitsToFloat(vertexData[i + 2]) - z;
-        val bx = Float.intBitsToFloat(vertexData[i + 8]) - x;
-        val by = Float.intBitsToFloat(vertexData[i + 9]) - y;
-        val bz = Float.intBitsToFloat(vertexData[i + 10]) - z;
-        val cx = Float.intBitsToFloat(vertexData[i + 16]) - x;
-        val cy = Float.intBitsToFloat(vertexData[i + 17]) - y;
-        val cz = Float.intBitsToFloat(vertexData[i + 18]) - z;
+        val bx = Float.intBitsToFloat(vertexData[i + vertexSize]) - x;
+        val by = Float.intBitsToFloat(vertexData[i + vertexSize + 1]) - y;
+        val bz = Float.intBitsToFloat(vertexData[i + vertexSize + 2]) - z;
+        val cx = Float.intBitsToFloat(vertexData[i + vertexSize * 2]) - x;
+        val cy = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 1]) - y;
+        val cz = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 2]) - z;
 
         val xAvg = (ax + bx + cx) / 3f;
         val yAvg = (ay + by + cy) / 3f;
@@ -39,8 +41,8 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
         return xAvg * xAvg + yAvg * yAvg + zAvg * zAvg;
     }
 
-    private static int compare(int a, int b, float x, float y, float z, int[] vertexData) {
-        return Float.compare(getCenter(x, y, z, vertexData, b), getCenter(x, y, z, vertexData, a));
+    private static int compare(int a, int b, float x, float y, float z, int[] vertexData, int vertexSize) {
+        return Float.compare(getCenter(x, y, z, vertexData, b, vertexSize), getCenter(x, y, z, vertexData, a, vertexSize));
     }
 
     @Inject(method = "compare(Ljava/lang/Integer;Ljava/lang/Integer;)I",
@@ -49,11 +51,16 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
             require = 1)
     private void triCompare(Integer aObj, Integer bObj, CallbackInfoReturnable<Integer> cir) {
         if (!triMode) return;
-        cir.setReturnValue(compare(aObj, bObj, this.field_147630_a, this.field_147628_b, this.field_147629_c, this.field_147627_d));
+        cir.setReturnValue(compare(aObj, bObj, this.field_147630_a, this.field_147628_b, this.field_147629_c, this.field_147627_d, shaderMode ? 18 : 8));
     }
 
     @Override
     public void enableTriMode() {
         triMode = true;
+    }
+
+    @Override
+    public void enableShaderMode() {
+        shaderMode = true;
     }
 }

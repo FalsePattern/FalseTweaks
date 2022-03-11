@@ -1,4 +1,4 @@
-package com.falsepattern.triangulator.mixin.mixins.client;
+package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.val;
