@@ -1,7 +1,7 @@
 name: Compatibility Request
 description: If you tested Triangulator with another mod and it crashes or has weird bugs, you can ask for a compatibility patch through this.
 title: "[Compatibility Request]: "
-labels: ["bug", "compat-request"]
+labels: ["compat-request"]
 assignees:
   - falsepattern
 body:
