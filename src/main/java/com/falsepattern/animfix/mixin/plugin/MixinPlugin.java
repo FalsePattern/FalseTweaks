@@ -1,14 +1,12 @@
-package com.falsepattern.animfix.mixinplugin;
+package com.falsepattern.animfix.mixin.plugin;
 
 import com.falsepattern.animfix.Tags;
-import lombok.val;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import ru.timeconqueror.spongemixins.MinecraftURLClassPath;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,15 +48,14 @@ public class MixinPlugin implements IMixinConfigPlugin {
     // This method return a List<String> of mixins. Every mixins in this list will be loaded.
     @Override
     public List<String> getMixins() {
-        val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+        boolean isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-        val loadedMods = Arrays.stream(TargetedMod.values())
-                .filter(mod -> mod == TargetedMod.VANILLA
-                        || (mod.loadInDevelopment && isDevelopmentEnvironment)
-                        || loadJarOf(mod))
-                .collect(Collectors.toList());
+        List<TargetedMod> loadedMods = Arrays.stream(TargetedMod.values())
+                               .filter(mod -> (mod.loadInDevelopment && isDevelopmentEnvironment)
+                                              || loadJarOf(mod))
+                               .collect(Collectors.toList());
 
-        for (val mod : TargetedMod.values()) {
+        for (TargetedMod mod : TargetedMod.values()) {
             if(loadedMods.contains(mod)) {
                 LOG.info("Found " + mod.modName + "! Integrating now...");
             }
@@ -67,10 +64,10 @@ public class MixinPlugin implements IMixinConfigPlugin {
             }
         }
 
-        val mixins = new ArrayList<String>();
-        for (val mixin : Mixin.values()) {
+        List<String> mixins = new ArrayList<>();
+        for (Mixin mixin : Mixin.values()) {
             if (mixin.shouldLoad(loadedMods)) {
-                val mixinClass = mixin.mixin;
+                String mixinClass = mixin.mixin;
                 mixins.add(mixinClass);
                 LOG.info("Loading mixin: " + mixinClass);
             }
@@ -80,7 +77,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     private boolean loadJarOf(final TargetedMod mod) {
         try {
-            val jar = findJarOf(mod);
+            File jar = findJarOf(mod);
             if(jar == null) {
                 LOG.info("Jar not found for " + mod);
                 return false;

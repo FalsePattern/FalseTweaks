@@ -1,4 +1,4 @@
-package com.falsepattern.animfix.mixins.client;
+package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
 import com.falsepattern.animfix.Config;

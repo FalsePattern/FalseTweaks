@@ -1,8 +1,8 @@
 {
   "required": true,
   "minVersion": "0.7.11",
-  "package": "com.falsepattern.animfix.mixins",
-  "plugin": "com.falsepattern.animfix.mixinplugin.MixinPlugin",
+  "package": "com.falsepattern.animfix.mixin.mixins",
+  "plugin": "com.falsepattern.animfix.mixin.plugin.MixinPlugin",
   "refmap": "mixins.animfix.refmap.json",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8"

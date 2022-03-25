@@ -15,8 +15,8 @@ import org.apache.logging.log4j.Logger;
                     "required-after:spongemixins@[1.2.0,)")
 public class AnimFix {
 
-    @SidedProxy(clientSide = Tags.GROUPNAME + "." + Tags.MODID + ".proxy.ClientProxy",
-                serverSide = Tags.GROUPNAME + "." + Tags.MODID + ".proxy.CommonProxy")
+    @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy",
+                serverSide = Tags.GROUPNAME + ".proxy.CommonProxy")
     public static CommonProxy proxy;
     private static final Logger LOG = LogManager.getLogger(Tags.MODID);
 

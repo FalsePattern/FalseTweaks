@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern10
+//version: 1641429628falsepattern12
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -94,6 +94,7 @@ checkPropertyExists("repositoryURL")
 checkPropertyExists("repositoryName")
 checkPropertyExists("mavenGroupId")
 checkPropertyExists("mavenArtifactId")
+checkPropertyExists("hasMixinDeps")
 
 
 String javaSourceDir = "src/main/java/"
@@ -213,7 +214,7 @@ repositories {
         name = "Overmind forge repo mirror"
         url = "https://gregtech.overminddl1.com/"
     }
-    if(usesMixins.toBoolean()) {
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
         maven {
             name = "sponge"
             url = "https://sponge.falsepattern.com/"
@@ -240,6 +241,17 @@ dependencies {
             exclude module: "log4j-core"
         }
         compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
+    }
+    if(hasMixinDeps.toBoolean()) {
+        runtime("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+            // Mixin includes a lot of dependencies that are too up-to-date
+            exclude module: "launchwrapper"
+            exclude module: "guava"
+            exclude module: "gson"
+            exclude module: "commons-io"
+            exclude module: "log4j-core"
+        }
+        runtime("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
     }
 }
 
@@ -328,9 +340,14 @@ runClient {
     def arguments = []
     def jvmArguments = []
 
-    if(usesMixins.toBoolean()) {
+    if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
                 "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
         ]
         jvmArguments += [
@@ -355,7 +372,12 @@ runServer {
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$archivesBaseName-${version}.jar",
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if (usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
                 "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
         ]
         jvmArguments += [
