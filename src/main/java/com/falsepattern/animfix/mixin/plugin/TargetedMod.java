@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.function.Predicate;
 
 public enum TargetedMod {
+    FASTCRAFT("FastCraft", false, startsWith("fastcraft"))
     ;
 
     public final String modName;
