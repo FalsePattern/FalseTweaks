@@ -5,7 +5,29 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public interface ToggleableTessellator {
+    /**
+     * Temporarily disables triangulation mode <em>when already rendering</em>. This is useful for rendering triangle-based meshes
+     * into the chunk, which is quad based.
+     */
     void suspendQuadTriangulation();
 
+    /**
+     * Disables the effect of {@link #suspendQuadTriangulation()}.
+     */
     void resumeQuadTriangulation();
+
+    boolean isQuadTriangulationSuspended();
+
+    /**
+     * Temporarily disables triangulation. Call this <em>before</em> you call {@link net.minecraft.client.renderer.Tessellator#startDrawingQuads()}.
+     * This is useful for drawing wireframe meshes, where you don't want a diagonal line to show up.
+     */
+    void disableTriangulator();
+
+    /**
+     * Disables the effect of {@link #disableTriangulator()}.
+     */
+    void enableTriangulator();
+
+    boolean isTriangulatorDisabled();
 }
