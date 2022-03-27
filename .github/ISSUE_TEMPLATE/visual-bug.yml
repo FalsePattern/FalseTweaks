@@ -1,0 +1,52 @@
+name: Visual Bug
+description: There are broken graphics when AnimFix is present
+title: "[Visual]: "
+labels: ["bug", "visual"]
+assignees:
+  - falsepattern
+body:
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      description: What kind of operating system do you have? (MacOS is unsupported, do not report issues from apple systems)
+      options:
+        - Windows
+        - Linux/BSD
+    validations:
+      required: true
+  - type: dropdown
+    id: gpu
+    attributes:
+      label: GPU
+      description: What kind of graphics card do you have? If you have multiple, select the one that minecraft uses, you can usually find it somewhere at the top of the crash report.
+      options:
+        - AMD
+        - NVIDIA
+        - Intel
+    validations:
+      required: true
+  - type: input
+    id: modpack
+    attributes:
+      label: Modpack (Optional)
+      description: If you used AnimFix in a public modpack, you should include the pack's exact name and version here to make debugging easier.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Game log
+      description: Attach the fml-client-latest.log file here.
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        Describe how and when you experience this bug. Also attach screenshots of the issue if possible.
+        
+        Tip: You can attach images by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
