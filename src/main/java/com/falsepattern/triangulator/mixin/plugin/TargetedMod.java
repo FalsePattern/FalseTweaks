@@ -4,40 +4,49 @@ import com.google.common.io.Files;
 import lombok.val;
 
 import java.nio.file.Path;
+import java.util.function.Predicate;
 
 public enum TargetedMod {
 
-    VANILLA("Minecraft", "", "", true),
-    FOAMFIX("FoamFix", "foamfix", "", false),
-    OPTIFINE("OptiFine", "optifine", "", false);
+    FOAMFIX("FoamFix", false, startsWith("foamfix")),
+    OPTIFINE("OptiFine", false, startsWith("optifine")),
+    ;
 
     public final String modName;
-    public final String jarNamePrefixLowercase;
-    public final String jarNameContainsLowercase;
-
+    public final Predicate<String> condition;
     public final boolean loadInDevelopment;
 
-    TargetedMod(String modName, String jarNamePrefix, String jarNameContains, boolean loadInDevelopment) {
+    TargetedMod(String modName, boolean loadInDevelopment, Predicate<String> condition) {
         this.modName = modName;
-        this.jarNamePrefixLowercase = jarNamePrefix.toLowerCase();
-        this.jarNameContainsLowercase = jarNameContains.toLowerCase();
+        this.condition = condition;
         this.loadInDevelopment = loadInDevelopment;
+    }
+
+    private static Predicate<String> startsWith(String subString) {
+        return (name) -> name.startsWith(subString);
+    }
+
+    private static Predicate<String> contains(String subString) {
+        return (name) -> name.contains(subString);
+    }
+
+    private static Predicate<String> matches(String regex) {
+        return (name) -> name.matches(regex);
     }
 
     @SuppressWarnings("UnstableApiUsage")
     public boolean isMatchingJar(Path path) {
-        val pathString = path.toString();
-        val nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();
-        val fileExtension = Files.getFileExtension(pathString);
+        String pathString = path.toString();
+        String nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();
+        String fileExtension = Files.getFileExtension(pathString);
 
-        return "jar".equals(fileExtension) && nameLowerCase.startsWith(jarNamePrefixLowercase) && nameLowerCase.contains(jarNameContainsLowercase);
+        return "jar".equals(fileExtension) && condition.test(nameLowerCase);
     }
 
     @Override
     public String toString() {
         return "TargetedMod{" +
-                "modName='" + modName + '\'' +
-                ", jarNamePrefixLowercase='" + jarNamePrefixLowercase + '\'' +
-                '}';
+               "modName='" + modName + '\'' +
+               '}';
     }
 }

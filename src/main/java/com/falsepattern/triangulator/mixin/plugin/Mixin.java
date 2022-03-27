@@ -6,72 +6,62 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public enum Mixin {
-    //Vanilla
-    VanillaClientQuadComparatorMixin(builder(Side.CLIENT).mixin("vanilla.QuadComparatorMixin")),
-    VanillaClientTileEntityBeaconRendererMixin(builder(Side.CLIENT).mixin("vanilla.TileEntityBeaconRendererMixin")),
-    VanillaClientRenderBlocksMixin(builder(Side.CLIENT).mixin("vanilla.RenderBlocksMixin")),
-    VanillaClientTessellatorMixin(builder(Side.CLIENT).mixin("vanilla.TessellatorMixin")),
+    //BEGIN Minecraft->client
+        QuadComparatorMixin(Side.CLIENT, always(),"vanilla.QuadComparatorMixin"),
+        TileEntityBeaconRendererMixin(Side.CLIENT, always(),"vanilla.TileEntityBeaconRendererMixin"),
+        RenderBlocksMixin(Side.CLIENT, always(),"vanilla.RenderBlocksMixin"),
+        TessellatorMixin(Side.CLIENT, always(),"vanilla.TessellatorMixin"),
+    //END Minecraft->client
+    //BEGIN FoamFix->client
+        FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
+        FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
+    //END FoamFix->client
+    //BEGIN OptiFine->client
+        OFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE), "optifine.TessellatorVanillaMixin"),
+        OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE), "optifine.TessellatorOptiFineMixin"),
+    //END OptiFine->client
 
-    //FoamFix
-    FoamFixClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.FOAMFIX).mixin("foamfix.TessellatorVanillaMixin")),
-    FoamFixClientTessellatorFoamFixMixin(builder(Side.CLIENT).target(TargetedMod.FOAMFIX).mixin("foamfix.TessellatorFoamFixMixin")),
+    ;
 
-    //OptiFine
-    OptiFineClientTessellatorVanillaMixin(builder(Side.CLIENT).avoid(TargetedMod.OPTIFINE).mixin("optifine.TessellatorVanillaMixin")),
-    OptiFineClientTessellatorOptiFineMixin(builder(Side.CLIENT).target(TargetedMod.OPTIFINE).mixin("optifine.TessellatorOptiFineMixin"));
-
-
+    public final Side side;
     public final String mixin;
-    public final Set<TargetedMod> targetedMods;
-    public final Set<TargetedMod> avoidedMods;
-    private final Side side;
+    public final Predicate<List<TargetedMod>> filter;
 
-    Mixin(Builder builder) {
-        this.mixin = builder.mixin;
-        this.targetedMods = Collections.unmodifiableSet(builder.targetedMods);
-        this.avoidedMods = Collections.unmodifiableSet(builder.avoidedMods);
-        this.side = builder.side;
+    Mixin(Side side, Predicate<List<TargetedMod>> modFilter, String mixin) {
+        this.side = side;
+        this.mixin = side.name().toLowerCase() + "." + mixin;
+        this.filter = modFilter;
     }
 
     public boolean shouldLoad(List<TargetedMod> loadedMods) {
         return (side == Side.COMMON
                 || side == Side.SERVER && FMLLaunchHandler.side().isServer()
                 || side == Side.CLIENT && FMLLaunchHandler.side().isClient())
-               && loadedMods.containsAll(targetedMods) && avoidedMods.stream().noneMatch(loadedMods::contains);
+               && filter.test(loadedMods);
     }
 
-
-    @SuppressWarnings("SameParameterValue")
-    private static Builder builder(Side side) {
-        return new Builder(side);
+    private static Predicate<List<TargetedMod>> never() {
+        return (list) -> false;
     }
 
-    private static class Builder {
-        public String mixin;
-        public Side side;
-        public Set<TargetedMod> targetedMods = new HashSet<>();
-        public final Set<TargetedMod> avoidedMods = new HashSet<>();
+    private static Predicate<List<TargetedMod>> condition(Supplier<Boolean> condition) {
+        return (list) -> condition.get();
+    }
 
-        public Builder(Side side) {
-            this.side = side;
-        }
+    private static Predicate<List<TargetedMod>> always() {
+        return (list) -> true;
+    }
 
-        public Builder mixin(String mixinClass) {
-            mixin = side.name().toLowerCase() + "." + mixinClass;
-            return this;
-        }
+    private static Predicate<List<TargetedMod>> require(TargetedMod mod) {
+        return (list) -> list.contains(mod);
+    }
 
-        public Builder target(TargetedMod mod) {
-            targetedMods.add(mod);
-            return this;
-        }
-
-        public Builder avoid(TargetedMod mod) {
-            avoidedMods.add(mod);
-            return this;
-        }
+    private static Predicate<List<TargetedMod>> avoid(TargetedMod mod) {
+        return (list) -> !list.contains(mod);
     }
 
     private enum Side {

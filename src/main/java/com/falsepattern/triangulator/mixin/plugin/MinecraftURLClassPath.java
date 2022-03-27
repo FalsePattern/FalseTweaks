@@ -2,17 +2,14 @@ package com.falsepattern.triangulator.mixin.plugin;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModClassLoader;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.file.Path;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import com.google.common.io.Files;
 import sun.misc.URLClassPath;
 
+import java.io.File;
+import java.lang.reflect.Field;
+
 /**
- * Backport from spongemixins 1.3
+ * Backport from spongemixins 1.3 for compat with the curseforge 1.2.0 version
  */
 public final class MinecraftURLClassPath {
     /**
@@ -47,21 +44,6 @@ public final class MinecraftURLClassPath {
             ucp = (URLClassPath)ucpField.get(mainClassLoader);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    /**
-     * Get a jar within the minecraft mods directory
-     */
-    public static File getJarInModPath(final String jarname) {
-        try {
-            return java.nio.file.Files.walk(new File(Launch.minecraftHome, "mods/").toPath()).filter( p -> {
-                final String filename = p.toString();
-                return Files.getNameWithoutExtension(filename).contains(jarname) && Files.getFileExtension(filename).equals("jar");
-            }).map(Path::toFile).findFirst().orElse(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
