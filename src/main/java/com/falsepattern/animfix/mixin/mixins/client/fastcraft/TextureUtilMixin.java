@@ -19,8 +19,7 @@ public abstract class TextureUtilMixin {
     @Redirect(method = "generateMipmapData",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;p(IIIIZ)I",
-                       remap = false),
-              require = 1)
+                       remap = false))
     private static int disableGenerateMipmapDataTweak(int a, int b, int c, int d, boolean e) {
         return func_147943_a(a, b, c, d, e);
     }
