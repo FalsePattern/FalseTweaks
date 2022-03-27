@@ -3,4 +3,8 @@ dependencies {
         transitive = false
     }
     annotationProcessor("org.projectlombok:lombok:1.18.22")
+
+    compileOnly("curse.maven:redstone-paste-67508:2211249") {
+        transitive = false
+    }
 }

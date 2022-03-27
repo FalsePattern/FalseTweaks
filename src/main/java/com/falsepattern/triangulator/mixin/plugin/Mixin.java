@@ -24,7 +24,9 @@ public enum Mixin {
         OFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE), "optifine.TessellatorVanillaMixin"),
         OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE), "optifine.TessellatorOptiFineMixin"),
     //END OptiFine->client
-
+    //BEGIN RedstonePaste->client
+        RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
+    //END RedstonePaste->client
     ;
 
     public final Side side;

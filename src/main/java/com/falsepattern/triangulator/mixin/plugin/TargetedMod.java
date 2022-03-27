@@ -10,6 +10,7 @@ public enum TargetedMod {
 
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
     OPTIFINE("OptiFine", false, startsWith("optifine")),
+    REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     ;
 
     public final String modName;
