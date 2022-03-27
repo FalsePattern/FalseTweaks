@@ -89,3 +89,5 @@ body:
           required: true
         - label: This request is not for FoamFix
           required: true
+        - label: This request is not for RedstonePaste
+          required: true
