@@ -9,7 +9,12 @@ import java.util.function.Predicate;
 public enum TargetedMod {
 
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
-    OPTIFINE("OptiFine", false, startsWith("optifine")),
+    OPTIFINE("OptiFine", false,
+            startsWith("optifine")
+            .and(    contains("d7")
+                 .or(contains("d8"))
+                 .or(contains("e3"))
+                 .or(contains("e7")))),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     ;
 
