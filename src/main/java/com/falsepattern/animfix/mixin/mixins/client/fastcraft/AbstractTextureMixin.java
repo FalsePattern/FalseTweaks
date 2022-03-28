@@ -14,8 +14,7 @@ public abstract class AbstractTextureMixin {
     @Redirect(method = "deleteGlTexture",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;k(Lnet/minecraft/client/renderer/texture/AbstractTexture;)V",
-                       remap = false),
-              require = 1)
+                       remap = false))
     private void disabledeleteGlTextureTweak(AbstractTexture dt) {
 
     }
