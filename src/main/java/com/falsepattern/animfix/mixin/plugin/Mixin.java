@@ -15,10 +15,10 @@ public enum Mixin {
         StitcherSlotMixin(Side.CLIENT, always(), "minecraft.StitcherSlotMixin"),
     //END Minecraft->client
     //BEGIN FastCraft->client
-        FCAbstractTextureMixin(Side.CLIENT, always(), "fastcraft.AbstractTextureMixin"),
-        FCDynamicTextureMixin(Side.CLIENT, always(), "fastcraft.DynamicTextureMixin"),
-        FCTextureMapMixin(Side.CLIENT, always(), "fastcraft.TextureMapMixin"),
-        FCTextureUtilMixin(Side.CLIENT, always(), "fastcraft.TextureUtilMixin"),
+        FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.AbstractTextureMixin"),
+        FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.DynamicTextureMixin"),
+        FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureMapMixin"),
+        FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureUtilMixin"),
     //END FastCraft->client
     ;
 
