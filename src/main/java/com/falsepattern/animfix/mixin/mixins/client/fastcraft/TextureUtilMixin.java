@@ -27,8 +27,7 @@ public abstract class TextureUtilMixin {
     @Redirect(method = "uploadTextureMipmap",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;i([[IIIIIZZ)Z",
-                       remap = false),
-              require = 1)
+                       remap = false))
     private static boolean disableUploadTextureMipmapTweak(int[][] a, int b, int c, int d, int e, boolean f, boolean g) {
         return false;
     }
