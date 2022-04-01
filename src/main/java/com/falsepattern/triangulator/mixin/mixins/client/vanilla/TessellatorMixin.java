@@ -5,14 +5,19 @@ import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import sun.misc.Unsafe;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Comparator;
+import java.util.Random;
 
 @Mixin(Tessellator.class)
 public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableTessellator {
@@ -22,6 +27,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow private int[] rawBuffer;
     @Shadow private int rawBufferIndex;
     @Shadow private int vertexCount;
+    @Shadow private boolean hasBrightness;
     private boolean hackedQuadRendering = false;
     private boolean drawingTris = false;
     private boolean alternativeTriangulation = false;
@@ -89,9 +95,22 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             int vertexSize = shaderOn() ? 18 : 8;
+            LocalDateTime now = LocalDateTime.now();
+            boolean trolling = now.getMonth().equals(Month.APRIL) && now.getDayOfMonth() == 1 && this.hasBrightness;
+            if (trolling) {
+                Vec3 a = getVec(vertexSize * 4);
+                Vec3 b = getVec(vertexSize * 3);
+                Vec3 c = getVec(vertexSize * 2);
+                Vec3 d = getVec(vertexSize);
+                Vec3 topCenter = Vec3.createVectorHelper((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
+                Vec3 bottomCenter = Vec3.createVectorHelper((c.xCoord + d.xCoord) / 2, (c.yCoord + d.yCoord) / 2, (c.zCoord + d.zCoord) / 2);
+                putVec(topCenter, vertexSize * 4);
+                putVec(c, vertexSize * 3);
+                putVec(bottomCenter, vertexSize * 2);
+            }
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
-            if (alternativeTriangulation) {
+            if ((!trolling) && alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
                 System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex, 2 * vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize), vertexSize);
@@ -104,6 +123,19 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             vertexCount += 2;
             rawBufferIndex += 2 * vertexSize;
         }
+    }
+
+    private Vec3 getVec(int offset) {
+        float x = Float.intBitsToFloat(rawBuffer[rawBufferIndex - offset]);
+        float y = Float.intBitsToFloat(rawBuffer[rawBufferIndex - offset + 1]);
+        float z = Float.intBitsToFloat(rawBuffer[rawBufferIndex - offset + 2]);
+        return Vec3.createVectorHelper(x, y, z);
+    }
+
+    private void putVec(Vec3 vec, int offset) {
+        rawBuffer[rawBufferIndex - offset] = Float.floatToRawIntBits((float) vec.xCoord);
+        rawBuffer[rawBufferIndex - offset + 1] = Float.floatToRawIntBits((float) vec.yCoord);
+        rawBuffer[rawBufferIndex - offset + 2] = Float.floatToRawIntBits((float) vec.zCoord);
     }
 
     @Override
