@@ -8,8 +8,9 @@ This mod fixes that problem by batching those animated textures into a single gi
 
 The batching has a user-configurable limit, see the mod's config file for more information.
 
-Dependencies:
 
-- SpongeMixins https://www.curseforge.com/minecraft/mc-mods/spongemixins
+## Dependencies
+- [FalsePatternLib](https://www.curseforge.com/minecraft/mc-mods/falsepatternlib)
+- Either [SpongeMixins](https://www.curseforge.com/minecraft/mc-mods/spongemixins) or [Grimoire](https://www.curseforge.com/minecraft/mc-mods/grimoire-api)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask.

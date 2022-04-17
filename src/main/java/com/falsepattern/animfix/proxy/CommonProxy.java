@@ -6,7 +6,7 @@ import cpw.mods.fml.common.event.*;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
-        Config.syncronizeConfiguration(event.getSuggestedConfigurationFile());
+        Config.synchronizeConfiguration(event.getSuggestedConfigurationFile());
     }
 
     public void init(FMLInitializationEvent event) {

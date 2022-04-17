@@ -1,67 +1,35 @@
 package com.falsepattern.animfix.mixin.plugin;
 
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import com.falsepattern.lib.mixin.IMixin;
+import com.falsepattern.lib.mixin.ITargetedMod;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
 
-public enum Mixin {
-    //BEGIN Minecraft->client
+@RequiredArgsConstructor
+public enum Mixin implements IMixin {
+    //region Minecraft->client
         TextureMapMixin(Side.CLIENT, always(), "minecraft.TextureMapMixin"),
         TextureUtilMixin(Side.CLIENT, always(), "minecraft.TextureUtilMixin"),
         StitcherMixin(Side.CLIENT, always(), "minecraft.StitcherMixin"),
         StitcherSlotMixin(Side.CLIENT, always(), "minecraft.StitcherSlotMixin"),
-    //END Minecraft->client
-    //BEGIN FastCraft->client
+    //endregion Minecraft->client
+    //region FastCraft->client
         FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.AbstractTextureMixin"),
         FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.DynamicTextureMixin"),
         FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureMapMixin"),
         FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureUtilMixin"),
-    //END FastCraft->client
+    //endregion FastCraft->client
     ;
 
-    public final Side side;
-    public final String mixin;
-    public final Predicate<List<TargetedMod>> filter;
-
-    Mixin(Side side, Predicate<List<TargetedMod>> modFilter, String mixin) {
-        this.side = side;
-        this.mixin = side.name().toLowerCase() + "." + mixin;
-        this.filter = modFilter;
-    }
-
-    public boolean shouldLoad(List<TargetedMod> loadedMods) {
-        return (side == Side.COMMON
-                || side == Side.SERVER && FMLLaunchHandler.side().isServer()
-                || side == Side.CLIENT && FMLLaunchHandler.side().isClient())
-               && filter.test(loadedMods);
-    }
-
-    private static Predicate<List<TargetedMod>> never() {
-        return (list) -> false;
-    }
-
-    private static Predicate<List<TargetedMod>> condition(Supplier<Boolean> condition) {
-        return (list) -> condition.get();
-    }
-
-    private static Predicate<List<TargetedMod>> always() {
-        return (list) -> true;
-    }
-
-    private static Predicate<List<TargetedMod>> require(TargetedMod mod) {
-        return (list) -> list.contains(mod);
-    }
-
-    private static Predicate<List<TargetedMod>> avoid(TargetedMod mod) {
-        return (list) -> !list.contains(mod);
-    }
-
-    private enum Side {
-        COMMON,
-        CLIENT,
-        SERVER
-    }
+    @Getter
+    private final Side side;
+    @Getter
+    private final Predicate<List<ITargetedMod>> filter;
+    @Getter
+    private final String mixin;
 }

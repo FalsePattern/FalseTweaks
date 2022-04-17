@@ -10,8 +10,13 @@ public class Config {
 
     private static File configFile;
 
-    public static void syncronizeConfiguration(File configFile) {
+    public static void synchronizeConfiguration(File configFile) {
         Config.configFile = configFile;
+        reload();
+    }
+
+    public static void reload() {
+        if (configFile == null) return;
         val configuration = new Configuration(configFile);
         configuration.load();
 
@@ -20,9 +25,5 @@ public class Config {
         if(configuration.hasChanged()) {
             configuration.save();
         }
-    }
-
-    public static void reload() {
-        syncronizeConfiguration(configFile);
     }
 }
