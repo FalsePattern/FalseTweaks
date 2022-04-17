@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.profiler.Profiler;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,8 +20,10 @@ import java.util.List;
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin implements ITextureMapMixin {
     @Shadow private int mipmapLevels;
+    @Shadow @Final private String basePath;
     private AnimationUpdateBatcher batcher;
     private static Profiler theProfiler;
+    private boolean batchingDisabled;
 
     @Inject(method = "loadTexture",
             at = @At(value = "HEAD"),
@@ -44,17 +47,19 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
               require = 1)
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
-        listAnimatedSprites.add(sprite);
+        boolean ret = listAnimatedSprites.add(sprite);
+        if (batchingDisabled) return ret;
         AnimationUpdateBatcher.batcher = batcher;
         TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(), sprite.getOriginX(), sprite.getOriginY(), false, false);
         AnimationUpdateBatcher.batcher = null;
-        return false;
+        return ret;
     }
 
     @Inject(method = "updateAnimations",
             at = @At(value = "HEAD"),
             require = 1)
     private void beginBatchAnimations(CallbackInfo ci) {
+        if (batchingDisabled) return;
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
@@ -66,6 +71,7 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             at = @At(value = "RETURN"),
             require = 1)
     private void flushBatchAnimations(CallbackInfo ci) {
+        if (batchingDisabled) return;
         AnimationUpdateBatcher.batcher = null;
         if (batcher != null) {
             theProfiler.startSection("uploadBatch");
@@ -78,5 +84,15 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     @Override
     public void initializeBatcher(int xOffset, int yOffset, int width, int height) {
         batcher = new AnimationUpdateBatcher(xOffset, yOffset, width, height, mipmapLevels);
+    }
+
+    @Override
+    public String getBasePath() {
+        return basePath;
+    }
+
+    @Override
+    public void disableBatching() {
+        batchingDisabled = true;
     }
 }

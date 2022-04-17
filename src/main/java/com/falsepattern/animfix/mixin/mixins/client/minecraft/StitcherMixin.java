@@ -1,11 +1,13 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
+import com.falsepattern.animfix.AnimFix;
 import com.falsepattern.animfix.AnimationUpdateBatcher;
 import com.falsepattern.animfix.Config;
 import com.falsepattern.animfix.MegaTexture;
 import com.falsepattern.animfix.interfaces.IRecursiveStitcher;
 import com.falsepattern.animfix.interfaces.IStitcherSlotMixin;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
+import lombok.val;
 import net.minecraft.client.renderer.texture.Stitcher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Final;
@@ -21,7 +23,7 @@ import java.util.List;
 @Mixin(Stitcher.class)
 public abstract class StitcherMixin implements IRecursiveStitcher {
     private boolean skipRecursion;
-    private Set<Stitcher.Holder> animatedHolders;
+    private Set<TextureAtlasSprite> animatedSprites;
     private List<Stitcher.Slot> animatedSlots;
     private TextureAtlasSprite megaTexture;
 
@@ -41,6 +43,12 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
 
     @Shadow @Final private List<Stitcher.Slot> stitchSlots;
 
+    @Shadow public abstract void doStitch();
+
+    @Shadow private int currentWidth;
+
+    @Shadow private int currentHeight;
+
     @Override
     public void doNotRecurse() {
         skipRecursion = true;
@@ -56,7 +64,7 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
             require = 1)
     private void doStitch_0(CallbackInfo ci) {
         if (!skipRecursion) {
-            animatedHolders = new HashSet<>();
+            val animatedHolders = new HashSet<Stitcher.Holder>();
             int maxSize = Config.maximumBatchedTextureSize;
 
             //Extract animated sprites that are smaller than the max size
@@ -78,8 +86,11 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
                 //Put animated textures into a "block"
                 Stitcher recursiveStitcher = new Stitcher(maxWidth, maxHeight, forcePowerOf2, maxTileDimension, mipmapLevelStitcher);
                 ((IRecursiveStitcher) recursiveStitcher).doNotRecurse();
+                animatedSprites = new HashSet<>();
                 for (Stitcher.Holder holder : animatedHolders) {
-                    recursiveStitcher.addSprite(holder.getAtlasSprite());
+                    val sprite = holder.getAtlasSprite();
+                    animatedSprites.add(sprite);
+                    recursiveStitcher.addSprite(sprite);
                 }
                 recursiveStitcher.doStitch();
 
@@ -105,20 +116,40 @@ public abstract class StitcherMixin implements IRecursiveStitcher {
                 if (megaTextureSlot != null) break;
             }
             if (megaTextureSlot == null) {
-                throw new IllegalStateException("Failed to extract animated texture stitching slot!");
-            }
+                // Something weird is going on. Emergency cancel of all batching logic for this atlas.
 
-            //Clear the texture from the placeholder, and populate it with the animated textures
-            Stitcher.Holder megaHolder = megaTextureSlot.getStitchHolder();
-            setStitchHolders.remove(megaHolder);
-            ((IStitcherSlotMixin) megaTextureSlot).insertHolder(null);
-            for (Stitcher.Slot animatedSlot: animatedSlots) {
-                ((IStitcherSlotMixin) megaTextureSlot).insertSlot(animatedSlot);
+                String basePath;
+                if (AnimationUpdateBatcher.currentAtlas != null) {
+                    basePath = ((ITextureMapMixin)AnimationUpdateBatcher.currentAtlas).getBasePath();
+                    ((ITextureMapMixin)AnimationUpdateBatcher.currentAtlas).disableBatching();
+                } else {
+                    basePath = "Unknown Atlas";
+                }
+                AnimFix.error(basePath + ": Could not batch stitch animated textures! " +
+                              "This is 99% a mod compatibility issue, do not report this issue to the developers without identifying the exact mod responsible for the conflict, or you will be ignored!");
+                val megaTextureHolder = setStitchHolders.stream().filter((holder) -> holder.getAtlasSprite() == megaTexture).findFirst();
+                megaTextureHolder.ifPresent(holder -> setStitchHolders.remove(holder));
+                animatedSprites.forEach(this::addSprite);
+                animatedSprites.clear();
+                doNotRecurse();
+                stitchSlots.clear();
+                currentWidth = 0;
+                currentHeight = 0;
+                doStitch();
+            } else {
+
+                //Clear the texture from the placeholder, and populate it with the animated textures
+                Stitcher.Holder megaHolder = megaTextureSlot.getStitchHolder();
+                setStitchHolders.remove(megaHolder);
+                ((IStitcherSlotMixin) megaTextureSlot).insertHolder(null);
+                for (Stitcher.Slot animatedSlot : animatedSlots) {
+                    ((IStitcherSlotMixin) megaTextureSlot).insertSlot(animatedSlot);
+                }
+                ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(megaTextureSlot.getOriginX(), megaTextureSlot.getOriginY(), megaHolder.getWidth(), megaHolder.getHeight());
             }
-            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(megaTextureSlot.getOriginX(), megaTextureSlot.getOriginY(), megaHolder.getWidth(), megaHolder.getHeight());
         }
         skipRecursion = false;
-        animatedHolders = null;
+        animatedSprites = null;
         animatedSlots = null;
         megaTexture = null;
     }
