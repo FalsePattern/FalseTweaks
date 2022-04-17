@@ -11,7 +11,7 @@ Highlights:
 The initial goal of the project was only the modernization of 1.7.10's ancient quad-based rendering, however, as time went on, more and more improvements were included
 
 ## Dependencies
-- FalsePatternLib
+- [FalsePatternLib](https://www.curseforge.com/minecraft/mc-mods/falsepatternlib)
 - Either [SpongeMixins](https://www.curseforge.com/minecraft/mc-mods/spongemixins) or [Grimoire](https://www.curseforge.com/minecraft/mc-mods/grimoire-api)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
