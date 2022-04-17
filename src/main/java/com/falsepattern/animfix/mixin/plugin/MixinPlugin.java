@@ -75,6 +75,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
         return mixins;
     }
 
+    private int grimoireDetected = -1;
+
     private boolean loadJarOf(final TargetedMod mod) {
         try {
             File jar = findJarOf(mod);
@@ -87,13 +89,23 @@ public class MixinPlugin implements IMixinConfigPlugin {
             if(!jar.exists()) {
                 throw new FileNotFoundException(jar.toString());
             }
-            MinecraftURLClassPath.addJar(jar);
-            return true;
-        }
-        catch (Exception e) {
+            if (grimoireDetected < 0) {
+                try {
+                    Class.forName("io.github.crucible.grimoire.Grimoire", false, getClass().getClassLoader());
+                    grimoireDetected = 1;
+                } catch (ClassNotFoundException ignored) {
+                    grimoireDetected = 0;
+                }
+            }
+            if (grimoireDetected == 1) {
+                LOG.info("Not adding " + jar + " to the URL Class Path, because Grimoire breaks our utility class.");
+            } else {
+                MinecraftURLClassPath.addJar(jar);
+            }
+        } catch (Throwable e) {
             e.printStackTrace();
-            return false;
         }
+        return true;
     }
 
     public static File findJarOf(final TargetedMod mod) {
