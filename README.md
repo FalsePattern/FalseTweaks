@@ -12,3 +12,5 @@ The batching has a user-configurable limit, see the mod's config file for more i
 - [SpongeMixins](https://github.com/TimeConqueror/SpongeMixins)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask.
+
+[![POOP badge](https://raw.githubusercontent.com/gist/poop-person/991e80f390384bbeef09d208bff208f4/raw/a9ef83add84a70f2202896c2d81117ff7b169be1/poop-badge.svg)](https://gist.github.com/poop-person/991e80f390384bbeef09d208bff208f4)
