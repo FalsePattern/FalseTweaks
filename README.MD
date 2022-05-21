@@ -1,6 +1,6 @@
 A small mixin library that does various low-level tweaks to 1.7.10's rendering system.
 
-CurseForge: https://www.curseforge.com/minecraft/mc-mods/triangulator
+Modrinth: https://modrinth.com/mod/triangulator
 
 Highlights:
 - Replaced minecraft's quad-based rendering with triangle-based rendering (the original scope of this project)
@@ -11,7 +11,7 @@ Highlights:
 The initial goal of the project was only the modernization of 1.7.10's ancient quad-based rendering, however, as time went on, more and more improvements were included
 
 ## Dependencies
-- [FalsePatternLib](https://www.curseforge.com/minecraft/mc-mods/falsepatternlib)
-- Either [SpongeMixins](https://www.curseforge.com/minecraft/mc-mods/spongemixins) or [Grimoire](https://www.curseforge.com/minecraft/mc-mods/grimoire-api)
+- [FalsePatternLib](https://modrinth.com/mod/fplib)
+- Either [SpongeMixins](https://modrinth.com/mod/spongemixin1710) or [Grimoire](https://github.com/CrucibleMC/Grimoire-legacy)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
