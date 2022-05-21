@@ -9,7 +9,7 @@ Highlights:
 The initial goal of the project was only the modernization of 1.7.10's ancient quad-based rendering, however, as time went on, more and more improvements were included
 
 ## Dependencies
-- [FalsePatternLib](https://modrinth.com/mod/fplib)
-- [SpongeMixins](https://modrinth.com/mod/spongemixin1710)
+- [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
+- [SpongeMixins](https://github.com/TimeConqueror/SpongeMixins)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
