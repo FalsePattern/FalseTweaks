@@ -4,6 +4,7 @@ import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
+import lombok.Getter;
 import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.lib.Opcodes;
@@ -23,6 +24,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow private int rawBufferIndex;
     @Shadow private int vertexCount;
     private boolean hackedQuadRendering = false;
+    @Getter
     private boolean drawingTris = false;
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;

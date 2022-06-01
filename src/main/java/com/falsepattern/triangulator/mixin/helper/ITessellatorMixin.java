@@ -5,6 +5,7 @@ import java.util.Comparator;
 public interface ITessellatorMixin {
     void setAlternativeTriangulation();
 
+    boolean isDrawingTris();
     boolean hackedQuadRendering();
     boolean quadTriangulationActive();
     boolean shaderOn();
