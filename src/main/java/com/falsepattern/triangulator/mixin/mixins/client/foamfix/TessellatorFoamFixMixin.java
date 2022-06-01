@@ -4,7 +4,10 @@ package com.falsepattern.triangulator.mixin.mixins.client.foamfix;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import net.minecraft.client.renderer.Tessellator;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import java.util.Comparator;
 
@@ -13,8 +16,8 @@ import java.util.Comparator;
 public abstract class TessellatorFoamFixMixin implements ITessellatorMixin {
     @ModifyArg(method = {"getVertexState_foamfix_old"},
                at = @At(value = "INVOKE",
-                       target = "Ljava/util/PriorityQueue;<init>(ILjava/util/Comparator;)V",
-                       remap = false),
+                        target = "Ljava/util/PriorityQueue;<init>(ILjava/util/Comparator;)V",
+                        remap = false),
                index = 1,
                remap = false,
                require = 1)

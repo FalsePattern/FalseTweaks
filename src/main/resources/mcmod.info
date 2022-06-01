@@ -1,14 +1,18 @@
 [
-{
-  "modid": "${modId}",
-  "name": "${modName}",
-  "description": "A small library for modernizing the way minecraft renders quads.",
-  "version": "${modVersion}",
-  "mcversion": "${minecraftVersion}",
-  "url": "https://github.com/FalsePattern/Triangulator",
-  "authorList": ["FalsePattern"],
-  "parent": "",
-  "dependencies": ["spongemixins"],
-  "useDependencyInformation": true
-}
+  {
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "A small library for modernizing the way minecraft renders quads.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/FalsePattern/Triangulator",
+    "authorList": [
+      "FalsePattern"
+    ],
+    "parent": "",
+    "dependencies": [
+      "spongemixins"
+    ],
+    "useDependencyInformation": true
+  }
 ]

@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Tessellator.class)
 public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
 
-    @Shadow private int drawMode;
+    @Shadow
+    private int drawMode;
 
     private boolean trollOptifineAddVertex;
 
@@ -47,6 +48,7 @@ public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
             drawMode = GL11.GL_TRIANGLES;
         }
     }
+
     @Inject(method = "draw",
             at = @At(value = "RETURN"),
             require = 1)

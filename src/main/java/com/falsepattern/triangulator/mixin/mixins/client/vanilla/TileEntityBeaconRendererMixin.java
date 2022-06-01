@@ -17,10 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TileEntityBeaconRenderer.class)
 public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRenderer {
-    @Shadow @Final private static ResourceLocation field_147523_b;
-    
+    @Shadow
+    @Final
+    private static ResourceLocation field_147523_b;
+
     private static int displayList;
-    
+
     private static void runDisplayList() {
         if (displayList == 0) {
             displayList = GLAllocation.generateDisplayLists(1);
@@ -119,10 +121,9 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
         ci.cancel();
         float f1 = beacon.func_146002_i();
 
-        if (f1 > 0.0F)
-        {
+        if (f1 > 0.0F) {
             bindTexture(field_147523_b);
-            double tickTime = (double)beacon.getWorldObj().getTotalWorldTime() + partialTickTime;
+            double tickTime = (double) beacon.getWorldObj().getTotalWorldTime() + partialTickTime;
             double rotation = tickTime * 2;
             double textureMove = tickTime / 10d;
             GL11.glMatrixMode(GL11.GL_TEXTURE);

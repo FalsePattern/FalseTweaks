@@ -11,13 +11,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(QuadComparator.class)
 public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
-    @Shadow private float field_147630_a;
+    @Shadow
+    private float field_147630_a;
 
-    @Shadow private float field_147628_b;
+    @Shadow
+    private float field_147628_b;
 
-    @Shadow private float field_147629_c;
+    @Shadow
+    private float field_147629_c;
 
-    @Shadow private int[] field_147627_d;
+    @Shadow
+    private int[] field_147627_d;
 
     private boolean triMode;
 

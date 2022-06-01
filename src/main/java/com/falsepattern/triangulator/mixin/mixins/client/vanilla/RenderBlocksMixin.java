@@ -16,29 +16,53 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
 
-    @Shadow(aliases = "colorRedTopLeftF") public float colorRedTopLeft;
+    @Shadow(aliases = "colorRedTopLeftF")
+    public float colorRedTopLeft;
 
-    @Shadow(aliases = "colorGreenTopLeftF") public float colorGreenTopLeft;
+    @Shadow(aliases = "colorGreenTopLeftF")
+    public float colorGreenTopLeft;
 
-    @Shadow(aliases = "colorBlueTopLeftF") public float colorBlueTopLeft;
+    @Shadow(aliases = "colorBlueTopLeftF")
+    public float colorBlueTopLeft;
 
-    @Shadow(aliases = "colorRedBottomLeftF") public float colorRedBottomLeft;
+    @Shadow(aliases = "colorRedBottomLeftF")
+    public float colorRedBottomLeft;
 
-    @Shadow(aliases = "colorGreenBottomLeftF") public float colorGreenBottomLeft;
+    @Shadow(aliases = "colorGreenBottomLeftF")
+    public float colorGreenBottomLeft;
 
-    @Shadow(aliases = "colorBlueBottomLeftF") public float colorBlueBottomLeft;
+    @Shadow(aliases = "colorBlueBottomLeftF")
+    public float colorBlueBottomLeft;
 
-    @Shadow(aliases = "colorRedBottomRightF") public float colorRedBottomRight;
+    @Shadow(aliases = "colorRedBottomRightF")
+    public float colorRedBottomRight;
 
-    @Shadow(aliases = "colorGreenBottomRightF") public float colorGreenBottomRight;
+    @Shadow(aliases = "colorGreenBottomRightF")
+    public float colorGreenBottomRight;
 
-    @Shadow(aliases = "colorBlueBottomRightF") public float colorBlueBottomRight;
+    @Shadow(aliases = "colorBlueBottomRightF")
+    public float colorBlueBottomRight;
 
-    @Shadow(aliases = "colorRedTopRightF") public float colorRedTopRight;
+    @Shadow(aliases = "colorRedTopRightF")
+    public float colorRedTopRight;
 
-    @Shadow(aliases = "colorGreenTopRightF") public float colorGreenTopRight;
+    @Shadow(aliases = "colorGreenTopRightF")
+    public float colorGreenTopRight;
 
-    @Shadow(aliases = "colorBlueTopRightF") public float colorBlueTopRight;
+    @Shadow(aliases = "colorBlueTopRightF")
+    public float colorBlueTopRight;
+
+    private static float avg(final float a, final float b) {
+        return (a + b) * 0.5F;
+    }
+
+    private static float avg(final float r, final float g, final float b) {
+        return (r + g + b) * 0.3333333333333333F;
+    }
+
+    private static float diff(final float a, final float b) {
+        return Math.abs(a - b);
+    }
 
     @Inject(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
             at = {
@@ -61,7 +85,7 @@ public abstract class RenderBlocksMixin {
         val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         val avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        val mainDiagonalDiff= diff(avgTopLeft, avgBottomRight);
+        val mainDiagonalDiff = diff(avgTopLeft, avgBottomRight);
         val altDiagonalDiff = diff(avgBottomLeft, avgTopRight);
         if (Math.abs(mainDiagonalDiff - altDiagonalDiff) < 0.01) {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
@@ -204,17 +228,5 @@ public abstract class RenderBlocksMixin {
                allow = 8)
     private int decrementXValue5(int x) {
         return x - 1;
-    }
-
-    private static float avg(final float a, final float b) {
-        return (a + b) * 0.5F;
-    }
-
-    private static float avg(final float r, final float g, final float b) {
-        return (r + g + b) * 0.3333333333333333F;
-    }
-
-    private static float diff(final float a, final float b) {
-        return Math.abs(a - b);
     }
 }

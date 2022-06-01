@@ -13,21 +13,21 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
     //region Minecraft->client
-        QuadComparatorMixin(Side.CLIENT, always(),"vanilla.QuadComparatorMixin"),
-        TileEntityBeaconRendererMixin(Side.CLIENT, always(),"vanilla.TileEntityBeaconRendererMixin"),
-        RenderBlocksMixin(Side.CLIENT, always(),"vanilla.RenderBlocksMixin"),
-        TessellatorMixin(Side.CLIENT, always(),"vanilla.TessellatorMixin"),
+    QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
+    TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
+    RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksMixin"),
+    TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
     //endregion Minecraft->client
     //region FoamFix->client
-        FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
-        FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
+    FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
+    FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
     //endregion FoamFix->client
     //region OptiFine->client
-        OFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE), "optifine.TessellatorVanillaMixin"),
-        OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE), "optifine.TessellatorOptiFineMixin"),
+    OFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE), "optifine.TessellatorVanillaMixin"),
+    OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE), "optifine.TessellatorOptiFineMixin"),
     //endregion OptiFine->client
     //region RedstonePaste->client
-        RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
+    RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
     //endregion RedstonePaste->client
     ;
 

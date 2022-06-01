@@ -6,17 +6,18 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.*;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.contains;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
     OPTIFINE("OptiFine", false,
             startsWith("optifine")
-            .and(    contains("d7")
-                 .or(contains("d8"))
-                 .or(contains("e3"))
-                 .or(contains("e7")))),
+                    .and(contains("d7")
+                            .or(contains("d8"))
+                            .or(contains("e3"))
+                            .or(contains("e7")))),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     ;
 
