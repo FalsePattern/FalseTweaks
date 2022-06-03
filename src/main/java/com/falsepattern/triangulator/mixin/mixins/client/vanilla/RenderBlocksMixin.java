@@ -120,6 +120,42 @@ public abstract class RenderBlocksMixin {
         return y + 1;
     }
 
+    int countS;
+    int countB;
+    float sky;
+    float block;
+
+    private void addLight(int light) {
+        int S = light & 0xff;
+        int B = (light & 0xff0000) >>> 16;
+        if (S != 0) {
+            sky += S;
+            countS++;
+        }
+        if (B != 0) {
+            block += B;
+            countB++;
+        }
+    }
+
+    @Inject(method = "getAoBrightness",
+            at = @At(value = "HEAD"),
+            cancellable = true,
+            require = 1)
+    private void betterCompute(int a, int b, int c, int d, CallbackInfoReturnable<Integer> cir) {
+        countS = 0;
+        countB = 0;
+        sky = 0;
+        block = 0;
+        addLight(a);
+        addLight(b);
+        addLight(c);
+        addLight(d);
+        sky /= countS;
+        block /= countB;
+        cir.setReturnValue((((int)sky) & 0xff) | ((((int)block) & 0xff) << 16));
+    }
+
     /**
      * @author embeddedt
      */
