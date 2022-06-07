@@ -238,7 +238,7 @@ public abstract class RenderBlocksMixin {
                ),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 0,
+               index = 1,
                allow = 8)
     private int incrementXValue4(int x) {
         return x + 1;
@@ -260,7 +260,7 @@ public abstract class RenderBlocksMixin {
                ),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 0,
+               index = 1,
                allow = 8)
     private int decrementXValue5(int x) {
         return x - 1;
