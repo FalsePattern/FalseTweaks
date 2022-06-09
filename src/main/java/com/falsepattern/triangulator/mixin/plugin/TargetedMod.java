@@ -6,18 +6,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.contains;
 import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
+import static com.falsepattern.triangulator.mixin.plugin.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
-    OPTIFINE("OptiFine", false,
-            startsWith("optifine")
-                    .and(contains("d7")
-                            .or(contains("d8"))
-                            .or(contains("e3"))
-                            .or(contains("e7")))),
+    OPTIFINE_WITHOUT_SHADERS("OptiFine without shaders", false,
+            startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.negate())),
+    OPTIFINE_WITH_SHADERS("OptiFine with shaders", false,
+            startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     ;
 
