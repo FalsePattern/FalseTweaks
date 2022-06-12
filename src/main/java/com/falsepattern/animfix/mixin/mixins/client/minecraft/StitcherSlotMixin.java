@@ -14,6 +14,8 @@ public abstract class StitcherSlotMixin implements IStitcherSlotMixin {
 
     @Shadow public abstract boolean addSlot(Stitcher.Holder p_94182_1_);
 
+    @Shadow private List subSlots;
+
     @Override
     public void insertHolder(Stitcher.Holder holder) {
         this.holder = holder;
@@ -21,15 +23,9 @@ public abstract class StitcherSlotMixin implements IStitcherSlotMixin {
 
     @Override
     public void insertSlot(Stitcher.Slot slot) {
-        Stitcher.Holder holder = slot.getStitchHolder();
-        if (holder == null) {
-            List<Stitcher.Slot> subSlots = new ArrayList<>();
-            slot.getAllStitchSlots(subSlots);
-            for (Stitcher.Slot subSlot : subSlots) {
-                insertSlot(subSlot);
-            }
-        } else {
-            addSlot(holder);
+        if (this.subSlots == null) {
+            this.subSlots = new ArrayList();
         }
+        this.subSlots.add(slot);
     }
 }
