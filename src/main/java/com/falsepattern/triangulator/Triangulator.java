@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator;
 
+import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -19,9 +20,12 @@ public class Triangulator {
         triLog.info("Skidaddle skidoodle, your quad is now a noodle!");
     }
 
-    @SneakyThrows
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        ConfigurationManager.registerConfig(TriConfig.class);
+        try {
+            ConfigurationManager.registerConfig(TriConfig.class);
+        } catch (ConfigException ex) {
+            triLog.error("Failed to register config", ex);
+        }
     }
 }
