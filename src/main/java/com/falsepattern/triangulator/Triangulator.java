@@ -1,6 +1,9 @@
 package com.falsepattern.triangulator;
 
+import com.falsepattern.lib.config.ConfigurationManager;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,5 +17,11 @@ public class Triangulator {
 
     public Triangulator() {
         triLog.info("Skidaddle skidoodle, your quad is now a noodle!");
+    }
+
+    @SneakyThrows
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent e) {
+        ConfigurationManager.registerConfig(TriConfig.class);
     }
 }

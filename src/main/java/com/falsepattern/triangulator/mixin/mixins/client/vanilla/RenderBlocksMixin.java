@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.val;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -81,6 +82,7 @@ public abstract class RenderBlocksMixin {
             },
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
+        if (!TriConfig.ENABLE_QUAD_TRIANGULATION) return;
         val avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
         val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
