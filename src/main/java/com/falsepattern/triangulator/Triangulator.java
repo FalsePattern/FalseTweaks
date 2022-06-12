@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
      version = Tags.VERSION,
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
-     dependencies = "required-after:falsepatternlib@[0.5.0,);")
+     dependencies = "required-after:falsepatternlib@[0.8.0,);")
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
 
