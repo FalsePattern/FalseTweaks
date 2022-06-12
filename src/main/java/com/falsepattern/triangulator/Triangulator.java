@@ -2,7 +2,10 @@ package com.falsepattern.triangulator;
 
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
+import com.falsepattern.triangulator.proxy.CommonProxy;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -16,16 +19,20 @@ import org.apache.logging.log4j.Logger;
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
 
+    @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy", serverSide = Tags.GROUPNAME + ".proxy.CommonProxy")
+    private static CommonProxy proxy;
+
     public Triangulator() {
         triLog.info("Skidaddle skidoodle, your quad is now a noodle!");
     }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        try {
-            ConfigurationManager.registerConfig(TriConfig.class);
-        } catch (ConfigException ex) {
-            triLog.error("Failed to register config", ex);
-        }
+        proxy.preInit(e);
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent e) {
+        proxy.postInit(e);
     }
 }

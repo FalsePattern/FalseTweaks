@@ -13,6 +13,7 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
     //region Minecraft->client
+    ItemRendererMixin(Side.CLIENT, always(), "vanilla.ItemRendererMixin"),
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
     RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksMixin"),
