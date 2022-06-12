@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
@@ -56,7 +57,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (value == GL11.GL_QUADS && !forceQuadRendering) {
+        if (TriConfig.ENABLE_QUAD_TRIANGULATION && value == GL11.GL_QUADS && !forceQuadRendering) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -176,6 +177,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public int hackQuadCounting(int constant) {
-        return (constant / 4) * 3;
+        return drawingTris ? (constant / 4) * 3 : constant;
     }
 }

@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.val;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -81,6 +82,7 @@ public abstract class RenderBlocksMixin {
             },
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
+        if (!TriConfig.ENABLE_QUAD_TRIANGULATION) return;
         val avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
         val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
@@ -159,7 +161,7 @@ public abstract class RenderBlocksMixin {
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion"},
                slice = @Slice(
                        from = @At(value = "FIELD",
                                   target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
@@ -173,7 +175,7 @@ public abstract class RenderBlocksMixin {
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 1,
-               allow = 8)
+               allow = 4)
     private int decrementYValue1(int y) {
         return y - 1;
     }
