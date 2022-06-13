@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriConfig;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -104,6 +105,7 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
             GL11.glPopMatrix();
             GL11.glMatrixMode(GL11.GL_TEXTURE);
             GL11.glPopMatrix();
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glDepthMask(true);
@@ -118,6 +120,7 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
             cancellable = true,
             require = 1)
     private void renderTileEntityAt(TileEntityBeacon beacon, double x, double y, double z, float partialTickTime, CallbackInfo ci) {
+        if (!TriConfig.ENABLE_BEACON_OPTIMIZATION) return;
         ci.cancel();
         float f1 = beacon.func_146002_i();
 

@@ -20,6 +20,10 @@ public class TriConfig {
                     "is still highly experimental.\n")
     public static boolean ENABLE_ITEM_RENDERLISTS = true;
 
+    @Config.Comment("Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
+                    "you can toggle said optimization here.")
+    public static boolean ENABLE_BEACON_OPTIMIZATION = true;
+
     @Config.Comment("The total amount of renderlists Triangulator may allocate for optimized item rendering.\n" +
                     "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
                     "Bigger buffer sizes use more VRAM, but also get a higher average performance.\n" +
