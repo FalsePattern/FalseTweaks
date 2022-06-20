@@ -7,12 +7,12 @@ import org.lwjgl.opengl.GL11;
 public final class LeakFix {
     public static final boolean ENABLED;
     static {
-        switch (TriConfig.ENABLE_MEMORY_LEAK_FIX) {
+        switch (TriConfig.MEMORY_LEAK_FIX) {
             default:
                 Triangulator.triLog.info("Disabling leak fix because of config flag.");
                 ENABLED = false;
                 break;
-            case 1:
+            case Auto:
                 boolean isAMD = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("amd");
                 if (isAMD) {
                     Triangulator.triLog.info("Enabling leak fix because an AMD gpu was detected.");
@@ -22,7 +22,7 @@ public final class LeakFix {
                     ENABLED = false;
                 }
                 break;
-            case 2:
+            case Enable:
                 Triangulator.triLog.info("Enabling leak fix because of config flag.");
                 ENABLED = true;
                 break;

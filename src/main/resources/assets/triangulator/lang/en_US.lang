@@ -1,0 +1,5 @@
+config.triangulator.enable_quad_triangulation=Enable quad triangulation
+config.triangulator.enable_item_renderlists=Enable item renderlists
+config.triangulator.enable_beacon_optimization=Enable beacon optimization
+config.triangulator.enable_memory_leak_fix=Enable memory leak fix
+config.triangulator.item_renderlist_buffer_max_size=Item renderlist buffer max size
