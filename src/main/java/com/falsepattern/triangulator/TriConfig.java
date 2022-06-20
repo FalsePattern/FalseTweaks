@@ -24,6 +24,20 @@ public class TriConfig {
                     "you can toggle said optimization here.")
     public static boolean ENABLE_BEACON_OPTIMIZATION = true;
 
+    @Config.Comment("Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
+                    "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
+                    "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
+                    "which gets emphasized on modern AMD windows drivers, and on MESA with linux. This patch\n" +
+                    "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
+                    "deleting these renderlists based on usage.\n" +
+                    "Options:\n" +
+                    "0 -- Force Disable\n" +
+                    "1 -- Autodetect\n" +
+                    "2 -- Force Enable\n")
+    @Config.RangeInt(min = 0, max = 2)
+    @Config.RequiresMcRestart
+    public static int ENABLE_MEMORY_LEAK_FIX = 1;
+
     @Config.Comment("The total amount of renderlists Triangulator may allocate for optimized item rendering.\n" +
                     "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
                     "Bigger buffer sizes use more VRAM, but also get a higher average performance.\n" +

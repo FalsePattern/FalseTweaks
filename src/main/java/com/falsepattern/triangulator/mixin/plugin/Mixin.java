@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
@@ -18,6 +19,10 @@ public enum Mixin implements IMixin {
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
     RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
+    //region leak fix
+    RenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
+    WorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
+    //endregion leak fix
     //endregion Minecraft->client
     //region FoamFix->client
     FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
