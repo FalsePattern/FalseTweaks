@@ -13,7 +13,7 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
-    //region Minecraft->client
+    //region Minecraft
     ItemRendererMixin(Side.CLIENT, always(), "vanilla.ItemRendererMixin"),
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
@@ -23,19 +23,19 @@ public enum Mixin implements IMixin {
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
     WorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
     //endregion leak fix
-    //endregion Minecraft->client
-    //region FoamFix->client
+    //endregion Minecraft
+    //region FoamFix
     FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
     FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
-    //endregion FoamFix->client
-    //region OptiFine->client
+    //endregion FoamFix
+    //region OptiFine
     OFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.TessellatorVanillaMixin"),
     OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE_WITH_SHADERS), "optifine.TessellatorVanillaOrOldOptifineMixin"),
     OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITH_SHADERS), "optifine.TessellatorOptiFineMixin"),
-    //endregion OptiFine->client
-    //region RedstonePaste->client
+    //endregion OptiFine
+    //region RedstonePaste
     RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
-    //endregion RedstonePaste->client
+    //endregion RedstonePaste
     ;
 
     @Getter
