@@ -38,6 +38,14 @@ public class TriConfig {
     @Config.LangKey("config.triangulator.enable_memory_leak_fix")
     public static LeakFixState MEMORY_LEAK_FIX = LeakFixState.Auto;
 
+    @Config.Comment("The memory leak optimization unfortunately increases the amount of calls sent to the GPU.\n" +
+                    "This pressure can be reduced with the help of caching, which temporarily stores inactive renderlists\n" +
+                    "in a buffer, where renderers can then fetch them from when needed.\n" +
+                    "You can set this to any value above zero, but setting it too high will eat a LOT of VRAM. 1024 is\n" +
+                    "a decent safe point.")
+    @Config.RangeInt(min = 0)
+    public static int MEMORY_LEAK_FIX_CACHE_SIZE_TARGET = 1024;
+
     @Config.Comment("The total amount of renderlists Triangulator may allocate for optimized item rendering.\n" +
                     "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
                     "Bigger buffer sizes use more VRAM, but also get a higher average performance.\n" +

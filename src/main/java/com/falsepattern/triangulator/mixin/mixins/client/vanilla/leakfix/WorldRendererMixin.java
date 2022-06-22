@@ -1,9 +1,17 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla.leakfix;
 
+import com.falsepattern.triangulator.mixin.helper.IWorldRendererMixin;
 import com.falsepattern.triangulator.mixin.helper.LeakFix;
-import net.minecraft.client.renderer.GLAllocation;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.AxisAlignedBB;
+import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,8 +19,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.class)
-public abstract class WorldRendererMixin {
+@Accessors(fluent = true)
+public abstract class WorldRendererMixin implements IWorldRendererMixin {
     @Shadow private int glRenderList;
+
+    @Shadow public int posXClip;
+    @Shadow public int posYClip;
+    @Shadow public int posZClip;
+    @Getter
+    private boolean hasRenderList;
 
     @Redirect(method = "<init>",
               at = @At(value = "INVOKE",
@@ -21,22 +36,9 @@ public abstract class WorldRendererMixin {
     private void resetRenderListBefore(WorldRenderer thiz, int x, int y, int z) {
         if (LeakFix.ENABLED) {
             glRenderList = -1;
+            hasRenderList = false;
         }
         thiz.setPosition(x, y, z);
-    }
-
-    @Inject(method = "setPosition",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/WorldRenderer;setDontDraw()V",
-                     shift = At.Shift.AFTER),
-            require = 1)
-    private void genLists(int p_78913_1_, int p_78913_2_, int p_78913_3_, CallbackInfo ci) {
-        if (LeakFix.ENABLED) {
-            if (glRenderList >= 0) {
-                GLAllocation.deleteDisplayLists(glRenderList);
-            }
-            glRenderList = GLAllocation.generateDisplayLists(3);
-        }
     }
 
     @Inject(method = "setDontDraw",
@@ -44,11 +46,32 @@ public abstract class WorldRendererMixin {
             require = 1)
     private void clearLists(CallbackInfo ci) {
         if (LeakFix.ENABLED) {
-            if (glRenderList < 0) {
-                return;
-            }
-            GLAllocation.deleteDisplayLists(glRenderList);
-            glRenderList = -1;
+            clearList();
         }
+    }
+
+    @Override
+    public void renderAABB() {
+        float extra = 6;
+        GL11.glNewList(this.glRenderList + 2, 4864);
+        RenderItem.renderAABB(AxisAlignedBB.getBoundingBox(this.posXClip - extra, this.posYClip - extra, this.posZClip - extra, this.posXClip + 16 + extra, this.posYClip + 16 + extra, this.posZClip + 16 + extra));
+        GL11.glEndList();
+    }
+
+    @Override
+    public boolean genList() {
+        if (hasRenderList) return false;
+        glRenderList = LeakFix.allocateWorldRendererBuffer();
+        hasRenderList = true;
+        return true;
+    }
+
+    @Override
+    public boolean clearList() {
+        if (!hasRenderList) return false;
+        hasRenderList = false;
+        LeakFix.releaseWorldRendererBuffer(glRenderList);
+        glRenderList = -1;
+        return true;
     }
 }
