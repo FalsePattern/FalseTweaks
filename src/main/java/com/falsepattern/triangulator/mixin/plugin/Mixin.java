@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
@@ -45,6 +44,9 @@ public enum Mixin implements IMixin {
     GLAllocatorMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.leakfix.GLAllocationMixin"),
     //endregion leak fix
     //endregion FastCraft
+    //region ChromatiCraft
+    CCRuneRendererMixin(Side.CLIENT, require(TargetedMod.CHROMATICRAFT), "chromaticraft.RuneRendererMixin"),
+    //endregion ChromatiCraft
     //region RedstonePaste
     RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
     //endregion RedstonePaste

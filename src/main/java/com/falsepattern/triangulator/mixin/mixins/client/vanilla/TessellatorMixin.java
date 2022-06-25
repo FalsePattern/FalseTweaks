@@ -6,6 +6,8 @@ import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
 import org.lwjgl.opengl.GL11;
@@ -21,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Comparator;
 
 @Mixin(Tessellator.class)
+@Accessors(fluent = true, chain = false)
 public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableTessellator {
     @Shadow
     private int drawMode;
@@ -34,6 +37,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
+    @Getter
+    @Setter
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;
     private boolean shaderOn = false;
@@ -90,11 +95,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Override
     public boolean quadTriangulationActive() {
         return !quadTriangulationTemporarilySuspended;
-    }
-
-    @Override
-    public void setAlternativeTriangulation() {
-        alternativeTriangulation = true;
     }
 
     @Override

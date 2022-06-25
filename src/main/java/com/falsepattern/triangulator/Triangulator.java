@@ -1,13 +1,10 @@
 package com.falsepattern.triangulator;
 
-import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.triangulator.proxy.CommonProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

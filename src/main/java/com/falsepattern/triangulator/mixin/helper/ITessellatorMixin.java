@@ -3,9 +3,11 @@ package com.falsepattern.triangulator.mixin.helper;
 import java.util.Comparator;
 
 public interface ITessellatorMixin {
-    void setAlternativeTriangulation();
+    void alternativeTriangulation(boolean state);
 
-    boolean isDrawingTris();
+    boolean alternativeTriangulation();
+
+    boolean drawingTris();
 
     boolean hackedQuadRendering();
 

@@ -1,6 +1,5 @@
 package com.falsepattern.triangulator.mixin.mixins.client.fastcraft.leakfix;
 
-import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.mixin.helper.LeakFix;
 import lombok.val;
 import net.minecraft.client.renderer.GLAllocation;
@@ -12,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Arrays;
 import java.util.Map;
 
 @Mixin(GLAllocation.class)
