@@ -246,7 +246,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                ),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 1,
+               index = 2,
                allow = 4)
     private int decrementYValue1(int y) {
         return y - 1;
@@ -255,6 +255,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
     /**
      * @author embeddedt
      */
+    @SuppressWarnings("InvalidInjectorMethodSignature")
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
                slice = @Slice(
                        from = @At(value = "FIELD",
@@ -268,7 +269,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                ),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 2,
+               index = 3,
                allow = 8)
     private int incrementZValue2(int z) {
         return z + 1;
@@ -277,6 +278,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
     /**
      * @author embeddedt
      */
+    @SuppressWarnings("InvalidInjectorMethodSignature")
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
                slice = @Slice(
                        from = @At(value = "FIELD",
@@ -290,7 +292,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                ),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 2,
+               index = 3,
                allow = 8)
     private int decrementZValue3(int z) {
         return z - 1;
