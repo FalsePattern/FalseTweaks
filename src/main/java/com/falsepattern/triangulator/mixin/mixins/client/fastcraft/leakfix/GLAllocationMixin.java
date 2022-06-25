@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.fastcraft.leakfix;
 
 import com.falsepattern.triangulator.Triangulator;
+import com.falsepattern.triangulator.mixin.helper.LeakFix;
 import lombok.val;
 import net.minecraft.client.renderer.GLAllocation;
 import org.spongepowered.asm.mixin.Final;
@@ -23,7 +24,7 @@ public abstract class GLAllocationMixin {
             cancellable = true,
             require = 1)
     private static void nullSafeDealloc(int p_74523_0_, CallbackInfo ci) {
-        if (!mapDisplayLists.containsKey(p_74523_0_)) {
+        if (LeakFix.ENABLED && !mapDisplayLists.containsKey(p_74523_0_)) {
             ci.cancel();
         }
     }
@@ -33,12 +34,14 @@ public abstract class GLAllocationMixin {
             cancellable = true,
             require = 1)
     private static void callerSensitiveAlloc(int p_74526_0_, CallbackInfoReturnable<Integer> cir) {
-        val trace = Thread.currentThread().getStackTrace()[3];
-        if (trace.getMethodName().equals("a") && trace.getClassName().equals("fastcraft.ak")) {
-            //Line 336 in FastCraft 1.23
-            //Line 53 in FastCraft 1.25
-            //^ If anything breaks, check if the caller points are precisely these
-            cir.setReturnValue(-1);
+        if (LeakFix.ENABLED) {
+            val trace = Thread.currentThread().getStackTrace()[3];
+            if (trace.getMethodName().equals("a") && trace.getClassName().equals("fastcraft.ak")) {
+                //Line 336 in FastCraft 1.23
+                //Line 53 in FastCraft 1.25
+                //^ If anything breaks, check if the caller points are precisely these
+                cir.setReturnValue(-1);
+            }
         }
     }
 }
