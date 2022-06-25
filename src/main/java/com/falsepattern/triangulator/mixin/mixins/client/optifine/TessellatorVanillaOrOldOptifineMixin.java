@@ -1,7 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.optifine;
 
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
-import lombok.val;
 import net.minecraft.client.renderer.Tessellator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

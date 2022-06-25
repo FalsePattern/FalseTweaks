@@ -3,7 +3,6 @@ package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;

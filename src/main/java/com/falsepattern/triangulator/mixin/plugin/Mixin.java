@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
