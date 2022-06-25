@@ -14,6 +14,7 @@ public abstract class GameSettingsOptifineMixin {
 
     @Inject(method = "updateChunkLoading",
             at = @At(value = "HEAD"),
+            remap = false,
             require = 1)
     private void blockMultiThreadedChunkLoading(CallbackInfo ci) {
         ofChunkLoading = 0;
