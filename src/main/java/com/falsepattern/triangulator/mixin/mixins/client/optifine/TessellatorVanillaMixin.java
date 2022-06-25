@@ -16,7 +16,7 @@ public abstract class TessellatorVanillaMixin implements ITessellatorMixin {
               require = 1)
     private int snapTo3(int a, int b) {
         val v = Math.min(a, b);
-        if (isDrawingTris()) {
+        if (drawingTris()) {
             return v - (v % 3);
         } else {
             return v;

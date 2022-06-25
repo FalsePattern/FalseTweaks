@@ -17,6 +17,7 @@ public enum TargetedMod implements ITargetedMod {
     OPTIFINE_WITH_SHADERS("OptiFine with shaders", false,
             startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
     FASTCRAFT("FastCraft", false, startsWith("fastcraft")),
+    CHROMATICRAFT("ChromatiCraft", false, startsWith("chromaticraft")),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     ;
 

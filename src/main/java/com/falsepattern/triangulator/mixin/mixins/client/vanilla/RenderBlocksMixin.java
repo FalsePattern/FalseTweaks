@@ -1,10 +1,16 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.TriConfig;
+import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.val;
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.IIcon;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,10 +18,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RenderBlocks.class)
-public abstract class RenderBlocksMixin {
+@Accessors(fluent = true, chain = false)
+public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
     @Shadow(aliases = "colorRedTopLeftF")
     public float colorRedTopLeft;
@@ -53,6 +61,18 @@ public abstract class RenderBlocksMixin {
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
 
+    private boolean[] states;
+
+    @Setter
+    private boolean reusePreviousStates;
+
+    @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
+            at = @At(value = "RETURN"),
+            require = 2)
+    private void setupStates(CallbackInfo ci) {
+        states = new boolean[6];
+    }
+
     private static float avg(final float a, final float b) {
         return (a + b) * 0.5F;
     }
@@ -83,6 +103,7 @@ public abstract class RenderBlocksMixin {
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
         if (!TriConfig.ENABLE_QUAD_TRIANGULATION) return;
+        if (reusePreviousStates) return;
         val avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
         val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
@@ -93,11 +114,63 @@ public abstract class RenderBlocksMixin {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (mainDiagonalAvg < altDiagonalAvg) {
-                ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
+                ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
-            ((ITessellatorMixin) Tessellator.instance).setAlternativeTriangulation();
+            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+        } else {
+            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(false);
         }
+    }
+
+    private void reuse(int index) {
+        if (reusePreviousStates) {
+            ((ITessellatorMixin)Tessellator.instance).alternativeTriangulation(states[index]);
+        } else {
+            states[index] = ((ITessellatorMixin)Tessellator.instance).alternativeTriangulation();
+        }
+    }
+
+    @Inject(method = {"renderFaceXNeg"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(0);
+    }
+
+    @Inject(method = {"renderFaceXPos"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseXPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(1);
+    }
+
+    @Inject(method = {"renderFaceYNeg"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseYNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(2);
+    }
+
+    @Inject(method = {"renderFaceYPos"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseYPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(3);
+    }
+
+    @Inject(method = {"renderFaceZNeg"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseZNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(4);
+    }
+
+    @Inject(method = {"renderFaceZPos"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void reuseZPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+        reuse(5);
     }
 
     /**
