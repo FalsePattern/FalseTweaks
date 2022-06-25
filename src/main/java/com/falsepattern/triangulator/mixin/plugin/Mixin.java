@@ -40,6 +40,11 @@ public enum Mixin implements IMixin {
     OFWorldRendererOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.WorldRendererOptifineMixin"),
     //endregion leak fix
     //endregion OptiFine
+    //region FastCraft
+    //region leak fix
+    GLAllocatorMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.leakfix.GLAllocationMixin"),
+    //endregion leak fix
+    //endregion FastCraft
     //region RedstonePaste
     RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE), "redstonepaste.RedstonePasteHighlighterMixin"),
     //endregion RedstonePaste
