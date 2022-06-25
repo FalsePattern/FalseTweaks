@@ -22,7 +22,8 @@ public final class LeakFix {
     @Getter
     private static int activeBufferCount = 0;
     private static boolean debugText = false;
-    private static TIntList cachedBuffers = new TIntArrayList();
+    private static TIntList freshAllocations = new TIntArrayList();
+    private static TIntList reusableAllocations = new TIntArrayList();
     private static int allocs = 0;
     private static int totalAllocs = 0;
     private static int hits = 0;
@@ -31,22 +32,31 @@ public final class LeakFix {
     private static long lastGC = 0;
 
     public static int getCachedBufferCount() {
-        return cachedBuffers.size();
+        return freshAllocations.size() + reusableAllocations.size();
+    }
+
+    public static void activate() {
+        activeBufferCount++;
     }
 
     public static void gc() {
         allocs = 0;
-        int currentSize = getCachedBufferCount();
+        int reusables = reusableAllocations.size();
+        for (int i = 0; i < reusables; i++) {
+            GL11.glDeleteLists(reusableAllocations.get(i), 3);
+        }
+        reusableAllocations.clear();
+        int currentSize = freshAllocations.size();
         int targetSize = TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET;
         int allocationCount = targetSize - currentSize;
         if (allocationCount > 0) {
             int base = GL11.glGenLists(allocationCount * 3);
             for (int i = 0; i < allocationCount; i++) {
-                cachedBuffers.add(base + i * 3);
+                freshAllocations.add(base + i * 3);
             }
         } else if (allocationCount < 0) {
             for (int i = currentSize - 1; i >= targetSize; i--) {
-                GL11.glDeleteLists(cachedBuffers.removeAt(i), 3);
+                GL11.glDeleteLists(freshAllocations.removeAt(i), 3);
             }
         }
     }
@@ -55,19 +65,27 @@ public final class LeakFix {
         activeBufferCount++;
         allocs++;
         totalAllocs++;
-        int size = getCachedBufferCount();
-        if (size == 0) {
-            misses++;
-            return GL11.glGenLists(3);
-        } else {
+        int reusables = reusableAllocations.size();
+        if (reusables > 0) {
             hits++;
-            return cachedBuffers.removeAt(size - 1);
+            return reusableAllocations.removeAt(reusables - 1);
         }
+        int fresh = freshAllocations.size();
+        if (fresh > 0) {
+            hits++;
+            return freshAllocations.removeAt(fresh - 1);
+        }
+        misses++;
+        return GL11.glGenLists(3);
     }
 
     public static void releaseWorldRendererBuffer(int buffer) {
         activeBufferCount--;
-        cachedBuffers.add(buffer);
+        for (int i = 0; i < 3; i++) {
+            GL11.glNewList(buffer + i, GL11.GL_COMPILE);
+            GL11.glEndList();
+        }
+        reusableAllocations.add(buffer);
     }
 
 
