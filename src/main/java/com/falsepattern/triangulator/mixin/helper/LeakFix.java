@@ -103,7 +103,9 @@ public final class LeakFix {
     public void onRenderWorldLastEvent(RenderWorldLastEvent e) {
         long time = System.nanoTime();
         float secondsSinceLastGC = (time - lastGC) / 1000000000f;
-        if (secondsSinceLastGC > 5) {
+        int cacheSize = getCachedBufferCount();
+        if (secondsSinceLastGC > 5 ||
+            (secondsSinceLastGC > 1 && (cacheSize < (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET / 2) || cacheSize > (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET * 2)))) {
             gc();
             lastGC = time;
         }
