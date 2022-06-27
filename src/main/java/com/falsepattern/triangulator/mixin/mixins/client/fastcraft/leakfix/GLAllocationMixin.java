@@ -1,6 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.fastcraft.leakfix;
 
-import com.falsepattern.triangulator.mixin.helper.LeakFix;
+import com.falsepattern.triangulator.leakfix.LeakFix;
 import lombok.val;
 import net.minecraft.client.renderer.GLAllocation;
 import org.spongepowered.asm.mixin.Final;

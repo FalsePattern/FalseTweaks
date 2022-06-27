@@ -1,4 +1,4 @@
-package com.falsepattern.triangulator;
+package com.falsepattern.triangulator.leakfix;
 
 public enum LeakFixState {
     Disable,

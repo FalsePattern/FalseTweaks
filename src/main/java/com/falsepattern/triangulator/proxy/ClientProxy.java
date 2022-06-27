@@ -2,10 +2,11 @@ package com.falsepattern.triangulator.proxy;
 
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
-import com.falsepattern.triangulator.*;
+import com.falsepattern.triangulator.ItemRenderListManager;
+import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.calibration.Calibration;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
-import com.falsepattern.triangulator.mixin.helper.LeakFix;
+import com.falsepattern.triangulator.leakfix.LeakFix;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraft.client.Minecraft;

@@ -1,7 +1,7 @@
-package com.falsepattern.triangulator.mixin.helper;
+package com.falsepattern.triangulator.leakfix;
 
-import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.Triangulator;
+import com.falsepattern.triangulator.config.TriConfig;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;

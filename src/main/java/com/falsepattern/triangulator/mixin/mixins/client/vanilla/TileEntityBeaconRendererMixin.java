@@ -1,6 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
-import com.falsepattern.triangulator.TriConfig;
+import com.falsepattern.triangulator.config.TriConfig;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;

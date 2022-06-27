@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator;
 
+import com.falsepattern.triangulator.config.TriConfig;
 import com.falsepattern.triangulator.mixin.helper.ItemProp;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

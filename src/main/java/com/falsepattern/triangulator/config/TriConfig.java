@@ -1,6 +1,8 @@
-package com.falsepattern.triangulator;
+package com.falsepattern.triangulator.config;
 
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.triangulator.Tags;
+import com.falsepattern.triangulator.leakfix.LeakFixState;
 
 @Config(modid = Tags.MODID)
 public class TriConfig {

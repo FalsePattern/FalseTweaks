@@ -1,7 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla.leakfix;
 
+import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.mixin.helper.IWorldRendererMixin;
-import com.falsepattern.triangulator.mixin.helper.LeakFix;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.minecraft.client.renderer.WorldRenderer;

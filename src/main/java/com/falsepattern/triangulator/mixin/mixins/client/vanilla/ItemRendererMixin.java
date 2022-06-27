@@ -1,7 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.ItemRenderListManager;
-import com.falsepattern.triangulator.TriConfig;
+import com.falsepattern.triangulator.config.TriConfig;
 import lombok.SneakyThrows;
 import net.minecraft.client.renderer.Tessellator;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,6 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.optifine.leakfix;
 
-import com.falsepattern.triangulator.mixin.helper.LeakFix;
+import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.mixin.stubpackage.WrDisplayListAllocator;
 import net.minecraft.client.renderer.RenderGlobal;
 import org.spongepowered.asm.lib.Opcodes;
