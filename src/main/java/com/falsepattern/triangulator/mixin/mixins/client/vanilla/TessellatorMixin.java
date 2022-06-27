@@ -46,7 +46,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;
     private boolean shaderOn = false;
-    private boolean forceQuadRendering = false;
+    private int forceQuadRendering = 0;
     private int quadVerticesPutIntoBuffer = 0;
 
     @Inject(method = "reset",
@@ -66,7 +66,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (TriCompat.enableTriangulation() &&value == GL11.GL_QUADS && !forceQuadRendering) {
+        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS && forceQuadRendering == 0) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -174,17 +174,18 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public void disableTriangulator() {
-        forceQuadRendering = true;
+        forceQuadRendering++;
     }
 
     @Override
     public void enableTriangulator() {
-        forceQuadRendering = false;
+        forceQuadRendering--;
+        if (forceQuadRendering < 0) forceQuadRendering = 0;
     }
 
     @Override
     public boolean isTriangulatorDisabled() {
-        return forceQuadRendering;
+        return TriCompat.enableTriangulation() || forceQuadRendering == 0;
     }
 
     @Override

@@ -19,13 +19,13 @@ public interface ToggleableTessellator {
     boolean isQuadTriangulationSuspended();
 
     /**
-     * Temporarily disables triangulation. Call this <em>before</em> you call {@link net.minecraft.client.renderer.Tessellator#startDrawingQuads()}.
-     * This is useful for drawing wireframe meshes, where you don't want a diagonal line to show up.
+     * Completely disables triangulation and falls back to quad rendering.
      */
     void disableTriangulator();
 
     /**
-     * Disables the effect of {@link #disableTriangulator()}.
+     * Disables the effect of {@link #disableTriangulator()}. If it was called multiple times, this method also needs to
+     * be called at least the same amount of times to re-enable it.
      */
     void enableTriangulator();
 
