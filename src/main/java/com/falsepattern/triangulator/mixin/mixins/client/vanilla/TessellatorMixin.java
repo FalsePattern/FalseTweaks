@@ -34,9 +34,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private int rawBufferIndex;
     @Shadow
     private int vertexCount;
-    @Shadow private int rawBufferSize;
-
-    @Shadow public abstract TesselatorVertexState getVertexState(float p_147564_1_, float p_147564_2_, float p_147564_3_);
 
     private boolean hackedQuadRendering = false;
     @Getter
