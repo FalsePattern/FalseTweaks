@@ -12,11 +12,12 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.opengl.GL11;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LeakFix {
-    public static final LeakFix INSTANCE = new LeakFix();
+    private static final LeakFix INSTANCE = new LeakFix();
     public static final boolean ENABLED;
 
     @Getter
@@ -33,6 +34,10 @@ public final class LeakFix {
 
     public static int getCachedBufferCount() {
         return freshAllocations.size() + reusableAllocations.size();
+    }
+
+    public static void registerBus() {
+        MinecraftForge.EVENT_BUS.register(INSTANCE);
     }
 
     public static void activate() {

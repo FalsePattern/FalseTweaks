@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.TriConfig;
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
@@ -34,6 +35,10 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private int rawBufferIndex;
     @Shadow
     private int vertexCount;
+    @Shadow private int rawBufferSize;
+
+    @Shadow public abstract TesselatorVertexState getVertexState(float p_147564_1_, float p_147564_2_, float p_147564_3_);
+
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -62,7 +67,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (TriConfig.ENABLE_QUAD_TRIANGULATION && value == GL11.GL_QUADS && !forceQuadRendering) {
+        if (TriCompat.enableTriangulation() &&value == GL11.GL_QUADS && !forceQuadRendering) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -108,7 +113,15 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public void triangulate() {
-        if (!hackedQuadRendering || quadTriangulationTemporarilySuspended) return;
+        if (hackedQuadRendering) {
+            fixAOTriangles();
+        } else if (drawMode == GL11.GL_QUADS) {
+            fixAOQuad();
+        }
+    }
+
+    private void fixAOTriangles() {
+        if (quadTriangulationTemporarilySuspended) return;
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             int vertexSize = shaderOn() ? 18 : 8;
@@ -126,6 +139,27 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             }
             vertexCount += 2;
             rawBufferIndex += 2 * vertexSize;
+        }
+    }
+
+    private void fixAOQuad() {
+        //Current vertex layout: ABCD
+        if (alternativeTriangulation) {
+            //Target vertex layout: BCDA
+            quadVerticesPutIntoBuffer++;
+            if (quadVerticesPutIntoBuffer == 1) {
+                int vertexSize = shaderOn() ? 18 : 8;
+                rawBufferIndex -= vertexSize;
+                vertexCount--;
+                System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex + 3 * vertexSize, vertexSize);
+            } else if (quadVerticesPutIntoBuffer == 4) {
+                rawBufferIndex += shaderOn() ? 18 : 8;
+                vertexCount++;
+                quadVerticesPutIntoBuffer = 0;
+                alternativeTriangulation = false;
+            }
+        } else {
+            quadVerticesPutIntoBuffer = 0;
         }
     }
 

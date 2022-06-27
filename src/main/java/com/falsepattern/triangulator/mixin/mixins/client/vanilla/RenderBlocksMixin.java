@@ -1,11 +1,13 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
-import com.falsepattern.triangulator.TriConfig;
+import com.falsepattern.triangulator.TriCompat;
+import com.falsepattern.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
+import lombok.var;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -101,25 +103,33 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
             },
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
-        if (!TriConfig.ENABLE_QUAD_TRIANGULATION) return;
         if (reusePreviousStates) return;
-        val avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
-        val avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
-        val avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
-        val avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
+        var avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
+        var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
+        var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
+        var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
+        if (!TriCompat.enableTriangulation() && CalibrationConfig.FLIP_DIAGONALS) {
+            var tmp = avgTopLeft;
+            avgTopLeft = avgBottomLeft;
+            avgBottomLeft = tmp;
+            tmp = avgTopRight;
+            avgTopRight = avgBottomRight;
+            avgBottomRight = tmp;
+        }
         val mainDiagonalDiff = diff(avgTopLeft, avgBottomRight);
         val altDiagonalDiff = diff(avgBottomLeft, avgTopRight);
         if (Math.abs(mainDiagonalDiff - altDiagonalDiff) < 0.01) {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
-            if (mainDiagonalAvg < altDiagonalAvg) {
+            if (Math.abs(mainDiagonalAvg - altDiagonalAvg) > 0.01 && mainDiagonalAvg < altDiagonalAvg) {
                 ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+                return;
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
             ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
-        } else {
-            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(false);
+            return;
         }
+        ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(false);
     }
 
     private void reuse(int index) {
