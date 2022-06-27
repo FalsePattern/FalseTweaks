@@ -1,3 +1,7 @@
+## NOTICE
+The mod currently has a lot of known bugs. Please do not report texture errors, i know about them, a fix is planned.
+
+
 A mixin-based library to improve the horrible stuttering in heavily modded games caused by animated textures (also known as Animated Terrain from OptiFine, but this mod actually optimizes the way said animations are uploaded to the graphics card, instead of just outright turning them off and calling that a "fix").
 
 This happens because each individual animated texture has to separately upload its contents to the GPU. Each of these uploads has a nonzero overhead, which quickly spirals out of control when faced with hundreds or even thousands of animated textures.
