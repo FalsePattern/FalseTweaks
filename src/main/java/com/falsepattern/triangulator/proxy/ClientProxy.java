@@ -6,6 +6,7 @@ import com.falsepattern.triangulator.ItemRenderListManager;
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.calibration.Calibration;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
+import com.falsepattern.triangulator.config.TriConfig;
 import com.falsepattern.triangulator.leakfix.LeakFix;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -18,6 +19,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         try {
+            ConfigurationManager.registerConfig(TriConfig.class);
             ConfigurationManager.registerConfig(CalibrationConfig.class);
         } catch (ConfigException ex) {
             Triangulator.triLog.error("Failed to register config", ex);
