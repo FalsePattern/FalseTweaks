@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
      version = Tags.VERSION,
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
-     dependencies = "required-after:falsepatternlib@[0.8.0,);")
+     dependencies = "required-after:falsepatternlib@[0.9.1,);")
 public class AnimFix {
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy",
