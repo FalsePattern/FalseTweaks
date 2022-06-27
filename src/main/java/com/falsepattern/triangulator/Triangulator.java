@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
      version = Tags.VERSION,
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
-     guiFactory = Tags.GROUPNAME + ".TriangulatorGuiFactory",
+     guiFactory = Tags.GROUPNAME + ".config.TriangulatorGuiFactory",
      dependencies = "required-after:falsepatternlib@[0.9.1,);")
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
