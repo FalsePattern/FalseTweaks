@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.TriCompat;
+import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
@@ -108,7 +109,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (!TriCompat.enableTriangulation() && CalibrationConfig.FLIP_DIAGONALS) {
+        if (((ToggleableTessellator)Tessellator.instance).isTriangulatorDisabled() && CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
             avgBottomLeft = tmp;
