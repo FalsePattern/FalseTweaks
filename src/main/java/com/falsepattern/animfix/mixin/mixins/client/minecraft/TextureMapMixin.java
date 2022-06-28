@@ -20,10 +20,8 @@ import java.util.List;
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin implements ITextureMapMixin {
     @Shadow private int mipmapLevels;
-    @Shadow @Final private String basePath;
     private AnimationUpdateBatcher batcher;
     private static Profiler theProfiler;
-    private boolean batchingDisabled;
 
     @Inject(method = "loadTexture",
             at = @At(value = "HEAD"),
@@ -48,7 +46,6 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
         boolean ret = listAnimatedSprites.add(sprite);
-        if (batchingDisabled) return ret;
         AnimationUpdateBatcher.batcher = batcher;
         TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(), sprite.getOriginX(), sprite.getOriginY(), false, false);
         AnimationUpdateBatcher.batcher = null;
@@ -59,7 +56,6 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void beginBatchAnimations(CallbackInfo ci) {
-        if (batchingDisabled) return;
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
@@ -71,7 +67,6 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             at = @At(value = "RETURN"),
             require = 1)
     private void flushBatchAnimations(CallbackInfo ci) {
-        if (batchingDisabled) return;
         AnimationUpdateBatcher.batcher = null;
         if (batcher != null) {
             theProfiler.startSection("uploadBatch");
@@ -84,15 +79,5 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     @Override
     public void initializeBatcher(int xOffset, int yOffset, int width, int height) {
         batcher = new AnimationUpdateBatcher(xOffset, yOffset, width, height, mipmapLevels);
-    }
-
-    @Override
-    public String getBasePath() {
-        return basePath;
-    }
-
-    @Override
-    public void disableBatching() {
-        batchingDisabled = true;
     }
 }
