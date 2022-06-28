@@ -31,9 +31,6 @@ public abstract class StitcherMixin {
     private int currentHeight;
     @Shadow
     private int currentWidth;
-    @Shadow
-    @Final
-    private int maxWidth;
     private TurboStitcher masterStitcher;
     private TurboStitcher batchingStitcher;
 

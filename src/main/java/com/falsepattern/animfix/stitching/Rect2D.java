@@ -12,9 +12,4 @@ public class Rect2D {
     public int y;
     public int width;
     public int height;
-
-    public void applyOffset(int x, int y) {
-        this.x += x;
-        this.y += y;
-    }
 }

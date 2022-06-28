@@ -44,11 +44,11 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
               require = 1)
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
-        boolean ret = listAnimatedSprites.add(sprite);
+        listAnimatedSprites.add(sprite);
         AnimationUpdateBatcher.batcher = batcher;
         TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(), sprite.getOriginX(), sprite.getOriginY(), false, false);
         AnimationUpdateBatcher.batcher = null;
-        return ret;
+        return true;
     }
 
     @Inject(method = "updateAnimations",

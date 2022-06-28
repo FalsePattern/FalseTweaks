@@ -7,8 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public abstract class Packer<T extends Rect2D> {
-    int stripWidth;
-    List<T> rectangles;
+    final int stripWidth;
+    final List<T> rectangles;
 
     Packer(int stripWidth, List<T> rectangles) {
         this.stripWidth = stripWidth;
