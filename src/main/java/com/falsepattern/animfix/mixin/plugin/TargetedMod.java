@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.*;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {

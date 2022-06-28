@@ -1,172 +1,90 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
-import com.falsepattern.animfix.AnimFix;
 import com.falsepattern.animfix.AnimationUpdateBatcher;
-import com.falsepattern.animfix.Config;
-import com.falsepattern.animfix.MegaTexture;
-import com.falsepattern.animfix.interfaces.IRecursiveStitcher;
-import com.falsepattern.animfix.interfaces.IStitcherSlotMixin;
+import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
+import com.falsepattern.animfix.stitching.TooBigException;
+import com.falsepattern.animfix.stitching.TurboStitcher;
+import cpw.mods.fml.common.ProgressManager;
 import lombok.val;
+import net.minecraft.client.renderer.StitcherException;
 import net.minecraft.client.renderer.texture.Stitcher;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
 import java.util.List;
+import java.util.Set;
 
+@SuppressWarnings("deprecation")
 @Mixin(Stitcher.class)
-public abstract class StitcherMixin implements IRecursiveStitcher {
-    private boolean skipRecursion;
-    private Set<TextureAtlasSprite> animatedSprites;
-    private List<Stitcher.Slot> animatedSlots;
-    private TextureAtlasSprite megaTexture;
+public abstract class StitcherMixin {
+    @Shadow
+    @Final
+    private List<Stitcher.Slot> stitchSlots;
 
-    @Shadow @Final private Set<Stitcher.Holder> setStitchHolders;
+    @Shadow
+    private int currentHeight;
+    @Shadow
+    private int currentWidth;
+    private TurboStitcher masterStitcher;
+    private TurboStitcher batchingStitcher;
 
-    @Shadow @Final private boolean forcePowerOf2;
-
-    @Shadow @Final private int maxWidth;
-
-    @Shadow @Final private int maxHeight;
-
-    @Shadow @Final private int maxTileDimension;
-
-    @Shadow @Final private int mipmapLevelStitcher;
-
-    @Shadow public abstract void addSprite(TextureAtlasSprite p_110934_1_);
-
-    @Shadow @Final private List<Stitcher.Slot> stitchSlots;
-
-    @Shadow public abstract void doStitch();
-
-    @Shadow private int currentWidth;
-
-    @Shadow private int currentHeight;
-
-    @Override
-    public void doNotRecurse() {
-        skipRecursion = true;
+    @Inject(method = "<init>",
+            at = @At(value = "RETURN"),
+            require = 1)
+    private void initTurbo(int maxWidth, int maxHeight, boolean forcePowerOf2, int maxTileDimension, int mipmapLevelStitcher, CallbackInfo ci) {
+        masterStitcher = new TurboStitcher(maxWidth, maxHeight);
+        batchingStitcher = new TurboStitcher(maxWidth, maxHeight);
+        masterStitcher.addSprite(batchingStitcher);
     }
 
-    @Override
-    public List<Stitcher.Slot> getSlots() {
-        return stitchSlots;
+    @Redirect(method = "addSprite",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"),
+              require = 1)
+    private boolean hijackAdd(Set<Stitcher.Holder> instance, Object e) {
+        val holder = (Stitcher.Holder) e;
+        val sprite = holder.getAtlasSprite();
+        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) && (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize && holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
+            batchingStitcher.addSprite(holder);
+        } else {
+            masterStitcher.addSprite((Stitcher.Holder) e);
+        }
+        return true;
     }
 
     @Inject(method = "doStitch",
             at = @At(value = "HEAD"),
+            cancellable = true,
             require = 1)
-    private void doStitch_0(CallbackInfo ci) {
-        if (!skipRecursion) {
-            val animatedHolders = new HashSet<Stitcher.Holder>();
-            int maxSize = Config.maximumBatchedTextureSize;
-
-            //Extract animated sprites that are smaller than the max size
-            for (Stitcher.Holder setStitchHolder : setStitchHolders) {
-                TextureAtlasSprite sprite = setStitchHolder.getAtlasSprite();
-                if (sprite.getIconWidth() > maxSize || sprite.getIconHeight() > maxSize) continue;
-                if (setStitchHolder.getAtlasSprite().hasAnimationMetadata()) {
-                    animatedHolders.add(setStitchHolder);
-                }
-            }
-
-            //Bailout if there aren't any animated textures
-            if (animatedHolders.size() == 0) {
-                skipRecursion = true;
-            } else {
-
-                setStitchHolders.removeAll(animatedHolders);
-
-                //Put animated textures into a "block"
-                Stitcher recursiveStitcher = new Stitcher(maxWidth, maxHeight, forcePowerOf2, maxTileDimension, mipmapLevelStitcher);
-                ((IRecursiveStitcher) recursiveStitcher).doNotRecurse();
-                animatedSprites = new HashSet<>();
-                for (Stitcher.Holder holder : animatedHolders) {
-                    val sprite = holder.getAtlasSprite();
-                    animatedSprites.add(sprite);
-                    recursiveStitcher.addSprite(sprite);
-                }
-                recursiveStitcher.doStitch();
-
-                //Replace the textures with a placeholder in the atlas
-                animatedSlots = ((IRecursiveStitcher) recursiveStitcher).getSlots();
-                megaTexture = new MegaTexture();
-                megaTexture.setIconWidth(recursiveStitcher.getCurrentWidth());
-                megaTexture.setIconHeight(recursiveStitcher.getCurrentHeight());
-                addSprite(megaTexture);
-            }
+    private void doTurboStitch(CallbackInfo ci) {
+        ci.cancel();
+        try {
+            val bar = ProgressManager.push("Texture stitching", 4);
+            bar.step("Stitching animated textures");
+            batchingStitcher.stitch();
+            bar.step("Stitching master atlas");
+            masterStitcher.addSprite(batchingStitcher);
+            masterStitcher.stitch();
+            currentWidth = masterStitcher.width;
+            currentHeight = masterStitcher.height;
+            bar.step("Extracting stitched textures");
+            stitchSlots.clear();
+            stitchSlots.addAll(masterStitcher.getSlots());
+            bar.step("Initializing animated texture batcher");
+            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x, batchingStitcher.y, batchingStitcher.width, batchingStitcher.height);
+            ProgressManager.pop(bar);
+        } catch (TooBigException ignored) {
+            throw new StitcherException(null, "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
+        } finally {
+            masterStitcher.reset();
+            batchingStitcher.reset();
+            masterStitcher.addSprite(batchingStitcher);
         }
     }
-
-    @Inject(method = "doStitch",
-            at = @At(value = "RETURN"),
-            require = 1)
-    private void doStitch_1(CallbackInfo ci) {
-        if (!skipRecursion) {
-            //Find our placeholder in the atlas
-            Stitcher.Slot megaTextureSlot = null;
-            for (Stitcher.Slot slot : stitchSlots) {
-                megaTextureSlot = removeMegaSlotRecursive(slot);
-                if (megaTextureSlot != null) break;
-            }
-            if (megaTextureSlot == null) {
-                // Something weird is going on. Emergency cancel of all batching logic for this atlas.
-
-                String basePath;
-                if (AnimationUpdateBatcher.currentAtlas != null) {
-                    basePath = ((ITextureMapMixin)AnimationUpdateBatcher.currentAtlas).getBasePath();
-                    ((ITextureMapMixin)AnimationUpdateBatcher.currentAtlas).disableBatching();
-                } else {
-                    basePath = "Unknown Atlas";
-                }
-                AnimFix.error(basePath + ": Could not batch stitch animated textures! " +
-                              "This is 99% a mod compatibility issue, do not report this issue to the developers without identifying the exact mod responsible for the conflict, or you will be ignored!");
-                val megaTextureHolder = setStitchHolders.stream().filter((holder) -> holder.getAtlasSprite() == megaTexture).findFirst();
-                megaTextureHolder.ifPresent(holder -> setStitchHolders.remove(holder));
-                animatedSprites.forEach(this::addSprite);
-                animatedSprites.clear();
-                doNotRecurse();
-                stitchSlots.clear();
-                currentWidth = 0;
-                currentHeight = 0;
-                doStitch();
-            } else {
-
-                //Clear the texture from the placeholder, and populate it with the animated textures
-                Stitcher.Holder megaHolder = megaTextureSlot.getStitchHolder();
-                setStitchHolders.remove(megaHolder);
-                ((IStitcherSlotMixin) megaTextureSlot).insertHolder(null);
-                for (Stitcher.Slot animatedSlot : animatedSlots) {
-                    ((IStitcherSlotMixin) megaTextureSlot).insertSlot(animatedSlot);
-                }
-                ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(megaTextureSlot.getOriginX(), megaTextureSlot.getOriginY(), megaHolder.getWidth(), megaHolder.getHeight());
-            }
-        }
-        skipRecursion = false;
-        animatedSprites = null;
-        animatedSlots = null;
-        megaTexture = null;
-    }
-
-    private Stitcher.Slot removeMegaSlotRecursive(Stitcher.Slot slot) {
-        Stitcher.Holder holder = slot.getStitchHolder();
-        if (holder == null) {
-            List<Stitcher.Slot> slots = new ArrayList<>();
-            slot.getAllStitchSlots(slots);
-            for (Stitcher.Slot slot2 : slots) {
-                Stitcher.Slot result = removeMegaSlotRecursive(slot2);
-                if (result != null) return result;
-            }
-        } else if (holder.getAtlasSprite() == megaTexture) {
-            return slot;
-        }
-        return null;
-    }
-
 }

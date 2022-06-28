@@ -1,14 +1,12 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
-import com.falsepattern.animfix.Config;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.profiler.Profiler;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,20 +15,19 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin implements ITextureMapMixin {
-    @Shadow private int mipmapLevels;
-    @Shadow @Final private String basePath;
-    private AnimationUpdateBatcher batcher;
     private static Profiler theProfiler;
-    private boolean batchingDisabled;
+    @Shadow
+    private int mipmapLevels;
+    private AnimationUpdateBatcher batcher;
 
     @Inject(method = "loadTexture",
             at = @At(value = "HEAD"),
             require = 1)
     private void setupBatcher(CallbackInfo ci) {
         AnimationUpdateBatcher.currentAtlas = (TextureMap) (Object) this;
-        Config.reload();
     }
 
     @Inject(method = "loadTexture",
@@ -47,19 +44,17 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
               require = 1)
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
-        boolean ret = listAnimatedSprites.add(sprite);
-        if (batchingDisabled) return ret;
+        listAnimatedSprites.add(sprite);
         AnimationUpdateBatcher.batcher = batcher;
         TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(), sprite.getOriginX(), sprite.getOriginY(), false, false);
         AnimationUpdateBatcher.batcher = null;
-        return ret;
+        return true;
     }
 
     @Inject(method = "updateAnimations",
             at = @At(value = "HEAD"),
             require = 1)
     private void beginBatchAnimations(CallbackInfo ci) {
-        if (batchingDisabled) return;
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
@@ -71,7 +66,6 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             at = @At(value = "RETURN"),
             require = 1)
     private void flushBatchAnimations(CallbackInfo ci) {
-        if (batchingDisabled) return;
         AnimationUpdateBatcher.batcher = null;
         if (batcher != null) {
             theProfiler.startSection("uploadBatch");
@@ -84,15 +78,5 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     @Override
     public void initializeBatcher(int xOffset, int yOffset, int width, int height) {
         batcher = new AnimationUpdateBatcher(xOffset, yOffset, width, height, mipmapLevels);
-    }
-
-    @Override
-    public String getBasePath() {
-        return basePath;
-    }
-
-    @Override
-    public void disableBatching() {
-        batchingDisabled = true;
     }
 }
