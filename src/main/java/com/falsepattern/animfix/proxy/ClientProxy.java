@@ -1,10 +1,10 @@
 package com.falsepattern.animfix.proxy;
 
-import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.AnimFix;
+import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
 

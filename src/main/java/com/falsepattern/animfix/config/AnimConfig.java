@@ -2,10 +2,6 @@ package com.falsepattern.animfix.config;
 
 import com.falsepattern.animfix.Tags;
 import com.falsepattern.lib.config.Config;
-import lombok.val;
-import net.minecraftforge.common.config.Configuration;
-
-import java.io.File;
 
 @Config(modid = Tags.MODID)
 public class AnimConfig {

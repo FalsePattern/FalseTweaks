@@ -2,7 +2,9 @@ package com.falsepattern.animfix.stitching;
 
 import com.falsepattern.animfix.stitching.packing2d.Algorithm;
 import com.falsepattern.animfix.stitching.packing2d.Packer;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import net.minecraft.client.renderer.texture.Stitcher;
 
 import java.util.ArrayList;
