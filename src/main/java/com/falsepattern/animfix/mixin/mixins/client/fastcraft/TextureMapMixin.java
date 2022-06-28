@@ -41,5 +41,6 @@ public abstract class TextureMapMixin {
                        target = "Lfastcraft/HC;l(Lnet/minecraft/client/renderer/texture/TextureMap;Ljava/lang/String;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
                        remap = false),
               remap = false)
-    private void disableSetTextureEntryTweak(TextureMap map, String str, TextureAtlasSprite sprite) {}
+    private void disableSetTextureEntryTweak(TextureMap map, String str, TextureAtlasSprite sprite) {
+    }
 }

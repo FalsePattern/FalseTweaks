@@ -23,13 +23,20 @@ import java.util.Set;
 @SuppressWarnings("deprecation")
 @Mixin(Stitcher.class)
 public abstract class StitcherMixin {
-    @Shadow @Final private List<Stitcher.Slot> stitchSlots;
+    @Shadow
+    @Final
+    private List<Stitcher.Slot> stitchSlots;
 
-    @Shadow private int currentHeight;
-    @Shadow private int currentWidth;
-    @Shadow @Final private int maxWidth;
+    @Shadow
+    private int currentHeight;
+    @Shadow
+    private int currentWidth;
+    @Shadow
+    @Final
+    private int maxWidth;
     private TurboStitcher masterStitcher;
     private TurboStitcher batchingStitcher;
+
     @Inject(method = "<init>",
             at = @At(value = "RETURN"),
             require = 1)
@@ -46,8 +53,7 @@ public abstract class StitcherMixin {
     private boolean hijackAdd(Set<Stitcher.Holder> instance, Object e) {
         val holder = (Stitcher.Holder) e;
         val sprite = holder.getAtlasSprite();
-        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) &&
-            (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize && holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
+        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) && (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize && holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
             batchingStitcher.addSprite(holder);
         } else {
             masterStitcher.addSprite((Stitcher.Holder) e);

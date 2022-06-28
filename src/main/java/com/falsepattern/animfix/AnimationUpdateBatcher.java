@@ -17,6 +17,7 @@ public class AnimationUpdateBatcher {
     private final int width;
     private final int height;
     private final IntBuffer[] data;
+
     public AnimationUpdateBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
         this.mipLevels = mipLevel;
         this.xOffset = xOffset;
@@ -32,7 +33,8 @@ public class AnimationUpdateBatcher {
     public boolean batchUpload(int[][] texture, int width, int height, int xOffset, int yOffset) {
         xOffset -= this.xOffset;
         yOffset -= this.yOffset;
-        if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height) return false;
+        if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height)
+            return false;
         int w = this.width;
         for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
             IntBuffer atlasTexture = data[mipMapLevel];

@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Stitcher.Slot.class)
 public abstract class StitcherSlotMixin implements IStitcherSlotMixin {
-    @Shadow private Stitcher.Holder holder;
+    @Shadow
+    private Stitcher.Holder holder;
+
     @Override
     public void insertHolder(Stitcher.Holder holder) {
         this.holder = holder;

@@ -15,11 +15,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin implements ITextureMapMixin {
-    @Shadow private int mipmapLevels;
-    private AnimationUpdateBatcher batcher;
     private static Profiler theProfiler;
+    @Shadow
+    private int mipmapLevels;
+    private AnimationUpdateBatcher batcher;
 
     @Inject(method = "loadTexture",
             at = @At(value = "HEAD"),

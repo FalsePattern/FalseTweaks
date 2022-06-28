@@ -18,6 +18,17 @@ public class TurboStitcher extends SpriteSlot {
     @Getter
     private StitcherState state = StitcherState.SETUP;
 
+    private static int nextPowerOfTwo(int number) {
+        number--;
+        number |= number >>> 1;
+        number |= number >>> 2;
+        number |= number >>> 4;
+        number |= number >>> 8;
+        number |= number >>> 16;
+        number++;
+        return number;
+    }
+
     public void addSprite(Stitcher.Holder holder) {
         addSprite(new HolderSlot(holder));
     }
@@ -65,6 +76,7 @@ public class TurboStitcher extends SpriteSlot {
         slots = packedSlots;
         state = StitcherState.STITCHED;
     }
+
     public List<Stitcher.Slot> getSlots() {
         return getSlots(new Rect2D());
     }
@@ -73,21 +85,10 @@ public class TurboStitcher extends SpriteSlot {
         verifyState(StitcherState.STITCHED);
         val mineSlots = new ArrayList<Stitcher.Slot>();
         val offset = new Rect2D(x + parent.x, y + parent.y, width, height);
-        for (val slot: slots) {
+        for (val slot : slots) {
             mineSlots.addAll(slot.getSlots(offset));
         }
         return mineSlots;
-    }
-
-    private static int nextPowerOfTwo(int number) {
-        number--;
-        number |= number >>> 1;
-        number |= number >>> 2;
-        number |= number >>> 4;
-        number |= number >>> 8;
-        number |= number >>> 16;
-        number++;
-        return number;
     }
 
     private void verifyState(StitcherState... allowedStates) {

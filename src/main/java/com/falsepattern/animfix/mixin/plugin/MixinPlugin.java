@@ -15,6 +15,7 @@ public class MixinPlugin implements IMixinPlugin {
     public ITargetedMod[] getTargetedModEnumValues() {
         return TargetedMod.values();
     }
+
     @Override
     public IMixin[] getMixinEnumValues() {
         return Mixin.values();
