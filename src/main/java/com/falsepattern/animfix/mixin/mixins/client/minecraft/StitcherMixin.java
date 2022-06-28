@@ -22,7 +22,7 @@ import java.util.Set;
 
 @SuppressWarnings("deprecation")
 @Mixin(Stitcher.class)
-public abstract class StitcherMixinNew {
+public abstract class StitcherMixin {
     @Shadow @Final private List<Stitcher.Slot> stitchSlots;
 
     @Shadow private int currentHeight;

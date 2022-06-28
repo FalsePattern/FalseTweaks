@@ -15,7 +15,7 @@ public enum Mixin implements IMixin {
     //region Minecraft->client
         TextureMapMixin(Side.CLIENT, always(), "minecraft.TextureMapMixin"),
         TextureUtilMixin(Side.CLIENT, always(), "minecraft.TextureUtilMixin"),
-        StitcherMixin(Side.CLIENT, always(), "minecraft.StitcherMixinNew"),
+        StitcherMixin(Side.CLIENT, always(), "minecraft.StitcherMixin"),
         StitcherSlotMixin(Side.CLIENT, always(), "minecraft.StitcherSlotMixin"),
     //endregion Minecraft->client
     //region FastCraft->client
