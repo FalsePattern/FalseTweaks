@@ -1,7 +1,7 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
-import com.falsepattern.animfix.Config;
+import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
 import com.falsepattern.animfix.stitching.TooBigException;
 import com.falsepattern.animfix.stitching.TurboStitcher;
@@ -47,7 +47,7 @@ public abstract class StitcherMixin {
         val holder = (Stitcher.Holder) e;
         val sprite = holder.getAtlasSprite();
         if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) &&
-            (holder.getWidth() <= Config.maximumBatchedTextureSize && holder.getHeight() <= Config.maximumBatchedTextureSize)) {
+            (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize && holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
             batchingStitcher.addSprite(holder);
         } else {
             masterStitcher.addSprite((Stitcher.Holder) e);

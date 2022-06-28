@@ -1,14 +1,13 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
-import com.falsepattern.animfix.Config;
+import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.profiler.Profiler;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +27,6 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             require = 1)
     private void setupBatcher(CallbackInfo ci) {
         AnimationUpdateBatcher.currentAtlas = (TextureMap) (Object) this;
-        Config.reload();
     }
 
     @Inject(method = "loadTexture",
