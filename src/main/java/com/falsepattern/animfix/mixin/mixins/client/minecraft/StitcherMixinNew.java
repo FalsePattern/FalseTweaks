@@ -1,5 +1,8 @@
 package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
+import com.falsepattern.animfix.AnimationUpdateBatcher;
+import com.falsepattern.animfix.Config;
+import com.falsepattern.animfix.interfaces.ITextureMapMixin;
 import com.falsepattern.animfix.stitching.TooBigException;
 import com.falsepattern.animfix.stitching.TurboStitcher;
 import cpw.mods.fml.common.ProgressManager;
@@ -24,14 +27,16 @@ public abstract class StitcherMixinNew {
 
     @Shadow private int currentHeight;
     @Shadow private int currentWidth;
+    @Shadow @Final private int maxWidth;
     private TurboStitcher masterStitcher;
-    private TurboStitcher animatedStitcher;
+    private TurboStitcher batchingStitcher;
     @Inject(method = "<init>",
             at = @At(value = "RETURN"),
             require = 1)
     private void initTurbo(int maxWidth, int maxHeight, boolean forcePowerOf2, int maxTileDimension, int mipmapLevelStitcher, CallbackInfo ci) {
         masterStitcher = new TurboStitcher(maxWidth, maxHeight);
-        animatedStitcher = new TurboStitcher(maxWidth, maxHeight);
+        batchingStitcher = new TurboStitcher(maxWidth, maxHeight);
+        masterStitcher.addSprite(batchingStitcher);
     }
 
     @Redirect(method = "addSprite",
@@ -41,8 +46,9 @@ public abstract class StitcherMixinNew {
     private boolean hijackAdd(Set<Stitcher.Holder> instance, Object e) {
         val holder = (Stitcher.Holder) e;
         val sprite = holder.getAtlasSprite();
-        if (sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) {
-            animatedStitcher.addSprite(holder);
+        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) &&
+            (holder.getWidth() <= Config.maximumBatchedTextureSize && holder.getHeight() <= Config.maximumBatchedTextureSize)) {
+            batchingStitcher.addSprite(holder);
         } else {
             masterStitcher.addSprite((Stitcher.Holder) e);
         }
@@ -55,22 +61,27 @@ public abstract class StitcherMixinNew {
             require = 1)
     private void doTurboStitch(CallbackInfo ci) {
         ci.cancel();
-        val bar = ProgressManager.push("Texture stitching", 3);
         try {
+            val bar = ProgressManager.push("Texture stitching", 4);
             bar.step("Stitching animated textures");
-            animatedStitcher.stitch();
+            batchingStitcher.stitch();
             bar.step("Stitching master atlas");
-            masterStitcher.addSprite(animatedStitcher);
+            masterStitcher.addSprite(batchingStitcher);
             masterStitcher.stitch();
             currentWidth = masterStitcher.width;
             currentHeight = masterStitcher.height;
+            bar.step("Extracting stitched textures");
+            stitchSlots.clear();
+            stitchSlots.addAll(masterStitcher.getSlots());
+            bar.step("Initializing animated texture batcher");
+            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x, batchingStitcher.y, batchingStitcher.width, batchingStitcher.height);
+            ProgressManager.pop(bar);
         } catch (TooBigException ignored) {
             throw new StitcherException(null, "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
+        } finally {
+            masterStitcher.reset();
+            batchingStitcher.reset();
+            masterStitcher.addSprite(batchingStitcher);
         }
-        bar.step("Extracting stitched textures");
-        stitchSlots.clear();
-        stitchSlots.addAll(masterStitcher.getSlots());
-        ProgressManager.pop(bar);
-        masterStitcher.reset();
     }
 }
