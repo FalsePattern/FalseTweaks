@@ -69,7 +69,6 @@ public abstract class StitcherMixin {
             bar.step("Stitching animated textures");
             batchingStitcher.stitch();
             bar.step("Stitching master atlas");
-            masterStitcher.addSprite(batchingStitcher);
             masterStitcher.stitch();
             currentWidth = masterStitcher.width;
             currentHeight = masterStitcher.height;
