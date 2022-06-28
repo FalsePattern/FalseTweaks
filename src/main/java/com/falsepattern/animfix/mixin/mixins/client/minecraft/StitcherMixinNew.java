@@ -1,0 +1,76 @@
+package com.falsepattern.animfix.mixin.mixins.client.minecraft;
+
+import com.falsepattern.animfix.stitching.TooBigException;
+import com.falsepattern.animfix.stitching.TurboStitcher;
+import cpw.mods.fml.common.ProgressManager;
+import lombok.val;
+import net.minecraft.client.renderer.StitcherException;
+import net.minecraft.client.renderer.texture.Stitcher;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
+import java.util.Set;
+
+@SuppressWarnings("deprecation")
+@Mixin(Stitcher.class)
+public abstract class StitcherMixinNew {
+    @Shadow @Final private List<Stitcher.Slot> stitchSlots;
+
+    @Shadow private int currentHeight;
+    @Shadow private int currentWidth;
+    private TurboStitcher masterStitcher;
+    private TurboStitcher animatedStitcher;
+    @Inject(method = "<init>",
+            at = @At(value = "RETURN"),
+            require = 1)
+    private void initTurbo(int maxWidth, int maxHeight, boolean forcePowerOf2, int maxTileDimension, int mipmapLevelStitcher, CallbackInfo ci) {
+        masterStitcher = new TurboStitcher(maxWidth, maxHeight);
+        animatedStitcher = new TurboStitcher(maxWidth, maxHeight);
+    }
+
+    @Redirect(method = "addSprite",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"),
+              require = 1)
+    private boolean hijackAdd(Set<Stitcher.Holder> instance, Object e) {
+        val holder = (Stitcher.Holder) e;
+        val sprite = holder.getAtlasSprite();
+        if (sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) {
+            animatedStitcher.addSprite(holder);
+        } else {
+            masterStitcher.addSprite((Stitcher.Holder) e);
+        }
+        return true;
+    }
+
+    @Inject(method = "doStitch",
+            at = @At(value = "HEAD"),
+            cancellable = true,
+            require = 1)
+    private void doTurboStitch(CallbackInfo ci) {
+        ci.cancel();
+        val bar = ProgressManager.push("Texture stitching", 3);
+        try {
+            bar.step("Stitching animated textures");
+            animatedStitcher.stitch();
+            bar.step("Stitching master atlas");
+            masterStitcher.addSprite(animatedStitcher);
+            masterStitcher.stitch();
+            currentWidth = masterStitcher.width;
+            currentHeight = masterStitcher.height;
+        } catch (TooBigException ignored) {
+            throw new StitcherException(null, "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
+        }
+        bar.step("Extracting stitched textures");
+        stitchSlots.clear();
+        stitchSlots.addAll(masterStitcher.getSlots());
+        ProgressManager.pop(bar);
+        masterStitcher.reset();
+    }
+}

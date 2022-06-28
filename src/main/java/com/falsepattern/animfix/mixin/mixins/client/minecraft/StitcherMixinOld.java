@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.List;
 
 @Mixin(Stitcher.class)
-public abstract class StitcherMixin implements IRecursiveStitcher {
+public abstract class StitcherMixinOld implements IRecursiveStitcher {
     private boolean skipRecursion;
     private Set<TextureAtlasSprite> animatedSprites;
     private List<Stitcher.Slot> animatedSlots;
