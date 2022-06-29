@@ -2,14 +2,11 @@ package com.falsepattern.triangulator.calibration;
 
 import com.falsepattern.lib.compat.GuiLabel;
 import com.falsepattern.triangulator.Tags;
-import com.falsepattern.triangulator.api.ToggleableTessellator;
-import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.val;
 import lombok.var;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -41,29 +38,14 @@ public class CalibrationGUI extends GuiScreen {
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glShadeModel(GL11.GL_SMOOTH);
-        val tess = Tessellator.instance;
-        ((ToggleableTessellator)tess).disableTriangulator();
-        tess.startDrawingQuads();
-        ((ITessellatorMixin)tess).alternativeTriangulation(flip);
-        drawQuad(left, top, scale, 3);
-        ((ITessellatorMixin)tess).alternativeTriangulation(!flip);
-        drawQuad(left, top + scale, scale, 0);
-        ((ITessellatorMixin)tess).alternativeTriangulation(flip);
-        drawQuad(left + scale, top + scale, scale, 1);
-        ((ITessellatorMixin)tess).alternativeTriangulation(!flip);
-        drawQuad(left + scale, top, scale, 2);
+        drawQuad(left, top, scale, 3, 0xFFFF00, false, flip);
+        drawQuad(left, top + scale, scale, 0, 0xFFFF00, false, !flip);
+        drawQuad(left + scale, top + scale, scale, 1, 0xFFFF00, false, flip);
+        drawQuad(left + scale, top, scale, 2, 0xFFFF00, false, !flip);
         top += scale * 2 + 10;
-        tess.draw();
-        ((ToggleableTessellator)tess).enableTriangulator();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         Minecraft.getMinecraft().getTextureManager().bindTexture(reference);
-        tess.startDrawingQuads();
-        tess.setColorOpaque_F(1, 1, 1);
-        tess.addVertexWithUV(left + scale * 2, top, 0, 1, 0);
-        tess.addVertexWithUV(left, top, 0, 0, 0);
-        tess.addVertexWithUV(left, top + scale * 2, 0, 0, 1);
-        tess.addVertexWithUV(left + scale * 2, top + scale * 2, 0, 1, 1);
-        tess.draw();
+        drawQuad(left, top, scale * 2, 4, 0xFFFFFF, true, false);
         GL11.glPopAttrib();
     }
 
@@ -115,45 +97,22 @@ public class CalibrationGUI extends GuiScreen {
     }
 
 
-    private void drawQuad(float x, float y, float scale, int blackIndex) {
-        val tess = Tessellator.instance;
-        for (int j = 0; j < 4; j++) {
-            float color = j == blackIndex ? 0 : 1;
-            tess.setColorOpaque_F(color, color, 0);
+    private void drawQuad(float x, float y, float scale, int blackIndex, int rgb, boolean texture, boolean alt) {
+        GL11.glBegin(GL11.GL_QUADS);
+        int r = (rgb >>> 16) & 0xff;
+        int g = (rgb >>> 8) & 0xff;
+        int b = rgb & 0xff;
+        int[] map = alt ? new int[]{1, 2, 3, 0} : new int[]{0, 1, 2, 3};
+        for (int i = 0; i < 4; i++) {
+            int j = map[i];
+            int color = j == blackIndex ? 0 : 1;
+            GL11.glColor3f(r * color, g * color, b * color);
             float X = ((j == 0) || (j == 3)) ? (x + scale) : x;
             float Y = ((j == 2) || (j == 3)) ? (y + scale) : y;
-            tess.addVertex(X, Y, 0);
-        }
-    }
-
-    private void drawQuadGLTris(float x, float y, float scale, float a, float b, float c, float d, boolean alternative) {
-        GL11.glBegin(GL11.GL_TRIANGLES);
-        if (alternative) {
-            GL11.glColor3f(a, a, a);
-            GL11.glVertex2f(x + scale, y);
-            GL11.glColor3f(b, b, b);
-            GL11.glVertex2f(x, y);
-            GL11.glColor3f(d, d, d);
-            GL11.glVertex2f(x + scale, y + scale);
-            GL11.glColor3f(d, d, d);
-            GL11.glVertex2f(x + scale, y + scale);
-            GL11.glColor3f(b, b, b);
-            GL11.glVertex2f(x, y);
-            GL11.glColor3f(c, c, c);
-            GL11.glVertex2f(x, y + scale);
-        } else {
-            GL11.glColor3f(a, a, a);
-            GL11.glVertex2f(x + scale, y);
-            GL11.glColor3f(b, b, b);
-            GL11.glVertex2f(x, y);
-            GL11.glColor3f(c, c, c);
-            GL11.glVertex2f(x, y + scale);
-            GL11.glColor3f(d, d, d);
-            GL11.glVertex2f(x + scale, y + scale);
-            GL11.glColor3f(a, a, a);
-            GL11.glVertex2f(x + scale, y);
-            GL11.glColor3f(c, c, c);
-            GL11.glVertex2f(x, y + scale);
+            if (texture) {
+                GL11.glTexCoord2f((j == 0 || j == 3) ? 1 : 0, (j == 2 || j == 3) ? 1 : 0);
+            }
+            GL11.glVertex2f(X, Y);
         }
         GL11.glEnd();
     }
