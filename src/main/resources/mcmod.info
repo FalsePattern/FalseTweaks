@@ -14,7 +14,7 @@
     "logoFile": "",
     "screenshots": [],
     "dependencies": [
-      "spongemixins"
+      "falsepatternlib"
     ]
   }
 ]
