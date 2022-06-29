@@ -3,6 +3,7 @@ package com.falsepattern.animfix.config;
 import com.falsepattern.animfix.Tags;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 

@@ -1,9 +1,10 @@
 package com.falsepattern.animfix.mixin.mixins.client.fastcraft;
 
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import net.minecraft.client.renderer.texture.AbstractTexture;
 
 
 //Evil black magic class #1

@@ -5,10 +5,7 @@ import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
 import com.falsepattern.animfix.stitching.TooBigException;
 import com.falsepattern.animfix.stitching.TurboStitcher;
-import cpw.mods.fml.common.ProgressManager;
 import lombok.val;
-import net.minecraft.client.renderer.StitcherException;
-import net.minecraft.client.renderer.texture.Stitcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.client.renderer.StitcherException;
+import net.minecraft.client.renderer.texture.Stitcher;
+import cpw.mods.fml.common.ProgressManager;
 
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,9 @@ public abstract class StitcherMixin {
     private boolean hijackAdd(Set<Stitcher.Holder> instance, Object e) {
         val holder = (Stitcher.Holder) e;
         val sprite = holder.getAtlasSprite();
-        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) && (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize && holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
+        if ((sprite.hasAnimationMetadata() || sprite.getFrameCount() > 1) &&
+            (holder.getWidth() <= AnimConfig.maximumBatchedTextureSize &&
+             holder.getHeight() <= AnimConfig.maximumBatchedTextureSize)) {
             batchingStitcher.addSprite(holder);
         } else {
             masterStitcher.addSprite((Stitcher.Holder) e);
@@ -76,10 +79,14 @@ public abstract class StitcherMixin {
             stitchSlots.clear();
             stitchSlots.addAll(masterStitcher.getSlots());
             bar.step("Initializing animated texture batcher");
-            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x, batchingStitcher.y, batchingStitcher.width, batchingStitcher.height);
+            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x,
+                                                                                       batchingStitcher.y,
+                                                                                       batchingStitcher.width,
+                                                                                       batchingStitcher.height);
             ProgressManager.pop(bar);
         } catch (TooBigException ignored) {
-            throw new StitcherException(null, "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
+            throw new StitcherException(null,
+                                        "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
         } finally {
             masterStitcher.reset();
             batchingStitcher.reset();

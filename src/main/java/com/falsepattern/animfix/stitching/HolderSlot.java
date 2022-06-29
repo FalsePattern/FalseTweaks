@@ -2,6 +2,7 @@ package com.falsepattern.animfix.stitching;
 
 import com.falsepattern.animfix.interfaces.IStitcherSlotMixin;
 import lombok.val;
+
 import net.minecraft.client.renderer.texture.Stitcher;
 
 import java.util.Collections;

@@ -1,9 +1,10 @@
 package com.falsepattern.animfix.mixin.mixins.client.fastcraft;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import net.minecraft.client.renderer.texture.DynamicTexture;
 
 //Evil black magic class #2
 //Revert fastcraft ASM changes

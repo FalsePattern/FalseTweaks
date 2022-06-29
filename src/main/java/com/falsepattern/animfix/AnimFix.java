@@ -1,11 +1,12 @@
 package com.falsepattern.animfix;
 
 import com.falsepattern.animfix.proxy.CommonProxy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Tags.MODID,
      version = Tags.VERSION,

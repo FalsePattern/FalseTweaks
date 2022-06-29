@@ -2,17 +2,18 @@ package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.profiler.Profiler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.profiler.Profiler;
 
 import java.util.List;
 
@@ -46,7 +47,8 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
         listAnimatedSprites.add(sprite);
         AnimationUpdateBatcher.batcher = batcher;
-        TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(), sprite.getOriginX(), sprite.getOriginY(), false, false);
+        TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(),
+                                        sprite.getOriginX(), sprite.getOriginY(), false, false);
         AnimationUpdateBatcher.batcher = null;
         return true;
     }

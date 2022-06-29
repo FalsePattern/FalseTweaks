@@ -6,6 +6,7 @@ import com.falsepattern.animfix.stitching.packing2d.Packer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+
 import net.minecraft.client.renderer.texture.Stitcher;
 
 import java.util.ArrayList;
@@ -56,8 +57,9 @@ public class TurboStitcher extends SpriteSlot {
         for (val slot : slots) {
             width = Math.max(width, slot.width);
         }
-        if (forcePowerOf2 || !AnimConfig.optimalPacking)
+        if (forcePowerOf2 || !AnimConfig.optimalPacking) {
             width = nextPowerOfTwo(width);
+        }
         if (width > maxWidth) {
             throw new TooBigException();
         }
@@ -80,8 +82,9 @@ public class TurboStitcher extends SpriteSlot {
             for (val sprite : packedSlots) {
                 height = Math.max(height, sprite.y + sprite.height);
             }
-            if (forcePowerOf2)
+            if (forcePowerOf2) {
                 height = nextPowerOfTwo(height);
+            }
         } while (height > maxHeight || height > width);
         slots = packedSlots;
         state = StitcherState.STITCHED;

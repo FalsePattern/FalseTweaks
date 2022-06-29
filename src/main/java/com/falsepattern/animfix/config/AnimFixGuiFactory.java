@@ -1,6 +1,7 @@
 package com.falsepattern.animfix.config;
 
 import com.falsepattern.lib.config.SimpleGuiFactory;
+
 import net.minecraft.client.gui.GuiScreen;
 
 @SuppressWarnings("unused")

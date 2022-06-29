@@ -14,9 +14,15 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
     //region Minecraft->client
-    TextureMapMixin(Side.CLIENT, always(), "minecraft.TextureMapMixin"), TextureUtilMixin(Side.CLIENT, always(), "minecraft.TextureUtilMixin"), StitcherMixin(Side.CLIENT, always(), "minecraft.StitcherMixin"), StitcherSlotMixin(Side.CLIENT, always(), "minecraft.StitcherSlotMixin"), //endregion Minecraft->client
+    TextureMapMixin(Side.CLIENT, always(), "minecraft.TextureMapMixin"),
+    TextureUtilMixin(Side.CLIENT, always(), "minecraft.TextureUtilMixin"),
+    StitcherMixin(Side.CLIENT, always(), "minecraft.StitcherMixin"),
+    StitcherSlotMixin(Side.CLIENT, always(), "minecraft.StitcherSlotMixin"), //endregion Minecraft->client
     //region FastCraft->client
-    FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.AbstractTextureMixin"), FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.DynamicTextureMixin"), FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureMapMixin"), FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureUtilMixin"),
+    FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.AbstractTextureMixin"),
+    FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.DynamicTextureMixin"),
+    FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureMapMixin"),
+    FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.TextureUtilMixin"),
     //endregion FastCraft->client
     ;
 

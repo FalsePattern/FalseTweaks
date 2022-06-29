@@ -25,7 +25,8 @@ public class PackerBFDH<T extends Rect2D> extends Packer<T> {
                 if (!level.canFit(r)) {
                     continue;
                 }
-                if (levelWithSmallestResidual != null && levelWithSmallestResidual.availableWidth() > level.availableWidth()) {
+                if (levelWithSmallestResidual != null &&
+                    levelWithSmallestResidual.availableWidth() > level.availableWidth()) {
                     levelWithSmallestResidual = level;
                 } else if (levelWithSmallestResidual == null) {
                     levelWithSmallestResidual = level;

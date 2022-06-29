@@ -1,10 +1,11 @@
 package com.falsepattern.animfix;
 
 import lombok.SneakyThrows;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.texture.TextureMap;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.texture.TextureMap;
 
 import java.nio.IntBuffer;
 
@@ -33,8 +34,9 @@ public class AnimationUpdateBatcher {
     public boolean batchUpload(int[][] texture, int width, int height, int xOffset, int yOffset) {
         xOffset -= this.xOffset;
         yOffset -= this.yOffset;
-        if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height)
+        if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height) {
             return false;
+        }
         int w = this.width;
         for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
             IntBuffer atlasTexture = data[mipMapLevel];
@@ -58,7 +60,8 @@ public class AnimationUpdateBatcher {
         for (int i = 0; i <= mipLevels; i++) {
             IntBuffer buf = data[i];
             buf.position(0);
-            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, i, xOffset >>> i, yOffset >>> i, width >>> i, height >>> i, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, buf);
+            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, i, xOffset >>> i, yOffset >>> i, width >>> i, height >>> i,
+                                 GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, buf);
         }
     }
 }
