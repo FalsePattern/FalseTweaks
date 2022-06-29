@@ -9,8 +9,10 @@ public class CalibrationConfig {
                     "because different graphics cards have different ways of processing quads.\n" +
                     "This is useful when quad triangulation is disabled, or if the triangulator gets disabled internally\n" +
                     "for compatibility reasons.")
-    public static boolean FLIP_DIAGONALS = false;
+    @Config.DefaultBoolean(false)
+    public static boolean FLIP_DIAGONALS;
 
     @Config.Comment("The SHA256 hash of the graphics card that this calibration was configured for.")
-    public static String GPU_HASH = "undefined";
+    @Config.DefaultString("undefined")
+    public static String GPU_HASH;
 }

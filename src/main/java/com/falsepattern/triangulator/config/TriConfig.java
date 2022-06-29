@@ -13,7 +13,8 @@ public class TriConfig {
                     "on weaker systems, it may noticeably decrease render performance (integrated graphics).\n" +
                     "By sacrificing a bit of visual quality, you might get back a few extra FPS depending on your system.")
     @Config.LangKey("config.triangulator.enable_quad_triangulation")
-    public static boolean ENABLE_QUAD_TRIANGULATION = true;
+    @Config.DefaultBoolean(true)
+    public static boolean ENABLE_QUAD_TRIANGULATION;
 
     @Config.Comment("In vanilla code, dropped and held items are re-rendered every frame, generating a lot of\n" +
                     "unnecessary CPU load because of the very inefficient way the rendering is done.\n" +
@@ -22,12 +23,14 @@ public class TriConfig {
                     "Notice: Turn this off if you notice any weird rendering artifacts with items, as this feature\n" +
                     "is still highly experimental.\n")
     @Config.LangKey("config.triangulator.enable_item_renderlists")
-    public static boolean ENABLE_ITEM_RENDERLISTS = true;
+    @Config.DefaultBoolean(true)
+    public static boolean ENABLE_ITEM_RENDERLISTS;
 
     @Config.Comment("Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
                     "you can toggle said optimization here.")
     @Config.LangKey("config.triangulator.enable_beacon_optimization")
-    public static boolean ENABLE_BEACON_OPTIMIZATION = true;
+    @Config.DefaultBoolean(true)
+    public static boolean ENABLE_BEACON_OPTIMIZATION;
 
     @Config.Comment("Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
                     "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
@@ -38,7 +41,8 @@ public class TriConfig {
                     "Requires a game restart to apply.")
     @Config.RequiresMcRestart
     @Config.LangKey("config.triangulator.enable_memory_leak_fix")
-    public static LeakFixState MEMORY_LEAK_FIX = LeakFixState.Auto;
+    @Config.DefaultEnum("Auto")
+    public static LeakFixState MEMORY_LEAK_FIX;
 
     @Config.Comment("The memory leak optimization unfortunately increases the amount of calls sent to the GPU.\n" +
                     "This pressure can be reduced with the help of caching, which temporarily stores inactive renderlists\n" +
@@ -46,7 +50,8 @@ public class TriConfig {
                     "You can set this to any value above zero, but setting it too high will eat a LOT of VRAM. 1024 is\n" +
                     "a decent safe point.")
     @Config.RangeInt(min = 0)
-    public static int MEMORY_LEAK_FIX_CACHE_SIZE_TARGET = 1024;
+    @Config.DefaultInt(1024)
+    public static int MEMORY_LEAK_FIX_CACHE_SIZE_TARGET;
 
     @Config.Comment("The total amount of renderlists Triangulator may allocate for optimized item rendering.\n" +
                     "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
@@ -56,5 +61,6 @@ public class TriConfig {
                     "(Only useful if you have ENABLE_ITEM_RENDERLISTS turned on)")
     @Config.RangeInt(min = 64)
     @Config.LangKey("config.triangulator.item_renderlist_buffer_max_size")
-    public static int ITEM_RENDERLIST_BUFFER_MAX_SIZE = 256;
+    @Config.DefaultInt(256)
+    public static int ITEM_RENDERLIST_BUFFER_MAX_SIZE;
 }
