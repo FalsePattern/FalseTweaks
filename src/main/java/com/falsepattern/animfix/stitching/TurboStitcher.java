@@ -1,5 +1,6 @@
 package com.falsepattern.animfix.stitching;
 
+import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.stitching.packing2d.Algorithm;
 import com.falsepattern.animfix.stitching.packing2d.Packer;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.List;
 public class TurboStitcher extends SpriteSlot {
     private final int maxWidth;
     private final int maxHeight;
+    private final boolean forcePowerOf2;
     private List<SpriteSlot> slots = new ArrayList<>();
     @Getter
     private StitcherState state = StitcherState.SETUP;
@@ -54,25 +56,33 @@ public class TurboStitcher extends SpriteSlot {
         for (val slot : slots) {
             width = Math.max(width, slot.width);
         }
-        width = nextPowerOfTwo(width);
+        if (forcePowerOf2 || !AnimConfig.optimalPacking)
+            width = nextPowerOfTwo(width);
         if (width > maxWidth) {
             throw new TooBigException();
         }
         width = Math.max(width >>> 1, 1);
         List<SpriteSlot> packedSlots;
         do {
-            width *= 2;
-            if (width > maxWidth) {
+            if (width == maxWidth) {
                 throw new TooBigException();
+            }
+            if (forcePowerOf2 || !AnimConfig.optimalPacking) {
+                width *= 2;
+            } else {
+                width += Math.min(width, 16);
+            }
+            if (width > maxWidth) {
+                width = maxWidth;
             }
             packedSlots = Packer.pack(slots, Algorithm.FIRST_FIT_DECREASING_HEIGHT, width);
             height = 0;
             for (val sprite : packedSlots) {
                 height = Math.max(height, sprite.y + sprite.height);
             }
-            height = nextPowerOfTwo(height);
-
-        } while (height > maxHeight || (height > width && width * 2 < maxWidth));
+            if (forcePowerOf2)
+                height = nextPowerOfTwo(height);
+        } while (height > maxHeight || height > width);
         slots = packedSlots;
         state = StitcherState.STITCHED;
     }

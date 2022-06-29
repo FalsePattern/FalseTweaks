@@ -38,8 +38,8 @@ public abstract class StitcherMixin {
             at = @At(value = "RETURN"),
             require = 1)
     private void initTurbo(int maxWidth, int maxHeight, boolean forcePowerOf2, int maxTileDimension, int mipmapLevelStitcher, CallbackInfo ci) {
-        masterStitcher = new TurboStitcher(maxWidth, maxHeight);
-        batchingStitcher = new TurboStitcher(maxWidth, maxHeight);
+        masterStitcher = new TurboStitcher(maxWidth, maxHeight, forcePowerOf2);
+        batchingStitcher = new TurboStitcher(maxWidth, maxHeight, false);
         masterStitcher.addSprite(batchingStitcher);
     }
 
