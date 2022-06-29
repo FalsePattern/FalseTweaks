@@ -2,24 +2,24 @@ package com.falsepattern.triangulator.leakfix;
 
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.config.TriConfig;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import org.lwjgl.opengl.GL11;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LeakFix {
-    private static final LeakFix INSTANCE = new LeakFix();
     public static final boolean ENABLED;
-
+    private static final LeakFix INSTANCE = new LeakFix();
     @Getter
     private static int activeBufferCount = 0;
     private static boolean debugText = false;
@@ -31,6 +31,29 @@ public final class LeakFix {
     private static int misses = 0;
 
     private static long lastGC = 0;
+
+    static {
+        switch (TriConfig.MEMORY_LEAK_FIX) {
+            default:
+                Triangulator.triLog.info("Disabling leak fix because of config flag.");
+                ENABLED = false;
+                break;
+            case Auto:
+                boolean isAMD = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("amd");
+                if (isAMD) {
+                    Triangulator.triLog.info("Enabling leak fix because an AMD gpu was detected.");
+                    ENABLED = true;
+                } else {
+                    Triangulator.triLog.info("Disabling leak fix because an AMD gpu was NOT detected.");
+                    ENABLED = false;
+                }
+                break;
+            case Enable:
+                Triangulator.triLog.info("Enabling leak fix because of config flag.");
+                ENABLED = true;
+                break;
+        }
+    }
 
     public static int getCachedBufferCount() {
         return freshAllocations.size() + reusableAllocations.size();
@@ -93,7 +116,6 @@ public final class LeakFix {
         reusableAllocations.add(buffer);
     }
 
-
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Pre e) {
         if (LeakFix.ENABLED) {
@@ -101,7 +123,10 @@ public final class LeakFix {
                 debugText = true;
                 return;
             }
-            if (!debugText || !(e instanceof RenderGameOverlayEvent.Text) || !e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) return;
+            if (!debugText || !(e instanceof RenderGameOverlayEvent.Text) ||
+                !e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
+                return;
+            }
             debugText = false;
             val txt = (RenderGameOverlayEvent.Text) e;
             txt.right.add(null);
@@ -116,8 +141,11 @@ public final class LeakFix {
                 //Verbose info
                 txt.right.add("Allocations since last GC cycle: " + allocs);
                 txt.right.add("Total allocations: " + totalAllocs);
-                txt.right.add("Total allocation cache hits: " + hits + " (" + (int)((100f / totalAllocs) * hits) + "%)");
-                txt.right.add("Total allocation cache misses: " + misses + " (" + (int)((100f / totalAllocs) * misses) + "%)");
+                txt.right.add(
+                        "Total allocation cache hits: " + hits + " (" + (int) ((100f / totalAllocs) * hits) + "%)");
+                txt.right.add(
+                        "Total allocation cache misses: " + misses + " (" + (int) ((100f / totalAllocs) * misses) +
+                        "%)");
             }
         }
     }
@@ -127,33 +155,11 @@ public final class LeakFix {
         long time = System.nanoTime();
         float secondsSinceLastGC = (time - lastGC) / 1000000000f;
         int cacheSize = getCachedBufferCount();
-        if (secondsSinceLastGC > 5 ||
-            (secondsSinceLastGC > 1 && (cacheSize < (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET / 2) || cacheSize > (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET * 2)))) {
+        if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 &&
+                                       (cacheSize < (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET / 2) ||
+                                        cacheSize > (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET * 2)))) {
             gc();
             lastGC = time;
-        }
-    }
-
-    static {
-        switch (TriConfig.MEMORY_LEAK_FIX) {
-            default:
-                Triangulator.triLog.info("Disabling leak fix because of config flag.");
-                ENABLED = false;
-                break;
-            case Auto:
-                boolean isAMD = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("amd");
-                if (isAMD) {
-                    Triangulator.triLog.info("Enabling leak fix because an AMD gpu was detected.");
-                    ENABLED = true;
-                } else {
-                    Triangulator.triLog.info("Disabling leak fix because an AMD gpu was NOT detected.");
-                    ENABLED = false;
-                }
-                break;
-            case Enable:
-                Triangulator.triLog.info("Enabling leak fix because of config flag.");
-                ENABLED = true;
-                break;
         }
     }
 }

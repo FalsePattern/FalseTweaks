@@ -13,9 +13,8 @@ import static com.falsepattern.triangulator.mixin.plugin.Extras.OPTIFINE_SHADERS
 public enum TargetedMod implements ITargetedMod {
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
     OPTIFINE_WITHOUT_SHADERS("OptiFine without shaders", false,
-            startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.negate())),
-    OPTIFINE_WITH_SHADERS("OptiFine with shaders", false,
-            startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
+                             startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.negate())),
+    OPTIFINE_WITH_SHADERS("OptiFine with shaders", false, startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
     FASTCRAFT("FastCraft", false, startsWith("fastcraft")),
     CHROMATICRAFT("ChromatiCraft", false, startsWith("chromaticraft")),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),

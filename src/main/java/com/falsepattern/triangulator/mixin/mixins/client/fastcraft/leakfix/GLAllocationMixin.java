@@ -2,7 +2,6 @@ package com.falsepattern.triangulator.mixin.mixins.client.fastcraft.leakfix;
 
 import com.falsepattern.triangulator.leakfix.LeakFix;
 import lombok.val;
-import net.minecraft.client.renderer.GLAllocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,11 +10,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.client.renderer.GLAllocation;
+
 import java.util.Map;
 
 @Mixin(GLAllocation.class)
 public abstract class GLAllocationMixin {
-    @Shadow @Final private static Map<Integer, Integer> mapDisplayLists;
+    @Shadow
+    @Final
+    private static Map<Integer, Integer> mapDisplayLists;
 
     @Inject(method = "deleteDisplayLists",
             at = @At(value = "HEAD"),

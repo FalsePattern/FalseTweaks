@@ -26,19 +26,20 @@ public class TriConfig {
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_ITEM_RENDERLISTS;
 
-    @Config.Comment("Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
-                    "you can toggle said optimization here.")
+    @Config.Comment(
+            "Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
+            "you can toggle said optimization here.")
     @Config.LangKey("config.triangulator.enable_beacon_optimization")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_BEACON_OPTIMIZATION;
 
-    @Config.Comment("Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
-                    "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
-                    "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
-                    "which gets emphasized on modern AMD windows drivers, and on MESA with linux. This patch\n" +
-                    "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
-                    "deleting these renderlists based on usage.\n" +
-                    "Requires a game restart to apply.")
+    @Config.Comment(
+            "Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
+            "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
+            "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
+            "which gets emphasized on modern AMD windows drivers, and on MESA with linux. This patch\n" +
+            "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
+            "deleting these renderlists based on usage.\n" + "Requires a game restart to apply.")
     @Config.RequiresMcRestart
     @Config.LangKey("config.triangulator.enable_memory_leak_fix")
     @Config.DefaultEnum("Auto")
@@ -57,8 +58,7 @@ public class TriConfig {
                     "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
                     "Bigger buffer sizes use more VRAM, but also get a higher average performance.\n" +
                     "256 should be good enough for most modded games, and going above 1024 is not recommended unless\n" +
-                    "you have a lot of VRAM.\n" +
-                    "(Only useful if you have ENABLE_ITEM_RENDERLISTS turned on)")
+                    "you have a lot of VRAM.\n" + "(Only useful if you have ENABLE_ITEM_RENDERLISTS turned on)")
     @Config.RangeInt(min = 64)
     @Config.LangKey("config.triangulator.item_renderlist_buffer_max_size")
     @Config.DefaultInt(256)

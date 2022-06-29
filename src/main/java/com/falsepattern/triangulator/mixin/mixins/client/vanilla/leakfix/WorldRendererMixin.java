@@ -4,9 +4,6 @@ import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.mixin.helper.IWorldRendererMixin;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,14 +12,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.util.AxisAlignedBB;
+
 @Mixin(WorldRenderer.class)
 @Accessors(fluent = true)
 public abstract class WorldRendererMixin implements IWorldRendererMixin {
-    @Shadow private int glRenderList;
-
-    @Shadow public int posXClip;
-    @Shadow public int posYClip;
-    @Shadow public int posZClip;
+    @Shadow
+    public int posXClip;
+    @Shadow
+    public int posYClip;
+    @Shadow
+    public int posZClip;
+    @Shadow
+    private int glRenderList;
     @Getter
     private boolean hasRenderList;
 
@@ -51,13 +55,18 @@ public abstract class WorldRendererMixin implements IWorldRendererMixin {
     public void renderAABB() {
         float extra = 6;
         GL11.glNewList(this.glRenderList + 2, 4864);
-        RenderItem.renderAABB(AxisAlignedBB.getBoundingBox(this.posXClip - extra, this.posYClip - extra, this.posZClip - extra, this.posXClip + 16 + extra, this.posYClip + 16 + extra, this.posZClip + 16 + extra));
+        RenderItem.renderAABB(
+                AxisAlignedBB.getBoundingBox(this.posXClip - extra, this.posYClip - extra, this.posZClip - extra,
+                                             this.posXClip + 16 + extra, this.posYClip + 16 + extra,
+                                             this.posZClip + 16 + extra));
         GL11.glEndList();
     }
 
     @Override
     public boolean genList() {
-        if (hasRenderList) return false;
+        if (hasRenderList) {
+            return false;
+        }
         glRenderList = LeakFix.allocateWorldRendererBuffer();
         hasRenderList = true;
         return true;
@@ -65,7 +74,9 @@ public abstract class WorldRendererMixin implements IWorldRendererMixin {
 
     @Override
     public boolean clearList() {
-        if (!hasRenderList) return false;
+        if (!hasRenderList) {
+            return false;
+        }
         hasRenderList = false;
         LeakFix.releaseWorldRendererBuffer(glRenderList);
         glRenderList = -1;

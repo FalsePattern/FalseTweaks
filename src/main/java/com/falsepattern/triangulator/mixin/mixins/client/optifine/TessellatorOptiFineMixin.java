@@ -2,7 +2,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.optifine;
 
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
-import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.client.renderer.Tessellator;
 
 @Mixin(Tessellator.class)
 public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
@@ -35,8 +36,9 @@ public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
         if (hackedQuadRendering()) {
             shaderOn(true);
             trollOptifineAddVertex = true;
-            if (quadTriangulationActive())
+            if (quadTriangulationActive()) {
                 drawMode = GL11.GL_QUADS;
+            }
         }
     }
 
@@ -54,8 +56,9 @@ public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
             require = 1)
     private void stateSwitchingForDrawCallEnd(CallbackInfoReturnable<Integer> cir) {
         if (hackedQuadRendering() && trollOptifineAddVertex) {
-            if (quadTriangulationActive())
+            if (quadTriangulationActive()) {
                 drawMode = GL11.GL_QUADS;
+            }
         }
     }
 

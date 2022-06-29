@@ -1,13 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.config.TriConfig;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityBeaconRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntityBeacon;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +8,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.tileentity.TileEntityBeaconRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntityBeacon;
+import net.minecraft.util.ResourceLocation;
 
 @Mixin(TileEntityBeaconRenderer.class)
 public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRenderer {
@@ -120,7 +121,9 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
             cancellable = true,
             require = 1)
     private void renderTileEntityAt(TileEntityBeacon beacon, double x, double y, double z, float partialTickTime, CallbackInfo ci) {
-        if (!TriConfig.ENABLE_BEACON_OPTIMIZATION) return;
+        if (!TriConfig.ENABLE_BEACON_OPTIMIZATION) {
+            return;
+        }
         ci.cancel();
         float f1 = beacon.func_146002_i();
 

@@ -2,12 +2,13 @@
 package com.falsepattern.triangulator.mixin.mixins.client.foamfix;
 
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
-import net.minecraft.client.renderer.Tessellator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+
+import net.minecraft.client.renderer.Tessellator;
 
 import java.util.Comparator;
 

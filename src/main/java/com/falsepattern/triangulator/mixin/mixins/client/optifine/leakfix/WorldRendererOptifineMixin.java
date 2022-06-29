@@ -2,18 +2,20 @@ package com.falsepattern.triangulator.mixin.mixins.client.optifine.leakfix;
 
 import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.mixin.helper.IWorldRendererMixin;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.entity.EntityLivingBase;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.EntityLivingBase;
+
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererOptifineMixin implements IWorldRendererMixin {
 
-    @Shadow private boolean isInitialized;
+    @Shadow
+    private boolean isInitialized;
 
     @Inject(method = "updateRenderer",
             at = @At(value = "HEAD"),

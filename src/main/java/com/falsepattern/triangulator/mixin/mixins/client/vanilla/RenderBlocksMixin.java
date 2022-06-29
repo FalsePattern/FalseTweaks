@@ -1,6 +1,5 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
-import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
@@ -9,10 +8,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import lombok.var;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,8 +18,14 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.IIcon;
+
 @Mixin(RenderBlocks.class)
-@Accessors(fluent = true, chain = false)
+@Accessors(fluent = true,
+           chain = false)
 public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
     @Shadow(aliases = "colorRedTopLeftF")
@@ -62,18 +63,13 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
-
+    int countS;
+    int countB;
+    float sky;
+    float block;
     private boolean[] states;
-
     @Setter
     private boolean reusePreviousStates;
-
-    @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
-            at = @At(value = "RETURN"),
-            require = 2)
-    private void setupStates(CallbackInfo ci) {
-        states = new boolean[6];
-    }
 
     private static float avg(final float a, final float b) {
         return (a + b) * 0.5F;
@@ -87,29 +83,37 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
         return Math.abs(a - b);
     }
 
+    @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
+            at = @At(value = "RETURN"),
+            require = 2)
+    private void setupStates(CallbackInfo ci) {
+        states = new boolean[6];
+    }
+
     @Inject(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-            at = {
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceXNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceXPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceYNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceYPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceZNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-                    @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceZPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
-            },
+            at = {@At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceXNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceXPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceYNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceYPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceZNeg(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderFaceZPos(Lnet/minecraft/block/Block;DDDLnet/minecraft/util/IIcon;)V"),},
             require = 12)
     private void aoFix(CallbackInfoReturnable<Boolean> cir) {
-        if (reusePreviousStates) return;
+        if (reusePreviousStates) {
+            return;
+        }
         var avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator)Tessellator.instance).isTriangulatorDisabled() && CalibrationConfig.FLIP_DIAGONALS) {
+        if (((ToggleableTessellator) Tessellator.instance).isTriangulatorDisabled() &&
+            CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
             avgBottomLeft = tmp;
@@ -135,9 +139,9 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
     private void reuse(int index) {
         if (reusePreviousStates) {
-            ((ITessellatorMixin)Tessellator.instance).alternativeTriangulation(states[index]);
+            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(states[index]);
         } else {
-            states[index] = ((ITessellatorMixin)Tessellator.instance).alternativeTriangulation();
+            states[index] = ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation();
         }
     }
 
@@ -187,16 +191,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPN:F",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 0),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 0)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPN:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 0),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 0)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 1,
@@ -204,11 +206,6 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
     private int incrementYValue0(int y) {
         return y + 1;
     }
-
-    int countS;
-    int countB;
-    float sky;
-    float block;
 
     private void addLight(int light) {
         int S = light & 0xff;
@@ -238,23 +235,21 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
         addLight(d);
         sky /= countS;
         block /= countB;
-        cir.setReturnValue((((int)sky) & 0xff) | ((((int)block) & 0xff) << 16));
+        cir.setReturnValue((((int) sky) & 0xff) | ((((int) block) & 0xff) << 16));
     }
 
     /**
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 0),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNPN:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 0)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 0),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNPN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 0)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 1,
@@ -267,16 +262,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoBrightnessXZPN:I",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 0),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 2)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoBrightnessXZPN:I",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 0),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 2)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 2,
@@ -289,16 +282,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 1),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNP:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 2)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 1),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNP:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 2)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 2,
@@ -311,16 +302,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYNP:F",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 1),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 4)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYNP:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 1),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 4)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 0,
@@ -333,16 +322,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
      * @author embeddedt
      */
     @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(
-                       from = @At(value = "FIELD",
-                                  target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPP:F",
-                                  opcode = Opcodes.PUTFIELD,
-                                  ordinal = 1),
-                       to = @At(value = "FIELD",
-                                target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZPNN:F",
-                                opcode = Opcodes.PUTFIELD,
-                                ordinal = 4)
-               ),
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPP:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 1),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZPNN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 4)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
                index = 0,

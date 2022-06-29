@@ -1,12 +1,13 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla.leakfix;
 
 import com.falsepattern.triangulator.leakfix.LeakFix;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.RenderGlobal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
+
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.RenderGlobal;
 
 @Mixin(RenderGlobal.class)
 public abstract class RenderGlobalMixin {
@@ -27,9 +28,9 @@ public abstract class RenderGlobalMixin {
     }
 
     @Redirect(method = "deleteAllDisplayLists",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/GLAllocation;deleteDisplayLists(I)V"),
-            require = 1)
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/GLAllocation;deleteDisplayLists(I)V"),
+              require = 1)
     private void removeDelete(int list) {
         if (!LeakFix.ENABLED) {
             GLAllocation.deleteDisplayLists(list);

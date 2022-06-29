@@ -8,8 +8,6 @@ import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.shader.TesselatorVertexState;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,10 +18,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.shader.TesselatorVertexState;
+
 import java.util.Comparator;
 
 @Mixin(Tessellator.class)
-@Accessors(fluent = true, chain = false)
+@Accessors(fluent = true,
+           chain = false)
 public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableTessellator {
     @Shadow
     private int drawMode;
@@ -80,9 +82,11 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
      * <p>
      * Fixes <a href="https://github.com/MinecraftForge/MinecraftForge/issues/981">MinecraftForge#981</a> . Crash on <a href="https://github.com/MinecraftForge/MinecraftForge/issues/981#issuecomment-57375939">bad moder rendering"(©LexManos)</a> of transparent/translucent blocks when they draw nothing.
      */
-    @Inject(method = "getVertexState", at = @At("HEAD"), cancellable = true)
-    public void getVertexStateNatural0Safe(float x, float y, float z, CallbackInfoReturnable<TesselatorVertexState> cir){
-        if(this.rawBufferIndex <= 0) {
+    @Inject(method = "getVertexState",
+            at = @At("HEAD"),
+            cancellable = true)
+    public void getVertexStateNatural0Safe(float x, float y, float z, CallbackInfoReturnable<TesselatorVertexState> cir) {
+        if (this.rawBufferIndex <= 0) {
             cir.setReturnValue(null);
             cir.cancel();
         }
@@ -102,7 +106,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     public void suspendQuadTriangulation() {
         quadTriangulationTemporarilySuspended = true;
         if (quadVerticesPutIntoBuffer != 0) {
-            Triangulator.triLog.error(new RuntimeException("Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
+            Triangulator.triLog.error(new RuntimeException(
+                    "Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
             quadVerticesPutIntoBuffer = 0;
         }
     }
@@ -117,7 +122,9 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     }
 
     private void fixAOTriangles() {
-        if (quadTriangulationTemporarilySuspended) return;
+        if (quadTriangulationTemporarilySuspended) {
+            return;
+        }
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             int vertexSize = shaderOn() ? 18 : 8;
@@ -125,13 +132,16 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
-                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex, 2 * vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize), vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex,
+                                 2 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize),
+                                 vertexSize);
                 alternativeTriangulation = false;
             } else {
                 //Target vertex layout: ABC DAC
                 System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize, vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize,
+                                 vertexSize);
             }
             vertexCount += 2;
             rawBufferIndex += 2 * vertexSize;
@@ -177,7 +187,9 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Override
     public void enableTriangulator() {
         forceQuadRendering--;
-        if (forceQuadRendering < 0) forceQuadRendering = 0;
+        if (forceQuadRendering < 0) {
+            forceQuadRendering = 0;
+        }
     }
 
     @Override
@@ -200,8 +212,9 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         if (drawingTris) {
             IQuadComparatorMixin comp = (IQuadComparatorMixin) comparator;
             comp.enableTriMode();
-            if (shaderOn)
+            if (shaderOn) {
                 comp.enableShaderMode();
+            }
         }
         return comparator;
     }

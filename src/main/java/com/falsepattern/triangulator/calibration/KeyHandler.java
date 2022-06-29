@@ -1,9 +1,9 @@
 package com.falsepattern.triangulator.calibration;
 
+import net.minecraft.client.settings.KeyBinding;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
-import net.minecraft.client.settings.KeyBinding;
 
 public class KeyHandler extends KeyBinding {
 
@@ -17,12 +17,12 @@ public class KeyHandler extends KeyBinding {
 
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent event) {
-        if(this.isPressed()){
+        if (this.isPressed()) {
             callBack.onPress();
         }
     }
 
-    public interface CallBack{
+    public interface CallBack {
         void onPress();
     }
 }

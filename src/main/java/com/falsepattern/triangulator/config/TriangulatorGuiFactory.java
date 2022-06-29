@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.config;
 
 import com.falsepattern.lib.config.SimpleGuiFactory;
+
 import net.minecraft.client.gui.GuiScreen;
 
 public class TriangulatorGuiFactory implements SimpleGuiFactory {

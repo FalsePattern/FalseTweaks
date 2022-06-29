@@ -1,14 +1,15 @@
 package com.falsepattern.triangulator;
 
 import com.falsepattern.triangulator.proxy.CommonProxy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Tags.MODID,
      version = Tags.VERSION,
@@ -19,7 +20,8 @@ import org.apache.logging.log4j.Logger;
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
 
-    @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy", serverSide = Tags.GROUPNAME + ".proxy.ServerConfig")
+    @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy",
+                serverSide = Tags.GROUPNAME + ".proxy.ServerConfig")
     private static CommonProxy proxy;
 
     public Triangulator() {

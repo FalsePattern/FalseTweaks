@@ -2,12 +2,13 @@ package com.falsepattern.triangulator.mixin.mixins.client.optifine.leakfix;
 
 import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.mixin.stubpackage.WrDisplayListAllocator;
-import net.minecraft.client.renderer.RenderGlobal;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import net.minecraft.client.renderer.RenderGlobal;
 
 @SuppressWarnings({"InvalidInjectorMethodSignature", "UnresolvedMixinReference", "MixinAnnotationTarget"})
 @Mixin(RenderGlobal.class)

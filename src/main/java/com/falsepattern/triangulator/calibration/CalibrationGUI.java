@@ -4,12 +4,13 @@ import com.falsepattern.lib.compat.GuiLabel;
 import com.falsepattern.triangulator.Tags;
 import lombok.val;
 import lombok.var;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,9 @@ public class CalibrationGUI extends GuiScreen {
     private static final int ID_DESCRIPTION = 0;
     private static final int ID_TOGGLE = 1;
     private static final int ID_APPLY = 2;
-
+    protected List<GuiLabel> labelList = new ArrayList<>();
     private boolean flip = false;
     private ResourceLocation reference = new ResourceLocation(Tags.MODID, "reference.png");
-
-    protected List<GuiLabel> labelList = new ArrayList<>();
 
     private int getYAfterComparison(int scale) {
         return 10 + scale * 4 + 20;
@@ -67,8 +66,10 @@ public class CalibrationGUI extends GuiScreen {
             y += 10;
         }
         labelList.add(descriptionLabel);
-        val toggle = new GuiButton(ID_TOGGLE, centerX - 110, y, 100, 20, I18n.format("gui.triangulator.calibration.toggle"));
-        val apply = new GuiButton(ID_APPLY, centerX + 10, y, 100, 20, I18n.format("gui.triangulator.calibration.apply"));
+        val toggle =
+                new GuiButton(ID_TOGGLE, centerX - 110, y, 100, 20, I18n.format("gui.triangulator.calibration.toggle"));
+        val apply =
+                new GuiButton(ID_APPLY, centerX + 10, y, 100, 20, I18n.format("gui.triangulator.calibration.apply"));
         buttonList.add(toggle);
         buttonList.add(apply);
     }

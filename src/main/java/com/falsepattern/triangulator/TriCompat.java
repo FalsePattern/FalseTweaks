@@ -1,7 +1,6 @@
 package com.falsepattern.triangulator;
 
 import com.falsepattern.triangulator.config.TriConfig;
-import cpw.mods.fml.common.Loader;
 
 public class TriCompat {
     public static boolean enableTriangulation() {

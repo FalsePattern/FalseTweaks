@@ -2,11 +2,12 @@ package com.falsepattern.triangulator.calibration;
 
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.text.FormattedText;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.resources.I18n;
@@ -16,7 +17,7 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import org.lwjgl.opengl.GL11;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -27,21 +28,6 @@ public class Calibration {
 
     public static void registerBus() {
         MinecraftForge.EVENT_BUS.register(INSTANCE);
-    }
-
-    @SneakyThrows
-    @SubscribeEvent
-    public void onSinglePlayer(EntityJoinWorldEvent e) {
-        if (!(e.entity instanceof EntityPlayerSP)) return;
-        if (gpuHash().equals(CalibrationConfig.GPU_HASH)) return;
-        val alert = FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
-        val text = alert.toChatText();
-        val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
-        for (val t: text) {
-            t.getChatStyle().setChatClickEvent(ce);
-            ((EntityPlayerSP) e.entity).addChatMessage(t);
-        }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -77,7 +63,27 @@ public class Calibration {
     }
 
     private static String gpu() {
-        return GL11.glGetString(GL11.GL_RENDERER) + " GL version " + GL11.glGetString(GL11.GL_VERSION) + ", " + GL11.glGetString(GL11.GL_VENDOR);
+        return GL11.glGetString(GL11.GL_RENDERER) + " GL version " + GL11.glGetString(GL11.GL_VERSION) + ", " +
+               GL11.glGetString(GL11.GL_VENDOR);
+    }
+
+    @SneakyThrows
+    @SubscribeEvent
+    public void onSinglePlayer(EntityJoinWorldEvent e) {
+        if (!(e.entity instanceof EntityPlayerSP)) {
+            return;
+        }
+        if (gpuHash().equals(CalibrationConfig.GPU_HASH)) {
+            return;
+        }
+        val alert = FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
+        val text = alert.toChatText();
+        val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
+        for (val t : text) {
+            t.getChatStyle().setChatClickEvent(ce);
+            ((EntityPlayerSP) e.entity).addChatMessage(t);
+        }
+
     }
 
     public static class CalibrationCommand extends CommandBase {
