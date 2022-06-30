@@ -2,6 +2,7 @@ config.triangulator.enable_quad_triangulation=Enable quad triangulation
 config.triangulator.enable_item_renderlists=Enable item renderlists
 config.triangulator.enable_beacon_optimization=Enable beacon optimization
 config.triangulator.enable_memory_leak_fix=Enable memory leak fix
+config.triangulator.memory_leak_fix_cache_size_target=Cache size target for memory leak fix
 config.triangulator.item_renderlist_buffer_max_size=Item renderlist buffer max size
 gui.triangulator.calibrationdescription.line0=Click the Toggle button until the
 gui.triangulator.calibrationdescription.line1=yellow and the blue squares look the same,

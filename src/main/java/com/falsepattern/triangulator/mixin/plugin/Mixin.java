@@ -30,10 +30,6 @@ public enum Mixin implements IMixin {
     FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
     //endregion FoamFix
     //region OptiFine
-    OFGameSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.GameSettingsOptifineMixin"),
-    OFGuiVideoSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.GuiVideoSettingsOptifineMixin"),
     OFTessellatorVanillaMixin(Side.CLIENT,
                               avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
                               "optifine.TessellatorVanillaMixin"),
@@ -42,6 +38,10 @@ public enum Mixin implements IMixin {
     OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITH_SHADERS),
                                "optifine.TessellatorOptiFineMixin"),
     //region leak fix
+    OFGameSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
+            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.GameSettingsOptifineMixin"),
+    OFGuiVideoSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
+            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.GuiVideoSettingsOptifineMixin"),
     OFRenderGlobalOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
             require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.RenderGlobalOptiFineMixin"),
     OFWorldRendererVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(

@@ -39,7 +39,10 @@ public class TriConfig {
             "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
             "which gets emphasized on modern AMD windows drivers, and on MESA with linux. This patch\n" +
             "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
-            "deleting these renderlists based on usage.\n" + "Requires a game restart to apply.")
+            "deleting these renderlists based on usage. Requires a game restart to apply.\n" +
+            "NOTICE FOR OPTIFINE USERS:\n" +
+            "Setting this to Auto or Enable blocks Smooth and Multi-Core chunkloading. If you want multicore chunkloading,\n" +
+            "you MUST set this do Disable.")
     @Config.RequiresMcRestart
     @Config.LangKey("config.triangulator.enable_memory_leak_fix")
     @Config.DefaultEnum("Auto")
@@ -51,6 +54,7 @@ public class TriConfig {
                     "You can set this to any value above zero, but setting it too high will eat a LOT of VRAM. 1024 is\n" +
                     "a decent safe point.")
     @Config.RangeInt(min = 0)
+    @Config.LangKey("config.triangulator.memory_leak_fix_cache_size_target")
     @Config.DefaultInt(1024)
     public static int MEMORY_LEAK_FIX_CACHE_SIZE_TARGET;
 
