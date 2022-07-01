@@ -98,12 +98,12 @@ public class Calibration {
         }
 
         @Override
-        public String getCommandUsage(ICommandSender p_71518_1_) {
+        public String getCommandUsage(ICommandSender sender) {
             return "/triangulator_calibrate";
         }
 
         @Override
-        public void processCommand(ICommandSender p_71515_1_, String[] p_71515_2_) {
+        public void processCommand(ICommandSender sender, String[] args) {
             Minecraft.getMinecraft().displayGuiScreen(new CalibrationGUI());
         }
     }

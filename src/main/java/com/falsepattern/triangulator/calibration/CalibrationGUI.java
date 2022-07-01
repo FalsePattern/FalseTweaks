@@ -88,13 +88,13 @@ public class CalibrationGUI extends GuiScreen {
     }
 
     @Override
-    public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         drawComparison(25);
         for (GuiLabel guiLabel : this.labelList) {
-            guiLabel.drawLabel(this.mc, p_73863_1_, p_73863_2_);
+            guiLabel.drawLabel(this.mc, mouseX, mouseY);
         }
-        super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
+        super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
 
