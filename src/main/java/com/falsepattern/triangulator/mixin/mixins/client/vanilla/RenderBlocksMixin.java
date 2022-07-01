@@ -14,14 +14,17 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 
 @Mixin(RenderBlocks.class)
 @Accessors(fluent = true,
@@ -63,6 +66,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
+    @Shadow private static RenderBlocks instance;
     int countS;
     int countB;
     float sky;

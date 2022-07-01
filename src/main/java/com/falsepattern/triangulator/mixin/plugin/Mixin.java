@@ -18,7 +18,7 @@ public enum Mixin implements IMixin {
     ItemRendererMixin(Side.CLIENT, always(), "vanilla.ItemRendererMixin"),
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
-    RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksMixin"),
+    RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksUltraMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
     //region leak fix
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
