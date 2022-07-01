@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -112,34 +113,87 @@ public abstract class RenderBlocksUltraMixin {
         return blockAccess.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
     }
 
-    private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset) {
-        return getMixedBrightnessForBlockOffset(x, y, z, offset, false);
+    private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, int face) {
+        return getMixedBrightnessForBlockOffset(x, y, z, offset, false, face);
     }
 
-    private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, boolean front) {
+    private Boolean frontSlab = null;
+
+    private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, boolean front, int face) {
         x += offset.x();
         y += offset.y();
         z += offset.z();
         Block block = blockAccess.getBlock(x, y, z);
         int l = blockAccess.getLightBrightnessForSkyBlocks(x, y, z, block.getLightValue(blockAccess, x, y, z));
 
-        if (block instanceof BlockSlab)
-        {
-            if (offset.y() != 0) {
-                y -= offset.y();
-            } else {
-                int metadata = blockAccess.getBlockMetadata(x, y, z);
-                if ((metadata & 8) != 0) {
-                    y--;
-                } else {
-                    y++;
-                }
+        if (block instanceof BlockSlab) {
+            if (block.isOpaqueCube()) {
+                return 0;
             }
+            boolean topSlab = (blockAccess.getBlockMetadata(x, y, z) & 8) != 0;
+            switch (face) {
+                case 0:
+                    if (topSlab) {
+                        y--;
+                    }
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    if (front) {
+                        frontSlab = null;
+                    }
+                    if (offset.y() < 0) {
+                        y++;
+                    } else if (offset.y() > 0) {
+                        y--;
+                    } else if (frontSlab != null) {
+                        if (frontSlab) {
+                            y--;
+                        } else {
+                            y++;
+                        }
+                    } else if (topSlab) {
+                        y--;
+                        if (front) {
+                            frontSlab = true;
+                        }
+                    } else {
+                        y++;
+                        if (front) {
+                            frontSlab = false;
+                        }
+                    }
+                    break;
+            }
+
 
             block = blockAccess.getBlock(x, y, z);
             return blockAccess.getLightBrightnessForSkyBlocks(x, y, z, block.getLightValue(blockAccess, x, y, z));
+        } else if (block instanceof BlockStairs) {
+            if (front) {
+                return l;
+            } else if (face <= 2) {
+                x -= offset.x();
+                y -= offset.y();
+                z -= offset.z();
+            } else if (offset.y() < 0) {
+                y++;
+            } else if (offset.y() > 0) {
+                y--;
+            } else {
+                return 0;
+            }
+            block = blockAccess.getBlock(x, y, z);
+            return blockAccess.getLightBrightnessForSkyBlocks(x, y, z, block.getLightValue(blockAccess, x, y, z));
+        } else {
+            if (front) {
+                frontSlab = null;
+            }
+            return l;
         }
-        return l;
 
     }
 
@@ -161,6 +215,12 @@ public abstract class RenderBlocksUltraMixin {
             return false;
         }
         boolean shift = facing.shift((RenderBlocks) (Object) this);
+
+        int light = state.light;
+
+        if (shift || !getBlockOffset(x, y, z, facing.front).isOpaqueCube()) {
+            light = getMixedBrightnessForBlockOffset(x, y, z, facing.front, true, facing.face);
+        }
         if (shift) {
             x += facing.front.x();
             y += facing.front.y();
@@ -176,10 +236,10 @@ public abstract class RenderBlocksUltraMixin {
         lightRight = getBlockOffset(x, y, z, facing.right).getAmbientOcclusionLightValue();
         lightBottom = getBlockOffset(x, y, z, facing.bottom).getAmbientOcclusionLightValue();
         lightTop = getBlockOffset(x, y, z, facing.top).getAmbientOcclusionLightValue();
-        brightnessLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.left);
-        brightnessRight = getMixedBrightnessForBlockOffset(x, y, z, facing.right);
-        brightnessBottom = getMixedBrightnessForBlockOffset(x, y, z, facing.bottom);
-        brightnessTop = getMixedBrightnessForBlockOffset(x, y, z, facing.top);
+        brightnessLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.left, facing.face);
+        brightnessRight = getMixedBrightnessForBlockOffset(x, y, z, facing.right, facing.face);
+        brightnessBottom = getMixedBrightnessForBlockOffset(x, y, z, facing.bottom, facing.face);
+        brightnessTop = getMixedBrightnessForBlockOffset(x, y, z, facing.top, facing.face);
         boolean transparentLeft = getBlockOffset(x, y, z, facing.left).getCanBlockGrass();
         boolean transparentRight = getBlockOffset(x, y, z, facing.right).getCanBlockGrass();
         boolean transparentBottom = getBlockOffset(x, y, z, facing.bottom).getCanBlockGrass();
@@ -190,7 +250,7 @@ public abstract class RenderBlocksUltraMixin {
             brightnessBottomLeft = brightnessLeft;
         } else {
             lightBottomLeft = getBlockOffset(x, y, z, facing.bottomLeft).getAmbientOcclusionLightValue();
-            brightnessBottomLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomLeft);
+            brightnessBottomLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomLeft, facing.face);
         }
 
         if (!transparentLeft && !transparentTop) {
@@ -198,7 +258,7 @@ public abstract class RenderBlocksUltraMixin {
             brightnessTopLeft = brightnessLeft;
         } else {
             lightTopLeft = getBlockOffset(x, y, z, facing.topLeft).getAmbientOcclusionLightValue();
-            brightnessTopLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.topLeft);
+            brightnessTopLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.topLeft, facing.face);
         }
 
         if (!transparentRight && !transparentBottom) {
@@ -206,7 +266,7 @@ public abstract class RenderBlocksUltraMixin {
             brightnessBottomRight = brightnessRight;
         } else {
             lightBottomRight = getBlockOffset(x, y, z, facing.bottomRight).getAmbientOcclusionLightValue();
-            brightnessBottomRight = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomRight);
+            brightnessBottomRight = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomRight, facing.face);
         }
 
         if (!transparentRight && !transparentTop) {
@@ -214,19 +274,13 @@ public abstract class RenderBlocksUltraMixin {
             brightnessTopRight = brightnessRight;
         } else {
             lightTopRight = getBlockOffset(x, y, z, facing.topRight).getAmbientOcclusionLightValue();
-            brightnessTopRight = getMixedBrightnessForBlockOffset(x, y, z, facing.topRight);
+            brightnessTopRight = getMixedBrightnessForBlockOffset(x, y, z, facing.topRight, facing.face);
         }
 
         if (shift) {
             x -= facing.front.x();
             y -= facing.front.y();
             z -= facing.front.z();
-        }
-
-        int light = state.light;
-
-        if (shift || !getBlockOffset(x, y, z, facing.front).isOpaqueCube()) {
-            light = getMixedBrightnessForBlockOffset(x, y, z, facing.front, true);
         }
 
         float aoFront = getBlockOffset(x, y, z, facing.front).getAmbientOcclusionLightValue();
@@ -239,30 +293,30 @@ public abstract class RenderBlocksUltraMixin {
         this.brightnessBottomRight = getAoBrightness(brightnessBottom, brightnessBottomRight, brightnessRight, light);
         this.brightnessTopRight = getAoBrightness(brightnessTop, brightnessRight, brightnessTopRight, light);
 
-//        if (facing.worldUp >= 0) {
-//            Block frontBlock = getBlockOffset(x, y, z, facing.front);
-//            if (frontBlock instanceof BlockSlab && !frontBlock.isOpaqueCube()) {
-//                int dir = facing.worldUp ^ ((~getBlockMetadataOffset(x, y, z, facing.front) & 8) >>> 2);
-//                switch (dir) {
-//                    case 0:
-//                        this.brightnessTopLeft = this.brightnessBottomLeft;
-//                        this.brightnessTopRight = this.brightnessBottomRight;
-//                        break;
-//                    case 1:
-//                        this.brightnessTopRight = this.brightnessTopLeft;
-//                        this.brightnessBottomRight = this.brightnessBottomLeft;
-//                        break;
-//                    case 2:
-//                        this.brightnessBottomLeft = this.brightnessTopLeft;
-//                        this.brightnessBottomRight = this.brightnessTopRight;
-//                        break;
-//                    case 3:
-//                        this.brightnessTopLeft = this.brightnessTopRight;
-//                        this.brightnessBottomLeft = this.brightnessBottomRight;
-//                        break;
-//                }
-//            }
-//        }
+        if (facing.worldUp >= 0) {
+            Block frontBlock = getBlockOffset(x, y, z, facing.front);
+            if (frontBlock instanceof BlockSlab && !frontBlock.isOpaqueCube()) {
+                int dir = facing.worldUp ^ ((~getBlockMetadataOffset(x, y, z, facing.front) & 8) >>> 2);
+                switch (dir) {
+                    case 0:
+                        this.brightnessTopLeft = this.brightnessBottomLeft;
+                        this.brightnessTopRight = this.brightnessBottomRight;
+                        break;
+                    case 1:
+                        this.brightnessTopRight = this.brightnessTopLeft;
+                        this.brightnessBottomRight = this.brightnessBottomLeft;
+                        break;
+                    case 2:
+                        this.brightnessBottomLeft = this.brightnessTopLeft;
+                        this.brightnessBottomRight = this.brightnessTopRight;
+                        break;
+                    case 3:
+                        this.brightnessTopLeft = this.brightnessTopRight;
+                        this.brightnessBottomLeft = this.brightnessBottomRight;
+                        break;
+                }
+            }
+        }
 
         boolean useCustomColor = state.useCustomColor;
         if (useCustomColor || facing.face == 1) {
