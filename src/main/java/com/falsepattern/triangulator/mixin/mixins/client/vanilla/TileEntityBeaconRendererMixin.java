@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.config.TriConfig;
+import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,95 +26,68 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
 
     private static int displayList;
 
+    private static void drawQuad(Tessellator tess, double aX, double bX, double aZ, double bZ) {
+        val yMax = 256d;
+        val uMin = 0d;
+        val uMax = 1d;
+        val vMin = 0d;
+        val vMax = 256d;
+        tess.addVertexWithUV(aX, yMax, aZ, uMax, vMax);
+        tess.addVertexWithUV(aX, 0, aZ, uMax, vMin);
+        tess.addVertexWithUV(bX, 0, bZ, uMin, vMin);
+        tess.addVertexWithUV(bX, yMax, bZ, uMin, vMax);
+    }
+
+    private static void drawBeam(Tessellator tess, int alpha) {
+        val topRightX = 0.15d;
+        val topRightZ = 0.15d;
+        val topLeftX = -0.15d;
+        val topLeftZ = 0.15d;
+        val bottomRightX = 0.15d;
+        val bottomRightZ = -0.15d;
+        val bottomLeftX = -0.15d;
+        val bottomLeftZ = -0.15d;
+        tess.startDrawingQuads();
+        tess.setColorRGBA(255, 255, 255, alpha);
+        drawQuad(tess, topRightX, topLeftX, topRightZ, topLeftZ);
+        drawQuad(tess, bottomLeftX, bottomRightX, bottomLeftZ, bottomRightZ);
+        drawQuad(tess, topLeftX, bottomLeftX, topLeftZ, bottomLeftZ);
+        drawQuad(tess, bottomRightX, topRightX, bottomRightZ, topRightZ);
+        tess.draw();
+        GL11.glPopMatrix();
+    }
+
     private static void runDisplayList() {
         if (displayList == 0) {
             displayList = GLAllocation.generateDisplayLists(1);
             GL11.glNewList(displayList, GL11.GL_COMPILE);
-            Tessellator tessellator = Tessellator.instance;
-
+            Tessellator tess = Tessellator.instance;
+            GL11.glPushAttrib(GL11.GL_ENABLE_BIT |
+                              GL11.GL_TEXTURE_BIT |
+                              GL11.GL_COLOR_BUFFER_BIT |
+                              GL11.GL_DEPTH_BUFFER_BIT |
+                              GL11.GL_TRANSFORM_BIT);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_CULL_FACE);
             GL11.glDisable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_FOG);
             GL11.glDepthMask(true);
             OpenGlHelper.glBlendFunc(770, 1, 1, 0);
-            tessellator.startDrawingQuads();
-            tessellator.setColorRGBA(255, 255, 255, 32);
-            double topRightX = 0.15;
-            double topRightZ = 0.15;
-            double topLeftX = -0.15;
-            double topLeftZ = 0.15;
-            double bottomRightX = 0.15;
-            double bottomRightZ = -0.15;
-            double bottomLeftX = -0.15;
-            double bottomLeftZ = -0.15;
-            double yMax = 256;
-            double uMin = 0;
-            double uMax = 1;
-            double vMin = 0;
-            double vMax = 256;
-            tessellator.addVertexWithUV(topRightX, 0, topRightZ, uMax, vMin);
-            tessellator.addVertexWithUV(topRightX, yMax, topRightZ, uMax, vMax);
-            tessellator.addVertexWithUV(topLeftX, 0, topLeftZ, uMin, vMin);
-            tessellator.addVertexWithUV(topLeftX, yMax, topLeftZ, uMin, vMax);
-            tessellator.addVertexWithUV(bottomLeftX, yMax, bottomLeftZ, uMax, vMax);
-            tessellator.addVertexWithUV(bottomLeftX, 0, bottomLeftZ, uMax, vMin);
-            tessellator.addVertexWithUV(bottomRightX, 0, bottomRightZ, uMin, vMin);
-            tessellator.addVertexWithUV(bottomRightX, yMax, bottomRightZ, uMin, vMax);
-            tessellator.addVertexWithUV(topLeftX, yMax, topLeftZ, uMax, vMax);
-            tessellator.addVertexWithUV(topLeftX, 0, topLeftZ, uMax, vMin);
-            tessellator.addVertexWithUV(bottomLeftX, 0, bottomLeftZ, uMin, vMin);
-            tessellator.addVertexWithUV(bottomLeftX, yMax, bottomLeftZ, uMin, vMax);
-            tessellator.addVertexWithUV(bottomRightX, yMax, bottomRightZ, uMax, vMax);
-            tessellator.addVertexWithUV(bottomRightX, 0, bottomRightZ, uMax, vMin);
-            tessellator.addVertexWithUV(topRightX, 0, topRightZ, uMin, vMin);
-            tessellator.addVertexWithUV(topRightX, yMax, topRightZ, uMin, vMax);
-            tessellator.draw();
-
-            GL11.glPopMatrix();
+            drawBeam(tess, 32);
             GL11.glEnable(GL11.GL_BLEND);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
             GL11.glDepthMask(false);
-            tessellator.startDrawingQuads();
-            tessellator.setColorRGBA(255, 255, 255, 64);
-            topLeftX *= 2;
-            topLeftZ *= 2;
-            topRightX *= 2;
-            topRightZ *= 2;
-            bottomLeftX *= 2;
-            bottomLeftZ *= 2;
-            bottomRightX *= 2;
-            bottomRightZ *= 2;
-            tessellator.addVertexWithUV(topRightX, yMax, topRightZ, uMax, vMax);
-            tessellator.addVertexWithUV(topRightX, 0, topRightZ, uMax, vMin);
-            tessellator.addVertexWithUV(topLeftX, 0, topLeftZ, uMin, vMin);
-            tessellator.addVertexWithUV(topLeftX, yMax, topLeftZ, uMin, vMax);
-            tessellator.addVertexWithUV(bottomLeftX, yMax, bottomLeftZ, uMax, vMax);
-            tessellator.addVertexWithUV(bottomLeftX, 0, bottomLeftZ, uMax, vMin);
-            tessellator.addVertexWithUV(bottomRightX, 0, bottomRightZ, uMin, vMin);
-            tessellator.addVertexWithUV(bottomRightX, yMax, bottomRightZ, uMin, vMax);
-            tessellator.addVertexWithUV(topLeftX, yMax, topLeftZ, uMax, vMax);
-            tessellator.addVertexWithUV(topLeftX, 0, topLeftZ, uMax, vMin);
-            tessellator.addVertexWithUV(bottomLeftX, 0, bottomLeftZ, uMin, vMin);
-            tessellator.addVertexWithUV(bottomLeftX, yMax, bottomLeftZ, uMin, vMax);
-            tessellator.addVertexWithUV(bottomRightX, yMax, bottomRightZ, uMax, vMax);
-            tessellator.addVertexWithUV(bottomRightX, 0, bottomRightZ, uMax, vMin);
-            tessellator.addVertexWithUV(topRightX, 0, topRightZ, uMin, vMin);
-            tessellator.addVertexWithUV(topRightX, yMax, topRightZ, uMin, vMax);
-            tessellator.draw();
-            GL11.glPopMatrix();
+            GL11.glScaled(2, 1, 2);
+            drawBeam(tess, 64);
             GL11.glMatrixMode(GL11.GL_TEXTURE);
             GL11.glPopMatrix();
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glDepthMask(true);
+            GL11.glPopAttrib();
             GL11.glEndList();
         }
         GL11.glCallList(displayList);
-
     }
 
     @Inject(method = "renderTileEntityAt(Lnet/minecraft/tileentity/TileEntityBeacon;DDDF)V",
@@ -129,9 +103,10 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
 
         if (f1 > 0.0F) {
             bindTexture(field_147523_b);
-            double tickTime = (double) beacon.getWorldObj().getTotalWorldTime() + partialTickTime;
-            double rotation = tickTime * 2;
-            double textureMove = tickTime / 10d;
+            val ptt = (double) partialTickTime;
+            val integerTickTime = beacon.getWorldObj().getTotalWorldTime();
+            val rotation = ((integerTickTime % 180) + ptt) * 2;
+            val textureMove = ((integerTickTime % 10) + ptt) / 10;
             GL11.glMatrixMode(GL11.GL_TEXTURE);
             GL11.glPushMatrix();
             GL11.glTranslated(0, -textureMove, 0);
