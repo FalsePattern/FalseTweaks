@@ -1,13 +1,13 @@
 repositories {
     maven {
         name = "cursemaven"
-        url = "https://cursemaven.falsepattern.com/"
+        url = "https://mvn.falsepattern.com/cursemaven"
         content {
             includeGroup "curse.maven"
         }
     }
     maven {
-        name = "mavenpattern"
-        url = "https://maven.falsepattern.com/"
+        name = "mvnpattern"
+        url = "https://mvn.falsepattern.com/releases"
     }
 }

@@ -20,8 +20,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         try {
-            ConfigurationManager.registerConfig(TriConfig.class);
-            ConfigurationManager.registerConfig(CalibrationConfig.class);
+            ConfigurationManager.initialize(TriConfig.class, CalibrationConfig.class);
         } catch (ConfigException ex) {
             Triangulator.triLog.error("Failed to register config", ex);
         }
