@@ -29,40 +29,40 @@ import net.minecraft.world.IBlockAccess;
            chain = false)
 public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
-    @Shadow(aliases = "colorRedTopLeftF")
+    @Shadow
     public float colorRedTopLeft;
 
-    @Shadow(aliases = "colorGreenTopLeftF")
+    @Shadow
     public float colorGreenTopLeft;
 
-    @Shadow(aliases = "colorBlueTopLeftF")
+    @Shadow
     public float colorBlueTopLeft;
 
-    @Shadow(aliases = "colorRedBottomLeftF")
+    @Shadow
     public float colorRedBottomLeft;
 
-    @Shadow(aliases = "colorGreenBottomLeftF")
+    @Shadow
     public float colorGreenBottomLeft;
 
-    @Shadow(aliases = "colorBlueBottomLeftF")
+    @Shadow
     public float colorBlueBottomLeft;
 
-    @Shadow(aliases = "colorRedBottomRightF")
+    @Shadow
     public float colorRedBottomRight;
 
-    @Shadow(aliases = "colorGreenBottomRightF")
+    @Shadow
     public float colorGreenBottomRight;
 
-    @Shadow(aliases = "colorBlueBottomRightF")
+    @Shadow
     public float colorBlueBottomRight;
 
-    @Shadow(aliases = "colorRedTopRightF")
+    @Shadow
     public float colorRedTopRight;
 
-    @Shadow(aliases = "colorGreenTopRightF")
+    @Shadow
     public float colorGreenTopRight;
 
-    @Shadow(aliases = "colorBlueTopRightF")
+    @Shadow
     public float colorBlueTopRight;
     int countS;
     int countB;

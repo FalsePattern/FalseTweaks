@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern32
+//version: 1656003793falsepattern34
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -325,9 +325,14 @@ dependencies {
 
 apply from: 'dependencies.gradle'
 
+def mixinDir = new File(project.buildDir, 'mixins')
+if (!mixinDir.exists()) {
+    mixinDir.mkdirs()
+}
 def mixingConfigRefMap = "mixins." + modId + ".refmap.json"
-def refMap = "${tasks.compileJava.temporaryDir}" + File.separator + mixingConfigRefMap
-def mixinSrg = "${tasks.reobf.temporaryDir}" + File.separator + "mixins.srg"
+def srgFile = new File(project.buildDir, 'srgs/mcp-srg.srg')
+def mixinSrg = new File(mixinDir, "${mixingConfigRefMap}.srg")
+def mixinRefMap = new File(mixinDir, mixingConfigRefMap)
 
 task generateAssets {
     if(usesMixins.toBoolean()) {
@@ -390,23 +395,19 @@ jar {
 }
 
 reobf {
-    if(usesMixins.toBoolean() && file(mixinSrg).exists()) {
+    if(usesMixins.toBoolean()) {
         addExtraSrgFile mixinSrg
     }
 }
 
-afterEvaluate {
-    if(usesMixins.toBoolean()) {
-        tasks.compileJava {
-            options.compilerArgs += [
-                    "-AreobfSrgFile=${tasks.reobf.srg}",
-                    "-AoutSrgFile=${mixinSrg}",
-                    "-AoutRefMapFile=${refMap}",
-                    // Elan: from what I understand they are just some linter configs so you get some warning on how to properly code
-                    "-XDenableSunApiLintControl",
-                    "-XDignore.symbol.file"
-            ]
-        }
+if(usesMixins.toBoolean()) {
+    tasks.compileJava {
+        options.compilerArgs += [
+                '-Xlint:-processing',
+                "-AreobfSrgFile=${srgFile}",
+                "-AoutSrgFile=${mixinSrg}",
+                "-AoutRefMapFile=${mixinRefMap}"
+        ]
     }
 }
 
@@ -488,7 +489,7 @@ processResources {
     }
 
     if(usesMixins.toBoolean()) {
-        from refMap
+        from mixinRefMap
     }
 
     // copy everything else that's not the mcmod.info
@@ -597,6 +598,14 @@ task apiJar(type: Jar) {
 
     getArchiveClassifier().set('api')
 }
+
+task copySrgs(type: Copy, dependsOn: 'genSrgs') {
+    from plugins.getPlugin('forge').delayedFile('{SRG_DIR}')
+    include '**/*.srg'
+    into layout.buildDirectory.file('srgs')
+}
+
+compileJava.dependsOn(copySrgs)
 
 artifacts {
     archives sourcesJar
