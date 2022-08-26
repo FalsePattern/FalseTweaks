@@ -1,6 +1,6 @@
 repositories {
     maven {
         name = "mavenpattern"
-        url = "https://maven.falsepattern.com/"
+        url = "https://mvn.falsepattern.com/releases/"
     }
 }

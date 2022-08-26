@@ -2,5 +2,5 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.22")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
-    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.9.1:dev")
+    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.5:dev")
 }
