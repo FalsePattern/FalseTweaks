@@ -38,15 +38,15 @@ public class AnimationUpdateBatcher {
     public static TextureMap currentAtlas = null;
     public static AnimationUpdateBatcher batcher = null;
     private static final Unsafe unsafe = ReflectionHelper.getPrivateValue(Unsafe.class, null, "theUnsafe");
-    private static final long arrayBaseOffset = unsafe.arrayBaseOffset(int[].class);
+    private static final int arrayBaseOffset = unsafe.arrayBaseOffset(int[].class);
     private final int mipLevels;
     private final int xOffset;
     private final int yOffset;
     private final int width;
     private final int height;
     private final int[] offsets;
+    private final long[] baseOffsets;
     private final IntBuffer memory;
-    private final long basePointer;
 
     @SneakyThrows
     public AnimationUpdateBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
@@ -62,7 +62,11 @@ public class AnimationUpdateBatcher {
             size += (width >>> i) * (height >>> i);
         }
         memory = GLAllocation.createDirectIntBuffer(size);
-        basePointer = ReflectionHelper.getPrivateValue(Buffer.class, memory, "address");
+        long basePointer = ReflectionHelper.getPrivateValue(Buffer.class, memory, "address");
+        baseOffsets = new long[mipLevel + 1];
+        for (int i = 0; i <= mipLevel; i++) {
+            baseOffsets[i] = basePointer + ((long)offsets[i] << 2);
+        }
     }
 
     public boolean batchUpload(int[][] texture, int width, int height, int xOffset, int yOffset) {
@@ -71,11 +75,13 @@ public class AnimationUpdateBatcher {
         if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height) {
             return false;
         }
-        int w = this.width;
+        xOffset <<= 2;
+        width <<= 2;
+        int w = this.width << 2;
         for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
-            long base = basePointer + ((offsets[mipMapLevel] + (long) yOffset * w + xOffset) << 2);
-            for (int i = 0; i < height; i++) {
-                unsafe.copyMemory(texture[mipMapLevel], arrayBaseOffset + (((long) i * width) << 2), null, base + (((long) i * w)<< 2), (long) width << 2);
+            long base = baseOffsets[mipMapLevel] + (long) yOffset * w + xOffset;
+            for (long i = 0; i < height; i++) {
+                unsafe.copyMemory(texture[mipMapLevel], arrayBaseOffset + i * width, null, base + i * w, width);
             }
             xOffset >>>= 1;
             yOffset >>>= 1;
