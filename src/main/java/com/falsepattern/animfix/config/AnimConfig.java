@@ -23,15 +23,24 @@ package com.falsepattern.animfix.config;
 
 import com.falsepattern.animfix.Tags;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Config(modid = Tags.MODID)
-public class AnimConfig {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AnimConfig {
+    static {
+        ConfigurationManager.selfInit();
+    }
     @Config.Comment("The largest width and height animated textures can have to get put into the buffer.\n" +
                     "Making this higher will batch higher resolution textures too, but will consume more RAM.")
     @Config.RangeInt(min = 16,
                      max = 1024)
-    public static int maximumBatchedTextureSize = 32;
+    @Config.DefaultInt(32)
+    public static int maximumBatchedTextureSize;
 
     @Config.Comment("Spends a little more time optimizing the batch during loading so that it uses less resources during gameplay.")
-    public static boolean optimalPacking = true;
+    @Config.DefaultBoolean(true)
+    public static boolean optimalPacking;
 }
