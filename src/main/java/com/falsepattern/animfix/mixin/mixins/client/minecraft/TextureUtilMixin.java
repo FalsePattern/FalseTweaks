@@ -48,7 +48,7 @@ public abstract class TextureUtilMixin {
         }
         if (AnimationUpdateBatcher.batcher != null) {
             theProfiler.startSection("copyToBatch");
-            boolean ended = AnimationUpdateBatcher.batcher.batchUpload(texture, width, height, xOffset, yOffset);
+            boolean ended = AnimationUpdateBatcher.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
             theProfiler.endSection();
             if (ended) {
                 ci.cancel();

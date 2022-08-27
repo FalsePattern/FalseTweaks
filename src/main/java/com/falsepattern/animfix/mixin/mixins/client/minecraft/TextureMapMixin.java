@@ -23,6 +23,7 @@ package com.falsepattern.animfix.mixin.mixins.client.minecraft;
 
 import com.falsepattern.animfix.AnimationUpdateBatcher;
 import com.falsepattern.animfix.interfaces.ITextureMapMixin;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,6 +44,7 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     private static Profiler theProfiler;
     @Shadow
     private int mipmapLevels;
+    @Shadow @Final private String basePath;
     private AnimationUpdateBatcher batcher;
 
     @Inject(method = "loadTexture",
@@ -50,6 +52,7 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             require = 1)
     private void setupBatcher(CallbackInfo ci) {
         AnimationUpdateBatcher.currentAtlas = (TextureMap) (Object) this;
+        AnimationUpdateBatcher.currentName = this.basePath;
     }
 
     @Inject(method = "loadTexture",
@@ -57,6 +60,7 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
             require = 1)
     private void finishSetup(CallbackInfo ci) {
         AnimationUpdateBatcher.currentAtlas = null;
+        AnimationUpdateBatcher.currentName = null;
     }
 
     @Redirect(method = "loadTextureAtlas",
@@ -100,6 +104,9 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
 
     @Override
     public void initializeBatcher(int xOffset, int yOffset, int width, int height) {
+        if (batcher != null) {
+            batcher.terminate();
+        }
         batcher = new AnimationUpdateBatcher(xOffset, yOffset, width, height, mipmapLevels);
     }
 }
