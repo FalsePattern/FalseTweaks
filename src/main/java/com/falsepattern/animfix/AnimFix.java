@@ -27,6 +27,6 @@ import cpw.mods.fml.common.Mod;
      version = Tags.VERSION,
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
-     dependencies = "required-after:falsepatternlib@[0.9.1,);")
+     dependencies = "required-after:falsepatternlib@[0.10.5,);")
 public class AnimFix {
 }
