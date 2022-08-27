@@ -25,14 +25,10 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import sun.misc.Unsafe;
 
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.TextureMap;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
-
-import java.nio.Buffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +40,6 @@ public class AnimationUpdateBatcher {
     public static TextureMap currentAtlas = null;
     public static AnimationUpdateBatcher batcher = null;
     public static String currentName = null;
-    private static final Unsafe unsafe = ReflectionHelper.getPrivateValue(Unsafe.class, null, "theUnsafe");
-    private static final int arrayBaseOffset = unsafe.arrayBaseOffset(int[].class);
 
     private final int mipLevels;
     private final int xOffset;
@@ -53,7 +47,6 @@ public class AnimationUpdateBatcher {
     private final int width;
     private final int height;
     private final int[] offsets;
-    private final long[] baseOffsets;
     private final IntBuffer memory;
 
     private final List<int[][]> queuedTextures1 = new ArrayList<>();
@@ -84,11 +77,6 @@ public class AnimationUpdateBatcher {
             size += (width >>> i) * (height >>> i);
         }
         memory = GLAllocation.createDirectIntBuffer(size);
-        long basePointer = ReflectionHelper.getPrivateValue(Buffer.class, memory, "address");
-        baseOffsets = new long[mipLevel + 1];
-        for (int i = 0; i <= mipLevel; i++) {
-            baseOffsets[i] = basePointer + ((long)offsets[i] << 2);
-        }
         thread = new Thread(this::run);
         thread.setName("AnimFix batch thread (" + currentName + ")");
         thread.setDaemon(true);
@@ -146,13 +134,12 @@ public class AnimationUpdateBatcher {
         int height = dims[1];
         int xOffset = dims[2];
         int yOffset = dims[3];
-        xOffset <<= 2;
-        width <<= 2;
-        int w = this.width << 2;
-        for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
-            long base = baseOffsets[mipMapLevel] + (long) yOffset * w + xOffset;
-            for (long i = 0; i < height; i++) {
-                unsafe.copyMemory(texture[mipMapLevel], arrayBaseOffset + i * width, null, base + i * w, width);
+        int w = this.width;
+        for (int[] mipMapLevel : texture) {
+            int base = yOffset * w + xOffset;
+            for (int i = 0; i < height; i++) {
+                memory.position(base + i * w);
+                memory.put(mipMapLevel, i * width, width);
             }
             xOffset >>>= 1;
             yOffset >>>= 1;
