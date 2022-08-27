@@ -36,12 +36,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.StitcherException;
 import net.minecraft.client.renderer.texture.Stitcher;
-import cpw.mods.fml.common.ProgressManager;
 
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("deprecation")
 @Mixin(Stitcher.class)
 public abstract class StitcherMixin {
     @Shadow
@@ -86,22 +84,16 @@ public abstract class StitcherMixin {
     private void doTurboStitch(CallbackInfo ci) {
         ci.cancel();
         try {
-            val bar = ProgressManager.push("Texture stitching", 4);
-            bar.step("Stitching animated textures");
             batchingStitcher.stitch();
-            bar.step("Stitching master atlas");
             masterStitcher.stitch();
             currentWidth = masterStitcher.width;
             currentHeight = masterStitcher.height;
-            bar.step("Extracting stitched textures");
             stitchSlots.clear();
             stitchSlots.addAll(masterStitcher.getSlots());
-            bar.step("Initializing animated texture batcher");
             ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x,
                                                                                        batchingStitcher.y,
                                                                                        batchingStitcher.width,
                                                                                        batchingStitcher.height);
-            ProgressManager.pop(bar);
         } catch (TooBigException ignored) {
             throw new StitcherException(null,
                                         "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
