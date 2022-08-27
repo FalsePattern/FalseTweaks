@@ -21,7 +21,6 @@
 
 package com.falsepattern.animfix.stitching;
 
-import com.falsepattern.animfix.config.AnimConfig;
 import com.falsepattern.animfix.stitching.packing2d.Algorithm;
 import com.falsepattern.animfix.stitching.packing2d.Packer;
 import lombok.Getter;
@@ -78,7 +77,7 @@ public class TurboStitcher extends SpriteSlot {
         for (val slot : slots) {
             width = Math.max(width, slot.width);
         }
-        if (forcePowerOf2 || !AnimConfig.optimalPacking) {
+        if (forcePowerOf2) {
             width = nextPowerOfTwo(width);
         }
         if (width > maxWidth) {
@@ -90,7 +89,7 @@ public class TurboStitcher extends SpriteSlot {
             if (width == maxWidth) {
                 throw new TooBigException();
             }
-            if (forcePowerOf2 || !AnimConfig.optimalPacking) {
+            if (forcePowerOf2) {
                 width *= 2;
             } else {
                 width += Math.min(width, 16);
