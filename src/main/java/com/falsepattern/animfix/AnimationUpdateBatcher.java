@@ -135,11 +135,11 @@ public class AnimationUpdateBatcher {
         int xOffset = dims[2];
         int yOffset = dims[3];
         int w = this.width;
-        for (int[] mipMapLevel : texture) {
-            int base = yOffset * w + xOffset;
+        for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
+            int base = offsets[mipMapLevel] + yOffset * w + xOffset;
             for (int i = 0; i < height; i++) {
                 memory.position(base + i * w);
-                memory.put(mipMapLevel, i * width, width);
+                memory.put(texture[mipMapLevel], i * width, width);
             }
             xOffset >>>= 1;
             yOffset >>>= 1;
