@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern36
+//version: 1656003793falsepattern38
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -9,6 +9,10 @@ Please check https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/build.gr
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.matthewprenger.cursegradle.CurseArtifact
+import com.matthewprenger.cursegradle.CurseRelation
+import com.modrinth.minotaur.dependencies.ModDependency
+import com.modrinth.minotaur.dependencies.VersionDependency
 import org.gradle.internal.logging.text.StyledTextOutput.Style
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
@@ -63,6 +67,8 @@ plugins {
     id 'com.palantir.git-version'        version '0.13.0'
     id 'de.undercouch.download'          version '5.0.1'
     id 'com.github.gmazzo.buildconfig'   version '3.0.3'        apply false
+    id 'com.modrinth.minotaur'           version '2.+'          apply false
+    id 'com.matthewprenger.cursegradle'  version '1.4.0'        apply false
 }
 apply plugin: 'com.falsepattern.jtweaker'
 
@@ -121,6 +127,12 @@ propertyDefaultIfUnset("hasMixinDeps", false)
 propertyDefaultIfUnset("mixinPreinitConfig", "")
 propertyDefaultIfUnset("remapStubs", false)
 propertyDefaultIfUnset("useObsoleteSpongeMixins", false)
+
+propertyDefaultIfUnset("modrinthProjectId", "")
+propertyDefaultIfUnset("modrinthDependencies", "")
+propertyDefaultIfUnset("curseForgeProjectId", "")
+propertyDefaultIfUnset("curseForgeRelations", "")
+propertyDefaultIfUnset("changelog", "No changelog URL was provided.")
 
 propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/MinecraftForge/FML/1.7.10/conf/")
 propertyDefaultIfUnset("mappingsChannel", "stable")
@@ -704,6 +716,99 @@ publishing {
     }
 }
 
+
+if (curseForgeProjectId != "") {
+    apply plugin: 'com.matthewprenger.cursegradle'
+    curseforge {
+        apiKey = System.getenv("CURSEFORGE_TOKEN") ?: ""
+        project {
+            id = curseForgeProjectId
+            changelogType = "text"
+            changelog = project.changelog.replace("{version}", modVersion)
+            releaseType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
+            addGameVersion project.minecraft.version
+            mainArtifact(jar) {
+                displayName = "$modName version: $modVersion"
+            }
+        }
+        options {
+            javaIntegration = false
+            forgeGradleIntegration = false
+        }
+    }
+    if (curseForgeRelations.size() != 0) {
+        String[] deps = curseForgeRelations.split(";")
+        deps.each { dep ->
+            if (dep.size() == 0) {
+                return
+            }
+            String[] parts = dep.split(":")
+            String type = parts[0]
+            String name = parts[1]
+            addCurseForgeRelation(type, name)
+        }
+    }
+    tasks.curseforge.dependsOn(build)
+    tasks.publish.dependsOn(curseforge)
+}
+
+if (modrinthProjectId != "") {
+    apply plugin: 'com.modrinth.minotaur'
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = modrinthProjectId
+        versionNumber = modVersion
+        versionType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
+        changelog = project.changelog.replace("{version}", modVersion)
+        uploadFile = jar
+        gameVersions = [project.minecraft.version]
+        loaders = ["forge"]
+    }
+    if (modrinthDependencies.size() != 0) {
+        String[] deps = modrinthDependencies.split(";")
+        deps.each { dep ->
+            if (dep.size() == 0) {
+                return
+            }
+            String[] parts = dep.split(":")
+            String[] qual = parts[0].split("-")
+            String scope = qual[0]
+            String type = qual[1]
+            String name = parts[1]
+            addModrinthDep(scope, type, name)
+        }
+    }
+    tasks.modrinth.dependsOn(build)
+    tasks.publish.dependsOn(modrinth)
+}
+
+def addModrinthDep(scope, type, name) {
+    com.modrinth.minotaur.dependencies.Dependency dep;
+    if (!(scope in ["required", "optional", "incompatible", "embedded"])) {
+        throw new Exception("Invalid modrinth dependency scope: " + scope)
+    }
+    switch (type) {
+        case "project":
+            dep = new ModDependency(name, scope)
+            break
+        case "version":
+            dep = new VersionDependency(name, scope)
+            break
+        default:
+            throw new Exception("Invalid modrinth dependency type: " + type)
+    }
+    project.modrinth.dependencies.add(dep)
+}
+
+def addCurseForgeRelation(type, name) {
+    if (!(type in ["requiredDependency", "embeddedLibrary", "optionalDependency", "tool", "incompatible"])) {
+        throw new Exception("Invalid CurseForge relation type: " + type)
+    }
+    CurseArtifact artifact = project.curseforge.curseProjects[0].mainArtifact
+    CurseRelation rel = (artifact.curseRelations ?: (artifact.curseRelations = new CurseRelation()))
+    rel."$type"(name)
+}
+
 // Updating
 task updateBuildScript {
     doLast {
@@ -995,7 +1100,7 @@ def checkPropertyExists(String propertyName) {
 }
 
 def propertyDefaultIfUnset(String propertyName, defaultValue) {
-    if (!project.hasProperty(propertyName)) {
+    if (!project.hasProperty(propertyName) || project.property(propertyName) == "") {
         project.ext.setProperty(propertyName, defaultValue)
     }
 }
