@@ -1,12 +1,7 @@
 package com.falsepattern.triangulator.proxy;
 
-import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.triangulator.ItemRenderListManager;
-import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.calibration.Calibration;
-import com.falsepattern.triangulator.calibration.CalibrationConfig;
-import com.falsepattern.triangulator.config.TriConfig;
 import com.falsepattern.triangulator.leakfix.LeakFix;
 
 import net.minecraft.client.Minecraft;
@@ -19,11 +14,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
-        try {
-            ConfigurationManager.initialize(TriConfig.class, CalibrationConfig.class);
-        } catch (ConfigException ex) {
-            Triangulator.triLog.error("Failed to register config", ex);
-        }
         LeakFix.registerBus();
         Calibration.registerBus();
     }
