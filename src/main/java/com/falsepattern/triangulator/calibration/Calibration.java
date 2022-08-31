@@ -30,20 +30,11 @@ public class Calibration {
         MinecraftForge.EVENT_BUS.register(INSTANCE);
     }
 
-    @SuppressWarnings("unchecked")
     @SneakyThrows
     public static void setCalibration(boolean flip) {
-        val config = ConfigurationManager.getConfigElements(CalibrationConfig.class);
-        for (val element : config) {
-            switch (element.getName()) {
-                case "FLIP_DIAGONALS":
-                    element.set(flip);
-                    break;
-                case "GPU_HASH":
-                    element.set(gpuHash());
-                    break;
-            }
-        }
+        CalibrationConfig.FLIP_DIAGONALS = flip;
+        CalibrationConfig.GPU_HASH = gpuHash();
+        ConfigurationManager.saveToFile(true, CalibrationConfig.class);
         Minecraft.getMinecraft().renderGlobal.loadRenderers();
     }
 
