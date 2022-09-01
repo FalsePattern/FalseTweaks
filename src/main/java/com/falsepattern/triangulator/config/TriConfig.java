@@ -92,6 +92,12 @@ public class TriConfig {
     @Config.DefaultInt(256)
     public static int ITEM_RENDERLIST_BUFFER_MAX_SIZE;
 
+    @Config.Comment("Transparent tile entities (beacons, for instance) might render behind other tile entities that are\n" +
+                    "actually BEHIND the transparent part. Sorting the tile entities before rendering fixes this bug, but\n" +
+                    "decreases framerate a tiny bit.")
+    @Config.DefaultBoolean(true)
+    public static boolean TE_TRANSPARENCY_FIX;
+
     static {
         ConfigurationManager.selfInit();
     }
