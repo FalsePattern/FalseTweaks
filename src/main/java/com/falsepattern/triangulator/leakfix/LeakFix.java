@@ -68,10 +68,6 @@ public final class LeakFix {
         MinecraftForge.EVENT_BUS.register(INSTANCE);
     }
 
-    public static void activate() {
-        activeBufferCount++;
-    }
-
     public static void gc() {
         allocs = 0;
         int reusables = reusableAllocations.size();
