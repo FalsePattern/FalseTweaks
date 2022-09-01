@@ -6,7 +6,7 @@ dependencies {
 
     compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.6:dev")
 
-    compile("org.joml:joml:1.10.4")
+    compileOnly("org.joml:joml:1.10.4")
 
     compileOnly("curse.maven:redstone-paste-67508:2211249") {
         transitive = false
