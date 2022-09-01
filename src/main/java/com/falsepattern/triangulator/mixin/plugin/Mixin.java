@@ -19,10 +19,11 @@ public enum Mixin implements IMixin {
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
     RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksUltraMixin"),
+    RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
     //region leak fix
-    RenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
-    WorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
+    LeakFixRenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
+    LeakFixWorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
     //endregion leak fix
     //endregion Minecraft
     //region FoamFix
