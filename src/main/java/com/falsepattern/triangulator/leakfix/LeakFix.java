@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.leakfix;
 
 import com.falsepattern.triangulator.Share;
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.config.TriConfig;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -23,8 +24,8 @@ public final class LeakFix {
     @Getter
     private static int activeBufferCount = 0;
     private static boolean debugText = false;
-    private static TIntList freshAllocations = new TIntArrayList();
-    private static TIntList reusableAllocations = new TIntArrayList();
+    private static final TIntList freshAllocations = new TIntArrayList();
+    private static final TIntList reusableAllocations = new TIntArrayList();
     private static int allocs = 0;
     private static int totalAllocs = 0;
     private static int hits = 0;
@@ -51,6 +52,10 @@ public final class LeakFix {
                 Share.log.info("Enabling leak fix because of config flag.");
                 enabled = true;
                 break;
+        }
+        if (enabled && TriCompat.neodymiumInstalled()) {
+            Share.log.error("Neodymium detected! The leak fix is incompatible with Neodymium for the time being. Disabling leak fix module...");
+            enabled = false;
         }
         ENABLED = enabled;
     }
