@@ -10,8 +10,6 @@ The initial goal of the project was only the modernization of 1.7.10's ancient q
 
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
-- [SpongeMixins](https://github.com/TimeConqueror/SpongeMixins)
+- [SpongeMixins](https://github.com/TimeConqueror/SpongeMixins) or [MixinBooterLegacy](https://github.com/tox1cozZ/mixin-booter-legacy)
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
-
-[![POOP badge](https://raw.githubusercontent.com/gist/poop-person/991e80f390384bbeef09d208bff208f4/raw/a9ef83add84a70f2202896c2d81117ff7b169be1/poop-badge.svg)](https://gist.github.com/poop-person/991e80f390384bbeef09d208bff208f4)

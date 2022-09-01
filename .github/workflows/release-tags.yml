@@ -11,9 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      MAVEN_DEPLOY_USER: ${{ secrets.MAVEN_DEPLOY_USER }}
-      MAVEN_DEPLOY_PASSWORD: ${{ secrets.MAVEN_DEPLOY_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -35,8 +32,13 @@ jobs:
       - name: Setup the workspace
         run: ./gradlew setupCIWorkspace
 
-      - name: Build the mod
-        run: ./gradlew build
+      - name: Publish to Maven, Modrinth, and CurseForge
+        run: ./gradlew publish
+        env:
+          MAVEN_DEPLOY_USER: ${{ secrets.MAVEN_DEPLOY_USER }}
+          MAVEN_DEPLOY_PASSWORD: ${{ secrets.MAVEN_DEPLOY_PASSWORD }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - name: Release under current tag
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -46,6 +48,3 @@ jobs:
           prerelease: false
           title: "${{ env.RELEASE_VERSION }}"
           files: build/libs/*.jar
-
-      - name: Publish to maven
-        run: ./gradlew publish

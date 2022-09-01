@@ -16,7 +16,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.GROUPNAME + ".config.TriangulatorGuiFactory",
-     dependencies = "required-after:falsepatternlib@[0.9.1,);")
+     dependencies = "required-after:falsepatternlib@[0.10.6,);")
 public class Triangulator {
     public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
 

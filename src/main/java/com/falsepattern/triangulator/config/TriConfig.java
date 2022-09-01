@@ -1,11 +1,15 @@
 package com.falsepattern.triangulator.config;
 
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.triangulator.Tags;
 import com.falsepattern.triangulator.leakfix.LeakFixState;
 
 @Config(modid = Tags.MODID)
 public class TriConfig {
+    static {
+        ConfigurationManager.selfInit();
+    }
     @Config.Comment("Used to toggle the namesake feature of this mod: quad triangulation.\n" +
                     "If you turn this off, the triangulation will not execute, but you will still have the AO and the\n" +
                     "smooth lighting fixes.\n" +

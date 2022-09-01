@@ -8,12 +8,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import lombok.var;
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,40 +30,40 @@ import net.minecraft.world.IBlockAccess;
            chain = false)
 public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
 
-    @Shadow(aliases = "colorRedTopLeftF")
+    @Shadow
     public float colorRedTopLeft;
 
-    @Shadow(aliases = "colorGreenTopLeftF")
+    @Shadow
     public float colorGreenTopLeft;
 
-    @Shadow(aliases = "colorBlueTopLeftF")
+    @Shadow
     public float colorBlueTopLeft;
 
-    @Shadow(aliases = "colorRedBottomLeftF")
+    @Shadow
     public float colorRedBottomLeft;
 
-    @Shadow(aliases = "colorGreenBottomLeftF")
+    @Shadow
     public float colorGreenBottomLeft;
 
-    @Shadow(aliases = "colorBlueBottomLeftF")
+    @Shadow
     public float colorBlueBottomLeft;
 
-    @Shadow(aliases = "colorRedBottomRightF")
+    @Shadow
     public float colorRedBottomRight;
 
-    @Shadow(aliases = "colorGreenBottomRightF")
+    @Shadow
     public float colorGreenBottomRight;
 
-    @Shadow(aliases = "colorBlueBottomRightF")
+    @Shadow
     public float colorBlueBottomRight;
 
-    @Shadow(aliases = "colorRedTopRightF")
+    @Shadow
     public float colorRedTopRight;
 
-    @Shadow(aliases = "colorGreenTopRightF")
+    @Shadow
     public float colorGreenTopRight;
 
-    @Shadow(aliases = "colorBlueTopRightF")
+    @Shadow
     public float colorBlueTopRight;
     @Shadow private static RenderBlocks instance;
     int countS;
@@ -191,26 +190,6 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
         reuse(5);
     }
 
-    /**
-     * @author embeddedt
-     */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(from = @At(value = "FIELD",
-                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPN:F",
-                                         opcode = Opcodes.PUTFIELD,
-                                         ordinal = 0),
-                              to = @At(value = "FIELD",
-                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
-                                       opcode = Opcodes.PUTFIELD,
-                                       ordinal = 0)),
-               at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 1,
-               allow = 8)
-    private int incrementYValue0(int y) {
-        return y + 1;
-    }
-
     private void addLight(int light) {
         int S = light & 0xff;
         int B = (light & 0xff0000) >>> 16;
@@ -245,7 +224,25 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion"},
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+               slice = @Slice(from = @At(value = "FIELD",
+                                         target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPN:F",
+                                         opcode = Opcodes.PUTFIELD,
+                                         ordinal = 0),
+                              to = @At(value = "FIELD",
+                                       target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZNNN:F",
+                                       opcode = Opcodes.PUTFIELD,
+                                       ordinal = 0)),
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
+               allow = 8)
+    private Block incrementYValue0(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x, y + 1, z);
+    }
+    /**
+     * @author embeddedt
+     */
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion"},
                slice = @Slice(from = @At(value = "FIELD",
                                          target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
                                          opcode = Opcodes.PUTFIELD,
@@ -256,16 +253,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                                        ordinal = 0)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 1,
                allow = 4)
-    private int decrementYValue1(int y) {
-        return y - 1;
+    private Block decrementYValue1(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x, y - 1, z);
     }
-
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
                slice = @Slice(from = @At(value = "FIELD",
                                          target = "Lnet/minecraft/client/renderer/RenderBlocks;aoBrightnessXZPN:I",
                                          opcode = Opcodes.PUTFIELD,
@@ -276,16 +271,14 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                                        ordinal = 2)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 2,
                allow = 8)
-    private int incrementZValue2(int z) {
-        return z + 1;
+    private Block incrementZValue2(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x, y, z + 1);
     }
-
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
                slice = @Slice(from = @At(value = "FIELD",
                                          target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchYZPP:F",
                                          opcode = Opcodes.PUTFIELD,
@@ -296,16 +289,15 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                                        ordinal = 2)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 2,
                allow = 8)
-    private int decrementZValue3(int z) {
-        return z - 1;
+    private Block decrementZValue3(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x, y, z - 1);
     }
 
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
                slice = @Slice(from = @At(value = "FIELD",
                                          target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYNP:F",
                                          opcode = Opcodes.PUTFIELD,
@@ -316,17 +308,15 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                                        ordinal = 4)),
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 0,
                allow = 8)
-    private int incrementXValue4(int x) {
-        return x + 1;
+    private Block incrementXValue4(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x + 1, y, z);
     }
-
     /**
      * @author embeddedt
      */
-    @ModifyArg(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
-               slice = @Slice(from = @At(value = "FIELD",
+    @Redirect(method = {"renderStandardBlockWithAmbientOcclusion", "renderStandardBlockWithAmbientOcclusionPartial"},
+              slice = @Slice(from = @At(value = "FIELD",
                                          target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYPP:F",
                                          opcode = Opcodes.PUTFIELD,
                                          ordinal = 1),
@@ -334,11 +324,10 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
                                        target = "Lnet/minecraft/client/renderer/RenderBlocks;aoLightValueScratchXYZPNN:F",
                                        opcode = Opcodes.PUTFIELD,
                                        ordinal = 4)),
-               at = @At(value = "INVOKE",
+              at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
-               index = 0,
-               allow = 8)
-    private int decrementXValue5(int x) {
-        return x - 1;
+              allow = 8)
+    private Block decrementXValue5(IBlockAccess instance, int x, int y, int z) {
+        return instance.getBlock(x - 1, y, z);
     }
 }

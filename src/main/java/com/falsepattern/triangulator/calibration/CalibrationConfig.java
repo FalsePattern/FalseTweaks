@@ -1,11 +1,15 @@
 package com.falsepattern.triangulator.calibration;
 
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.triangulator.Tags;
 
 @Config(modid = Tags.MODID,
         category = "calibration")
 public class CalibrationConfig {
+    static {
+        ConfigurationManager.selfInit();
+    }
     @Config.Comment("Modifies the way ambient occlusion alignment is calculated. Used for compatibility purposes,\n" +
                     "because different graphics cards have different ways of processing quads.\n" +
                     "This is useful when quad triangulation is disabled, or if the triangulator gets disabled internally\n" +
