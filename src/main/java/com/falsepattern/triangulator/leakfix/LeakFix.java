@@ -1,6 +1,6 @@
 package com.falsepattern.triangulator.leakfix;
 
-import com.falsepattern.triangulator.Triangulator;
+import com.falsepattern.triangulator.Share;
 import com.falsepattern.triangulator.config.TriConfig;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -33,26 +33,26 @@ public final class LeakFix {
     private static long lastGC = 0;
 
     static {
+        boolean enabled = false;
         switch (TriConfig.MEMORY_LEAK_FIX) {
             default:
-                Triangulator.triLog.info("Disabling leak fix because of config flag.");
-                ENABLED = false;
+                Share.log.info("Disabling leak fix because of config flag.");
                 break;
             case Auto:
                 boolean isAMD = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("amd");
                 if (isAMD) {
-                    Triangulator.triLog.info("Enabling leak fix because an AMD gpu was detected.");
-                    ENABLED = true;
+                    Share.log.info("Enabling leak fix because an AMD gpu was detected.");
+                    enabled = true;
                 } else {
-                    Triangulator.triLog.info("Disabling leak fix because an AMD gpu was NOT detected.");
-                    ENABLED = false;
+                    Share.log.info("Disabling leak fix because an AMD gpu was NOT detected.");
                 }
                 break;
             case Enable:
-                Triangulator.triLog.info("Enabling leak fix because of config flag.");
-                ENABLED = true;
+                Share.log.info("Enabling leak fix because of config flag.");
+                enabled = true;
                 break;
         }
+        ENABLED = enabled;
     }
 
     public static int getCachedBufferCount() {

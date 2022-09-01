@@ -1,8 +1,6 @@
 package com.falsepattern.triangulator;
 
 import com.falsepattern.triangulator.proxy.CommonProxy;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -18,14 +16,13 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
      guiFactory = Tags.GROUPNAME + ".config.TriangulatorGuiFactory",
      dependencies = "required-after:falsepatternlib@[0.10.6,);")
 public class Triangulator {
-    public static Logger triLog = LogManager.getLogger(Tags.MODNAME);
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy",
                 serverSide = Tags.GROUPNAME + ".proxy.ServerConfig")
     private static CommonProxy proxy;
 
     public Triangulator() {
-        triLog.info("Skidaddle skidoodle, your quad is now a noodle!");
+        Share.log.info("Skidaddle skidoodle, your quad is now a noodle!");
     }
 
     @Mod.EventHandler

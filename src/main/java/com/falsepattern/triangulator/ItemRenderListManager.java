@@ -53,7 +53,7 @@ public class ItemRenderListManager implements IResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(IResourceManager p_110549_1_) {
-        Triangulator.triLog.info("Resource pack reloaded! Clearing item render list cache.");
+        Share.log.info("Resource pack reloaded! Clearing item render list cache.");
         propList.clear();
         theMap.forEach((key, value) -> GLAllocation.deleteDisplayLists(value));
         theMap.clear();

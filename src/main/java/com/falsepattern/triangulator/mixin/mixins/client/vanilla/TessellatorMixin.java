@@ -1,7 +1,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.Share;
 import com.falsepattern.triangulator.TriCompat;
-import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
@@ -106,7 +106,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     public void suspendQuadTriangulation() {
         quadTriangulationTemporarilySuspended = true;
         if (quadVerticesPutIntoBuffer != 0) {
-            Triangulator.triLog.error(new RuntimeException(
+            Share.log.error(new RuntimeException(
                     "Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
             quadVerticesPutIntoBuffer = 0;
         }
