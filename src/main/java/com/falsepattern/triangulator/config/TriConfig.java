@@ -30,9 +30,6 @@ import com.falsepattern.triangulator.leakfix.LeakFixState;
 
 @Config(modid = Tags.MODID)
 public class TriConfig {
-    static {
-        ConfigurationManager.selfInit();
-    }
     @Config.Comment("Used to toggle the namesake feature of this mod: quad triangulation.\n" +
                     "If you turn this off, the triangulation will not execute, but you will still have the AO and the\n" +
                     "smooth lighting fixes.\n" +
@@ -94,4 +91,8 @@ public class TriConfig {
     @Config.LangKey("config.triangulator.item_renderlist_buffer_max_size")
     @Config.DefaultInt(256)
     public static int ITEM_RENDERLIST_BUFFER_MAX_SIZE;
+
+    static {
+        ConfigurationManager.selfInit();
+    }
 }

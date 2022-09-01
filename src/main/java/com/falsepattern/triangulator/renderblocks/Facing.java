@@ -82,10 +82,6 @@ public enum Facing {
          new Vector3i(0, -1, 0),
          new Vector3i(1, 0, 0));
 
-    public interface ShiftFunc {
-        boolean doShift(RenderBlocks rb);
-    }
-
     public final int face;
     public final ShiftFunc shiftFunc;
     public final int worldUp;
@@ -122,5 +118,9 @@ public enum Facing {
 
     public boolean shift(RenderBlocks rb) {
         return shiftFunc.doShift(rb);
+    }
+
+    public interface ShiftFunc {
+        boolean doShift(RenderBlocks rb);
     }
 }

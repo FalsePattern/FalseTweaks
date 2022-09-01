@@ -44,7 +44,7 @@ public class CalibrationGUI extends GuiScreen {
     private static final int ID_APPLY = 2;
     protected List<GuiLabel> labelList = new ArrayList<>();
     private boolean flip = false;
-    private ResourceLocation reference = new ResourceLocation(Tags.MODID, "reference.png");
+    private final ResourceLocation reference = new ResourceLocation(Tags.MODID, "reference.png");
 
     private int getYAfterComparison(int scale) {
         return 10 + scale * 4 + 20;
@@ -71,6 +71,7 @@ public class CalibrationGUI extends GuiScreen {
         GL11.glPopAttrib();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void initGui() {
         super.initGui();

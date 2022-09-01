@@ -24,7 +24,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.optifine.leakfix;
 
 import com.falsepattern.triangulator.config.TriConfig;
-import com.falsepattern.triangulator.leakfix.LeakFix;
 import com.falsepattern.triangulator.leakfix.LeakFixState;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -41,6 +40,7 @@ import java.util.List;
 
 @Mixin(GuiVideoSettings.class)
 public abstract class GuiVideoSettingsOptifineMixin {
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @SneakyThrows
     @Redirect(method = "initGui",
               at = @At(value = "INVOKE",

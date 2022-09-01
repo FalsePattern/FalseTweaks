@@ -42,12 +42,14 @@ import net.minecraft.world.IBlockAccess;
 
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksUltraMixin {
-    @Shadow public boolean enableAO;
-    @Shadow public IBlockAccess blockAccess;
-
-    @Shadow public abstract IIcon getBlockIcon(Block p_147793_1_, IBlockAccess p_147793_2_, int p_147793_3_, int p_147793_4_, int p_147793_5_, int p_147793_6_);
-
-    @Shadow public boolean renderAllFaces;
+    @Shadow
+    public static boolean fancyGrass;
+    @Shadow
+    public boolean enableAO;
+    @Shadow
+    public IBlockAccess blockAccess;
+    @Shadow
+    public boolean renderAllFaces;
     @Shadow(aliases = "colorRedTopLeftF")
     public float colorRedTopLeft;
     @Shadow(aliases = "colorGreenTopLeftF")
@@ -73,33 +75,48 @@ public abstract class RenderBlocksUltraMixin {
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
 
-    @Shadow public int brightnessTopLeft;
-    @Shadow public int brightnessBottomLeft;
-    @Shadow public int brightnessBottomRight;
-    @Shadow public int brightnessTopRight;
-
-    @Shadow public abstract IIcon getBlockIcon(Block p_147745_1_);
-
-    @Shadow public abstract boolean hasOverrideBlockTexture();
-
-    @Shadow public abstract void renderFaceYNeg(Block p_147768_1_, double p_147768_2_, double p_147768_4_, double p_147768_6_, IIcon p_147768_8_);
-
-    @Shadow public abstract void renderFaceYPos(Block p_147806_1_, double p_147806_2_, double p_147806_4_, double p_147806_6_, IIcon p_147806_8_);
-
-    @Shadow public abstract void renderFaceZNeg(Block p_147761_1_, double p_147761_2_, double p_147761_4_, double p_147761_6_, IIcon p_147761_8_);
-
-    @Shadow public abstract void renderFaceZPos(Block p_147734_1_, double p_147734_2_, double p_147734_4_, double p_147734_6_, IIcon p_147734_8_);
-
-    @Shadow public static boolean fancyGrass;
-
-    @Shadow public abstract void renderFaceXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_);
-
-    @Shadow public abstract void renderFaceXPos(Block p_147764_1_, double p_147764_2_, double p_147764_4_, double p_147764_6_, IIcon p_147764_8_);
-
+    @Shadow
+    public int brightnessTopLeft;
+    @Shadow
+    public int brightnessBottomLeft;
+    @Shadow
+    public int brightnessBottomRight;
+    @Shadow
+    public int brightnessTopRight;
     int countS;
     int countB;
     float lightSky;
     float lightBlock;
+    private Boolean frontSlab = null;
+    private RenderState state;
+
+    @Shadow
+    public abstract IIcon getBlockIcon(Block p_147793_1_, IBlockAccess p_147793_2_, int p_147793_3_, int p_147793_4_, int p_147793_5_, int p_147793_6_);
+
+    @Shadow
+    public abstract IIcon getBlockIcon(Block p_147745_1_);
+
+    @Shadow
+    public abstract boolean hasOverrideBlockTexture();
+
+    @Shadow
+    public abstract void renderFaceYNeg(Block p_147768_1_, double p_147768_2_, double p_147768_4_, double p_147768_6_, IIcon p_147768_8_);
+
+    @Shadow
+    public abstract void renderFaceYPos(Block p_147806_1_, double p_147806_2_, double p_147806_4_, double p_147806_6_, IIcon p_147806_8_);
+
+    @Shadow
+    public abstract void renderFaceZNeg(Block p_147761_1_, double p_147761_2_, double p_147761_4_, double p_147761_6_, IIcon p_147761_8_);
+
+    @Shadow
+    public abstract void renderFaceZPos(Block p_147734_1_, double p_147734_2_, double p_147734_4_, double p_147734_6_, IIcon p_147734_8_);
+
+    @Shadow
+    public abstract void renderFaceXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_);
+
+    @Shadow
+    public abstract void renderFaceXPos(Block p_147764_1_, double p_147764_2_, double p_147764_4_, double p_147764_6_, IIcon p_147764_8_);
+
     private void addLight(int light) {
         int S = light & 0xff;
         int B = (light & 0xff0000) >>> 16;
@@ -139,8 +156,6 @@ public abstract class RenderBlocksUltraMixin {
     private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, int face) {
         return getMixedBrightnessForBlockOffset(x, y, z, offset, false, face);
     }
-
-    private Boolean frontSlab = null;
 
     private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, boolean front, int face) {
         x += offset.x();
@@ -228,7 +243,6 @@ public abstract class RenderBlocksUltraMixin {
         return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face);
     }
 
-    private RenderState state;
     private boolean renderFace(IFaceRenderer renderer, Facing facing) {
         Block block = state.block;
         int x = state.x;

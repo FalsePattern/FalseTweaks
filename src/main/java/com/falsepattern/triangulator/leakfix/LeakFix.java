@@ -44,11 +44,11 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public final class LeakFix {
     public static final boolean ENABLED;
     private static final LeakFix INSTANCE = new LeakFix();
+    private static final TIntList freshAllocations = new TIntArrayList();
+    private static final TIntList reusableAllocations = new TIntArrayList();
     @Getter
     private static int activeBufferCount = 0;
     private static boolean debugText = false;
-    private static final TIntList freshAllocations = new TIntArrayList();
-    private static final TIntList reusableAllocations = new TIntArrayList();
     private static int allocs = 0;
     private static int totalAllocs = 0;
     private static int hits = 0;

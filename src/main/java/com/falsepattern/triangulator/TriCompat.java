@@ -43,6 +43,7 @@ public class TriCompat {
         }
         return NEODYMIUM;
     }
+
     public static boolean enableTriangulation() {
         return TriConfig.ENABLE_QUAD_TRIANGULATION && !neodymiumInstalled();
     }

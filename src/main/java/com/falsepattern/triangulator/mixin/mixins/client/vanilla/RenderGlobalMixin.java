@@ -23,7 +23,6 @@
 
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
-import com.falsepattern.lib.util.MathUtil;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,17 +41,9 @@ import java.util.List;
 
 @Mixin(RenderGlobal.class)
 public abstract class RenderGlobalMixin {
-    @Shadow public List tileEntities;
-
-    @Inject(method = "renderEntities",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/RenderHelper;enableStandardItemLighting()V",
-                     shift = At.Shift.AFTER),
-            require = 1)
-    private void sortTEs(EntityLivingBase player, ICamera camera, float time, CallbackInfo ci) {
-        val TEs = (List<TileEntity>)tileEntities;
-        TEs.sort(Comparator.comparingDouble((te) -> -AABBDistance(te.getRenderBoundingBox(), player)));
-    }
+    @SuppressWarnings("rawtypes")
+    @Shadow
+    public List tileEntities;
 
     private static double AABBDistance(AxisAlignedBB AABB, EntityLivingBase player) {
         val x = player.posX;
@@ -66,5 +57,16 @@ public abstract class RenderGlobalMixin {
 
     private static double max(double a, double b, double c) {
         return Math.max(a, Math.max(b, c));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Inject(method = "renderEntities",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/client/renderer/RenderHelper;enableStandardItemLighting()V",
+                     shift = At.Shift.AFTER),
+            require = 1)
+    private void sortTEs(EntityLivingBase player, ICamera camera, float time, CallbackInfo ci) {
+        val TEs = (List<TileEntity>) tileEntities;
+        TEs.sort(Comparator.comparingDouble((te) -> -AABBDistance(te.getRenderBoundingBox(), player)));
     }
 }
