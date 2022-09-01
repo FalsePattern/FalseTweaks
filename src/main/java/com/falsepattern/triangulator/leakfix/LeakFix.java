@@ -77,7 +77,6 @@ public final class LeakFix {
                 break;
         }
         if (enabled && TriCompat.neodymiumInstalled()) {
-            Share.log.error("Neodymium detected! The leak fix is incompatible with Neodymium for the time being. Disabling leak fix module...");
             enabled = false;
         }
         ENABLED = enabled;

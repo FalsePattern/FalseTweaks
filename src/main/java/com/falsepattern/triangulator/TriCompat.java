@@ -40,6 +40,12 @@ public class TriCompat {
                 e.printStackTrace();
                 NEODYMIUM = false;
             }
+            if (NEODYMIUM) {
+                Share.log.warn("Neodymium detected! Incompatible modules will be disabled.");
+                Share.log.warn("Incompatible modules:");
+                Share.log.warn("Leak Fix");
+                Share.log.warn("Quad Triangulation");
+            }
         }
         return NEODYMIUM;
     }
