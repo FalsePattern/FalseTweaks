@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
@@ -20,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
@@ -113,7 +113,7 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) Tessellator.instance).isTriangulatorDisabled() &&
+        if (((ToggleableTessellator) TriCompat.tessellator()).isTriangulatorDisabled() &&
             CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
@@ -128,21 +128,21 @@ public abstract class RenderBlocksMixin implements IRenderBlocksMixin {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (Math.abs(mainDiagonalAvg - altDiagonalAvg) > 0.01 && mainDiagonalAvg < altDiagonalAvg) {
-                ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+                ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
                 return;
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
-            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
             return;
         }
-        ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(false);
+        ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(false);
     }
 
     private void reuse(int index) {
         if (reusePreviousStates) {
-            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(states[index]);
+            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(states[index]);
         } else {
-            states[index] = ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation();
+            states[index] = ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation();
         }
     }
 

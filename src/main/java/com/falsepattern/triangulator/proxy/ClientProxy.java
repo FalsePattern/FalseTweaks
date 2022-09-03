@@ -1,6 +1,7 @@
 package com.falsepattern.triangulator.proxy;
 
 import com.falsepattern.triangulator.ItemRenderListManager;
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.calibration.Calibration;
 import com.falsepattern.triangulator.leakfix.LeakFix;
 
@@ -25,5 +26,6 @@ public class ClientProxy extends CommonProxy {
                 ItemRenderListManager.INSTANCE);
         LeakFix.gc();
         ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
+        TriCompat.applyCompatibilityTweaks();
     }
 }
