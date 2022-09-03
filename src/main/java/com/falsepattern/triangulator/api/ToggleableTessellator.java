@@ -20,12 +20,14 @@ public interface ToggleableTessellator {
 
     /**
      * Completely disables triangulation and falls back to quad rendering.
+     * Should not be called after mod loading has finished.
      */
     void disableTriangulator();
 
     /**
      * Disables the effect of {@link #disableTriangulator()}. If it was called multiple times, this method also needs to
      * be called at least the same amount of times to re-enable it.
+     * Should not be called after mod loading has finished.
      */
     void enableTriangulator();
 
