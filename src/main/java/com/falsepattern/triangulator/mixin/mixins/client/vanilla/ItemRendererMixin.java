@@ -84,4 +84,26 @@ public abstract class ItemRendererMixin {
     private static void batchDrawCalls2(Tessellator instance) {
 
     }
+    
+    @Inject(method = "renderItemIn2D",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/Tessellator;draw()I",
+                       ordinal = 5,
+                       shift = At.Shift.BEFORE),
+              require = 1)
+    private static void plugLeak(Tessellator tess, float u1, float v1, float u2, float v2, int width, int height, float thickness, CallbackInfo ci) {
+        float uOffset = 0.5F * (u1 - u2) / (float)width;
+
+
+        tess.setNormal(-1.0F, 0.0F, 0.0F);
+        for (int k = 0; k < width; ++k)
+        {
+            float pos = (float)k / (float)width;
+            float u = u1 + (u2 - u1) * pos - uOffset;
+            tess.addVertexWithUV(pos + (1f / width), 0, -thickness, u, v2);
+            tess.addVertexWithUV(pos, 0, 0, u, v2);
+            tess.addVertexWithUV(pos, 1, 0, u, v1);
+            tess.addVertexWithUV(pos + (1f / width), 1, -thickness, u, v1);
+        }
+    }
 }
