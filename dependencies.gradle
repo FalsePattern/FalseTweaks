@@ -4,7 +4,7 @@ dependencies {
     }
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
-    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.6:dev")
+    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.9:dev")
 
     compileOnly("org.joml:joml:1.10.4")
 
