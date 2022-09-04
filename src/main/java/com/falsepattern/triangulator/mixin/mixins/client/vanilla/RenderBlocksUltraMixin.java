@@ -30,18 +30,16 @@ import com.falsepattern.triangulator.mixin.helper.ITessellatorMixin;
 import com.falsepattern.triangulator.renderblocks.Facing;
 import com.falsepattern.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.triangulator.renderblocks.RenderState;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import lombok.Setter;
 import lombok.val;
 import lombok.var;
 import org.joml.Vector3ic;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.Block;
@@ -113,6 +111,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     float lightSky;
     float lightBlock;
     private RenderState state;
+    private Vector3ic frontDir;
     private boolean[] states;
     private double[] bounds;
     @Setter
@@ -193,17 +192,66 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         int l = blockAccess.getLightBrightnessForSkyBlocks(x, y, z, block.getLightValue(blockAccess, x, y, z));
 
         if (block instanceof BlockSlab) {
+            Boolean selfTopSlab = null;
+            Boolean frontTopSlab = null;
+            if (state.block instanceof BlockSlab) {
+                selfTopSlab = (blockAccess.getBlockMetadata(state.x, state.y, state.z) & 8) != 0;
+            }
+            Block frontBlock = blockAccess.getBlock(state.x + this.frontDir.x(),
+                                                    state.y + this.frontDir.y(),
+                                                    state.z + this.frontDir.z());
+            if (frontBlock instanceof BlockSlab) {
+                frontTopSlab = (blockAccess.getBlockMetadata(state.x + this.frontDir.x(),
+                                                             state.y + this.frontDir.y(),
+                                                             state.z + this.frontDir.z()) & 8) != 0;
+            }
             if (block.isOpaqueCube()) {
                 return 0;
             }
             boolean topSlab = (blockAccess.getBlockMetadata(x, y, z) & 8) != 0;
             switch (face) {
                 case FACE_YNEG:
-                    if (topSlab) {
+                    if (selfTopSlab != null) {
+                        if (offset.y() == 0) {
+                            if (selfTopSlab && topSlab) {
+                                if (frontTopSlab == null || frontTopSlab) {
+                                    y--;
+                                }
+                            } else if (!selfTopSlab && !topSlab) {
+                                if (frontTopSlab == null || !frontTopSlab) {
+                                    y++;
+                                }
+                            } else {
+                                return 0;
+                            }
+                        } else if (front && frontTopSlab != null) {
+                            y++;
+                        }
+                    } else if (topSlab) {
                         y--;
                     }
                     break;
                 case FACE_YPOS:
+                    if (selfTopSlab != null) {
+                        if (offset.y() == 0) {
+                            if (selfTopSlab && topSlab) {
+                                if (frontTopSlab == null || frontTopSlab) {
+                                    y--;
+                                }
+                            } else if (!selfTopSlab && !topSlab) {
+                                if (frontTopSlab == null || !frontTopSlab) {
+                                    y++;
+                                }
+                            } else {
+                                return 0;
+                            }
+                        } else if (front && frontTopSlab != null) {
+                            y--;
+                        }
+                    } else if (!topSlab) {
+                        y++;
+                    }
+                    break;
                 case FACE_ZNEG:
                 case FACE_ZPOS:
                 case FACE_XNEG:
@@ -212,6 +260,20 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                         y++;
                     } else if (offset.y() > 0) {
                         y--;
+                    } else if (selfTopSlab != null) {
+                        if (selfTopSlab && topSlab) {
+                            if (frontTopSlab != null && !frontTopSlab) {
+                                return 0;
+                            }
+                            y--;
+                        } else if (!selfTopSlab && !topSlab) {
+                            if (frontTopSlab != null && frontTopSlab) {
+                                return 0;
+                            }
+                            y++;
+                        } else {
+                            return 0;
+                        }
                     } else if (topSlab) {
                         y--;
                     } else {
@@ -252,6 +314,17 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
     }
 
+    private boolean getIsTransparent(int x, int y, int z, Vector3ic offset, Facing.Direction dir) {
+        Block block = getBlockOffset(x, y, z, offset);
+        boolean materialTransparent = block.getCanBlockGrass();
+        if (block instanceof BlockSlab) {
+            boolean topSlab = (getBlockMetadataOffset(x, y, z, offset) & 8) != 0;
+            return (!topSlab || dir != Facing.Direction.FACE_YNEG) && (topSlab || dir != Facing.Direction.FACE_YPOS) || materialTransparent;
+        } else {
+            return materialTransparent;
+        }
+    }
+
     private boolean renderFace(IFaceRenderer renderer, Facing facing) {
         Block block = state.block;
         int x = state.x;
@@ -262,6 +335,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
         boolean shift = facing.shift((RenderBlocks) (Object) this);
 
+        frontDir = facing.front;
         int light = getMixedBrightnessForBlockOffset(x, y, z, facing.front, true, facing.face);
 
         if (shift) {
@@ -283,10 +357,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         brightnessRight = getMixedBrightnessForBlockOffset(x, y, z, facing.right, facing.face);
         brightnessBottom = getMixedBrightnessForBlockOffset(x, y, z, facing.bottom, facing.face);
         brightnessTop = getMixedBrightnessForBlockOffset(x, y, z, facing.top, facing.face);
-        boolean transparentLeft = getBlockOffset(x, y, z, facing.left).getCanBlockGrass();
-        boolean transparentRight = getBlockOffset(x, y, z, facing.right).getCanBlockGrass();
-        boolean transparentBottom = getBlockOffset(x, y, z, facing.bottom).getCanBlockGrass();
-        boolean transparentTop = getBlockOffset(x, y, z, facing.top).getCanBlockGrass();
+        boolean transparentLeft = getIsTransparent(x, y, z, facing.left, facing.face);
+        boolean transparentRight = getIsTransparent(x, y, z, facing.right, facing.face);
+        boolean transparentBottom = getIsTransparent(x, y, z, facing.bottom, facing.face);
+        boolean transparentTop = getIsTransparent(x, y, z, facing.top, facing.face);
 
         if (!transparentLeft && !transparentBottom) {
             lightBottomLeft = lightLeft;
@@ -534,14 +608,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_XNEG);
     }
 
-    @ModifyExpressionValue(method = "renderFaceXNeg",
+    @Redirect(method = "renderFaceXNeg",
                            at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
                                     ordinal = 0),
                            require = 1)
-    private double xNegBounds(double val) {
+    private double xNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_XNEG);
-        return val;
+        return instance.renderMinX;
     }
 
     @Inject(method = {"renderFaceXPos"},
@@ -552,14 +626,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_XPOS);
     }
 
-    @ModifyExpressionValue(method = "renderFaceXPos",
+    @Redirect(method = "renderFaceXPos",
                            at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMaxX:D",
                                     ordinal = 0),
                            require = 1)
-    private double xPosBounds(double val) {
+    private double xPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_XPOS);
-        return val;
+        return instance.renderMaxX;
     }
 
     @Inject(method = {"renderFaceYNeg"},
@@ -570,14 +644,15 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_YNEG);
     }
 
-    @ModifyExpressionValue(method = "renderFaceYNeg",
-                           at = @At(value = "FIELD",
+    @SuppressWarnings("SuspiciousNameCombination")
+    @Redirect(method = "renderFaceYNeg",
+              at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
                                     ordinal = 5),
-                           require = 1)
-    private double yNegBounds(double val) {
+              require = 1)
+    private double yNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_YNEG);
-        return val;
+        return instance.renderMinX;
     }
 
     @Inject(method = {"renderFaceYPos"},
@@ -588,14 +663,15 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_YPOS);
     }
 
-    @ModifyExpressionValue(method = "renderFaceYPos",
-                           at = @At(value = "FIELD",
+    @SuppressWarnings("SuspiciousNameCombination")
+    @Redirect(method = "renderFaceYPos",
+              at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
                                     ordinal = 5),
-                           require = 1)
-    private double yPosBounds(double val) {
+              require = 1)
+    private double yPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_YPOS);
-        return val;
+        return instance.renderMinX;
     }
 
     @Inject(method = {"renderFaceZNeg"},
@@ -606,14 +682,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_ZNEG);
     }
 
-    @ModifyExpressionValue(method = "renderFaceZNeg",
+    @Redirect(method = "renderFaceZNeg",
                            at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
                                     ordinal = 6),
                            require = 1)
-    private double zNegBounds(double val) {
+    private double zNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_ZNEG);
-        return val;
+        return instance.renderMinX;
     }
 
     @Inject(method = {"renderFaceZPos"},
@@ -624,14 +700,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         reuse(Facing.Direction.FACE_ZPOS);
     }
 
-    @ModifyExpressionValue(method = "renderFaceZPos",
-                           at = @At(value = "FIELD",
+    @Redirect(method = "renderFaceZPos",
+              at = @At(value = "FIELD",
                                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
                                     ordinal = 5),
-                           require = 1)
-    private double zPosBounds(double val) {
+              require = 1)
+    private double zPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_ZPOS);
-        return val;
+        return instance.renderMinX;
     }
 
     private void preBounds(Facing.Direction skipDir) {
