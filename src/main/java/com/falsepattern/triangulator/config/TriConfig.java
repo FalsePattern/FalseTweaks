@@ -100,16 +100,19 @@ public class TriConfig {
     @Config.Comment("Transparent tile entities (beacons, for instance) might render behind other tile entities that are\n" +
                     "actually BEHIND the transparent part. Sorting the tile entities before rendering fixes this bug.\n" +
                     "FPS impact: Slight decrease")
+    @Config.LangKey("config.triangulator.te_transparency_fix")
     @Config.DefaultBoolean(true)
     public static boolean TE_TRANSPARENCY_FIX;
 
     @Config.Comment("Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.\n" +
                     "FPS impact: None")
+    @Config.LangKey("config.triangulator.fix_block_crack")
     @Config.DefaultBoolean(true)
     public static boolean FIX_BLOCK_CRACK;
 
     @Config.Comment("Corners on items have \"cracks\" on the corners (for instance, swords). This option fixes it.\n" +
                     "FPS impact: Negligible decrease")
+    @Config.LangKey("config.triangulator.fix_item_crack")
     @Config.DefaultBoolean(true)
     public static boolean FIX_ITEM_CRACK;
 
