@@ -1,5 +1,6 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.Triangulator;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
@@ -45,7 +46,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;
     private boolean shaderOn = false;
-    private int forceQuadRendering = 0;
     private int quadVerticesPutIntoBuffer = 0;
 
     @Inject(method = "reset",
@@ -65,7 +65,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS && forceQuadRendering == 0) {
+        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS &&
+                ToggleableTessellatorManager.INSTANCE.forceQuadRendering() == 0) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -181,20 +182,17 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public void disableTriangulator() {
-        forceQuadRendering++;
+        ToggleableTessellatorManager.INSTANCE.disableTriangulator();
     }
 
     @Override
     public void enableTriangulator() {
-        forceQuadRendering--;
-        if (forceQuadRendering < 0) {
-            forceQuadRendering = 0;
-        }
+        ToggleableTessellatorManager.INSTANCE.enableTriangulator();
     }
 
     @Override
     public boolean isTriangulatorDisabled() {
-        return !TriCompat.enableTriangulation() || forceQuadRendering == 0;
+        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled();
     }
 
     @Override
