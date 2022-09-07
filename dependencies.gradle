@@ -15,4 +15,8 @@ dependencies {
     compileOnly("curse.maven:chromaticraft-235590:3574503") {
         transitive = false
     }
+
+    compileOnly("com.github.embeddedt:ArchaicFix:c6e3fc6") {
+        transitive = false
+    }
 }

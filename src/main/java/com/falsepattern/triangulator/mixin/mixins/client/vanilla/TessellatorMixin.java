@@ -24,6 +24,7 @@
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
 import com.falsepattern.triangulator.Share;
+import com.falsepattern.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.mixin.helper.IQuadComparatorMixin;
@@ -88,7 +89,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS && forceQuadRendering == 0) {
+        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS &&
+                ToggleableTessellatorManager.INSTANCE.forceQuadRendering() == 0) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -204,20 +206,17 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public void disableTriangulator() {
-        forceQuadRendering++;
+        ToggleableTessellatorManager.INSTANCE.disableTriangulator();
     }
 
     @Override
     public void enableTriangulator() {
-        forceQuadRendering--;
-        if (forceQuadRendering < 0) {
-            forceQuadRendering = 0;
-        }
+        ToggleableTessellatorManager.INSTANCE.enableTriangulator();
     }
 
     @Override
     public boolean isTriangulatorDisabled() {
-        return !TriCompat.enableTriangulation() || forceQuadRendering == 0;
+        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled();
     }
 
     @Override
