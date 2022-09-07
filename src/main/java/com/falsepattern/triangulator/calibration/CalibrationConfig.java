@@ -27,7 +27,7 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.triangulator.Tags;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MODID + "_userspecific",
         category = "calibration")
 public class CalibrationConfig {
     @Config.Comment("Modifies the way ambient occlusion alignment is calculated. Used for compatibility purposes,\n" +
