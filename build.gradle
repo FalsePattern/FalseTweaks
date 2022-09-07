@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern44
+//version: 1656003793falsepattern45
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -303,11 +303,11 @@ dependencies {
         annotationProcessor("com.llamalad7:MixinExtras:0.0.12-gasstation")
         compile("org.spongepowered:mixin:0.8.3-gasstation")
         compile("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        compile("com.falsepattern:00gasstation-mc1.7.10:0.2.1:dev")
+        compile("com.falsepattern:00gasstation-mc1.7.10:0.2.2:dev")
     } else if(hasMixinDeps.toBoolean()) {
         runtime("org.spongepowered:mixin:0.8.3-gasstation")
         runtime("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        runtime("com.falsepattern:00gasstation-mc1.7.10:0.2.1:dev")
+        runtime("com.falsepattern:00gasstation-mc1.7.10:0.2.2:dev")
     }
 }
 
