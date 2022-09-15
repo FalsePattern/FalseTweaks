@@ -212,6 +212,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             boolean topSlab = (blockAccess.getBlockMetadata(x, y, z) & 8) != 0;
             switch (face) {
                 case FACE_YNEG:
+                case FACE_YPOS: {
                     if (selfTopSlab != null) {
                         if (offset.y() == 0) {
                             if (selfTopSlab && topSlab) {
@@ -226,37 +227,23 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                                 return 0;
                             }
                         } else if (front && frontTopSlab != null) {
-                            y++;
+                            if (face == Facing.Direction.FACE_YNEG) {
+                                y++;
+                            } else {
+                                y--;
+                            }
                         }
-                    } else if (topSlab) {
+                    } else if (face == Facing.Direction.FACE_YNEG && topSlab) {
                         y--;
-                    }
-                    break;
-                case FACE_YPOS:
-                    if (selfTopSlab != null) {
-                        if (offset.y() == 0) {
-                            if (selfTopSlab && topSlab) {
-                                if (frontTopSlab == null || frontTopSlab) {
-                                    y--;
-                                }
-                            } else if (!selfTopSlab && !topSlab) {
-                                if (frontTopSlab == null || !frontTopSlab) {
-                                    y++;
-                                }
-                            } else {
-                                return 0;
-                            }
-                        } else if (front && frontTopSlab != null) {
-                            y--;
-                        }
                     } else if (!topSlab) {
                         y++;
                     }
                     break;
+                }
                 case FACE_ZNEG:
                 case FACE_ZPOS:
                 case FACE_XNEG:
-                case FACE_XPOS:
+                case FACE_XPOS: {
                     if (offset.y() < 0) {
                         y++;
                     } else if (offset.y() > 0) {
@@ -281,6 +268,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                         y++;
                     }
                     break;
+                }
             }
 
             block = blockAccess.getBlock(x, y, z);
