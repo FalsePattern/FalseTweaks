@@ -23,6 +23,7 @@
 
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.config.TriConfig;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
@@ -84,7 +85,7 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
         if (displayList == 0) {
             displayList = GLAllocation.generateDisplayLists(1);
             GL11.glNewList(displayList, GL11.GL_COMPILE);
-            Tessellator tess = Tessellator.instance;
+            Tessellator tess = TriCompat.tessellator();
             GL11.glPushAttrib(GL11.GL_ENABLE_BIT |
                               GL11.GL_TEXTURE_BIT |
                               GL11.GL_COLOR_BUFFER_BIT |
