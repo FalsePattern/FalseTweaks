@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern45
+//version: 1656003793falsepattern47
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -124,7 +124,8 @@ propertyDefaultIfUnset("repositoryName", "")
 propertyDefaultIfUnset("mavenGroupId", "")
 propertyDefaultIfUnset("mavenArtifactId", "")
 propertyDefaultIfUnset("hasMixinDeps", false)
-propertyDefaultIfUnset("mixinPreinitConfig", "")
+propertyDefaultIfUnset("mixinConfigs", "")
+propertyDefaultIfUnset("mixinPluginPreInit", "")
 propertyDefaultIfUnset("remapStubs", false)
 
 propertyDefaultIfUnset("modrinthProjectId", "")
@@ -165,8 +166,8 @@ if(accessTransformersFile) {
 }
 
 if(usesMixins.toBoolean()) {
-    if(mixinsPackage.isEmpty() || mixinPlugin.isEmpty()) {
-        throw new GradleException("\"mixinPlugin\" requires \"mixinsPackage\" and \"mixinPlugin\" to be set!")
+    if(mixinsPackage.isEmpty()) {
+        throw new GradleException("\"usesMixins\" requires \"mixinsPackage\" to be set!")
     }
 
     targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
@@ -176,12 +177,14 @@ if(usesMixins.toBoolean()) {
         throw new GradleException("Could not resolve \"mixinsPackage\"! Could not find " + targetPackageJava + " or " + targetPackageScala  + " or " + targetPackageKotlin)
     }
 
-    String targetFileJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".java"
-    String targetFileScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".scala"
-    String targetFileScalaJava = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".java"
-    String targetFileKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".kt"
-    if(!(getFile(targetFileJava).exists() || getFile(targetFileScala).exists() || getFile(targetFileScalaJava).exists() || getFile(targetFileKotlin).exists())) {
-        throw new GradleException("Could not resolve \"mixinPlugin\"! Could not find " + targetFileJava + " or " + targetFileScala + " or " + targetFileScalaJava + " or " + targetFileKotlin)
+    if (!mixinPlugin.isEmpty()) {
+        String targetFileJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".java"
+        String targetFileScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".scala"
+        String targetFileScalaJava = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".java"
+        String targetFileKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinPlugin.toString().replaceAll("\\.", "/") + ".kt"
+        if (!(getFile(targetFileJava).exists() || getFile(targetFileScala).exists() || getFile(targetFileScalaJava).exists() || getFile(targetFileKotlin).exists())) {
+            throw new GradleException("Could not resolve \"mixinPlugin\"! Could not find " + targetFileJava + " or " + targetFileScala + " or " + targetFileScalaJava + " or " + targetFileKotlin)
+        }
     }
 }
 
@@ -299,8 +302,8 @@ dependencies {
         annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
         annotationProcessor("com.google.guava:guava:24.1.1-jre")
         annotationProcessor("com.google.code.gson:gson:2.8.6")
-        annotationProcessor("org.spongepowered:mixin:0.8.3-gasstation")
         annotationProcessor("com.llamalad7:MixinExtras:0.0.12-gasstation")
+        annotationProcessor("org.spongepowered:mixin:0.8.3-gasstation")
         compile("org.spongepowered:mixin:0.8.3-gasstation")
         compile("com.llamalad7:MixinExtras:0.0.12-gasstation")
         compile("com.falsepattern:00gasstation-mc1.7.10:0.2.2:dev")
@@ -323,14 +326,14 @@ def mixinSrg = new File(mixinDir, "${mixingConfigRefMap}.srg")
 def mixinRefMap = new File(mixinDir, mixingConfigRefMap)
 
 task generateAssets {
-    if(usesMixins.toBoolean()) {
+    if(usesMixins.toBoolean() && !mixinPlugin.isEmpty()) {
         getFile("/src/main/resources/mixins." + modId + ".json").text = """{
   "required": true,
-  "minVersion": "0.7.11",
+  "minVersion": "0.8.3",
   "package": "${modGroup}.${mixinsPackage}",
   "plugin": "${modGroup}.${mixinPlugin}",
   "refmap": "${mixingConfigRefMap}",
-  "target": "@env(DEFAULT)",
+  "target": "@env(${mixinPluginPreInit.toBoolean() ? "PREINIT": "DEFAULT"})",
   "compatibilityLevel": "JAVA_8"
 }
 
@@ -501,9 +504,16 @@ def getManifestAttributes() {
     }
 
     if(usesMixins.toBoolean()) {
+        String[] configs = [];
+        if (!mixinPlugin.isEmpty()) {
+            configs += ["mixins.${modId}.json"];
+        }
+        if (!mixinConfigs.isEmpty()) {
+            configs += [mixinConfigs];
+        }
         manifestAttributes += [
                 "TweakClass" : "org.spongepowered.asm.launch.MixinTweaker",
-                "MixinConfigs" : "mixins." + modId + ".json" + (mixinPreinitConfig ? "," + mixinPreinitConfig : ""),
+                "MixinConfigs" : String.join(",", configs),
                 "ForceLoadAsMod" : !containsMixinsAndOrCoreModOnly.toBoolean()
         ]
     }
@@ -1077,6 +1087,9 @@ def checkPropertyExists(String propertyName) {
 }
 
 def propertyDefaultIfUnset(String propertyName, defaultValue) {
+    if (!project.hasProperty(propertyName)) {
+        System.err.println("Your gradle.properties is missing the $propertyName entry. It has been automatically set to \"$defaultValue\" as fallback. You can find all properties and their description here: https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/gradle.properties")
+    }
     if (!project.hasProperty(propertyName) || project.property(propertyName) == "") {
         project.ext.setProperty(propertyName, defaultValue)
     }

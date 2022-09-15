@@ -1,6 +1,6 @@
 {
   "required": true,
-  "minVersion": "0.7.11",
+  "minVersion": "0.8.3",
   "package": "com.falsepattern.triangulator.mixin.mixins",
   "plugin": "com.falsepattern.triangulator.mixin.plugin.MixinPlugin",
   "refmap": "mixins.triangulator.refmap.json",
