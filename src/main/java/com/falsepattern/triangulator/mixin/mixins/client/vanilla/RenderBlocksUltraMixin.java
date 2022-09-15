@@ -23,6 +23,7 @@
 
 package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
 
+import com.falsepattern.triangulator.TriCompat;
 import com.falsepattern.triangulator.api.ToggleableTessellator;
 import com.falsepattern.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.triangulator.config.TriConfig;
@@ -48,7 +49,6 @@ import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
@@ -86,6 +86,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public float colorGreenTopRight;
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
+
     @Shadow
     public double renderMinX;
     @Shadow
@@ -107,16 +108,29 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public int brightnessBottomRight;
     @Shadow
     public int brightnessTopRight;
-    int countS;
-    int countB;
-    float lightSky;
-    float lightBlock;
+
+    private int countS;
+    private int countB;
+    private float lightSky;
+    private float lightBlock;
     private RenderState state;
     private Vector3ic frontDir;
     private boolean[] states;
     private double[] bounds;
     @Setter
     private boolean reusePreviousStates;
+
+    private static float avg(final float a, final float b) {
+        return (a + b) / 2F;
+    }
+
+    private static float avg(final float r, final float g, final float b) {
+        return (r + g + b) / 3F;
+    }
+
+    private static float diff(final float a, final float b) {
+        return Math.abs(a - b);
+    }
 
     @Shadow
     public abstract IIcon getBlockIcon(Block p_147793_1_, IBlockAccess p_147793_2_, int p_147793_3_, int p_147793_4_, int p_147793_5_, int p_147793_6_);
@@ -198,13 +212,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             if (state.block instanceof BlockSlab) {
                 selfTopSlab = (blockAccess.getBlockMetadata(state.x, state.y, state.z) & 8) != 0;
             }
-            Block frontBlock = blockAccess.getBlock(state.x + this.frontDir.x(),
-                                                    state.y + this.frontDir.y(),
-                                                    state.z + this.frontDir.z());
+            Block frontBlock = getBlockOffset(state.x, state.y, state.z, frontDir);
             if (frontBlock instanceof BlockSlab) {
-                frontTopSlab = (blockAccess.getBlockMetadata(state.x + this.frontDir.x(),
-                                                             state.y + this.frontDir.y(),
-                                                             state.z + this.frontDir.z()) & 8) != 0;
+                frontTopSlab = (getBlockMetadataOffset(state.x, state.y, state.z, frontDir) & 8) != 0;
             }
             if (block.isOpaqueCube()) {
                 return 0;
@@ -300,7 +310,11 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private boolean shouldSideBeRenderedQuick(Block block, int x, int y, int z, Facing facing) {
-        return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
+        return block.shouldSideBeRendered(blockAccess,
+                                          x + facing.front.x(),
+                                          y + facing.front.y(),
+                                          z + facing.front.z(),
+                                          facing.face.ordinal());
     }
 
     private boolean getIsTransparent(int x, int y, int z, Vector3ic offset, Facing.Direction dir) {
@@ -308,7 +322,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         boolean materialTransparent = block.getCanBlockGrass();
         if (block instanceof BlockSlab) {
             boolean topSlab = (getBlockMetadataOffset(x, y, z, offset) & 8) != 0;
-            return (!topSlab || dir != Facing.Direction.FACE_YNEG) && (topSlab || dir != Facing.Direction.FACE_YPOS) || materialTransparent;
+            return (!topSlab || dir != Facing.Direction.FACE_YNEG) && (topSlab || dir != Facing.Direction.FACE_YPOS) ||
+                   materialTransparent;
         } else {
             return materialTransparent;
         }
@@ -473,15 +488,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         return true;
     }
 
-    /**
-     * @author FalsePattern
-     * @reason Reimplement
-     */
-    @Overwrite
-    public boolean renderStandardBlockWithAmbientOcclusion(Block block, int x, int y, int z, float r, float g, float b) {
+    private boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
         this.enableAO = true;
         int light = block.getMixedBrightnessForBlock(this.blockAccess, x, y, z);
-        Tessellator.instance.setBrightness(0x000f000f);
+        TriCompat.tessellator().setBrightness(0x000f000f);
 
         boolean useColor = !(getBlockIcon(block).getIconName().equals("grass_top") || hasOverrideBlockTexture());
 
@@ -506,27 +516,17 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
      * @reason Reimplement
      */
     @Overwrite
+    public boolean renderStandardBlockWithAmbientOcclusion(Block block, int x, int y, int z, float r, float g, float b) {
+        return renderWithAO(block, x, y, z, r, g, b);
+    }
+
+    /**
+     * @author FalsePattern
+     * @reason Reimplement
+     */
+    @Overwrite
     public boolean renderStandardBlockWithAmbientOcclusionPartial(Block block, int x, int y, int z, float r, float g, float b) {
-        this.enableAO = true;
-        int light = block.getMixedBrightnessForBlock(this.blockAccess, x, y, z);
-        Tessellator.instance.setBrightness(0x000f000f);
-
-        boolean useColor = !(getBlockIcon(block).getIconName().equals("grass_top") || hasOverrideBlockTexture());
-
-        if (state == null) {
-            state = new RenderState();
-        }
-        state.set(block, x, y, z, r, g, b, useColor, light);
-        boolean drewSomething;
-        drewSomething = renderFace(this::renderFaceYNeg, Facing.YNEG);
-        drewSomething |= renderFace(this::renderFaceYPos, Facing.YPOS);
-        drewSomething |= renderFace(this::renderFaceZNeg, Facing.ZNEG);
-        drewSomething |= renderFace(this::renderFaceZPos, Facing.ZPOS);
-        drewSomething |= renderFace(this::renderFaceXNeg, Facing.XNEG);
-        drewSomething |= renderFace(this::renderFaceXPos, Facing.XPOS);
-
-        this.enableAO = false;
-        return drewSomething;
+        return renderWithAO(block, x, y, z, r, g, b);
     }
 
     @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
@@ -538,22 +538,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private void reuse(Facing.Direction dir) {
         if (reusePreviousStates) {
-            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(states[dir.ordinal()]);
+            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
         } else {
-            states[dir.ordinal()] = ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation();
+            states[dir.ordinal()] = ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation();
         }
-    }
-
-    private static float avg(final float a, final float b) {
-        return (a + b) * 0.5F;
-    }
-
-    private static float avg(final float r, final float g, final float b) {
-        return (r + g + b) * 0.3333333333333333F;
-    }
-
-    private static float diff(final float a, final float b) {
-        return Math.abs(a - b);
     }
 
     private void aoFix() {
@@ -564,7 +552,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) Tessellator.instance).isTriangulatorDisabled() &&
+        if (((ToggleableTessellator) TriCompat.tessellator()).isTriangulatorDisabled() &&
             CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
@@ -579,14 +567,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (Math.abs(mainDiagonalAvg - altDiagonalAvg) > 0.01 && mainDiagonalAvg < altDiagonalAvg) {
-                ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+                ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
                 return;
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
-            ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(true);
+            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
             return;
         }
-        ((ITessellatorMixin) Tessellator.instance).alternativeTriangulation(false);
+        ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(false);
     }
 
     @Inject(method = {"renderFaceXNeg"},
@@ -598,10 +586,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     @Redirect(method = "renderFaceXNeg",
-                           at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
-                                    ordinal = 0),
-                           require = 1)
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
+                       ordinal = 0),
+              require = 1)
     private double xNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_XNEG);
         return instance.renderMinX;
@@ -616,10 +604,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     @Redirect(method = "renderFaceXPos",
-                           at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMaxX:D",
-                                    ordinal = 0),
-                           require = 1)
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMaxX:D",
+                       ordinal = 0),
+              require = 1)
     private double xPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_XPOS);
         return instance.renderMaxX;
@@ -636,8 +624,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @SuppressWarnings("SuspiciousNameCombination")
     @Redirect(method = "renderFaceYNeg",
               at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
-                                    ordinal = 5),
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
+                       ordinal = 5),
               require = 1)
     private double yNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_YNEG);
@@ -655,8 +643,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @SuppressWarnings("SuspiciousNameCombination")
     @Redirect(method = "renderFaceYPos",
               at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
-                                    ordinal = 5),
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
+                       ordinal = 5),
               require = 1)
     private double yPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_YPOS);
@@ -672,10 +660,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     @Redirect(method = "renderFaceZNeg",
-                           at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
-                                    ordinal = 6),
-                           require = 1)
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
+                       ordinal = 6),
+              require = 1)
     private double zNegBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_ZNEG);
         return instance.renderMinX;
@@ -691,8 +679,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     @Redirect(method = "renderFaceZPos",
               at = @At(value = "FIELD",
-                                    target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
-                                    ordinal = 5),
+                       target = "Lnet/minecraft/client/renderer/RenderBlocks;renderMinX:D",
+                       ordinal = 5),
               require = 1)
     private double zPosBounds(RenderBlocks instance) {
         preBounds(Facing.Direction.FACE_ZPOS);
