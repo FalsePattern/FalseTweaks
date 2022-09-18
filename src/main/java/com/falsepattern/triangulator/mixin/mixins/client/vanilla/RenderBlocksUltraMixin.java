@@ -839,12 +839,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
 
         //Bottom face
+        tess.setColorOpaque_F(0.5f, 0.5f, 0.5f);
         tess.addVertexWithUV(x + 1 + bottomShiftX, pnYmin, z + bottomShiftZ, pnU, pnV);
         tess.addVertexWithUV(x + 1 + bottomShiftX, ppYmin, z + 1 + bottomShiftZ, ppU, ppV);
         tess.addVertexWithUV(x + bottomShiftX, npYmin, z + 1 + bottomShiftZ, npU, npV);
         tess.addVertexWithUV(x + bottomShiftX, nnYmin, z + bottomShiftZ, nnU, nnV);
 
         //Top face
+        tess.setColorOpaque_F(1, 1, 1);
         tess.addVertexWithUV(x, nnYmax, z, nnU, nnV);
         tess.addVertexWithUV(x, npYmax, z + 1, npU, npV);
         tess.addVertexWithUV(x + 1, ppYmax, z + 1, ppU, ppV);
@@ -856,6 +858,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         double hOffset = 0.5f / height;
 
         int k;
+        tess.setColorOpaque_F(0.6f, 0.6f, 0.6f);
         for (k = 0; k < width; ++k) {
             double lerp = ((float) k / (float) width);
             double xOffset = MathUtil.clampedLerp(x, x + 1, lerp);
@@ -874,6 +877,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             tess.addVertexWithUV(xOffset, zNyMax, z, zNu, zNv);
         }
 
+        tess.setColorOpaque_F(0.8f, 0.8f, 0.8f);
         for (k = 0; k < height; ++k) {
             double lerp = ((float) k / (float) height);
             double zOffset = MathUtil.clampedLerp(z, z + 1, lerp);
@@ -892,6 +896,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             tess.addVertexWithUV(x + bottomShiftX, xNyMin, zOffset + bottomShiftZ, xNu, xNv);
         }
 
+        tess.setColorOpaque_F(0.6f, 0.6f, 0.6f);
         for (k = 0; k < width; ++k) {
             double lerp = ((float) k / (float) width) + 1f / height;
             double xOffset = MathUtil.clampedLerp(x, x + 1, lerp);
@@ -910,6 +915,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             tess.addVertexWithUV(xOffset + bottomShiftX, zNyMin, z + bottomShiftZ, zNu, zNv);
         }
 
+        tess.setColorOpaque_F(0.8f, 0.8f, 0.8f);
         for (k = 0; k < height; ++k) {
             double lerp = ((float) k / (float) height) + 1f / height;
             double zOffset = MathUtil.clampedLerp(z, z + 1, lerp);
