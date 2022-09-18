@@ -21,11 +21,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.mixin.helper;
+package com.falsepattern.triangulator.mixin.mixins.client.vanilla;
+
+import com.falsepattern.triangulator.mixin.helper.IRenderBlocksMixin;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
 
-public interface IRenderBlocksMixin {
-    void reusePreviousStates(boolean state);
-    boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b);
+@Mixin(RenderBlocks.class)
+public abstract class RenderBlocksPerformanceMixin implements IRenderBlocksMixin {
+    /**
+     * @author FalsePattern
+     * @reason Reimplement
+     */
+    @Overwrite
+    public boolean renderStandardBlockWithAmbientOcclusion(Block block, int x, int y, int z, float r, float g, float b) {
+        return renderWithAO(block, x, y, z, r, g, b);
+    }
+
+    /**
+     * @author FalsePattern
+     * @reason Reimplement
+     */
+    @Overwrite
+    public boolean renderStandardBlockWithAmbientOcclusionPartial(Block block, int x, int y, int z, float r, float g, float b) {
+        return renderWithAO(block, x, y, z, r, g, b);
+    }
 }

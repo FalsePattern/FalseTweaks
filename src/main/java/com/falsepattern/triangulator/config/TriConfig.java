@@ -116,6 +116,12 @@ public class TriConfig {
     @Config.DefaultBoolean(true)
     public static boolean FIX_ITEM_CRACK;
 
+    @Config.Comment("Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.")
+    @Config.LangKey("config.triangulator.render_hook_compat_mode")
+    @Config.DefaultBoolean(false)
+    @Config.RequiresMcRestart
+    public static boolean RENDER_HOOK_COMPAT_MODE;
+
     static {
         ConfigurationManager.selfInit();
     }

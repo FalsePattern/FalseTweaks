@@ -488,7 +488,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         return true;
     }
 
-    private boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
+    public boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
         this.enableAO = true;
         int light = block.getMixedBrightnessForBlock(this.blockAccess, x, y, z);
         TriCompat.tessellator().setBrightness(0x000f000f);
@@ -509,24 +509,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
         this.enableAO = false;
         return drewSomething;
-    }
-
-    /**
-     * @author FalsePattern
-     * @reason Reimplement
-     */
-    @Overwrite
-    public boolean renderStandardBlockWithAmbientOcclusion(Block block, int x, int y, int z, float r, float g, float b) {
-        return renderWithAO(block, x, y, z, r, g, b);
-    }
-
-    /**
-     * @author FalsePattern
-     * @reason Reimplement
-     */
-    @Overwrite
-    public boolean renderStandardBlockWithAmbientOcclusionPartial(Block block, int x, int y, int z, float r, float g, float b) {
-        return renderWithAO(block, x, y, z, r, g, b);
     }
 
     @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},

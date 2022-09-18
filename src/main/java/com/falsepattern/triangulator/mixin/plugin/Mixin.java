@@ -25,6 +25,7 @@ package com.falsepattern.triangulator.mixin.plugin;
 
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
+import com.falsepattern.triangulator.config.TriConfig;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +34,7 @@ import java.util.function.Predicate;
 
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 
 @RequiredArgsConstructor
@@ -42,6 +44,8 @@ public enum Mixin implements IMixin {
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
     RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksUltraMixin"),
+    RenderBlocksCompatMixin(Side.CLIENT, condition(() -> TriConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksCompatMixin"),
+    RenderBlocksPerformanceMixin(Side.CLIENT, condition(() -> !TriConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksPerformanceMixin"),
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
     //region leak fix
