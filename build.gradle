@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern47
+//version: 1656003793falsepattern48
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -303,14 +303,14 @@ dependencies {
         annotationProcessor("com.google.guava:guava:24.1.1-jre")
         annotationProcessor("com.google.code.gson:gson:2.8.6")
         annotationProcessor("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        annotationProcessor("org.spongepowered:mixin:0.8.3-gasstation")
-        compile("org.spongepowered:mixin:0.8.3-gasstation")
+        annotationProcessor("org.spongepowered:mixin:0.8.5-gasstation")
+        compile("org.spongepowered:mixin:0.8.5-gasstation")
         compile("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        compile("com.falsepattern:00gasstation-mc1.7.10:0.2.2:dev")
+        compile("com.falsepattern:00gasstation-mc1.7.10:0.3.1:dev")
     } else if(hasMixinDeps.toBoolean()) {
-        runtime("org.spongepowered:mixin:0.8.3-gasstation")
+        runtime("org.spongepowered:mixin:0.8.5-gasstation")
         runtime("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        runtime("com.falsepattern:00gasstation-mc1.7.10:0.2.2:dev")
+        runtime("com.falsepattern:00gasstation-mc1.7.10:0.3.1:dev")
     }
 }
 
