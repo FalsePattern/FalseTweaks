@@ -116,11 +116,19 @@ public class TriConfig {
     @Config.DefaultBoolean(true)
     public static boolean FIX_ITEM_CRACK;
 
-    @Config.Comment("Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.")
+    @Config.Comment("Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.\n" +
+                    "FPS impact: Minor decrease")
     @Config.LangKey("config.triangulator.render_hook_compat_mode")
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
+
+    @Config.Name("3d_rails")
+    @Config.Comment("Whether rails should have proper 3d rendering or not.\n" +
+                    "FPS impact: Minor decrease")
+    @Config.LangKey("config.triangulator.thick_rails")
+    @Config.DefaultBoolean(true)
+    public static boolean THICK_RAILS;
 
     static {
         ConfigurationManager.selfInit();
