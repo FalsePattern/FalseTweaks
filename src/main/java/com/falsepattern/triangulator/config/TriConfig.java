@@ -101,7 +101,7 @@ public class TriConfig {
                     "actually BEHIND the transparent part. Sorting the tile entities before rendering fixes this bug.\n" +
                     "FPS impact: Slight decrease")
     @Config.LangKey("config.triangulator.te_transparency_fix")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
     @Config.Comment("Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.\n" +
