@@ -51,6 +51,7 @@ import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -727,7 +728,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             cancellable = true,
             require = 1)
     private void renderRailCustom(BlockRailBase rail, int x, int y, int z, CallbackInfoReturnable<Boolean> cir) {
-        if (!TriConfig.THICK_RAILS) {
+        if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
             return;
         }
         Tessellator tess = TriCompat.tessellator();
@@ -751,7 +752,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         double u2 = iicon.getMaxU();
         double v2 = iicon.getMaxV();
         double offsetFromGround = 0.0625D;
-        double offsetFromGroundRoot2 = 0.0625D / MathUtil.SQRT_2;
+        double offsetFromGroundRoot2 = offsetFromGround / MathUtil.SQRT_2;
         double pnYmin = y;
         double ppYmin = y;
         double npYmin = y;
