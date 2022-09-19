@@ -11,4 +11,4 @@ and the only lag that happens is a *single* texture update per atlas per tick, i
 
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
-- [SpongeMixins](https://github.com/TimeConqueror/SpongeMixins) or [MixinBooterLegacy](https://github.com/tox1cozZ/mixin-booter-legacy)
+- [GasStation](https://github.com/FalsePattern/GasStation)
