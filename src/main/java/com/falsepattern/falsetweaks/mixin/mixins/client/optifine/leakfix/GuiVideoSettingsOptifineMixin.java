@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.optifine.leakfix;
 
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.leakfix.LeakFixState;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -47,7 +47,7 @@ public abstract class GuiVideoSettingsOptifineMixin {
                        target = "Ljava/util/List;add(Ljava/lang/Object;)Z"),
               require = 2)
     private boolean hackAdd(List instance, Object e) {
-        if (TriConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
+        if (FTConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
             if (e.getClass().getName().equals("GuiOptionButtonOF")) {
                 val b = (GuiOptionButton) e;
                 val field = ReflectionHelper.findField(b.getClass(), "option");

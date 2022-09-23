@@ -25,7 +25,7 @@ package com.falsepattern.falsetweaks.leakfix;
 
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import lombok.AccessLevel;
@@ -58,7 +58,7 @@ public final class LeakFix {
 
     static {
         boolean enabled = false;
-        switch (TriConfig.MEMORY_LEAK_FIX) {
+        switch (FTConfig.MEMORY_LEAK_FIX) {
             default:
                 Share.log.info("Disabling leak fix because of config flag.");
                 break;
@@ -98,7 +98,7 @@ public final class LeakFix {
         }
         reusableAllocations.clear();
         int currentSize = freshAllocations.size();
-        int targetSize = TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET;
+        int targetSize = FTConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET;
         int allocationCount = targetSize - currentSize;
         if (allocationCount > 0) {
             int base = GL11.glGenLists(allocationCount * 3);
@@ -179,8 +179,8 @@ public final class LeakFix {
         float secondsSinceLastGC = (time - lastGC) / 1000000000f;
         int cacheSize = getCachedBufferCount();
         if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 &&
-                                       (cacheSize < (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET / 2) ||
-                                        cacheSize > (TriConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET * 2)))) {
+                                       (cacheSize < (FTConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET / 2) ||
+                                        cacheSize > (FTConfig.MEMORY_LEAK_FIX_CACHE_SIZE_TARGET * 2)))) {
             gc();
             lastGC = time;
         }

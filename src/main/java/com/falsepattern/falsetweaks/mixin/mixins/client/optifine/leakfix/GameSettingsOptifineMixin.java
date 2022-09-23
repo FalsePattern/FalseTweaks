@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.optifine.leakfix;
 
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.leakfix.LeakFixState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,7 +44,7 @@ public abstract class GameSettingsOptifineMixin {
             remap = false,
             require = 1)
     private void blockMultiThreadedChunkLoading(CallbackInfo ci) {
-        if (TriConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
+        if (FTConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
             ofChunkLoading = 0;
         }
     }

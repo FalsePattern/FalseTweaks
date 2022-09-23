@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks;
 
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import cpw.mods.fml.common.Loader;
 import lombok.Getter;
 import net.minecraft.client.renderer.Tessellator;
@@ -61,7 +61,7 @@ public class TriCompat {
     }
 
     public static boolean enableTriangulation() {
-        return TriConfig.ENABLE_QUAD_TRIANGULATION && !neodymiumInstalled();
+        return FTConfig.ENABLE_QUAD_TRIANGULATION && !neodymiumInstalled();
     }
 
     public static Tessellator tessellator() {

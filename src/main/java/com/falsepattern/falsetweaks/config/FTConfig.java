@@ -29,7 +29,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.leakfix.LeakFixState;
 
 @Config(modid = Tags.MODID)
-public class TriConfig {
+public class FTConfig {
     @Config.Comment("Used to toggle the namesake feature of this mod: quad triangulation.\n" +
                     "If you turn this off, the triangulation will not execute, but you will still have the AO and the\n" +
                     "smooth lighting fixes.\n" +
@@ -122,6 +122,13 @@ public class TriConfig {
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
+
+    @Config.Comment("Optimizes the way forge scans the classpath during launch.\n" +
+                    "Not compatible with some badly-written mods.")
+    @Config.LangKey("config.falsetweaks.startup_optimizations")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean STARTUP_OPTIMIZATIONS;
 
     static {
         ConfigurationManager.selfInit();

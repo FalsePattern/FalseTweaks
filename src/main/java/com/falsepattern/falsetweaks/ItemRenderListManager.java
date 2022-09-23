@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks;
 
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.mixin.helper.ItemProp;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -56,7 +56,7 @@ public class ItemRenderListManager implements IResourceManagerReloadListener {
             GL11.glCallList(list);
             return true;
         } else {
-            if (propList.size() >= TriConfig.ITEM_RENDERLIST_BUFFER_MAX_SIZE) {
+            if (propList.size() >= FTConfig.ITEM_RENDERLIST_BUFFER_MAX_SIZE) {
                 val oldProp = propList.remove(0);
                 GLAllocation.deleteDisplayLists(theMap.remove(oldProp));
             }

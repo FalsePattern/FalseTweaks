@@ -31,6 +31,6 @@ import net.minecraft.client.gui.GuiScreen;
 
 public class FalseTweaksGuiConfig extends SimpleGuiConfig {
     public FalseTweaksGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, TriConfig.class, Tags.MODID, Tags.MODNAME);
+        super(parent, FTConfig.class, Tags.MODID, Tags.MODNAME);
     }
 }

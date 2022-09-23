@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
 import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
@@ -119,7 +119,7 @@ public abstract class TileEntityBeaconRendererMixin extends TileEntitySpecialRen
             cancellable = true,
             require = 1)
     private void renderTileEntityAt(TileEntityBeacon beacon, double x, double y, double z, float partialTickTime, CallbackInfo ci) {
-        if (!TriConfig.ENABLE_BEACON_OPTIMIZATION) {
+        if (!FTConfig.ENABLE_BEACON_OPTIMIZATION) {
             return;
         }
         ci.cancel();

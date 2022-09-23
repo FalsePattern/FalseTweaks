@@ -27,7 +27,7 @@ import com.falsepattern.lib.util.MathUtil;
 import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.api.ToggleableTessellator;
 import com.falsepattern.falsetweaks.calibration.CalibrationConfig;
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.mixin.helper.IRenderBlocksMixin;
 import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
 import com.falsepattern.falsetweaks.renderblocks.Facing;
@@ -681,7 +681,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private void preBounds(Facing.Direction skipDir) {
-        if (!TriConfig.FIX_BLOCK_CRACK) {
+        if (!FTConfig.FIX_BLOCK_CRACK) {
             return;
         }
         if (bounds == null) {
@@ -713,7 +713,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "RETURN"),
             require = 6)
     private void postBounds(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        if (!TriConfig.FIX_BLOCK_CRACK || bounds == null) {
+        if (!FTConfig.FIX_BLOCK_CRACK || bounds == null) {
             return;
         }
         renderMinX = bounds[0];

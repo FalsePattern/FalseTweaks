@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
 import com.falsepattern.falsetweaks.ItemRenderListManager;
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import lombok.SneakyThrows;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,7 +43,7 @@ public abstract class ItemRendererMixin {
             cancellable = true,
             require = 1)
     private static void leFunnyRenderListStart(Tessellator tess, float a, float b, float c, float d, int e, int f, float g, CallbackInfo ci) {
-        if (TriConfig.ENABLE_ITEM_RENDERLISTS && ItemRenderListManager.INSTANCE.pre(a, b, c, d, e, f, g)) {
+        if (FTConfig.ENABLE_ITEM_RENDERLISTS && ItemRenderListManager.INSTANCE.pre(a, b, c, d, e, f, g)) {
             ci.cancel();
         }
     }
@@ -52,7 +52,7 @@ public abstract class ItemRendererMixin {
             at = @At("RETURN"),
             require = 1)
     private static void leFunnyRenderListEnd(Tessellator tess, float a, float b, float c, float d, int e, int f, float g, CallbackInfo ci) {
-        if (TriConfig.ENABLE_ITEM_RENDERLISTS) {
+        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
             ItemRenderListManager.INSTANCE.post();
         }
     }
@@ -92,7 +92,7 @@ public abstract class ItemRendererMixin {
                        shift = At.Shift.BEFORE),
               require = 1)
     private static void plugLeak(Tessellator tess, float u1, float v1, float u2, float v2, int width, int height, float thickness, CallbackInfo ci) {
-        if (TriConfig.FIX_ITEM_CRACK) {
+        if (FTConfig.FIX_ITEM_CRACK) {
             float uOffset = 0.5F * (u1 - u2) / (float) width;
             tess.setNormal(-1.0F, 0.0F, 0.0F);
             for (int k = 0; k < width; ++k) {

@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
-import com.falsepattern.falsetweaks.config.TriConfig;
+import com.falsepattern.falsetweaks.config.FTConfig;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -67,7 +67,7 @@ public abstract class RenderGlobalMixin {
                      shift = At.Shift.AFTER),
             require = 1)
     private void sortTEs(EntityLivingBase player, ICamera camera, float time, CallbackInfo ci) {
-        if (TriConfig.TE_TRANSPARENCY_FIX) {
+        if (FTConfig.TE_TRANSPARENCY_FIX) {
             val TEs = (List<TileEntity>) tileEntities;
             TEs.sort(Comparator.comparingDouble((te) -> -AABBDistance(te.getRenderBoundingBox(), player)));
         }
