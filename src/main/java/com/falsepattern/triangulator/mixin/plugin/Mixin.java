@@ -91,6 +91,19 @@ public enum Mixin implements IMixin {
     RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE),
                                   "redstonepaste.RedstonePasteHighlighterMixin"),
     //endregion RedstonePaste
+
+    //region Minecraft->client
+    TextureMapMixin(Side.CLIENT, always(), "animfix.minecraft.TextureMapMixin"),
+    TextureUtilMixin(Side.CLIENT, always(), "animfix.minecraft.TextureUtilMixin"),
+    StitcherMixin(Side.CLIENT, always(), "animfix.minecraft.StitcherMixin"),
+    StitcherSlotMixin(Side.CLIENT, always(), "animfix.minecraft.StitcherSlotMixin"),
+    //endregion Minecraft->client
+    //region FastCraft->client
+    FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.AbstractTextureMixin"),
+    FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.DynamicTextureMixin"),
+    FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.TextureMapMixin"),
+    FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.TextureUtilMixin"),
+    //endregion FastCraft->client
     ;
 
     @Getter

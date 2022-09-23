@@ -2,7 +2,7 @@
   {
     "modid": "${modId}",
     "name": "${modName}",
-    "description": "A small library for modernizing the way minecraft renders quads.",
+    "description": "FalsePattern's flagship tweak and optimization mod.",
     "version": "${modVersion}",
     "mcversion": "${minecraftVersion}",
     "url": "https://github.com/FalsePattern/Triangulator",
@@ -11,8 +11,27 @@
     ],
     "parent": "",
     "dependencies": [
-      "spongemixins"
+      "falsepatternlib", "gasstation"
     ],
     "useDependencyInformation": true
+  },
+  {
+    "modid": "animfix",
+    "name": "AnimFix",
+    "description": "Fixes the horrible lag caused by animated textures in heavily modded instances.",
+    "version": "2.2.1",
+    "mcversion": "${minecraftVersion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "FalsePattern"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+      "falsepatternlib"
+    ],
+    "parent": "${modId}"
   }
 ]
