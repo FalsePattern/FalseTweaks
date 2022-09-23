@@ -1,6 +1,4 @@
 /*
- * FalseTweaks
- *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,18 +19,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.mixins.client.animfix.fastcraft;
 
-import com.falsepattern.lib.DeprecationDetails;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+//Evil black magic class #2
+//Revert fastcraft ASM changes
+@SuppressWarnings({"UnresolvedMixinReference", "InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
+@Mixin(DynamicTexture.class)
+public abstract class DynamicTextureMixin {
+    @Redirect(method = "updateDynamicTexture",
+              at = @At(value = "INVOKE",
+                       target = "Lfastcraft/HC;j(Lnet/minecraft/client/renderer/texture/DynamicTexture;)V",
+                       remap = false))
+    private void disableUpdateDynamicTextureTweak(DynamicTexture dt) {
+
+    }
 }

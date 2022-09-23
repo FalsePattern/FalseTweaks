@@ -21,18 +21,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.renderblocks;
 
-import com.falsepattern.lib.DeprecationDetails;
+import net.minecraft.block.Block;
+import net.minecraft.util.IIcon;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+public interface IFaceRenderer {
+    void render(Block block, int x, int y, int z, IIcon icon);
 }

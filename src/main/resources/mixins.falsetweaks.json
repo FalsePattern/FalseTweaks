@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8.3",
+  "package": "com.falsepattern.falsetweaks.mixin.mixins",
+  "plugin": "com.falsepattern.falsetweaks.mixin.plugin.MixinPlugin",
+  "refmap": "mixins.falsetweaks.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8"
+}
+

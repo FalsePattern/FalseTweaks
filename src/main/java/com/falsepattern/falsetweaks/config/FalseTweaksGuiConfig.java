@@ -21,18 +21,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.config;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.lib.config.ConfigException;
+import com.falsepattern.lib.config.SimpleGuiConfig;
+import com.falsepattern.falsetweaks.Tags;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+public class FalseTweaksGuiConfig extends SimpleGuiConfig {
+    public FalseTweaksGuiConfig(GuiScreen parent) throws ConfigException {
+        super(parent, TriConfig.class, Tags.MODID, Tags.MODNAME);
+    }
 }

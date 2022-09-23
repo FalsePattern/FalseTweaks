@@ -21,18 +21,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.mixins.client.optifine;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.Tessellator;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+@Mixin(Tessellator.class)
+public abstract class TessellatorVanillaOrOldOptifineMixin implements ITessellatorMixin {
+    @Inject(method = "addVertex",
+            at = @At(value = "RETURN"),
+            require = 1)
+    private void hackVertex(CallbackInfo ci) {
+        triangulate();
+    }
 }

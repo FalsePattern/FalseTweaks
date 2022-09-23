@@ -1,6 +1,4 @@
 /*
- * FalseTweaks
- *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,18 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.stitching;
 
-import com.falsepattern.lib.DeprecationDetails;
+import net.minecraft.client.renderer.texture.Stitcher;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+public abstract class SpriteSlot extends Rect2D {
+    public abstract List<Stitcher.Slot> getSlots(Rect2D parent);
 }

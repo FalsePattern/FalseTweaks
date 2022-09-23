@@ -21,18 +21,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.proxy;
 
-import com.falsepattern.lib.DeprecationDetails;
+import cpw.mods.fml.common.event.FMLConstructionEvent;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public class CommonProxy {
+    public void construct(FMLConstructionEvent e) {
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+    }
+
+    public void preInit(FMLPreInitializationEvent e) {
+
+    }
+
+    public void init(FMLInitializationEvent e) {
+
+    }
+
+    public void postInit(FMLPostInitializationEvent e) {
+
+    }
 }

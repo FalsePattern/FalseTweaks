@@ -2,36 +2,17 @@
   {
     "modid": "${modId}",
     "name": "${modName}",
-    "description": "FalsePattern's flagship tweak and optimization mod.",
+    "description": "FalsePattern's flagship tweaking, patching, and optimization mod.",
     "version": "${modVersion}",
     "mcversion": "${minecraftVersion}",
-    "url": "https://github.com/FalsePattern/Triangulator",
+    "url": "https://github.com/FalsePattern/FalseTweaks",
     "authorList": [
       "FalsePattern"
     ],
     "parent": "",
     "dependencies": [
-      "falsepatternlib", "gasstation"
-    ],
-    "useDependencyInformation": true
-  },
-  {
-    "modid": "animfix",
-    "name": "AnimFix",
-    "description": "Fixes the horrible lag caused by animated textures in heavily modded instances.",
-    "version": "2.2.1",
-    "mcversion": "${minecraftVersion}",
-    "url": "",
-    "updateUrl": "",
-    "authorList": [
-      "FalsePattern"
-    ],
-    "credits": "",
-    "logoFile": "",
-    "screenshots": [],
-    "dependencies": [
       "falsepatternlib"
     ],
-    "parent": "${modId}"
+    "useDependencyInformation": true
   }
 ]

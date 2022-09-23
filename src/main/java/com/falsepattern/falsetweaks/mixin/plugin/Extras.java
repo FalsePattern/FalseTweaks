@@ -21,18 +21,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.plugin;
 
-import com.falsepattern.lib.DeprecationDetails;
+import java.util.function.Predicate;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.contains;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+class Extras {
+    static final Predicate<String> OPTIFINE_SHADERSMOD_VERSIONS =
+            contains("d7").or(contains("d8")).or(contains("e3")).or(contains("e7"));
 }
