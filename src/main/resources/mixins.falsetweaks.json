@@ -4,7 +4,7 @@
   "package": "com.falsepattern.falsetweaks.mixin.mixins",
   "plugin": "com.falsepattern.falsetweaks.mixin.plugin.MixinPlugin",
   "refmap": "mixins.falsetweaks.refmap.json",
-  "target": "@env(PREINIT)",
+  "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8"
 }
 
