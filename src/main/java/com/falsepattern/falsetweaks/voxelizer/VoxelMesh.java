@@ -99,7 +99,7 @@ public class VoxelMesh {
                     break;
                 }
                 case Left: {
-                    tess.setNormal(-1, 0, 0);
+                    tess.setNormal(1, 0, 0);
                     tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON, face.u1, face.v2);
                     tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, face.u1, face.v2);
                     tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON, face.u1, face.v1);
@@ -107,7 +107,7 @@ public class VoxelMesh {
                     break;
                 }
                 case Right: {
-                    tess.setNormal(1, 0, 0);
+                    tess.setNormal(-1, 0, 0);
                     tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON, face.u1, face.v1);
                     tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON, face.u1, face.v1);
                     tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, face.u1, face.v2);
@@ -134,14 +134,12 @@ public class VoxelMesh {
         }
     }
 
-    public boolean compile() {
+    public void compile() {
         String currentIdentity = getIdentity();
         if (!Objects.equals(cacheIdentity, currentIdentity)) {
             faceCache = compiler.compile(strategy);
             cacheIdentity = currentIdentity;
-            return false;
         }
-        return true;
     }
 
     public String getIdentity() {

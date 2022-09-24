@@ -51,7 +51,6 @@ public enum Mixin implements IMixin {
     RenderBlocksPerformanceMixin(Side.CLIENT, condition(() -> !FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksPerformanceMixin"),
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
-    TextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.TextureAtlasSpriteMixin"),
 
     //leak fix
     LeakFixRenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
@@ -123,6 +122,7 @@ public enum Mixin implements IMixin {
     //region Voxelizer Module
     VoxItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.ItemRendererMixin"),
     VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.RenderItemMixin"),
+    VoxTextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.itemvox.TextureAtlasSpriteMixin"),
 
     //endregion Voxelizer Module
     ;

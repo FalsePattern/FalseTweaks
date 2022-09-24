@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.config;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 
 @Config(modid = Tags.MODID,
         category = "modules")
@@ -51,4 +52,8 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.module.item_voxelizer")
     @Config.DefaultBoolean(true)
     public static boolean ITEM_VOXELIZER;
+
+    static {
+        ConfigurationManager.selfInit();
+    }
 }
