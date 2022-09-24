@@ -33,7 +33,7 @@ public class ModuleConfig {
     @Config.Comment("Optimizes the way forge scans the classpath during launch.\n" +
                     "Not compatible with some badly-written mods.\n" +
                     "FPS impact: None, but makes startup a bit faster")
-    @Config.LangKey("config.falsetweaks.startup_optimizations")
+    @Config.LangKey("config.falsetweaks.module.startup_optimizations")
     @Config.DefaultBoolean(true)
     public static boolean STARTUP_OPTIMIZATIONS;
 
@@ -41,7 +41,14 @@ public class ModuleConfig {
                     "- Multithreaded animated textures\n" +
                     "- Faster texture atlas packing during startup\n" +
                     "FPS impact: Reduced stuttering in heavily modded packs")
-    @Config.LangKey("config.falsetweaks.texture_optimizations")
+    @Config.LangKey("config.falsetweaks.module.texture_optimizations")
     @Config.DefaultBoolean(true)
     public static boolean TEXTURE_OPTIMIZATIONS;
+
+    @Config.Comment("Enable/Disable item voxelization. This fixes a huge amount of item render issues, but is still\n" +
+                    "an experimental feature.\n" +
+                    "FPS impact: Very minor, breaking drawers still freezes the game")
+    @Config.LangKey("config.falsetweaks.module.item_voxelizer")
+    @Config.DefaultBoolean(true)
+    public static boolean ITEM_VOXELIZER;
 }

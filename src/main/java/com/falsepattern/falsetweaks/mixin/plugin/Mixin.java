@@ -121,8 +121,8 @@ public enum Mixin implements IMixin {
     //endregion Startup Optimizations Module
 
     //region Voxelizer Module
-    VoxItemRendererMixin(Side.CLIENT, always(), "vanilla.itemvox.ItemRendererMixin"),
-    VoxRenderItemMixin(Side.CLIENT, always(), "vanilla.itemvox.RenderItemMixin"),
+    VoxItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.ItemRendererMixin"),
+    VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.RenderItemMixin"),
 
     //endregion Voxelizer Module
     ;
