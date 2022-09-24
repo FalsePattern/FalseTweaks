@@ -110,12 +110,6 @@ public class FTConfig {
     @Config.DefaultBoolean(true)
     public static boolean FIX_BLOCK_CRACK;
 
-    @Config.Comment("Corners on items have \"cracks\" on the corners (for instance, swords). This option fixes it.\n" +
-                    "FPS impact: Negligible decrease")
-    @Config.LangKey("config.falsetweaks.fix_item_crack")
-    @Config.DefaultBoolean(true)
-    public static boolean FIX_ITEM_CRACK;
-
     @Config.Comment("Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.\n" +
                     "FPS impact: Minor decrease")
     @Config.LangKey("config.falsetweaks.render_hook_compat_mode")
