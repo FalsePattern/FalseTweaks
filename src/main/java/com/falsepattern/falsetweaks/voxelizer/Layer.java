@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.voxelizer;
 
+import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -33,11 +34,29 @@ public class Layer {
     public final float thickness;
 
     public int fetchAlpha(int x, int y, int W, int H) {
-        int wRatio = W / texture.getIconWidth();
-        int hRatio = H / texture.getIconHeight();
-        x /= wRatio;
-        y /= hRatio;
+        x = xToReal(x, W);
+        y = yToReal(y, H);
         int argb = texture.getFrameTextureData(texture.frameCounter)[0][y * texture.getIconWidth() + x];
         return (argb >>> 24) & 0xFF;
+    }
+
+    private int xToReal(int x, int W) {
+        return x / (W / texture.getIconWidth());
+    }
+
+    private int yToReal(int y, int H) {
+        return y / (H / texture.getIconHeight());
+    }
+
+    public float fetchU(float x, float W) {
+        return fetch(x, W, texture.getMinU(), texture.getMaxU());
+    }
+
+    public float fetchV(float y, float H) {
+        return fetch(y, H, texture.getMinV(), texture.getMaxV());
+    }
+
+    private float fetch(float a, float A, float min, float max) {
+        return (float) MathUtil.clampedLerp(min, max, (double)a / A);
     }
 }

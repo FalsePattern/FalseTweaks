@@ -23,34 +23,22 @@
 
 package com.falsepattern.falsetweaks.voxelizer;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-
-import java.util.Arrays;
-
 public class VoxelGrid {
     public final int xSize;
     public final int ySize;
     public final int zSize;
 
-    private final Layer[] layers;
     private final byte[] voxels;
-    public VoxelGrid(Layer... layers) {
-        this.layers = Arrays.copyOf(layers, layers.length);
-        {
-            int x = 0, y = 0;
-            zSize = this.layers.length;
-            for (int i = 0; i < zSize; i++) {
-                TextureAtlasSprite tex = layers[i].texture;
-                x = Math.max(x, tex.getIconWidth());
-                y = Math.max(y, tex.getIconHeight());
-            }
-            xSize = x;
-            ySize = y;
-        }
+
+    public VoxelGrid(int x, int y, int z) {
+        xSize = x;
+        ySize = y;
+        zSize = z;
         voxels = new byte[xSize * ySize * zSize];
     }
-    
-    private int toIndex(int x, int y, int z) {
+
+
+    public int toIndex(int x, int y, int z) {
         if (x < 0 || x >= xSize) return -1;
         if (y < 0 || y >= ySize) return -1;
         if (z < 0 || z >= zSize) return -1;
@@ -73,25 +61,7 @@ public class VoxelGrid {
         voxels[toIndex(x, y, z)] = Voxel.setFace(voxels[toIndex(x, y, z)], dir, state);
     }
 
-    public void compile() {
-        for (int z = 0; z < zSize; z++)
-            for (int y = 0; y < ySize; y++)
-                for (int x = 0; x < xSize; x++) {
-                    int alpha = layers[z].fetchAlpha(x, y, xSize, ySize);
-                    setType(x, y, z, VoxelType.fromAlpha(alpha));
-                }
-
-        for (int z = -1; z < zSize; z++)
-            for (int y = -1; y < ySize; y++)
-                for (int x = -1; x < xSize; x++) {
-                    int thisIndex = toIndex(x, y, z);
-                    exchangeFaces(thisIndex, toIndex(x + 1, y, z), Dir.Right);
-                    exchangeFaces(thisIndex, toIndex(x, y + 1, z), Dir.Down);
-                    exchangeFaces(thisIndex, toIndex(x, y, z + 1), Dir.Out);
-                }
-    }
-
-    private void exchangeFaces(int aIndex, int bIndex, Dir direction) {
+    public void exchangeFaces(int aIndex, int bIndex, Dir direction) {
         aIndex = aIndex >= voxels.length ? -1 : aIndex;
         bIndex = bIndex >= voxels.length ? -1 : bIndex;
         byte a = aIndex >= 0 ? voxels[aIndex] : 0;

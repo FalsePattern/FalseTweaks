@@ -41,7 +41,7 @@ public final class Voxel {
     public static final int OFFSET_DOWN = 6;
     public static final int OFFSET_UP = 7;
 
-    public static final byte BITMASK_TYPE = 0x2;
+    public static final byte BITMASK_TYPE = 0x3;
 
     public static VoxelType getType(byte voxel) {
         return VoxelType.fromNumber((voxel & BITMASK_TYPE) >>> OFFSET_TYPE);

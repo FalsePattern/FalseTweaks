@@ -26,6 +26,10 @@ package com.falsepattern.falsetweaks.voxelizer;
 public enum VoxelType {
     Solid, SemiSolid, Transparent;
 
+    public static VoxelType[] renderable() {
+        return new VoxelType[]{Solid, SemiSolid};
+    }
+
     public int toNumber() {
         switch (this) {
             case Transparent: return 0;

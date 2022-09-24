@@ -21,35 +21,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.voxelizer;
+package com.falsepattern.falsetweaks.voxelizer.strategy;
 
-import org.joml.Vector3i;
-import org.joml.Vector3ic;
+import com.falsepattern.falsetweaks.voxelizer.Face;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public enum Dir {
-    Up(0, -1, 0, Voxel.OFFSET_UP),
-    Down(0, 1, 0, Voxel.OFFSET_DOWN),
-    Left(-1, 0, 0, Voxel.OFFSET_LEFT),
-    Right(1, 0, 0, Voxel.OFFSET_RIGHT),
-    Back(0, 0, -1, Voxel.OFFSET_IN),
-    Front(0, 0, 1, Voxel.OFFSET_OUT);
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class NullMergingStrategy implements MergingStrategy {
+    public static final NullMergingStrategy NULL = new NullMergingStrategy();
 
-    public final Vector3ic dir;
-    public final int bit;
-    Dir(int x, int y, int z, int bit) {
-        dir = new Vector3i(x, y, z);
-        this.bit = bit;
+    @Override
+    public void merge(Face[][] faces) {
+
     }
 
-    public Dir opposite() {
-        switch (this) {
-            case Right: return Left;
-            case Up: return Down;
-            case Front: return Back;
-            case Left: return Right;
-            case Down: return Up;
-            case Back: return Front;
-            default: throw new IllegalStateException();
-        }
+    @Override
+    public void mergeSide(Face[] faces) {
+
     }
 }
