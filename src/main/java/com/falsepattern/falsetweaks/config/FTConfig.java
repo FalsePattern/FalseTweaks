@@ -45,8 +45,6 @@ public class FTConfig {
                     "unnecessary CPU load because of the very inefficient way the rendering is done.\n" +
                     "With this enabled, FalseTweaks will cache pre-rendered versions of items into RenderLists\n" +
                     "(same things that chunks use) to minimize the amount of work done by the cpu for every single item.\n" +
-                    "Notice: Turn this off if you notice any weird rendering artifacts with items, as this feature\n" +
-                    "is still highly experimental.\n" +
                     "FPS impact: Decent improvement with lots of items on ground")
     @Config.LangKey("config.falsetweaks.enable_item_renderlists")
     @Config.DefaultBoolean(true)
