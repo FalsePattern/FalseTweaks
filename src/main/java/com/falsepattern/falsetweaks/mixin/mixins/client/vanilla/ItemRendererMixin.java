@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
-import com.falsepattern.falsetweaks.ItemRenderListManager;
+import com.falsepattern.falsetweaks.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.config.FTConfig;
 import lombok.SneakyThrows;
 import org.spongepowered.asm.mixin.Mixin;

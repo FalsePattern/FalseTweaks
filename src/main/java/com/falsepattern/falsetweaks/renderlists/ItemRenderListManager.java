@@ -1,5 +1,5 @@
 /*
- * FalseTweaks
+ * Triangulator
  *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
@@ -21,10 +21,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks;
+package com.falsepattern.falsetweaks.renderlists;
 
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.FTConfig;
-import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
+import com.falsepattern.falsetweaks.mixin.helper.ItemProp;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -40,28 +41,30 @@ import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VoxelRenderListManager implements IResourceManagerReloadListener {
-    public static final VoxelRenderListManager INSTANCE = new VoxelRenderListManager();
+public class ItemRenderListManager implements IResourceManagerReloadListener {
+    public static final ItemRenderListManager INSTANCE = new ItemRenderListManager();
 
-    private final Map<String, Integer> theMap = new HashMap<>();
-    private final List<String> identityList = new ArrayList<>();
+    private final Map<ItemProp, Integer> theMap = new HashMap<>();
+    private final List<ItemProp> propList = new ArrayList<>();
+    private final ItemProp prop = new ItemProp();
     private int list = 0;
 
-    public boolean pre(VoxelMesh mesh) {
-        val identity = mesh.getIdentity();
-        if (theMap.containsKey(identity)) {
-            val list = theMap.get(identity);
-            identityList.add(identityList.remove(identityList.indexOf(identity)));
+    public boolean pre(float a, float b, float c, float d, int e, int f, float g) {
+        prop.set(a, b, c, d, e, f, g);
+        if (theMap.containsKey(prop)) {
+            val list = theMap.get(prop);
+            propList.add(propList.remove(propList.indexOf(prop)));
             GL11.glCallList(list);
             return true;
         } else {
-            if (identityList.size() >= FTConfig.ITEM_RENDERLIST_BUFFER_MAX_SIZE) {
-                val oldIden = identityList.remove(0);
-                GLAllocation.deleteDisplayLists(theMap.remove(oldIden));
+            if (propList.size() >= FTConfig.ITEM_RENDERLIST_BUFFER_MAX_SIZE) {
+                val oldProp = propList.remove(0);
+                GLAllocation.deleteDisplayLists(theMap.remove(oldProp));
             }
             list = GLAllocation.generateDisplayLists(1);
-            identityList.add(identity);
-            theMap.put(identity, list);
+            val newProp = new ItemProp(prop);
+            theMap.put(newProp, list);
+            propList.add(newProp);
             GL11.glNewList(list, GL11.GL_COMPILE);
             return false;
         }
@@ -74,8 +77,8 @@ public class VoxelRenderListManager implements IResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(IResourceManager p_110549_1_) {
-        Share.log.info("Resource pack reloaded! Clearing voxel render list cache.");
-        identityList.clear();
+        Share.log.info("Resource pack reloaded! Clearing item render list cache.");
+        propList.clear();
         theMap.forEach((key, value) -> GLAllocation.deleteDisplayLists(value));
         theMap.clear();
     }

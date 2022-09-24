@@ -23,9 +23,9 @@
 
 package com.falsepattern.falsetweaks.proxy;
 
-import com.falsepattern.falsetweaks.ItemRenderListManager;
+import com.falsepattern.falsetweaks.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.calibration.Calibration;
 import com.falsepattern.falsetweaks.leakfix.LeakFix;
 

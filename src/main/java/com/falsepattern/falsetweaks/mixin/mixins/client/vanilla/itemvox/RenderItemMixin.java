@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla.itemvox;
 
 import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
 import lombok.val;
