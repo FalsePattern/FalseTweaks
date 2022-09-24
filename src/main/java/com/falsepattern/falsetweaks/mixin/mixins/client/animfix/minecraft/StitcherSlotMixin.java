@@ -1,6 +1,4 @@
 /*
- * FalseTweaks
- *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,18 +19,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.mixins.client.animfix.minecraft;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.falsetweaks.interfaces.IStitcherSlotMixin;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.texture.Stitcher;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+@Mixin(Stitcher.Slot.class)
+public abstract class StitcherSlotMixin implements IStitcherSlotMixin {
+    @Shadow
+    private Stitcher.Holder holder;
+
+    @Override
+    public void insertHolder(Stitcher.Holder holder) {
+        this.holder = holder;
+    }
 }

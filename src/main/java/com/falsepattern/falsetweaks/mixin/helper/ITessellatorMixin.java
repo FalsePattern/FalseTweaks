@@ -21,18 +21,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.helper;
 
-import com.falsepattern.lib.DeprecationDetails;
+import java.util.Comparator;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public interface ITessellatorMixin {
+    void alternativeTriangulation(boolean state);
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+    boolean alternativeTriangulation();
+
+    boolean drawingTris();
+
+    boolean hackedQuadRendering();
+
+    boolean quadTriangulationActive();
+
+    boolean shaderOn();
+
+    void shaderOn(boolean state);
+
+    Comparator<?> hackQuadComparator(Comparator<?> comparator);
+
+    int hackQuadCounting(int constant);
+
+    void triangulate();
 }

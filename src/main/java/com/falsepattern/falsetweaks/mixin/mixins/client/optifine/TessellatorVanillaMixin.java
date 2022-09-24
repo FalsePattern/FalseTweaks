@@ -21,18 +21,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.mixins.client.optifine;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
+import lombok.val;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.Tessellator;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+@Mixin(Tessellator.class)
+public abstract class TessellatorVanillaMixin implements ITessellatorMixin {
+    @Redirect(method = "draw",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/lang/Math;min(II)I",
+                       ordinal = 0),
+              require = 1)
+    private int snapTo3(int a, int b) {
+        val v = Math.min(a, b);
+        if (drawingTris()) {
+            return v - (v % 3);
+        } else {
+            return v;
+        }
+    }
 }

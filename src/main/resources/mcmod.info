@@ -2,16 +2,16 @@
   {
     "modid": "${modId}",
     "name": "${modName}",
-    "description": "A small library for modernizing the way minecraft renders quads.",
+    "description": "FalsePattern's flagship tweaking, patching, and optimization mod.",
     "version": "${modVersion}",
     "mcversion": "${minecraftVersion}",
-    "url": "https://github.com/FalsePattern/Triangulator",
+    "url": "https://github.com/FalsePattern/FalseTweaks",
     "authorList": [
       "FalsePattern"
     ],
     "parent": "",
     "dependencies": [
-      "spongemixins"
+      "falsepatternlib"
     ],
     "useDependencyInformation": true
   }

@@ -1,6 +1,4 @@
 /*
- * FalseTweaks
- *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,18 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.stitching;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.falsetweaks.interfaces.IStitcherSlotMixin;
+import lombok.val;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.texture.Stitcher;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+import java.util.Collections;
+import java.util.List;
+
+public class HolderSlot extends SpriteSlot {
+    private final Stitcher.Holder holder;
+
+    public HolderSlot(Stitcher.Holder holder) {
+        this.holder = holder;
+        width = holder.getWidth();
+        height = holder.getHeight();
+    }
+
+    @Override
+    public List<Stitcher.Slot> getSlots(Rect2D parent) {
+        val slot = new Stitcher.Slot(x + parent.x, y + parent.y, width, height);
+        ((IStitcherSlotMixin) slot).insertHolder(holder);
+        return Collections.singletonList(slot);
+    }
 }

@@ -21,18 +21,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.renderblocks;
 
-import com.falsepattern.lib.DeprecationDetails;
+import net.minecraft.block.Block;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public class RenderState {
+    public Block block;
+    public int x;
+    public int y;
+    public int z;
+    public float r;
+    public float g;
+    public float b;
+    public boolean useCustomColor;
+    public int light;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+    public void set(Block block, int x, int y, int z, float r, float g, float b, boolean useColor, int light) {
+        this.block = block;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.useCustomColor = useColor;
+        this.light = light;
+    }
 }

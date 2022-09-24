@@ -21,18 +21,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
-
-import com.falsepattern.lib.DeprecationDetails;
+package com.falsepattern.falsetweaks.api;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
 @SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+public interface ToggleableTessellator {
+    /**
+     * Temporarily disables triangulation mode <em>when already rendering</em>. This is useful for rendering triangle-based meshes
+     * into the chunk, which is quad based.
+     */
+    void suspendQuadTriangulation();
+
+    /**
+     * Disables the effect of {@link #suspendQuadTriangulation()}.
+     */
+    void resumeQuadTriangulation();
+
+    boolean isQuadTriangulationSuspended();
+
+    /**
+     * Completely disables triangulation and falls back to quad rendering.
+     * Should not be called after mod loading has finished.
+     */
+    void disableTriangulator();
+
+    /**
+     * Disables the effect of {@link #disableTriangulator()}. If it was called multiple times, this method also needs to
+     * be called at least the same amount of times to re-enable it.
+     * Should not be called after mod loading has finished.
+     */
+    void enableTriangulator();
+
+    boolean isTriangulatorDisabled();
 }

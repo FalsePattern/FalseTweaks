@@ -21,18 +21,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.calibration;
 
-import com.falsepattern.lib.DeprecationDetails;
+import net.minecraft.client.settings.KeyBinding;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public class KeyHandler extends KeyBinding {
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+    private final CallBack callBack;
+
+    public KeyHandler(String description, int keyCode, String category, CallBack callback) {
+        super(description, keyCode, category);
+        this.callBack = callback;
+        FMLCommonHandler.instance().bus().register(this);
+    }
+
+    @SubscribeEvent
+    public void onKeyInput(InputEvent.KeyInputEvent event) {
+        if (this.isPressed()) {
+            callBack.onPress();
+        }
+    }
+
+    public interface CallBack {
+        void onPress();
+    }
 }

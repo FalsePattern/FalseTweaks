@@ -21,18 +21,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.api;
+package com.falsepattern.falsetweaks.mixin.plugin;
 
-import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.lib.mixin.IMixin;
+import com.falsepattern.lib.mixin.IMixinPlugin;
+import com.falsepattern.lib.mixin.ITargetedMod;
+import com.falsepattern.falsetweaks.Tags;
+import lombok.Getter;
+import org.apache.logging.log4j.Logger;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public class MixinPlugin implements IMixinPlugin {
+    @Getter
+    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME);
 
-/**
- * This is here for backwards compatibility with Neodymium.
- */
-@SideOnly(Side.CLIENT)
-@Deprecated
-@DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+    @Override
+    public ITargetedMod[] getTargetedModEnumValues() {
+        return TargetedMod.values();
+    }
+
+    @Override
+    public IMixin[] getMixinEnumValues() {
+        return Mixin.values();
+    }
 }
