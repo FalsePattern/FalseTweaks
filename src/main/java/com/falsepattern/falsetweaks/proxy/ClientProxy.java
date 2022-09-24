@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.proxy;
 
 import com.falsepattern.falsetweaks.ItemRenderListManager;
 import com.falsepattern.falsetweaks.TriCompat;
+import com.falsepattern.falsetweaks.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.calibration.Calibration;
 import com.falsepattern.falsetweaks.leakfix.LeakFix;
 
@@ -47,6 +48,8 @@ public class ClientProxy extends CommonProxy {
         super.postInit(e);
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
                 ItemRenderListManager.INSTANCE);
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
+                VoxelRenderListManager.INSTANCE);
         LeakFix.gc();
         ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
         TriCompat.applyCompatibilityTweaks();

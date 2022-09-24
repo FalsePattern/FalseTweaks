@@ -46,16 +46,6 @@ public class VoxelMesh {
     private String cacheIdentity = null;
     public static final float EPSILON = 0.0001f;
 
-    public static void render(Tessellator tess, TextureAtlasSprite iicon) {
-        val texture = (ITextureAtlasSpriteMixin) iicon;
-        VoxelMesh mesh = texture.getVoxelMesh();
-        if (mesh == null) {
-            mesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, new Layer(iicon, 0.0625F));
-            texture.setVoxelMesh(mesh);
-        }
-        mesh.renderToTessellator(tess);
-    }
-
     public VoxelMesh(MergingStrategy strategy, Layer... layers) {
         this.strategy = strategy;
         this.layers = layers;
@@ -76,6 +66,16 @@ public class VoxelMesh {
         for (int y = 0; y <= compiler.ySize; y++) {
             yOffsets[y] = 1 - y / (float)compiler.ySize;
         }
+    }
+
+    public static VoxelMesh getMesh(TextureAtlasSprite iicon) {
+        val texture = (ITextureAtlasSpriteMixin) iicon;
+        VoxelMesh mesh = texture.getVoxelMesh();
+        if (mesh == null) {
+            mesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, new Layer(iicon, 0.0625F));
+            texture.setVoxelMesh(mesh);
+        }
+        return mesh;
     }
 
     public void renderToTessellator(Tessellator tess) {
@@ -134,15 +134,17 @@ public class VoxelMesh {
         }
     }
 
-    public void compile() {
+    public boolean compile() {
         String currentIdentity = getIdentity();
         if (!Objects.equals(cacheIdentity, currentIdentity)) {
             faceCache = compiler.compile(strategy);
             cacheIdentity = currentIdentity;
+            return false;
         }
+        return true;
     }
 
-    private String getIdentity() {
+    public String getIdentity() {
         val result = new StringBuilder();
         for (val layer: layers) {
             result.append(layer.textureIdentity()).append("\f");

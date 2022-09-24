@@ -54,4 +54,9 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     public VoxelMesh getVoxelMesh() {
         return voxelMesh;
     }
+
+    @Override
+    public void setVoxelMesh(VoxelMesh mesh) {
+        voxelMesh = mesh;
+    }
 }

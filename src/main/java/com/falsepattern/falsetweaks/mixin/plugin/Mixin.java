@@ -50,7 +50,6 @@ public enum Mixin implements IMixin {
     RenderBlocksCompatMixin(Side.CLIENT, condition(() -> FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksCompatMixin"),
     RenderBlocksPerformanceMixin(Side.CLIENT, condition(() -> !FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksPerformanceMixin"),
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
-    RenderItemMixin(Side.CLIENT, always(), "vanilla.RenderItemMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
     TextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.TextureAtlasSpriteMixin"),
 
@@ -95,7 +94,7 @@ public enum Mixin implements IMixin {
                                   "redstonepaste.RedstonePasteHighlighterMixin"),
     //endregion RedstonePaste->client
 
-    //endregion
+    //endregion Always Loaded
 
     //region Texture Optimizations Module
     //region Minecraft->client
@@ -110,7 +109,7 @@ public enum Mixin implements IMixin {
     FCTextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureMapMixin"),
     FCTextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureUtilMixin"),
     //endregion FastCraft->client
-    //endregion
+    //endregion Texture Optimizations Module
 
     //region Startup Optimizations Module
     //region Minecraft->client
@@ -119,7 +118,13 @@ public enum Mixin implements IMixin {
     ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModContainerFactoryMixin"),
     ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModDiscovererMixin"),
     //endregion Minecraft->client
-    //endregion
+    //endregion Startup Optimizations Module
+
+    //region Voxelizer Module
+    VoxItemRendererMixin(Side.CLIENT, always(), "vanilla.itemvox.ItemRendererMixin"),
+    VoxRenderItemMixin(Side.CLIENT, always(), "vanilla.itemvox.RenderItemMixin"),
+
+    //endregion Voxelizer Module
     ;
 
     @Getter
