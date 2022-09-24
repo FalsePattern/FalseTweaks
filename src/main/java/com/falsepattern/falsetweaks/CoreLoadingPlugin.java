@@ -27,6 +27,8 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
 
+@IFMLLoadingPlugin.MCVersion("1.7.10")
+@IFMLLoadingPlugin.Name(Tags.MODID)
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         Deps.initDeps();
