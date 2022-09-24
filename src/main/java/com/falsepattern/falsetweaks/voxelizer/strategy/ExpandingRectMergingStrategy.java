@@ -223,10 +223,11 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
             candidates.add(candidate);
         }
-        root.maxX += 1;
-        for (val candidate: candidates) {
-            candidate.parent = root;
+        if (candidates.size() == 0) {
+            return false;
         }
+        mergeAll(candidates);
+        Face.tryMerge(root, candidates.get(0));
         return true;
     }
 
@@ -239,10 +240,11 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
             candidates.add(candidate);
         }
-        root.maxY += 1;
-        for (val candidate: candidates) {
-            candidate.parent = root;
+        if (candidates.size() == 0) {
+            return false;
         }
+        mergeAll(candidates);
+        Face.tryMerge(root, candidates.get(0));
         return true;
     }
 
@@ -255,10 +257,11 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
             candidates.add(candidate);
         }
-        root.minX -= 1;
-        for (val candidate: candidates) {
-            candidate.parent = root;
+        if (candidates.size() == 0) {
+            return false;
         }
+        mergeAll(candidates);
+        Face.tryMerge(root, candidates.get(0));
         return true;
     }
 
@@ -271,11 +274,22 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
             candidates.add(candidate);
         }
-        root.minY -= 1;
-        for (val candidate: candidates) {
-            candidate.parent = root;
+        if (candidates.size() == 0) {
+            return false;
         }
+        mergeAll(candidates);
+        Face.tryMerge(root, candidates.get(0));
         return true;
+    }
+
+    private static void mergeAll(List<Face> candidates) {
+        if (candidates.size() <= 1) {
+            return;
+        }
+        Face root = candidates.get(0);
+        for (val candidate: candidates.subList(1, candidates.size())) {
+            Face.tryMerge(root, candidate);
+        }
     }
 
     private static boolean isIneligible(Face face) {

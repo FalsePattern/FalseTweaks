@@ -50,7 +50,9 @@ public enum Mixin implements IMixin {
     RenderBlocksCompatMixin(Side.CLIENT, condition(() -> FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksCompatMixin"),
     RenderBlocksPerformanceMixin(Side.CLIENT, condition(() -> !FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksPerformanceMixin"),
     RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
+    RenderItemMixin(Side.CLIENT, always(), "vanilla.RenderItemMixin"),
     TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
+    TextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.TextureAtlasSpriteMixin"),
 
     //leak fix
     LeakFixRenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),

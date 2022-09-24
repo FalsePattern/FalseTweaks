@@ -24,16 +24,28 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
 import com.falsepattern.falsetweaks.ItemRenderListManager;
+import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.config.FTConfig;
+import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.client.IItemRenderer;
 
 @Mixin(net.minecraft.client.renderer.ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -46,6 +58,30 @@ public abstract class ItemRendererMixin {
         if (FTConfig.ENABLE_ITEM_RENDERLISTS && ItemRenderListManager.INSTANCE.pre(a, b, c, d, e, f, g)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                     ordinal = 0),
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            require = 1)
+    private void voxelizedRenderer(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type,
+                                   CallbackInfo ci,
+                                   TextureManager texturemanager, Item item, Block block, IItemRenderer customRenderer, IIcon iicon, Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5, float f6) {
+        val tess = TriCompat.tessellator();
+        tess.startDrawingQuads();
+        VoxelMesh.render(tess, (TextureAtlasSprite) iicon);
+        tess.draw();
+    }
+
+    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                       ordinal = 0),
+              require = 1)
+    private void voxelizedRendererKillOriginal(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
+
     }
 
     @Inject(method = "renderItemIn2D",

@@ -102,10 +102,10 @@ public class VoxelCompiler {
                             //Front and Back
                             faceBuilder.minX(x)
                                        .maxX(x)
-                                       .u1(layer.fetchU(x, xSize))
-                                       .u2(layer.fetchU(x + 1, xSize))
-                                       .v1(layer.fetchV(y, ySize))
-                                       .v2(layer.fetchV(y + 1, ySize));
+                                       .u1(layer.fetchU(x + 0.01f, xSize))
+                                       .u2(layer.fetchU(x + 0.99f, xSize))
+                                       .v1(layer.fetchV(y + 0.01f, ySize))
+                                       .v2(layer.fetchV(y + 0.99f, ySize));
                             if (voxels.getFace(x, y, z, Dir.Front)) {
                                 rowFront[x] = faceBuilder.dir(Dir.Front).build();
                             }
@@ -144,8 +144,8 @@ public class VoxelCompiler {
                                    .maxY(y)
                                    .u1(layer.fetchU(x + 0.5f, xSize))
                                    .u2(layer.fetchU(x + 0.5f, xSize))
-                                   .v1(layer.fetchV(y, ySize))
-                                   .v2(layer.fetchV(y + 1, ySize));
+                                   .v1(layer.fetchV(y + 0.01f, ySize))
+                                   .v2(layer.fetchV(y + 0.99f, ySize));
 
                         if (voxels.getFace(x, y, z, Dir.Left)) {
                             left[y] = faceBuilder.dir(Dir.Left).build();

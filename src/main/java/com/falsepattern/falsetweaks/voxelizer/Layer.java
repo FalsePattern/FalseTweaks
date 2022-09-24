@@ -57,6 +57,10 @@ public class Layer {
     }
 
     private float fetch(float a, float A, float min, float max) {
-        return (float) MathUtil.clampedLerp(min, max, (double)a / A);
+        return (float) MathUtil.clampedLerp(min, max, a / A);
+    }
+
+    public String textureIdentity() {
+        return texture.getIconName() + "\r" + texture.frameCounter;
     }
 }
