@@ -54,5 +54,25 @@ public interface ToggleableTessellator {
      */
     void enableTriangulator();
 
+    /**
+     * Same as {@link #disableTriangulator()}, but only applies to the current tessellator object.
+     */
+    void disableTriangulatorLocal();
+
+    /**
+     * Same as {@link #enableTriangulator()} ()}, but only applies to the current tessellator object.
+     */
+    void enableTriangulatorLocal();
+
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    void pass(int pass);
+
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    int pass();
+
     boolean isTriangulatorDisabled();
 }

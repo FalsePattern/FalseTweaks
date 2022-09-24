@@ -684,6 +684,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         if (!FTConfig.FIX_BLOCK_CRACK) {
             return;
         }
+        val tess = (ToggleableTessellator)TriCompat.tessellator();
+        if (tess.pass() != 0) {
+            return;
+        }
         if (bounds == null) {
             bounds = new double[6];
         }

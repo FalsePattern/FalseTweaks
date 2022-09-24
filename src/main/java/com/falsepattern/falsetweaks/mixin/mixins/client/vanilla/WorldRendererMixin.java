@@ -1,5 +1,5 @@
 /*
- * FalseTweaks
+ * Triangulator
  *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
@@ -21,30 +21,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.redstonepaste;
+package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
 import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.api.ToggleableTessellator;
-import fyber.redstonepastemod.client.RedstonePasteHighlighter;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = RedstonePasteHighlighter.class,
-       remap = false)
-public abstract class RedstonePasteHighlighterMixin {
-    @Inject(method = "drawLineLoop",
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.EntityLivingBase;
+
+@Mixin(WorldRenderer.class)
+public abstract class WorldRendererMixin {
+    @Inject(method = "preRenderBlocks",
             at = @At("HEAD"),
             require = 1)
-    private void turnOffTriangulator(CallbackInfo ci) {
-        ((ToggleableTessellator) TriCompat.tessellator()).disableTriangulatorLocal();
+    private void noTriOnPass1Pre(int pass, CallbackInfo ci) {
+        val tess = (ToggleableTessellator) TriCompat.tessellator();
+        tess.pass(pass);
+        if (pass != 0) {
+            tess.disableTriangulatorLocal();
+        }
     }
 
-    @Inject(method = "drawLineLoop",
-            at = @At("RETURN"),
+    @Inject(method = "postRenderBlocks",
+            at = @At(value = "RETURN"),
             require = 1)
-    private void turnOnTriangulator(CallbackInfo ci) {
-        ((ToggleableTessellator) TriCompat.tessellator()).enableTriangulatorLocal();
+    private void noTriOnPass1Post(int pass, EntityLivingBase p_147891_2_, CallbackInfo ci) {
+        if (pass != 0) {
+            ((ToggleableTessellator)TriCompat.tessellator()).enableTriangulatorLocal();
+        }
     }
 }

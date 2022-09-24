@@ -25,7 +25,6 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.ToggleableTessellatorManager;
-import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.api.ToggleableTessellator;
 import com.falsepattern.falsetweaks.mixin.helper.IQuadComparatorMixin;
 import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
@@ -71,6 +70,9 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private boolean shaderOn = false;
     private int forceQuadRendering = 0;
     private int quadVerticesPutIntoBuffer = 0;
+    @Getter
+    @Setter
+    private int pass;
 
     @Inject(method = "reset",
             at = @At(value = "HEAD"),
@@ -89,8 +91,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (TriCompat.enableTriangulation() && value == GL11.GL_QUADS &&
-                ToggleableTessellatorManager.INSTANCE.forceQuadRendering() == 0) {
+        if (!isTriangulatorDisabled() &&
+            value == GL11.GL_QUADS) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -215,8 +217,21 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     }
 
     @Override
+    public void disableTriangulatorLocal() {
+        forceQuadRendering++;
+    }
+
+    @Override
+    public void enableTriangulatorLocal() {
+        forceQuadRendering--;
+        if (forceQuadRendering < 0) {
+            forceQuadRendering = 0;
+        }
+    }
+
+    @Override
     public boolean isTriangulatorDisabled() {
-        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled();
+        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled() || forceQuadRendering == 0;
     }
 
     @Override
