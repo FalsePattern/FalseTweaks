@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import com.falsepattern.falsetweaks.config.FTConfig;
@@ -39,8 +40,8 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
-    //region Minecraft
-    //region client
+    //region Always Loaded
+    //region Minecraft->client
     ItemRendererMixin(Side.CLIENT, always(), "vanilla.ItemRendererMixin"),
     QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
     TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
@@ -54,26 +55,12 @@ public enum Mixin implements IMixin {
     //leak fix
     LeakFixRenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
     LeakFixWorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
-
-    //animfix
-    TextureMapMixin(Side.CLIENT, always(), "animfix.minecraft.TextureMapMixin"),
-    TextureUtilMixin(Side.CLIENT, always(), "animfix.minecraft.TextureUtilMixin"),
-    StitcherMixin(Side.CLIENT, always(), "animfix.minecraft.StitcherMixin"),
-    StitcherSlotMixin(Side.CLIENT, always(), "animfix.minecraft.StitcherSlotMixin"),
-    //endregion client
-    //region common
-    //startup optimizer
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> FTConfig.STARTUP_OPTIMIZATIONS), "common.regex.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> FTConfig.STARTUP_OPTIMIZATIONS), "common.regex.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> FTConfig.STARTUP_OPTIMIZATIONS), "common.regex.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> FTConfig.STARTUP_OPTIMIZATIONS), "common.regex.ModDiscovererMixin"),
-    //endregion common
-    //endregion Minecraft
-    //region FoamFix
+    //endregion Minecraft->client
+    //region FoamFix->client
     FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
     FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
-    //endregion FoamFix
-    //region OptiFine
+    //endregion FoamFix->client
+    //region OptiFine->client
     OFTessellatorVanillaMixin(Side.CLIENT,
                               avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
                               "optifine.TessellatorVanillaMixin"),
@@ -81,7 +68,8 @@ public enum Mixin implements IMixin {
                                            "optifine.TessellatorVanillaOrOldOptifineMixin"),
     OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITH_SHADERS),
                                "optifine.TessellatorOptiFineMixin"),
-    //region leak fix
+
+    //leak fix
     OFGameSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
             require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.GameSettingsOptifineMixin"),
     OFGuiVideoSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
@@ -92,25 +80,44 @@ public enum Mixin implements IMixin {
             avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.WorldRendererVanillaMixin"),
     OFWorldRendererOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
             require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.WorldRendererOptifineMixin"),
-    //endregion leak fix
-    //endregion OptiFine
-    //region FastCraft
+    //endregion OptiFine->client
+    //region FastCraft->client
     //leak fix
     FCGLAllocatorMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.leakfix.GLAllocationMixin"),
-
-    //animfix
-    FCAbstractTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.AbstractTextureMixin"),
-    FCDynamicTextureMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.DynamicTextureMixin"),
-    FCTextureMapMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.TextureMapMixin"),
-    FCTextureUtilMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "animfix.fastcraft.TextureUtilMixin"),
-    //endregion FastCraft
-    //region ChromatiCraft
+    //endregion FastCraft->client
+    //region ChromatiCraft->client
     CCRuneRendererMixin(Side.CLIENT, require(TargetedMod.CHROMATICRAFT), "chromaticraft.RuneRendererMixin"),
-    //endregion ChromatiCraft
-    //region RedstonePaste
+    //endregion ChromatiCraft->client
+    //region RedstonePaste->client
     RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE),
                                   "redstonepaste.RedstonePasteHighlighterMixin"),
-    //endregion RedstonePaste
+    //endregion RedstonePaste->client
+
+    //endregion
+
+    //region Texture Optimizations Module
+    //region Minecraft->client
+    TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.TextureMapMixin"),
+    TextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.TextureUtilMixin"),
+    StitcherMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.StitcherMixin"),
+    StitcherSlotMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.StitcherSlotMixin"),
+    //endregion Minecraft->client
+    //region FastCraft->client
+    FCAbstractTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.AbstractTextureMixin"),
+    FCDynamicTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.DynamicTextureMixin"),
+    FCTextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureMapMixin"),
+    FCTextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureUtilMixin"),
+    //endregion FastCraft->client
+    //endregion
+
+    //region Startup Optimizations Module
+    //region Minecraft->client
+    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.DirectoryDiscovererMixin"),
+    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.JarDiscovererMixin"),
+    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModContainerFactoryMixin"),
+    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModDiscovererMixin"),
+    //endregion Minecraft->client
+    //endregion
     ;
 
     @Getter

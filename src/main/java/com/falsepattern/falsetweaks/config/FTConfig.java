@@ -123,13 +123,6 @@ public class FTConfig {
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
 
-    @Config.Comment("Optimizes the way forge scans the classpath during launch.\n" +
-                    "Not compatible with some badly-written mods.")
-    @Config.LangKey("config.falsetweaks.startup_optimizations")
-    @Config.DefaultBoolean(true)
-    @Config.RequiresMcRestart
-    public static boolean STARTUP_OPTIMIZATIONS;
-
     static {
         ConfigurationManager.selfInit();
     }
