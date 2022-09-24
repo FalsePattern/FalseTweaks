@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
 import lombok.val;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -48,13 +49,13 @@ public abstract class RenderItemMixin {
                      ordinal = 0),
             require = 1)
     private void voxelizedRender(EntityItem p_77020_1_, IIcon iicon, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
-        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh)) {
+        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
+        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, false)) {
             return;
         }
         val tess = TriCompat.tessellator();
         tess.startDrawingQuads();
-        mesh.renderToTessellator(tess);
+        mesh.renderToTessellator(tess, false);
         tess.draw();
         if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
             VoxelRenderListManager.INSTANCE.post();
@@ -63,10 +64,62 @@ public abstract class RenderItemMixin {
 
     @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
               at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                     ordinal = 0),
+                       target = "Lorg/lwjgl/opengl/GL11;glDepthFunc(I)V",
+                       ordinal = 0),
+              remap = false,
+              require = 1)
+    private void noGlintBlend1(int func) {
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+    }
+
+    @Inject(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+            at = {@At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                      ordinal = 1),
+                  @At(value = "INVOKE",
+                      target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                      ordinal = 2)},
+            require = 1)
+    private void voxelizedRenderGlint(EntityItem p_77020_1_, IIcon iicon, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
+        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
+        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, true)) {
+            return;
+        }
+        val tess = TriCompat.tessellator();
+        tess.startDrawingQuads();
+        mesh.renderToTessellator(tess, true);
+        tess.draw();
+        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
+            VoxelRenderListManager.INSTANCE.post();
+        }
+    }
+
+    @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                       ordinal = 0),
               require = 1)
     private void voxelizedRendererKillOriginal(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
+
+    }
+
+
+    @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                       ordinal = 1),
+              require = 1)
+    private void voxelizedRendererKillOriginalG1(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
+
+    }
+
+
+    @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
+                       ordinal = 2),
+              require = 1)
+    private void voxelizedRendererKillOriginalG2(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
 
     }
 }
