@@ -23,15 +23,14 @@
 
 package com.falsepattern.falsetweaks;
 
-import com.falsepattern.lib.dependencies.DependencyLoader;
-import com.falsepattern.lib.dependencies.Library;
-import com.falsepattern.lib.dependencies.SemanticVersion;
-
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
 
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
+    static {
+        Deps.initDeps();
+    }
     @Override
     public String[] getASMTransformerClass() {
         return new String[0];
@@ -49,15 +48,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        DependencyLoader.addMavenRepo("https://repo.maven.apache.org/maven2/");
-        DependencyLoader.loadLibraries(Library.builder()
-                                              .loadingModId(Tags.MODID)
-                                              .groupId("org.joml")
-                                              .artifactId("joml")
-                                              .minVersion(new SemanticVersion(1, 10, 4))
-                                              .maxVersion(new SemanticVersion(1, 10, Integer.MAX_VALUE))
-                                              .preferredVersion(new SemanticVersion(1, 10, 5))
-                                              .build());
     }
 
     @Override
