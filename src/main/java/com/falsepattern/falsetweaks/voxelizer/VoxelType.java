@@ -21,35 +21,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.voxelizer;
+package com.falsepattern.falsetweaks.voxelizer;
 
-import org.joml.Vector3i;
-import org.joml.Vector3ic;
+public enum VoxelType {
+    Solid, SemiSolid, Transparent;
 
-public enum Dir {
-    Up(0, 1, 0, Voxel.OFFSET_UP),
-    Down(0, -1, 0, Voxel.OFFSET_DOWN),
-    Left(-1, 0, 0, Voxel.OFFSET_LEFT),
-    Right(1, 0, 0, Voxel.OFFSET_RIGHT),
-    In(0, 0, -1, Voxel.OFFSET_IN),
-    Out(0, 0, 1, Voxel.OFFSET_OUT);
-
-    public final Vector3ic dir;
-    public final int bit;
-    Dir(int x, int y, int z, int bit) {
-        dir = new Vector3i(x, y, z);
-        this.bit = bit;
+    public int toNumber() {
+        switch (this) {
+            case Transparent: return 0;
+            case SemiSolid: return 1;
+            case Solid: return 2;
+            default: throw new IllegalStateException();
+        }
     }
 
-    public Dir opposite() {
-        switch (this) {
-            case Right: return Left;
-            case Up: return Down;
-            case Out: return In;
-            case Left: return Right;
-            case Down: return Up;
-            case In: return Out;
-            default: throw new IllegalStateException();
+    public static VoxelType fromNumber(int number) {
+        switch (number) {
+            case 0: return Transparent;
+            case 1: return SemiSolid;
+            case 2: return Solid;
+            default: throw new IllegalArgumentException(Integer.toString(number));
+        }
+    }
+
+    public static VoxelType fromAlpha(int alpha) {
+        switch (alpha) {
+            case 0: return Transparent;
+            case 255: return Solid;
+            default: return SemiSolid;
         }
     }
 }

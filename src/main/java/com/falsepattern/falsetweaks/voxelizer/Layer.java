@@ -21,34 +21,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.voxelizer;
+package com.falsepattern.falsetweaks.voxelizer;
 
-public enum VoxelType {
-    Solid, SemiSolid, Transparent;
+import lombok.RequiredArgsConstructor;
 
-    public int toNumber() {
-        switch (this) {
-            case Transparent: return 0;
-            case SemiSolid: return 1;
-            case Solid: return 2;
-            default: throw new IllegalStateException();
-        }
-    }
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
-    public static VoxelType fromNumber(int number) {
-        switch (number) {
-            case 0: return Transparent;
-            case 1: return SemiSolid;
-            case 2: return Solid;
-            default: throw new IllegalArgumentException(Integer.toString(number));
-        }
-    }
+@RequiredArgsConstructor
+public class Layer {
+    public final TextureAtlasSprite texture;
+    public final float thickness;
 
-    public static VoxelType fromAlpha(int alpha) {
-        switch (alpha) {
-            case 0: return Transparent;
-            case 255: return Solid;
-            default: return SemiSolid;
-        }
+    public int fetchAlpha(int x, int y, int W, int H) {
+        int wRatio = W / texture.getIconWidth();
+        int hRatio = H / texture.getIconHeight();
+        x /= wRatio;
+        y /= hRatio;
+        int argb = texture.getFrameTextureData(texture.frameCounter)[0][y * texture.getIconWidth() + x];
+        return (argb >>> 24) & 0xFF;
     }
 }

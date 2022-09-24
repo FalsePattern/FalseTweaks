@@ -21,23 +21,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.voxelizer;
+package com.falsepattern.falsetweaks.voxelizer;
 
-import lombok.RequiredArgsConstructor;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+public enum Dir {
+    Up(0, 1, 0, Voxel.OFFSET_UP),
+    Down(0, -1, 0, Voxel.OFFSET_DOWN),
+    Left(-1, 0, 0, Voxel.OFFSET_LEFT),
+    Right(1, 0, 0, Voxel.OFFSET_RIGHT),
+    In(0, 0, -1, Voxel.OFFSET_IN),
+    Out(0, 0, 1, Voxel.OFFSET_OUT);
 
-@RequiredArgsConstructor
-public class Layer {
-    public final TextureAtlasSprite texture;
-    public final float thickness;
+    public final Vector3ic dir;
+    public final int bit;
+    Dir(int x, int y, int z, int bit) {
+        dir = new Vector3i(x, y, z);
+        this.bit = bit;
+    }
 
-    public int fetchAlpha(int x, int y, int W, int H) {
-        int wRatio = W / texture.getIconWidth();
-        int hRatio = H / texture.getIconHeight();
-        x /= wRatio;
-        y /= hRatio;
-        int argb = texture.getFrameTextureData(texture.frameCounter)[0][y * texture.getIconWidth() + x];
-        return (argb >>> 24) & 0xFF;
+    public Dir opposite() {
+        switch (this) {
+            case Right: return Left;
+            case Up: return Down;
+            case Out: return In;
+            case Left: return Right;
+            case Down: return Up;
+            case In: return Out;
+            default: throw new IllegalStateException();
+        }
     }
 }

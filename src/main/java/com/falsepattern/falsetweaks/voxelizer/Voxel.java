@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.triangulator.voxelizer;
+package com.falsepattern.falsetweaks.voxelizer;
 
 public final class Voxel {
     private Voxel() {
