@@ -115,6 +115,14 @@ public class FTConfig {
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
 
+    @Config.Comment("The \"epsilon\" value for the block crack fix inside chunks.\n" +
+                    "Advanced setting.\n" +
+                    "FPS impact: None")
+    @Config.LangKey("config.falsetweaks.block_crack_fix_internal_epsilon")
+    @Config.DefaultDouble(0.0005)
+    @Config.RangeDouble(min = 0, max = 0.005)
+    public static double BLOCK_CRACK_FIX_EPSILON;
+
     static {
         ConfigurationManager.selfInit();
     }

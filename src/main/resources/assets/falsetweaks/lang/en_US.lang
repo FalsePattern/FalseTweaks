@@ -8,6 +8,7 @@ config.falsetweaks.te_transparency_fix=Tile entity transparency fix
 config.falsetweaks.fix_block_crack=Block edge crack fix
 config.falsetweaks.fix_item_crack=Item edge crack fix
 config.falsetweaks.render_hook_compat_mode=Render hook compatibility mode
+config.falsetweaks.block_crack_fix_epsilon=Block crack fix epsilon
 config.falsetweaks.module.startup_optimizations=Startup optimizations module
 config.falsetweaks.module.texture_optimizations=Texture optimizations module
 config.falsetweaks.module.item_voxelizer=Item voxelizer module

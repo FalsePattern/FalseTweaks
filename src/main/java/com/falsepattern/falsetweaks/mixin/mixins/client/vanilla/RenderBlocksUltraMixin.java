@@ -693,12 +693,13 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         bounds[3] = renderMaxX;
         bounds[4] = renderMaxY;
         bounds[5] = renderMaxZ;
-        renderMinX -= 0.0001;
-        renderMinY -= 0.0001;
-        renderMinZ -= 0.0001;
-        renderMaxX += 0.0001;
-        renderMaxY += 0.0001;
-        renderMaxZ += 0.0001;
+        val EPSILON = FTConfig.BLOCK_CRACK_FIX_EPSILON;
+        renderMinX -= EPSILON;
+        renderMinY -= EPSILON;
+        renderMinZ -= EPSILON;
+        renderMaxX += EPSILON;
+        renderMaxY += EPSILON;
+        renderMaxZ += EPSILON;
         switch (skipDir) {
             case FACE_XNEG: renderMinX = bounds[0]; break;
             case FACE_YNEG: renderMinY = bounds[1]; break;
