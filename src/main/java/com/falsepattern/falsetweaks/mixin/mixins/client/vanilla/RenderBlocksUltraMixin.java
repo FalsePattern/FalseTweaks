@@ -34,6 +34,7 @@ import com.falsepattern.falsetweaks.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.renderblocks.RenderState;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.val;
 import lombok.var;
 import org.joml.Vector3ic;
@@ -58,6 +59,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
 @Mixin(RenderBlocks.class)
+@Accessors(fluent = true,
+           chain = false)
 public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Shadow
     public static boolean fancyGrass;
@@ -684,10 +687,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         if (!FTConfig.FIX_BLOCK_CRACK) {
             return;
         }
-        val tess = (ToggleableTessellator)TriCompat.tessellator();
-        if (tess.pass() != 0) {
-            return;
-        }
         if (bounds == null) {
             bounds = new double[6];
         }
@@ -697,6 +696,16 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         bounds[3] = renderMaxX;
         bounds[4] = renderMaxY;
         bounds[5] = renderMaxZ;
+
+        val tess = (ToggleableTessellator)TriCompat.tessellator();
+        if (tess.pass() != 0) {
+            return;
+        }
+
+        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 ||
+            renderMaxX != 1 || renderMaxY != 1 || renderMaxZ != 1) {
+            return;
+        }
         val EPSILON = FTConfig.BLOCK_CRACK_FIX_EPSILON;
         renderMinX -= EPSILON;
         renderMinY -= EPSILON;
@@ -728,6 +737,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         renderMaxY = bounds[4];
         renderMaxZ = bounds[5];
     }
+
     @Inject(method = "renderBlockMinecartTrack",
             at = @At(value = "HEAD"),
             cancellable = true,
