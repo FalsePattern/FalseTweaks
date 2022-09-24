@@ -24,12 +24,12 @@
 package com.falsepattern.falsetweaks;
 
 import com.falsepattern.falsetweaks.config.FTConfig;
-import cpw.mods.fml.common.Loader;
 import lombok.Getter;
-import net.minecraft.client.renderer.Tessellator;
 import org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates;
 
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
 

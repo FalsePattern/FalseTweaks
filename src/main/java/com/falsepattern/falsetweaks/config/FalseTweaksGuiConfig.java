@@ -23,9 +23,9 @@
 
 package com.falsepattern.falsetweaks.config;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
-import com.falsepattern.falsetweaks.Tags;
 
 import net.minecraft.client.gui.GuiScreen;
 

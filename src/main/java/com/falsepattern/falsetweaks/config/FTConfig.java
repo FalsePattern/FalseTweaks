@@ -23,10 +23,10 @@
 
 package com.falsepattern.falsetweaks.config;
 
-import com.falsepattern.lib.config.Config;
-import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.leakfix.LeakFixState;
+import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 
 @Config(modid = Tags.MODID)
 public class FTConfig {

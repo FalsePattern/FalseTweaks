@@ -23,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla;
 
-import com.falsepattern.lib.util.MathUtil;
 import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.api.ToggleableTessellator;
 import com.falsepattern.falsetweaks.calibration.CalibrationConfig;
@@ -33,6 +32,7 @@ import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
 import com.falsepattern.falsetweaks.renderblocks.Facing;
 import com.falsepattern.falsetweaks.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.renderblocks.RenderState;
+import com.falsepattern.lib.util.MathUtil;
 import lombok.Setter;
 import lombok.val;
 import lombok.var;

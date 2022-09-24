@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 import static com.falsepattern.falsetweaks.mixin.plugin.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {

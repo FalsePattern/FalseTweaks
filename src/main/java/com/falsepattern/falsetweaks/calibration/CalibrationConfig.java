@@ -23,9 +23,9 @@
 
 package com.falsepattern.falsetweaks.calibration;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
-import com.falsepattern.falsetweaks.Tags;
 
 @Config(modid = Tags.MODID + "_userspecific",
         category = "calibration")

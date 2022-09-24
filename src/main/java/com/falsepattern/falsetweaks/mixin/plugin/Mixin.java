@@ -23,10 +23,10 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin;
 
+import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
-import com.falsepattern.falsetweaks.config.FTConfig;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

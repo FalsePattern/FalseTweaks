@@ -23,8 +23,8 @@
 
 package com.falsepattern.falsetweaks.calibration;
 
-import com.falsepattern.lib.compat.GuiLabel;
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.lib.compat.GuiLabel;
 import lombok.val;
 import lombok.var;
 import org.lwjgl.opengl.GL11;
