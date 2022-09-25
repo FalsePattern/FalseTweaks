@@ -13,16 +13,10 @@ Highlights:
 - Sped up texture packing
 
 ## Fixing known problems
-
-- **Issue**: Game crashes on startup, forge log says `MixinTargetAlreadyLoadedException` 
-  **Known causes**: CoFH Core
-
-  **Potential solution**: Open `falsetweaks.cfg`, and under the `modules` category, set `B:STARTUP_OPTIMIZATIONS` to `false`.
-
-- **Issue**: Game crashes on startup, loading screen was already present (or fixing issue 1 didn't help)
-  **Known causes**: Apparatus
-
-  **Potential solution**: Open `falsetweaks.cfg`, and under the `general` category, set `B:RENDER_HOOK_COMPAT_MODE` to `true`.
+| **Issue**                                                                                   | **Known causes** | **Potential solution**                                                                               |
+|---------------------------------------------------------------------------------------------|------------------|------------------------------------------------------------------------------------------------------|
+| Game crashes on startup, forge log says `MixinTargetAlreadyLoadedException`                 | CoFH Core        | Open `falsetweaks.cfg`, and under the `modules` category, set `B:STARTUP_OPTIMIZATIONS` to `false`.  |
+| Game crashes on startup, loading screen was already present (or fixing issue 1 didn't help) | Apparatus        | Open `falsetweaks.cfg`, and under the `general` category, set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
 
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
