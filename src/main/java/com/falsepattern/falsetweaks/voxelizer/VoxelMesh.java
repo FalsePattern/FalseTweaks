@@ -84,64 +84,67 @@ public class VoxelMesh {
         compile();
         for (val face: faceCache) {
             float u1, v1, u2, v2;
+            float EPSILON_OUT;
             if (glint) {
                 u1 = xOffsets[face.minX];
                 v1 = yOffsets[face.minY];
                 u2 = xOffsets[face.maxX + 1];
                 v2 = yOffsets[face.maxY + 1];
+                EPSILON_OUT = 0.001f;
             } else {
                 u1 = face.u1;
                 v1 = face.v1;
                 u2 = face.u2;
                 v2 = face.v2;
+                EPSILON_OUT = 0;
             }
             switch (face.dir) {
                 case Front: {
                     tess.setNormal(0, 0, 1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1], u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1], u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1], u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1], u2, v2);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u2, v2);
                     break;
                 }
                 case Back: {
                     tess.setNormal(0, 0, -1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z], u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z], u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z], u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z], u2, v2);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT, u2, v2);
                     break;
                 }
                 case Left: {
                     tess.setNormal(1, 0, 0);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
                     break;
                 }
                 case Right: {
                     tess.setNormal(-1, 0, 0);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v2);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v2);
                     break;
                 }
                 case Up: {
                     tess.setNormal(0, 1, 0);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] - EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] - EPSILON, zOffsets[face.z] - EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] - EPSILON, zOffsets[face.z] - EPSILON, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] - EPSILON, zOffsets[face.z + 1] + EPSILON, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u2, v1);
                     break;
                 }
                 case Down: {
                     tess.setNormal(0, -1, 0);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u2, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
+                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
                     break;
                 }
             }
