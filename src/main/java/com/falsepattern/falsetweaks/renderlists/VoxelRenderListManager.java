@@ -48,8 +48,8 @@ public class VoxelRenderListManager implements IResourceManagerReloadListener {
     private final List<String> identityList = new ArrayList<>();
     private int list = 0;
 
-    public boolean pre(VoxelMesh mesh, boolean glint) {
-        val identity = mesh.getIdentity(glint);
+    public boolean pre(VoxelMesh mesh, int overlayLayer, boolean remapUV) {
+        val identity = mesh.getIdentity(overlayLayer, remapUV);
         if (theMap.containsKey(identity)) {
             val list = theMap.get(identity);
             identityList.add(identityList.remove(identityList.indexOf(identity)));

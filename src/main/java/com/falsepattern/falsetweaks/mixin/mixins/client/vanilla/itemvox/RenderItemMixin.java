@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla.itemvox;
 
 import com.falsepattern.falsetweaks.TriCompat;
+import com.falsepattern.falsetweaks.mixin.helper.VoxelRenderHelper;
 import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
@@ -49,17 +50,7 @@ public abstract class RenderItemMixin {
                      ordinal = 0),
             require = 1)
     private void voxelizedRender(EntityItem p_77020_1_, IIcon iicon, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
-        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, false)) {
-            return;
-        }
-        val tess = TriCompat.tessellator();
-        tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, false);
-        tess.draw();
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
-            VoxelRenderListManager.INSTANCE.post();
-        }
+        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, false);
     }
 
     @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
@@ -81,17 +72,7 @@ public abstract class RenderItemMixin {
                       ordinal = 2)},
             require = 1)
     private void voxelizedRenderGlint(EntityItem p_77020_1_, IIcon iicon, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
-        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, true)) {
-            return;
-        }
-        val tess = TriCompat.tessellator();
-        tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, true);
-        tess.draw();
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
-            VoxelRenderListManager.INSTANCE.post();
-        }
+        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, true);
     }
 
     @Redirect(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",

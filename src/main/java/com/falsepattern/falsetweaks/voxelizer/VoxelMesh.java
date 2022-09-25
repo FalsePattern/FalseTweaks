@@ -80,23 +80,21 @@ public class VoxelMesh {
         return mesh;
     }
 
-    public void renderToTessellator(Tessellator tess, boolean glint) {
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
         compile();
         for (val face: faceCache) {
             float u1, v1, u2, v2;
-            float EPSILON_OUT;
-            if (glint) {
+            float EPSILON_OUT = overlayLayer * EPSILON;
+            if (remapUV) {
                 u1 = xOffsets[face.minX];
                 v1 = yOffsets[face.minY];
                 u2 = xOffsets[face.maxX + 1];
                 v2 = yOffsets[face.maxY + 1];
-                EPSILON_OUT = 0.001f;
             } else {
                 u1 = face.u1;
                 v1 = face.v1;
                 u2 = face.u2;
                 v2 = face.v2;
-                EPSILON_OUT = 0;
             }
             switch (face.dir) {
                 case Front: {
@@ -152,20 +150,23 @@ public class VoxelMesh {
     }
 
     public void compile() {
-        String currentIdentity = getIdentity(false);
+        String currentIdentity = getIdentity(0, false);
         if (!Objects.equals(cacheIdentity, currentIdentity)) {
             faceCache = compiler.compile(strategy, cutout);
             cacheIdentity = currentIdentity;
         }
     }
 
-    public String getIdentity(boolean glint) {
+    public String getIdentity(int overlayLayer, boolean remapUV) {
         val result = new StringBuilder();
-        if (glint) {
-            result.append("glint\n");
+        if (remapUV) {
+            result.append("remap_uv!");
+        }
+        if (overlayLayer > 0) {
+            result.append("overlay").append(overlayLayer).append("!");
         }
         for (val layer: layers) {
-            result.append(layer.textureIdentity()).append("\f");
+            result.append(layer.textureIdentity()).append('&');
         }
         return result.toString();
     }

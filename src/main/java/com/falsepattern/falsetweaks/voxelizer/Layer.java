@@ -61,6 +61,6 @@ public class Layer {
     }
 
     public String textureIdentity() {
-        return texture.getIconName() + "\r" + texture.frameCounter;
+        return texture.getIconName() + '|' + texture.frameCounter;
     }
 }

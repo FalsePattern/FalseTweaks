@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla.itemvox;
 
 import com.falsepattern.falsetweaks.TriCompat;
+import com.falsepattern.falsetweaks.mixin.helper.VoxelRenderHelper;
 import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
@@ -58,20 +59,8 @@ public abstract class ItemRendererMixin {
     private void voxelizedRenderer(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type,
                                    CallbackInfo ci,
                                    TextureManager texturemanager, Item item, Block block, IItemRenderer customRenderer, IIcon iicon, Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5, float f6) {
-        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, false)) {
-            return;
-        }
-        val tess = TriCompat.tessellator();
-        tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, false);
-        tess.draw();
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
-            VoxelRenderListManager.INSTANCE.post();
-        }
+        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, false);
     }
-
-
 
     @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
               at = @At(value = "INVOKE",
@@ -104,17 +93,7 @@ public abstract class ItemRendererMixin {
     private void voxelizedRendererGlint(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type,
                                    CallbackInfo ci,
                                    TextureManager texturemanager, Item item, Block block, IItemRenderer customRenderer, IIcon iicon, Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5, float f6) {
-        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon, true);
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, true)) {
-            return;
-        }
-        val tess = TriCompat.tessellator();
-        tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, true);
-        tess.draw();
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
-            VoxelRenderListManager.INSTANCE.post();
-        }
+        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, true);
     }
 
     @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
