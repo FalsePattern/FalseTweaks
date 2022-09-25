@@ -27,9 +27,7 @@ import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.voxelizer.Layer;
 import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
 import com.falsepattern.falsetweaks.voxelizer.strategy.RowColumnMergingStrategy;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -38,14 +36,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 @Mixin(TextureAtlasSprite.class)
 public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixin {
-    @Shadow @Final private String iconName;
     private VoxelMesh voxelMesh;
 
     @Inject(method = "clearFramesTextureData",
             at = @At(value = "HEAD"),
             require = 1)
     private void compileStatic(CallbackInfo ci) {
-        System.out.println("Compiling " + this.iconName + " voxelmesh!");
         voxelMesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, true, new Layer((TextureAtlasSprite)(Object)this, 0.0625F));
         voxelMesh.compile();
     }
