@@ -56,8 +56,8 @@ public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
                      target = "Lshadersmod/client/ShadersTess;addVertex(Lnet/minecraft/client/renderer/Tessellator;DDD)V"),
             require = 1)
     private void shaderAddVertex(CallbackInfo ci) {
+        shaderOn(true);
         if (hackedQuadRendering()) {
-            shaderOn(true);
             trollOptifineAddVertex = true;
             if (quadTriangulationActive()) {
                 drawMode = GL11.GL_QUADS;

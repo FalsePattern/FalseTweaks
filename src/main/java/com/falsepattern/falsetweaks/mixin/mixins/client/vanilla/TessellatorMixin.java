@@ -180,14 +180,11 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         if (alternativeTriangulation) {
             //Target vertex layout: BCDA
             quadVerticesPutIntoBuffer++;
-            if (quadVerticesPutIntoBuffer == 1) {
+            if (quadVerticesPutIntoBuffer == 4) {
                 int vertexSize = shaderOn() ? 18 : 8;
-                rawBufferIndex -= vertexSize;
-                vertexCount--;
-                System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex + 3 * vertexSize, vertexSize);
-            } else if (quadVerticesPutIntoBuffer == 4) {
-                rawBufferIndex += shaderOn() ? 18 : 8;
-                vertexCount++;
+                System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize, 3 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - vertexSize, vertexSize);
                 quadVerticesPutIntoBuffer = 0;
                 alternativeTriangulation = false;
             }
