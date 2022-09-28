@@ -23,12 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.vanilla.itemvox;
 
-import com.falsepattern.falsetweaks.TriCompat;
 import com.falsepattern.falsetweaks.mixin.helper.VoxelRenderHelper;
-import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
-import com.falsepattern.falsetweaks.config.FTConfig;
-import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
-import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

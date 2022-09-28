@@ -23,11 +23,11 @@
 
 package com.falsepattern.falsetweaks.proxy;
 
-import com.falsepattern.falsetweaks.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.calibration.Calibration;
 import com.falsepattern.falsetweaks.leakfix.LeakFix;
+import com.falsepattern.falsetweaks.renderlists.ItemRenderListManager;
+import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -35,6 +35,7 @@ import net.minecraftforge.client.ClientCommandHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
+@SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
