@@ -1,4 +1,6 @@
 /*
+ * FalseTweaks
+ *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -30,7 +32,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -61,6 +65,7 @@ public abstract class StitcherMixin {
         batchingStitcher = new TurboStitcher(maxWidth, maxHeight, false);
         masterStitcher.addSprite(batchingStitcher);
     }
+
 
     @Redirect(method = "addSprite",
               at = @At(value = "INVOKE",

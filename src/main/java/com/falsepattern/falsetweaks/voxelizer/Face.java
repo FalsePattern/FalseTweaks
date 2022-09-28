@@ -1,5 +1,5 @@
 /*
- * Triangulator
+ * FalseTweaks
  *
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
