@@ -28,4 +28,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 public interface ITextureAtlasSpriteMixin {
     VoxelMesh getVoxelMesh();
     void setVoxelMesh(VoxelMesh mesh);
+
+    int getFrameCounter();
+    int[][] getFrameTextureDataSafe(int id);
 }

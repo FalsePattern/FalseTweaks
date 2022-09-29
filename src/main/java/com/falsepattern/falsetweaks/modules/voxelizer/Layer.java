@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
+import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
 
@@ -33,10 +34,14 @@ public class Layer {
     public final TextureAtlasSprite texture;
     public final float thickness;
 
+    private ITextureAtlasSpriteMixin tex() {
+        return (ITextureAtlasSpriteMixin) texture;
+    }
+
     public int fetchAlpha(int x, int y, int W, int H) {
         x = xToReal(x, W);
         y = yToReal(y, H);
-        int argb = texture.getFrameTextureData(texture.frameCounter)[0][y * texture.getIconWidth() + x];
+        int argb = tex().getFrameTextureDataSafe(tex().getFrameCounter())[0][y * texture.getIconWidth() + x];
         return (argb >>> 24) & 0xFF;
     }
 
@@ -61,6 +66,6 @@ public class Layer {
     }
 
     public String textureIdentity() {
-        return texture.getIconName() + '|' + texture.frameCounter;
+        return texture.getIconName() + '|' + tex().getFrameCounter();
     }
 }
