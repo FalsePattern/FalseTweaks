@@ -42,7 +42,7 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
             at = @At(value = "HEAD"),
             require = 1)
     private void compileStatic(CallbackInfo ci) {
-        voxelMesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, true, new Layer((TextureAtlasSprite)(Object)this, 0.0625F));
+        voxelMesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, false, new Layer((TextureAtlasSprite)(Object)this, 0.0625F));
         voxelMesh.compile();
     }
 
