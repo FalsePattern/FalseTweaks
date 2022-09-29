@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin;
+package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import java.util.function.Predicate;
 

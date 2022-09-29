@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin;
+package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.falsetweaks.mixin.plugin.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
 import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 
 @RequiredArgsConstructor

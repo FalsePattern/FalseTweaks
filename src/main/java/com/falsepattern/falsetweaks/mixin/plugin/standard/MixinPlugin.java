@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin;
+package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.mixin.IMixin;
@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MixinPlugin implements IMixinPlugin {
     @Getter
-    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME);
+    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME + " Standard");
 
     @Override
     public ITargetedMod[] getTargetedModEnumValues() {

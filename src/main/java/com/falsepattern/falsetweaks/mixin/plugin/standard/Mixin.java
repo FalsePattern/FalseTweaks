@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin;
+package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -111,20 +111,10 @@ public enum Mixin implements IMixin {
     //endregion FastCraft->client
     //endregion Texture Optimizations Module
 
-    //region Startup Optimizations Module
-    //region Minecraft->client
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModDiscovererMixin"),
-    //endregion Minecraft->client
-    //endregion Startup Optimizations Module
-
     //region Voxelizer Module
     VoxItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.ItemRendererMixin"),
     VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.RenderItemMixin"),
     VoxTextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.itemvox.TextureAtlasSpriteMixin"),
-
     //endregion Voxelizer Module
     ;
 
