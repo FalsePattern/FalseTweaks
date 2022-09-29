@@ -55,7 +55,7 @@ public class VoxelRenderHelper {
         }
     }
     public static void renderItemVoxelized(TextureAtlasSprite iicon, boolean glint) {
-        val mesh = VoxelMesh.getMesh(iicon, true);
+        val mesh = VoxelMesh.getMesh(iicon);
         val name = iicon.getIconName();
         int layer = 0;
         if (layers.containsKey(name)) {

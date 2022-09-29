@@ -53,7 +53,7 @@ public class VoxelCompiler {
         }
     }
 
-    public List<Face> compile(MergingStrategy strategy, boolean cutout) {
+    public List<Face> compile(MergingStrategy strategy) {
         val voxels = new VoxelGrid(xSize, ySize, zSize);
         for (int z = 0; z < zSize; z++)
             for (int y = 0; y < ySize; y++)
@@ -83,7 +83,7 @@ public class VoxelCompiler {
         for (int z = 0; z < zSize; z++) {
             faceBuilder.z(z);
             Layer layer = layers[z];
-            for (val type: VoxelType.renderable(cutout)) {
+            for (val type: VoxelType.renderable()) {
                 //Front and back faces (2D merge)
                 //Plus top and bottom faces inlined into the loop
                 {

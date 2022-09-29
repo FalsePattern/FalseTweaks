@@ -37,7 +37,6 @@ import java.util.Objects;
 public class VoxelMesh {
     public static final float EPSILON = 0.0001f;
     private final MergingStrategy strategy;
-    private final boolean cutout;
     private final Layer[] layers;
     private final float[] xOffsets;
     private final float[] yOffsets;
@@ -47,9 +46,8 @@ public class VoxelMesh {
     private List<Face> faceCache;
     private String cacheIdentity = null;
 
-    public VoxelMesh(MergingStrategy strategy, boolean cutout, Layer... layers) {
+    public VoxelMesh(MergingStrategy strategy, Layer... layers) {
         this.strategy = strategy;
-        this.cutout = cutout;
         this.layers = layers;
         this.compiler = new VoxelCompiler(layers);
         xOffsets = new float[compiler.xSize + 1];
@@ -70,11 +68,11 @@ public class VoxelMesh {
         }
     }
 
-    public static VoxelMesh getMesh(TextureAtlasSprite iicon, boolean cutout) {
+    public static VoxelMesh getMesh(TextureAtlasSprite iicon) {
         val texture = (ITextureAtlasSpriteMixin) iicon;
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
-            mesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, cutout, new Layer(iicon, 0.0625F));
+            mesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, new Layer(iicon, 0.0625F));
             texture.setVoxelMesh(mesh);
         }
         return mesh;
@@ -152,7 +150,7 @@ public class VoxelMesh {
     public void compile() {
         String currentIdentity = getIdentity(0, false);
         if (!Objects.equals(cacheIdentity, currentIdentity)) {
-            faceCache = compiler.compile(strategy, cutout);
+            faceCache = compiler.compile(strategy);
             cacheIdentity = currentIdentity;
         }
     }
