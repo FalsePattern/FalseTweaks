@@ -24,6 +24,7 @@
 package com.falsepattern.triangulator.api;
 
 import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.lib.StableAPI;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -34,5 +35,62 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @Deprecated
 @DeprecationDetails(deprecatedSince = "2.0.0")
-public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.ToggleableTessellator {
+public interface ToggleableTessellator extends com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator {
+    /**
+     * Temporarily disables triangulation mode <em>when already rendering</em>. This is useful for rendering triangle-based meshes
+     * into the chunk, which is quad based.
+     */
+    @StableAPI.Expose
+    void suspendQuadTriangulation();
+
+    /**
+     * Disables the effect of {@link #suspendQuadTriangulation()}.
+     */
+    @StableAPI.Expose
+    void resumeQuadTriangulation();
+
+    @StableAPI.Expose
+    boolean isQuadTriangulationSuspended();
+
+    /**
+     * Completely disables triangulation and falls back to quad rendering.
+     * Should not be called after mod loading has finished.
+     */
+    @StableAPI.Expose
+    void disableTriangulator();
+
+    /**
+     * Disables the effect of {@link #disableTriangulator()}. If it was called multiple times, this method also needs to
+     * be called at least the same amount of times to re-enable it.
+     * Should not be called after mod loading has finished.
+     */
+    @StableAPI.Expose
+    void enableTriangulator();
+
+    /**
+     * Same as {@link #disableTriangulator()}, but only applies to the current tessellator object.
+     */
+    @StableAPI.Expose
+    void disableTriangulatorLocal();
+
+    /**
+     * Same as {@link #enableTriangulator()} ()}, but only applies to the current tessellator object.
+     */
+    @StableAPI.Expose
+    void enableTriangulatorLocal();
+
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    @StableAPI.Expose
+    void pass(int pass);
+
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    @StableAPI.Expose
+    int pass();
+
+    @StableAPI.Expose
+    boolean isTriangulatorDisabled();
 }

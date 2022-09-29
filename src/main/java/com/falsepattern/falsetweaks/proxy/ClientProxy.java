@@ -23,11 +23,13 @@
 
 package com.falsepattern.falsetweaks.proxy;
 
-import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.calibration.Calibration;
-import com.falsepattern.falsetweaks.leakfix.LeakFix;
-import com.falsepattern.falsetweaks.renderlists.ItemRenderListManager;
-import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
+import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
+import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -40,19 +42,29 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
-        LeakFix.registerBus();
-        Calibration.registerBus();
+        if (LeakFix.ENABLED)
+            LeakFix.registerBus();
+        Share.LEAKFIX_CLASS_INITIALIZED = true;
+        if (ModuleConfig.TRIANGULATOR)
+            Calibration.registerBus();
     }
 
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
-        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
-                ItemRenderListManager.INSTANCE);
-        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
-                VoxelRenderListManager.INSTANCE);
-        LeakFix.gc();
-        ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
-        TriCompat.applyCompatibilityTweaks();
+        if (ModuleConfig.ITEM_RENDER_LISTS) {
+            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
+                    ItemRenderListManager.INSTANCE);
+            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
+                    VoxelRenderListManager.INSTANCE);
+        }
+        if (LeakFix.ENABLED) {
+            LeakFix.gc();
+        }
+        
+        if (ModuleConfig.TRIANGULATOR) {
+            ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
+            TriCompat.applyCompatibilityTweaks();
+        }
     }
 }

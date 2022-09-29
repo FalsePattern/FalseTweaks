@@ -23,8 +23,9 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
-import com.falsepattern.falsetweaks.config.FTConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
@@ -33,89 +34,131 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
-    //region Always Loaded
-    //region Minecraft->client
-    ItemRendererMixin(Side.CLIENT, always(), "vanilla.ItemRendererMixin"),
-    QuadComparatorMixin(Side.CLIENT, always(), "vanilla.QuadComparatorMixin"),
-    TileEntityBeaconRendererMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconRendererMixin"),
-    TileEntityBeaconMixin(Side.CLIENT, always(), "vanilla.TileEntityBeaconMixin"),
-    RenderBlocksMixin(Side.CLIENT, always(), "vanilla.RenderBlocksUltraMixin"),
-    RenderBlocksCompatMixin(Side.CLIENT, condition(() -> FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksCompatMixin"),
-    RenderBlocksPerformanceMixin(Side.CLIENT, condition(() -> !FTConfig.RENDER_HOOK_COMPAT_MODE), "vanilla.RenderBlocksPerformanceMixin"),
-    RenderGlobalMixin(Side.CLIENT, always(), "vanilla.RenderGlobalMixin"),
-    TessellatorMixin(Side.CLIENT, always(), "vanilla.TessellatorMixin"),
-    WorldRendererMixin(Side.CLIENT, always(), "vanilla.WorldRendererMixin"),
+    //region Triangulator Module
+    Tri_QuadComparatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.QuadComparatorMixin"),
+    Tri_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.RenderBlocksUltraMixin"),
+    Tri_RenderBlocksCompatMixin(Side.CLIENT,
+                                condition(() -> ModuleConfig.TRIANGULATOR)
+                                        .and(condition(() -> TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)),
+                                "triangulator.RenderBlocksCompatMixin"),
+    Tri_RenderBlocksPerformanceMixin(Side.CLIENT,
+                                     condition(() -> ModuleConfig.TRIANGULATOR)
+                                             .and(condition(() -> !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)),
+                                     "triangulator.RenderBlocksPerformanceMixin"),
+    Tri_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.TessellatorMixin"),
+    Tri_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.WorldRendererMixin"),
 
-    //leak fix
-    LeakFixRenderGlobalMixin(Side.CLIENT, always(), "vanilla.leakfix.RenderGlobalMixin"),
-    LeakFixWorldRendererMixin(Side.CLIENT, always(), "vanilla.leakfix.WorldRendererMixin"),
-    //endregion Minecraft->client
-    //region FoamFix->client
-    FFTessellatorVanillaMixin(Side.CLIENT, avoid(TargetedMod.FOAMFIX), "foamfix.TessellatorVanillaMixin"),
-    FFTessellatorFoamFixMixin(Side.CLIENT, require(TargetedMod.FOAMFIX), "foamfix.TessellatorFoamFixMixin"),
-    //endregion FoamFix->client
-    //region OptiFine->client
-    OFTessellatorVanillaMixin(Side.CLIENT,
-                              avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
-                              "optifine.TessellatorVanillaMixin"),
-    OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE_WITH_SHADERS),
-                                           "optifine.TessellatorVanillaOrOldOptifineMixin"),
-    OFTessellatorOptiFineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITH_SHADERS),
-                               "optifine.TessellatorOptiFineMixin"),
+    //FoamFix
+    Tri_FFTessellatorVanillaMixin(Side.CLIENT,
+                                  condition(() -> ModuleConfig.TRIANGULATOR)
+                                          .and(avoid(TargetedMod.FOAMFIX)),
+                                  "triangulator.foamfix.TessellatorVanillaMixin"),
+    Tri_FFTessellatorFoamFixMixin(Side.CLIENT,
+                                  condition(() -> ModuleConfig.TRIANGULATOR)
+                                          .and(require(TargetedMod.FOAMFIX)),
+                                  "triangulator.foamfix.TessellatorFoamFixMixin"),
 
-    //leak fix
-    OFGameSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.GameSettingsOptifineMixin"),
-    OFGuiVideoSettingsOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.GuiVideoSettingsOptifineMixin"),
-    OFRenderGlobalOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.RenderGlobalOptiFineMixin"),
-    OFWorldRendererVanillaMixin(Side.CLIENT, avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS).and(
-            avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.WorldRendererVanillaMixin"),
-    OFWorldRendererOptifineMixin(Side.CLIENT, require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(
-            require(TargetedMod.OPTIFINE_WITH_SHADERS)), "optifine.leakfix.WorldRendererOptifineMixin"),
-    //endregion OptiFine->client
-    //region FastCraft->client
-    //leak fix
-    FCGLAllocatorMixin(Side.CLIENT, require(TargetedMod.FASTCRAFT), "fastcraft.leakfix.GLAllocationMixin"),
-    //endregion FastCraft->client
-    //region ChromatiCraft->client
-    CCRuneRendererMixin(Side.CLIENT, require(TargetedMod.CHROMATICRAFT), "chromaticraft.RuneRendererMixin"),
-    //endregion ChromatiCraft->client
-    //region RedstonePaste->client
-    RedstonePasteHighlighterMixin(Side.CLIENT, require(TargetedMod.REDSTONEPASTE),
-                                  "redstonepaste.RedstonePasteHighlighterMixin"),
-    //endregion RedstonePaste->client
+    //OptiFine
+    Tri_OFTessellatorVanillaMixin(Side.CLIENT,
+                                  condition(() -> ModuleConfig.TRIANGULATOR)
+                                          .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS))
+                                          .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), 
+                                  "triangulator.optifine.TessellatorVanillaMixin"),
+    Tri_OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT,
+                                               condition(() -> ModuleConfig.TRIANGULATOR)
+                                                       .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                           "triangulator.optifine.TessellatorVanillaOrOldOptifineMixin"),
+    Tri_OFTessellatorOptiFineMixin(Side.CLIENT,
+                                   condition(() -> ModuleConfig.TRIANGULATOR)
+                                           .and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), 
+                                   "triangulator.optifine.TessellatorOptiFineMixin"),
+    
+    //ChromatiCraft
+    Tri_CCRuneRendererMixin(Side.CLIENT,
+                            condition(() -> ModuleConfig.TRIANGULATOR)
+                                    .and(require(TargetedMod.CHROMATICRAFT)),
+                            "triangulator.chromaticraft.RuneRendererMixin"),
+    
+    //RedstonePaste
+    Tri_RedstonePasteHighlighterMixin(Side.CLIENT,
+                                      condition(() -> ModuleConfig.TRIANGULATOR)
+                                              .and(require(TargetedMod.REDSTONEPASTE)), 
+                                      "triangulator.redstonepaste.RedstonePasteHighlighterMixin"),
 
-    //endregion Always Loaded
+    //endregion Triangulator Module
+
+    //region Memory Leak Fix Module
+    LeakFix_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable), "leakfix.RenderGlobalMixin"),
+    LeakFix_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable), "leakfix.WorldRendererMixin"),
+
+    //FastCraft
+    LeakFix_FCGLAllocationMixin(Side.CLIENT,
+                                condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                        .and(require(TargetedMod.FASTCRAFT)),
+                                "leakfix.fastcraft.GLAllocationMixin"),
+
+    //OptiFine
+    LeakFix_OFGameSettingsOptifineMixin(Side.CLIENT,
+                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                                .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
+                                                             .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
+                                        "leakfix.optifine.GameSettingsOptifineMixin"),
+    LeakFix_OFGuiVideoSettingsOptifineMixin(Side.CLIENT,
+                                            condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                                    .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
+                                                                 .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
+                                            "leakfix.optifine.GuiVideoSettingsOptifineMixin"),
+    LeakFix_OFRenderGlobalOptifineMixin(Side.CLIENT,
+                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                                .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
+                                                             .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
+                                        "leakfix.optifine.RenderGlobalOptiFineMixin"),
+    LeakFix_OFWorldRendererVanillaMixin(Side.CLIENT,
+                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                                .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
+                                                             .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS))), 
+                                        "leakfix.optifine.WorldRendererVanillaMixin"),
+    LeakFix_OFWorldRendererOptifineMixin(Side.CLIENT,
+                                         condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+                                                 .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
+                                                              .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
+                                         "leakfix.optifine.WorldRendererOptifineMixin"),
+    //endregion Memory Leak Fix Module
 
     //region Texture Optimizations Module
-    //region Minecraft->client
-    TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.TextureMapMixin"),
-    TextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.TextureUtilMixin"),
-    StitcherMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.StitcherMixin"),
-    StitcherSlotMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.minecraft.StitcherSlotMixin"),
-    //endregion Minecraft->client
-    //region FastCraft->client
-    FCAbstractTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.AbstractTextureMixin"),
-    FCDynamicTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.DynamicTextureMixin"),
-    FCTextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureMapMixin"),
-    FCTextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureUtilMixin"),
-    //endregion FastCraft->client
+    AnimFix_TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.TextureMapMixin"),
+    AnimFix_TextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.TextureUtilMixin"),
+    AnimFix_StitcherMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.StitcherMixin"),
+    AnimFix_StitcherSlotMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.StitcherSlotMixin"),
+
+    //FastCraft
+    AnimFix_FCAbstractTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.AbstractTextureMixin"),
+    AnimFix_FCDynamicTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.DynamicTextureMixin"),
+    AnimFix_FCTextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureMapMixin"),
+    AnimFix_FCTextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureUtilMixin"),
+
     //endregion Texture Optimizations Module
 
-    //region Voxelizer Module
-    VoxItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.ItemRendererMixin"),
-    VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "vanilla.itemvox.RenderItemMixin"),
-    VoxTextureAtlasSpriteMixin(Side.CLIENT, always(), "vanilla.itemvox.TextureAtlasSpriteMixin"),
-    //endregion Voxelizer Module
+    //region Item Voxelizer Module
+    ItemVox_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.ItemRendererMixin"),
+    ItemVox_VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.RenderItemMixin"),
+    ItemVox_VoxTextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.TextureAtlasSpriteMixin"),
+    //endregion Item Voxelizer Module
+
+    //region Misc Modules
+    ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),
+
+    BeaconFix_TileEntityBeaconRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconRendererMixin"),
+    BeaconFix_TileEntityBeaconMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconMixin"),
+
+    TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
+    //endregion Misc Modules
     ;
 
     @Getter

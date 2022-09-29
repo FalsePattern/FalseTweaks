@@ -24,11 +24,11 @@
 package com.falsepattern.falsetweaks.mixin.helper;
 
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.falsetweaks.TriCompat;
-import com.falsepattern.falsetweaks.config.FTConfig;
-import com.falsepattern.falsetweaks.config.OverlayConfig;
-import com.falsepattern.falsetweaks.renderlists.VoxelRenderListManager;
-import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
+import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.VoxelizerConfig;
+import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
@@ -38,10 +38,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
     static {
-        if (OverlayConfig.forcedLayers == null) {
+        if (VoxelizerConfig.forcedLayers == null) {
             Share.log.error("Overlay config broken.");
         }
-        for (val entry: OverlayConfig.forcedLayers) {
+        for (val entry: VoxelizerConfig.forcedLayers) {
             val parts = entry.split("=");
             if (parts.length != 2) {
                 Share.log.error("Invalid forced layer " + entry + " in overlay config! Format should be: texturename=number");
@@ -66,14 +66,14 @@ public class VoxelRenderHelper {
         if (glint) {
             layer++;
         }
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, glint)) {
+        if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, glint)) {
             return;
         }
         val tess = TriCompat.tessellator();
         tess.startDrawingQuads();
         mesh.renderToTessellator(tess, layer, glint);
         tess.draw();
-        if (FTConfig.ENABLE_ITEM_RENDERLISTS) {
+        if (ModuleConfig.ITEM_RENDER_LISTS) {
             VoxelRenderListManager.INSTANCE.post();
         }
     }

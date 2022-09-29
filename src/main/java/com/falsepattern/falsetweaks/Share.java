@@ -28,4 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 public class Share {
     public static final Logger log = LogManager.getLogger(Tags.MODNAME);
+
+    public static boolean LEAKFIX_CLASS_INITIALIZED = false;
 }

@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.helper;
 
-import com.falsepattern.falsetweaks.voxelizer.VoxelMesh;
+import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 
 public interface ITextureAtlasSpriteMixin {
     VoxelMesh getVoxelMesh();

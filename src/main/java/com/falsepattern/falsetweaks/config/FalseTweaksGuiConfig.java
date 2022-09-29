@@ -24,13 +24,30 @@
 package com.falsepattern.falsetweaks.config;
 
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
+import lombok.val;
 
 import net.minecraft.client.gui.GuiScreen;
 
+import java.util.ArrayList;
+
 public class FalseTweaksGuiConfig extends SimpleGuiConfig {
     public FalseTweaksGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, FTConfig.class, Tags.MODID, Tags.MODNAME);
+        super(parent, Tags.MODID, Tags.MODNAME, fetchConfigClasses());
+    }
+
+    private static Class<?>[] fetchConfigClasses() {
+        val result = new ArrayList<Class<?>>();
+        if (ModuleConfig.TRIANGULATOR)
+            result.add(TriangulatorConfig.class);
+        if (ModuleConfig.ITEM_RENDER_LISTS)
+            result.add(RenderListConfig.class);
+        if (ModuleConfig.ITEM_VOXELIZER)
+            result.add(VoxelizerConfig.class);
+        if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+            result.add(LeakFixConfig.class);
+        return result.toArray(new Class<?>[0]);
     }
 }

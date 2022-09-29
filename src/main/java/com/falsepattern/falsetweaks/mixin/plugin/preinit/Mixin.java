@@ -38,10 +38,10 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 public enum Mixin implements IMixin {
     //region Startup Optimizations Module
     //region Minecraft->client
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "regex.ModDiscovererMixin"),
+    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.DirectoryDiscovererMixin"),
+    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.JarDiscovererMixin"),
+    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModContainerFactoryMixin"),
+    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModDiscovererMixin"),
     //endregion Minecraft->client
     //endregion Startup Optimizations Module
     ;
