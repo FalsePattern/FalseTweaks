@@ -23,8 +23,14 @@
 
 package com.falsepattern.falsetweaks.modules.leakfix;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "__INTERNAL__")
 public enum LeakFixState {
+    @StableAPI.Expose
     Disable,
+    @StableAPI.Expose
     Auto,
+    @StableAPI.Expose
     Enable
 }
