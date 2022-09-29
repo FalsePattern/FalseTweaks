@@ -28,11 +28,16 @@ import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
+import com.falsepattern.lib.util.MathUtil;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
+import org.joml.Matrix4f;
 
+import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.IIcon;
 
 public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
@@ -75,5 +80,58 @@ public class VoxelRenderHelper {
         if (ModuleConfig.ITEM_RENDER_LISTS) {
             VoxelRenderListManager.INSTANCE.post();
         }
+    }
+
+    public static void renderRail(RenderBlocks renderBlocks, BlockRailBase rail, int x, int y, int z) {
+        val tess = Compat.tessellator();
+        int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+        IIcon iicon = renderBlocks.getBlockIconFromSideAndMetadata(rail, 0, meta);
+        if (renderBlocks.hasOverrideBlockTexture())
+        {
+            iicon = renderBlocks.overrideBlockTexture;
+        }
+        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
+
+        if (rail.isPowered())
+        {
+            meta &= 0x7;
+        }
+
+        tess.setBrightness(rail.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y, z));
+        tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);
+        val transform = new Matrix4f();
+        transform.translation(x, y, z);
+        transform.translate(0.5f, 0, 0.5f);
+        switch (meta) {
+            case 1:
+            case 2:
+            case 7:
+                transform.rotate((float) Math.toRadians(90), 0, 1, 0);
+                break;
+            case 4:
+            case 6:
+                transform.rotate((float) Math.toRadians(180), 0, 1, 0);
+                break;
+            case 3:
+            case 9:
+                transform.rotateY((float) Math.toRadians(-90));
+                break;
+        }
+        transform.translate(-0.5f, 0, -0.5f);
+        switch (meta) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                transform.translate(0, 0.0625F, 0)
+                         .rotate((float)Math.toRadians(45), 1, 0, 0)
+                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                         .translate(0, 0, 0.0625F);
+                break;
+            default:
+                transform.rotate((float) Math.toRadians(90), 1, 0, 0);
+                break;
+        }
+        mesh.renderToTessellator(tess, 0, false, true, transform);
     }
 }

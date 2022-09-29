@@ -32,7 +32,6 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
-import com.falsepattern.lib.util.MathUtil;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -45,16 +44,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGrass;
-import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
@@ -166,12 +161,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     @Shadow
     public abstract void renderFaceXPos(Block p_147764_1_, double p_147764_2_, double p_147764_4_, double p_147764_6_, IIcon p_147764_8_);
-
-    @Shadow
-    public abstract IIcon getBlockIconFromSideAndMetadata(Block p_147787_1_, int p_147787_2_, int p_147787_3_);
-
-    @Shadow
-    public IIcon overrideBlockTexture;
 
     private void addLight(int light) {
         int S = light & 0xff;
@@ -736,219 +725,5 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         renderMaxX = bounds[3];
         renderMaxY = bounds[4];
         renderMaxZ = bounds[5];
-    }
-
-    @Inject(method = "renderBlockMinecartTrack",
-            at = @At(value = "HEAD"),
-            cancellable = true,
-            require = 1)
-    private void renderRailCustom(BlockRailBase rail, int x, int y, int z, CallbackInfoReturnable<Boolean> cir) {
-        if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
-            return;
-        }
-        Tessellator tess = Compat.tessellator();
-        int l = this.blockAccess.getBlockMetadata(x, y, z);
-        IIcon iicon = this.getBlockIconFromSideAndMetadata(rail, 0, l);
-
-        if (this.hasOverrideBlockTexture())
-        {
-            iicon = this.overrideBlockTexture;
-        }
-
-        if (rail.isPowered())
-        {
-            l &= 7;
-        }
-
-        tess.setBrightness(rail.getMixedBrightnessForBlock(this.blockAccess, x, y, z));
-        tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);
-        double u1 = iicon.getMinU();
-        double v1 = iicon.getMinV();
-        double u2 = iicon.getMaxU();
-        double v2 = iicon.getMaxV();
-        double offsetFromGround = 0.0625D;
-        double offsetFromGroundRoot2 = offsetFromGround / MathUtil.SQRT_2;
-        double pnYmin = y;
-        double ppYmin = y;
-        double npYmin = y;
-        double nnYmin = y;
-        double pnYmax = (double)y + offsetFromGround;
-        double ppYmax = (double)y + offsetFromGround;
-        double npYmax = (double)y + offsetFromGround;
-        double nnYmax = (double)y + offsetFromGround;
-        double nnU = u1;
-        double npU = u1;
-        double pnU = u2;
-        double ppU = u2;
-        double nnV = v1;
-        double npV = v2;
-        double pnV = v1;
-        double ppV = v2;
-
-        switch (l) {
-            case 8:
-                pnU = ppU = u1;
-                npU = nnU = u2;
-                pnV = nnV = v2;
-                ppV = npV = v1;
-                break;
-            case 9:
-                pnU = nnU = u2;
-                ppU = npU = u1;
-                pnV = ppV = v2;
-                npV = nnV = v1;
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 7:
-                pnU = nnU = u1;
-                ppU = npU = u2;
-                pnV = ppV = v1;
-                npV = nnV = v2;
-                break;
-        }
-
-        double bottomShiftX = 0;
-        double bottomShiftZ = 0;
-
-        boolean correct = true;
-        switch (l) {
-            case 2:
-                ++pnYmax;
-                ++pnYmin;
-                ++ppYmax;
-                ++ppYmin;
-                bottomShiftX = offsetFromGroundRoot2;
-                break;
-            case 3:
-                ++nnYmax;
-                ++nnYmin;
-                ++npYmax;
-                ++npYmin;
-                bottomShiftX = -offsetFromGroundRoot2;
-                break;
-            case 4:
-                ++pnYmax;
-                ++pnYmin;
-                ++nnYmax;
-                ++nnYmin;
-                bottomShiftZ = -offsetFromGroundRoot2;
-                break;
-            case 5:
-                ++ppYmax;
-                ++ppYmin;
-                ++npYmax;
-                ++npYmin;
-                bottomShiftZ = offsetFromGroundRoot2;
-                break;
-            default:
-                correct = false;
-                break;
-        }
-        if (correct) {
-            nnYmin += offsetFromGround - offsetFromGroundRoot2;
-            npYmin += offsetFromGround - offsetFromGroundRoot2;
-            pnYmin += offsetFromGround - offsetFromGroundRoot2;
-            ppYmin += offsetFromGround - offsetFromGroundRoot2;
-        }
-
-        //Bottom face
-        tess.setColorOpaque_F(0.5f, 0.5f, 0.5f);
-        tess.addVertexWithUV(x + 1 + bottomShiftX, pnYmin, z + bottomShiftZ, pnU, pnV);
-        tess.addVertexWithUV(x + 1 + bottomShiftX, ppYmin, z + 1 + bottomShiftZ, ppU, ppV);
-        tess.addVertexWithUV(x + bottomShiftX, npYmin, z + 1 + bottomShiftZ, npU, npV);
-        tess.addVertexWithUV(x + bottomShiftX, nnYmin, z + bottomShiftZ, nnU, nnV);
-
-        //Top face
-        tess.setColorOpaque_F(1, 1, 1);
-        tess.addVertexWithUV(x, nnYmax, z, nnU, nnV);
-        tess.addVertexWithUV(x, npYmax, z + 1, npU, npV);
-        tess.addVertexWithUV(x + 1, ppYmax, z + 1, ppU, ppV);
-        tess.addVertexWithUV(x + 1, pnYmax, z, pnU, pnV);
-
-        int width = iicon.getIconWidth();
-        int height = iicon.getIconHeight();
-        double wOffset = 0.5f / width;
-        double hOffset = 0.5f / height;
-
-        int k;
-        tess.setColorOpaque_F(0.6f, 0.6f, 0.6f);
-        for (k = 0; k < width; ++k) {
-            double lerp = ((float) k / (float) width);
-            double xOffset = MathUtil.clampedLerp(x, x + 1, lerp);
-            double zNyMin = MathUtil.clampedLerp(nnYmin, pnYmin, lerp);
-            double zNyMax = MathUtil.clampedLerp(nnYmax, pnYmax, lerp);
-            double zPyMin = MathUtil.clampedLerp(npYmin, ppYmin, lerp);
-            double zPyMax = MathUtil.clampedLerp(npYmax, ppYmax, lerp);
-            double zNu = MathUtil.clampedLerp(nnU, pnU, lerp + wOffset);
-            double zPu = MathUtil.clampedLerp(npU, ppU, lerp + wOffset);
-            double zNv = MathUtil.clampedLerp(nnV, pnV, lerp + wOffset);
-            double zPv = MathUtil.clampedLerp(npV, ppV, lerp + wOffset);
-
-            tess.addVertexWithUV(xOffset + bottomShiftX, zNyMin, z + bottomShiftZ, zNu, zNv);
-            tess.addVertexWithUV(xOffset + bottomShiftX, zPyMin, z + 1 + bottomShiftZ, zPu, zPv);
-            tess.addVertexWithUV(xOffset, zPyMax, z + 1, zPu, zPv);
-            tess.addVertexWithUV(xOffset, zNyMax, z, zNu, zNv);
-        }
-
-        tess.setColorOpaque_F(0.8f, 0.8f, 0.8f);
-        for (k = 0; k < height; ++k) {
-            double lerp = ((float) k / (float) height);
-            double zOffset = MathUtil.clampedLerp(z, z + 1, lerp);
-            double xNyMin = MathUtil.clampedLerp(nnYmin, npYmin, lerp);
-            double xNyMax = MathUtil.clampedLerp(nnYmax, npYmax, lerp);
-            double xPyMin = MathUtil.clampedLerp(pnYmin, ppYmin, lerp);
-            double xPyMax = MathUtil.clampedLerp(pnYmax, ppYmax, lerp);
-            double xNu = MathUtil.clampedLerp(nnU, npU, lerp + hOffset);
-            double xPu = MathUtil.clampedLerp(pnU, ppU, lerp + hOffset);
-            double xNv = MathUtil.clampedLerp(nnV, npV, lerp + hOffset);
-            double xPv = MathUtil.clampedLerp(pnV, ppV, lerp + hOffset);
-
-            tess.addVertexWithUV(x, xNyMax, zOffset, xNu, xNv);
-            tess.addVertexWithUV(x + 1, xPyMax, zOffset, xPu, xPv);
-            tess.addVertexWithUV(x + 1 + bottomShiftX, xPyMin, zOffset + bottomShiftZ, xPu, xPv);
-            tess.addVertexWithUV(x + bottomShiftX, xNyMin, zOffset + bottomShiftZ, xNu, xNv);
-        }
-
-        tess.setColorOpaque_F(0.6f, 0.6f, 0.6f);
-        for (k = 0; k < width; ++k) {
-            double lerp = ((float) k / (float) width) + 1f / height;
-            double xOffset = MathUtil.clampedLerp(x, x + 1, lerp);
-            double zNyMin = MathUtil.clampedLerp(nnYmin, pnYmin, lerp);
-            double zNyMax = MathUtil.clampedLerp(nnYmax, pnYmax, lerp);
-            double zPyMin = MathUtil.clampedLerp(npYmin, ppYmin, lerp);
-            double zPyMax = MathUtil.clampedLerp(npYmax, ppYmax, lerp);
-            double zNu = MathUtil.clampedLerp(nnU, pnU, lerp - wOffset);
-            double zPu = MathUtil.clampedLerp(npU, ppU, lerp - wOffset);
-            double zNv = MathUtil.clampedLerp(nnV, pnV, lerp - wOffset);
-            double zPv = MathUtil.clampedLerp(npV, ppV, lerp - wOffset);
-
-            tess.addVertexWithUV(xOffset, zNyMax, z, zNu, zNv);
-            tess.addVertexWithUV(xOffset, zPyMax, z + 1, zPu, zPv);
-            tess.addVertexWithUV(xOffset + bottomShiftX, zPyMin, z + 1 + bottomShiftZ, zPu, zPv);
-            tess.addVertexWithUV(xOffset + bottomShiftX, zNyMin, z + bottomShiftZ, zNu, zNv);
-        }
-
-        tess.setColorOpaque_F(0.8f, 0.8f, 0.8f);
-        for (k = 0; k < height; ++k) {
-            double lerp = ((float) k / (float) height) + 1f / height;
-            double zOffset = MathUtil.clampedLerp(z, z + 1, lerp);
-            double xNyMin = MathUtil.clampedLerp(nnYmin, npYmin, lerp);
-            double xNyMax = MathUtil.clampedLerp(nnYmax, npYmax, lerp);
-            double xPyMin = MathUtil.clampedLerp(pnYmin, ppYmin, lerp);
-            double xPyMax = MathUtil.clampedLerp(pnYmax, ppYmax, lerp);
-            double xNu = MathUtil.clampedLerp(nnU, npU, lerp - hOffset);
-            double xPu = MathUtil.clampedLerp(pnU, ppU, lerp - hOffset);
-            double xNv = MathUtil.clampedLerp(nnV, npV, lerp - hOffset);
-            double xPv = MathUtil.clampedLerp(pnV, ppV, lerp - hOffset);
-
-            tess.addVertexWithUV(x + bottomShiftX, xNyMin, zOffset + bottomShiftZ, xNu, xNv);
-            tess.addVertexWithUV(x + 1 + bottomShiftX, xPyMin, zOffset + bottomShiftZ, xPu, xPv);
-            tess.addVertexWithUV(x + 1, xPyMax, zOffset, xPu, xPv);
-            tess.addVertexWithUV(x, xNyMax, zOffset, xNu, xNv);
-        }
-
-        cir.setReturnValue(true);
     }
 }

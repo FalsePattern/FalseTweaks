@@ -46,7 +46,14 @@ public class VoxelizerConfig {
                     "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.\n" +
                     "FPS impact: Depends on setup.")
     @Config.DefaultEnum("Regular_2")
+    @Config.LangKey("config.falsetweaks.voxelizer.mesh_optimization_strategy")
     public static StrategyPreset MESH_OPTIMIZATION_STRATEGY_PRESET;
+
+    @Config.Comment("Makes rails 3-dimensional. Doesn't require game restart.\n" +
+                    "FPS impact: basically none")
+    @Config.LangKey("config.falsetweaks.voxelizer.3d_rails")
+    @Config.DefaultBoolean(true)
+    public static boolean RAILS_3D;
 
     static {
         ConfigurationManager.selfInit();

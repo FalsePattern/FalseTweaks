@@ -26,7 +26,11 @@ package com.falsepattern.falsetweaks.modules.voxelizer;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
+import com.falsepattern.lib.util.MathUtil;
 import lombok.val;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -36,6 +40,8 @@ import java.util.Objects;
 
 public class VoxelMesh {
     public static final float EPSILON = 0.0001f;
+    private static final Matrix4fc IDENTITY = new Matrix4f();
+    private static final ThreadLocal<Vector3f> workingVector = ThreadLocal.withInitial(Vector3f::new);
     private final MergingStrategy strategy;
     private final Layer[] layers;
     private final float[] xOffsets;
@@ -79,7 +85,41 @@ public class VoxelMesh {
     }
 
     public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
+        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY);
+    }
+
+    private static void setNormal(Tessellator tess, Vector3f normal) {
+        tess.setNormal(normal.x, normal.y, normal.z);
+    }
+
+    private static void setWorldSpaceLight(Tessellator tess, Vector3f normal) {
+        float up = MathUtil.clamp(normal.dot(0, 1, 0), 0, 1);
+        float down = MathUtil.clamp(normal.dot(0, -1, 0), 0, 1);
+        float northsouth = MathUtil.clamp(MathUtil.abs(normal.dot(0, 0, 1)), 0, 1);
+        float eastwest = MathUtil.clamp(MathUtil.abs(normal.dot(1, 0, 0)), 0, 1);
+        float light = Math.max(Math.max(up, 0.5f * down), Math.max(0.8f * northsouth, 0.6f * eastwest));
+        tess.setColorOpaque_F(light, light, light);
+    }
+
+    private static void setupLighting(Tessellator tess, Vector3f normal, boolean chunkSpace, Matrix4fc transform) {
+        transform.transformDirection(normal);
+        if (chunkSpace) {
+            setWorldSpaceLight(tess, normal);
+        } else {
+            setNormal(tess, normal);
+        }
+    }
+
+
+    private static void addVertexWithUVWithTransform(Tessellator tess, Vector3f pos, float u, float v, Matrix4fc transform) {
+        transform.transformPosition(pos);
+        tess.addVertexWithUV(pos.x, pos.y, pos.z, u, v);
+    }
+
+
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform) {
         compile();
+        val vec = workingVector.get();
         for (val face: faceCache) {
             float u1, v1, u2, v2;
             float EPSILON_OUT = overlayLayer * EPSILON;
@@ -96,51 +136,51 @@ public class VoxelMesh {
             }
             switch (face.dir) {
                 case Front: {
-                    tess.setNormal(0, 0, 1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT, u2, v2);
+                    setupLighting(tess, vec.set(0, 0, 1), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z + 1] + EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT), u2, v2, transform);
                     break;
                 }
                 case Back: {
-                    tess.setNormal(0, 0, -1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT, u2, v2);
+                    setupLighting(tess, vec.set(0, 0, -1), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON, yOffsets[face.minY] + EPSILON, zOffsets[face.z] - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z] - EPSILON_OUT), u2, v2, transform);
                     break;
                 }
                 case Left: {
-                    tess.setNormal(1, 0, 0);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
+                    setupLighting(tess, vec.set(1, 0, 0), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
                     break;
                 }
                 case Right: {
-                    tess.setNormal(-1, 0, 0);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v2);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v2);
+                    setupLighting(tess, vec.set(-1, 0, 0), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v2, transform);
                     break;
                 }
                 case Up: {
-                    tess.setNormal(0, 1, 0);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u2, v1);
+                    setupLighting(tess, vec.set(0, 1, 0), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u2, v1, transform);
                     break;
                 }
                 case Down: {
-                    tess.setNormal(0, -1, 0);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u2, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT, u1, v1);
-                    tess.addVertexWithUV(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT, u1, v1);
+                    setupLighting(tess, vec.set(0, -1, 0), chunkSpace, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
                     break;
                 }
             }

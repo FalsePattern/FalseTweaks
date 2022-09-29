@@ -147,6 +147,7 @@ public enum Mixin implements IMixin {
 
     //region Item Voxelizer Module
     ItemVox_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.ItemRendererMixin"),
+    ItemVox_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.RenderBlocksMixin"),
     ItemVox_VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.RenderItemMixin"),
     ItemVox_VoxTextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.TextureAtlasSpriteMixin"),
     //endregion Item Voxelizer Module
