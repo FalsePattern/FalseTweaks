@@ -21,9 +21,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator;
+package com.falsepattern.falsetweaks;
 
-import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import lombok.Getter;
 import org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates;
@@ -34,13 +33,13 @@ import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
 
-public class TriCompat {
+public class Compat {
     private static Boolean NEODYMIUM = null;
 
     public static boolean neodymiumInstalled() {
         if (NEODYMIUM == null) {
             try {
-                NEODYMIUM = ((LaunchClassLoader)TriCompat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
+                NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
             } catch (IOException e) {
                 e.printStackTrace();
                 NEODYMIUM = false;

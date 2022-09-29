@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.leakfix;
 
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
-import com.falsepattern.falsetweaks.mixin.helper.IWorldRendererMixin;
+import com.falsepattern.falsetweaks.modules.leakfix.interfaces.IWorldRendererMixin;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.lwjgl.opengl.GL11;

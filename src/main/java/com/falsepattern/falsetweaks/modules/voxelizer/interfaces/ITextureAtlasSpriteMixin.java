@@ -21,33 +21,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.voxelizer.interfaces;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 
-@NoArgsConstructor
-@Data
-public class ItemProp {
-    private float a;
-    private float b;
-    private float c;
-    private float d;
-    private int e;
-    private int f;
-    private float g;
+public interface ITextureAtlasSpriteMixin {
+    VoxelMesh getVoxelMesh();
+    void setVoxelMesh(VoxelMesh mesh);
 
-    public ItemProp(ItemProp old) {
-        set(old.a, old.b, old.c, old.d, old.e, old.f, old.g);
-    }
-
-    public void set(float a, float b, float c, float d, int e, int f, float g) {
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.d = d;
-        this.e = e;
-        this.f = f;
-        this.g = g;
-    }
+    int getFrameCounter();
+    int[][] getFrameTextureDataSafe(int id);
 }

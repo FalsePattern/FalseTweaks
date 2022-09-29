@@ -21,28 +21,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
 
-import java.util.Comparator;
+import net.minecraft.block.Block;
 
-public interface ITessellatorMixin {
-    void alternativeTriangulation(boolean state);
-
-    boolean alternativeTriangulation();
-
-    boolean drawingTris();
-
-    boolean hackedQuadRendering();
-
-    boolean quadTriangulationActive();
-
-    boolean shaderOn();
-
-    void shaderOn(boolean state);
-
-    Comparator<?> hackQuadComparator(Comparator<?> comparator);
-
-    int hackQuadCounting(int constant);
-
-    void triangulate();
+public interface IRenderBlocksMixin {
+    void reusePreviousStates(boolean state);
+    boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b);
 }

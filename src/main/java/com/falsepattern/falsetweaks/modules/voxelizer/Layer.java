@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
-import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
+import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
 

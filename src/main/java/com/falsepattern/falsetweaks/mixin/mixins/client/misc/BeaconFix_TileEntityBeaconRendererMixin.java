@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
@@ -84,7 +84,7 @@ public abstract class BeaconFix_TileEntityBeaconRendererMixin extends TileEntity
         if (displayList == 0) {
             displayList = GLAllocation.generateDisplayLists(1);
             GL11.glNewList(displayList, GL11.GL_COMPILE);
-            Tessellator tess = TriCompat.tessellator();
+            Tessellator tess = Compat.tessellator();
             GL11.glPushAttrib(GL11.GL_ENABLE_BIT |
                               GL11.GL_TEXTURE_BIT |
                               GL11.GL_COLOR_BUFFER_BIT |

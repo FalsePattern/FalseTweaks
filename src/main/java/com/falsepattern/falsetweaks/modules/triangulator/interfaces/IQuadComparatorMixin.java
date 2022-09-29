@@ -21,14 +21,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
 
-import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
+public interface IQuadComparatorMixin {
+    void enableTriMode();
 
-public interface ITextureAtlasSpriteMixin {
-    VoxelMesh getVoxelMesh();
-    void setVoxelMesh(VoxelMesh mesh);
-
-    int getFrameCounter();
-    int[][] getFrameTextureDataSafe(int id);
+    void enableShaderMode();
 }

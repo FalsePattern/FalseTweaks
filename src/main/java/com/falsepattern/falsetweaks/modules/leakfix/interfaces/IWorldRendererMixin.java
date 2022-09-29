@@ -21,11 +21,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.leakfix.interfaces;
 
-import net.minecraft.block.Block;
+public interface IWorldRendererMixin {
+    boolean genList();
 
-public interface IRenderBlocksMixin {
-    void reusePreviousStates(boolean state);
-    boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b);
+    boolean clearList();
+
+    boolean hasRenderList();
+
+    void renderAABB();
 }

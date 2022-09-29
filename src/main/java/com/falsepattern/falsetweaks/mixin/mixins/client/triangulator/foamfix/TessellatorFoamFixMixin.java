@@ -24,7 +24,7 @@
 //keep in sync with TessellatorVanillaMixin
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.foamfix;
 
-import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;

@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.itemvox;
 
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
-import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
+import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 import lombok.Getter;

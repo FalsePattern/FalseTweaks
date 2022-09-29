@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator;
 
+import com.falsepattern.falsetweaks.Compat;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -46,6 +47,6 @@ public class ToggleableTessellatorManager {
     }
 
     public boolean isTriangulatorDisabled() {
-        return !TriCompat.enableTriangulation() || forceQuadRendering == 0;
+        return !Compat.enableTriangulation() || forceQuadRendering == 0;
     }
 }

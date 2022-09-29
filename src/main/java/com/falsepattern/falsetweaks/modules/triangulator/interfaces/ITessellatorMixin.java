@@ -21,10 +21,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
 
-public interface IQuadComparatorMixin {
-    void enableTriMode();
+import java.util.Comparator;
 
-    void enableShaderMode();
+public interface ITessellatorMixin {
+    void alternativeTriangulation(boolean state);
+
+    boolean alternativeTriangulation();
+
+    boolean drawingTris();
+
+    boolean hackedQuadRendering();
+
+    boolean quadTriangulationActive();
+
+    boolean shaderOn();
+
+    void shaderOn(boolean state);
+
+    Comparator<?> hackQuadComparator(Comparator<?> comparator);
+
+    int hackQuadCounting(int constant);
+
+    void triangulate();
 }

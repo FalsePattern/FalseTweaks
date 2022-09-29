@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.common.startup;
 
-import com.falsepattern.falsetweaks.mixin.helper.RegexHelper;
+import com.falsepattern.falsetweaks.modules.startup.RegexHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

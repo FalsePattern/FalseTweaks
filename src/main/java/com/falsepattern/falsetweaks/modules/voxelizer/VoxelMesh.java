@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
-import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
+import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
 import lombok.val;
 

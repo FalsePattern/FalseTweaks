@@ -23,12 +23,12 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.mixin.helper.IRenderBlocksMixin;
-import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
@@ -505,7 +505,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
         this.enableAO = true;
         int light = block.getMixedBrightnessForBlock(this.blockAccess, x, y, z);
-        TriCompat.tessellator().setBrightness(0x000f000f);
+        Compat.tessellator().setBrightness(0x000f000f);
 
         boolean useColor = !(getBlockIcon(block).getIconName().equals("grass_top") || hasOverrideBlockTexture());
 
@@ -534,9 +534,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private void reuse(Facing.Direction dir) {
         if (reusePreviousStates) {
-            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
+            ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
         } else {
-            states[dir.ordinal()] = ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation();
+            states[dir.ordinal()] = ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation();
         }
     }
 
@@ -548,7 +548,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) TriCompat.tessellator()).isTriangulatorDisabled() &&
+        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() &&
             CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
@@ -563,14 +563,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (Math.abs(mainDiagonalAvg - altDiagonalAvg) > 0.01 && mainDiagonalAvg < altDiagonalAvg) {
-                ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
+                ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(true);
                 return;
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
-            ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(true);
+            ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(true);
             return;
         }
-        ((ITessellatorMixin) TriCompat.tessellator()).alternativeTriangulation(false);
+        ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(false);
     }
 
     @Inject(method = {"renderFaceXNeg"},
@@ -697,7 +697,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         bounds[4] = renderMaxY;
         bounds[5] = renderMaxZ;
 
-        val tess = (ToggleableTessellator)TriCompat.tessellator();
+        val tess = (ToggleableTessellator) Compat.tessellator();
         if (tess.pass() != 0) {
             return;
         }
@@ -746,7 +746,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
             return;
         }
-        Tessellator tess = TriCompat.tessellator();
+        Tessellator tess = Compat.tessellator();
         int l = this.blockAccess.getBlockMetadata(x, y, z);
         IIcon iicon = this.getBlockIconFromSideAndMetadata(rail, 0, l);
 

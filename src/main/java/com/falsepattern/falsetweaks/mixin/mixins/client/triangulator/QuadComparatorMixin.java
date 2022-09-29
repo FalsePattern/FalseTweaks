@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-import com.falsepattern.falsetweaks.mixin.helper.IQuadComparatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IQuadComparatorMixin;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -24,7 +24,7 @@
 //Keep in sync with TessellatorVanillaMixin
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.optifine;
 
-import com.falsepattern.falsetweaks.mixin.helper.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

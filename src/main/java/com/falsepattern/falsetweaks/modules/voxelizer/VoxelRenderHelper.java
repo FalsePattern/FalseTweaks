@@ -21,14 +21,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.voxelizer;
 
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
-import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
@@ -69,7 +68,7 @@ public class VoxelRenderHelper {
         if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, glint)) {
             return;
         }
-        val tess = TriCompat.tessellator();
+        val tess = Compat.tessellator();
         tess.startDrawingQuads();
         mesh.renderToTessellator(tess, layer, glint);
         tess.draw();

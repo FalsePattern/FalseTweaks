@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks.modules.leakfix;
 
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.LeakFixConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import gnu.trove.list.TIntList;
@@ -71,7 +71,7 @@ public final class LeakFix {
                 } else {
                     Share.log.info("Disabling leak fix because an AMD gpu was NOT detected.");
                 }
-                if (enabled && TriCompat.neodymiumInstalled()) {
+                if (enabled && Compat.neodymiumInstalled()) {
                     Share.log.warn("Neodymium detected! Disabling leak fix for maximum compatibility.\n" +
                                    "If you still want to use it, set it to Enable in the config instead of Auto.");
                     enabled = false;

@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.redstonepaste;
 
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import fyber.redstonepastemod.client.RedstonePasteHighlighter;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,13 +38,13 @@ public abstract class RedstonePasteHighlighterMixin {
             at = @At("HEAD"),
             require = 1)
     private void turnOffTriangulator(CallbackInfo ci) {
-        ((ToggleableTessellator) TriCompat.tessellator()).disableTriangulatorLocal();
+        ((ToggleableTessellator) Compat.tessellator()).disableTriangulatorLocal();
     }
 
     @Inject(method = "drawLineLoop",
             at = @At("RETURN"),
             require = 1)
     private void turnOnTriangulator(CallbackInfo ci) {
-        ((ToggleableTessellator) TriCompat.tessellator()).enableTriangulatorLocal();
+        ((ToggleableTessellator) Compat.tessellator()).enableTriangulatorLocal();
     }
 }

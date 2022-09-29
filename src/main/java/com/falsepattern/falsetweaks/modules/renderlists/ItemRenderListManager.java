@@ -25,7 +25,6 @@ package com.falsepattern.falsetweaks.modules.renderlists;
 
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.RenderListConfig;
-import com.falsepattern.falsetweaks.mixin.helper.ItemProp;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;

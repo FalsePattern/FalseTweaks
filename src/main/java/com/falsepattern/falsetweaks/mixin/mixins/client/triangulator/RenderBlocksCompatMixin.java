@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-import com.falsepattern.falsetweaks.mixin.helper.IRenderBlocksMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

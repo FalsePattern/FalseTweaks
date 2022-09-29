@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-import com.falsepattern.falsetweaks.modules.triangulator.TriCompat;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +40,7 @@ public abstract class WorldRendererMixin {
             at = @At("HEAD"),
             require = 1)
     private void noTriOnPass1Pre(int pass, CallbackInfo ci) {
-        val tess = (ToggleableTessellator) TriCompat.tessellator();
+        val tess = (ToggleableTessellator) Compat.tessellator();
         tess.pass(pass);
         if (pass != 0) {
             tess.disableTriangulatorLocal();
@@ -52,7 +52,7 @@ public abstract class WorldRendererMixin {
             require = 1)
     private void noTriOnPass1Post(int pass, EntityLivingBase p_147891_2_, CallbackInfo ci) {
         if (pass != 0) {
-            ((ToggleableTessellator)TriCompat.tessellator()).enableTriangulatorLocal();
+            ((ToggleableTessellator) Compat.tessellator()).enableTriangulatorLocal();
         }
     }
 }

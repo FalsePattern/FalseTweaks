@@ -21,14 +21,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.helper;
+package com.falsepattern.falsetweaks.modules.leakfix.stubpackage;
 
-public interface IWorldRendererMixin {
-    boolean genList();
+/**
+ * Placeholder class, remapped and deleted during compilation.
+ */
+public class WrDisplayListAllocator {
+    public void resetAllocatedLists() {
+    }
 
-    boolean clearList();
-
-    boolean hasRenderList();
-
-    void renderAABB();
+    public void deleteDisplayLists() {
+    }
 }
