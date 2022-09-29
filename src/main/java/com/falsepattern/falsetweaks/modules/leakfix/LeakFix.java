@@ -23,8 +23,8 @@
 
 package com.falsepattern.falsetweaks.modules.leakfix;
 
-import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.LeakFixConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import gnu.trove.list.TIntList;

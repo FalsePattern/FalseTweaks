@@ -23,13 +23,13 @@
 
 package com.falsepattern.falsetweaks.proxy;
 
-import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Compat;
-import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;

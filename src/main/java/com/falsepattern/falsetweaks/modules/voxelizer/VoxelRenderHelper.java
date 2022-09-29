@@ -23,8 +23,8 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
-import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;

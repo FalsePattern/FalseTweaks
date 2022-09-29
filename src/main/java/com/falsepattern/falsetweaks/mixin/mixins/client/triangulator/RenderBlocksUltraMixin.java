@@ -25,8 +25,8 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
-import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;

@@ -24,8 +24,8 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
+import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IQuadComparatorMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import lombok.Getter;
