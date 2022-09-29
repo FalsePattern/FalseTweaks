@@ -145,12 +145,12 @@ public enum Mixin implements IMixin {
 
     //endregion Texture Optimizations Module
 
-    //region Item Voxelizer Module
-    ItemVox_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.ItemRendererMixin"),
-    ItemVox_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.RenderBlocksMixin"),
-    ItemVox_VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.RenderItemMixin"),
-    ItemVox_VoxTextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_VOXELIZER), "itemvox.TextureAtlasSpriteMixin"),
-    //endregion Item Voxelizer Module
+    //region Voxelizer Module
+    Voxelizer_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.ItemRendererMixin"),
+    Voxelizer_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderBlocksMixin"),
+    Voxelizer_VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderItemMixin"),
+    Voxelizer_VoxTextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.TextureAtlasSpriteMixin"),
+    //endregion Voxelizer Module
 
     //region Misc Modules
     ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),

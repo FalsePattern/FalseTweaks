@@ -44,7 +44,7 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
             result.add(TriangulatorConfig.class);
         if (ModuleConfig.ITEM_RENDER_LISTS)
             result.add(RenderListConfig.class);
-        if (ModuleConfig.ITEM_VOXELIZER)
+        if (ModuleConfig.VOXELIZER)
             result.add(VoxelizerConfig.class);
         if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
             result.add(LeakFixConfig.class);

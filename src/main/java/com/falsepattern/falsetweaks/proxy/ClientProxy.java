@@ -55,7 +55,7 @@ public class ClientProxy extends CommonProxy {
         if (ModuleConfig.ITEM_RENDER_LISTS) {
             ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
                     ItemRenderListManager.INSTANCE);
-            if (ModuleConfig.ITEM_VOXELIZER) {
+            if (ModuleConfig.VOXELIZER) {
                 ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(
                         VoxelRenderListManager.INSTANCE);
             }

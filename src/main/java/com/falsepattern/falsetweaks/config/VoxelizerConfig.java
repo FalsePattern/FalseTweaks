@@ -29,7 +29,7 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
 @Config(modid = Tags.MODID,
-        category = "item_voxelizer")
+        category = "voxelizer")
 @Config.RequiresMcRestart
 public class VoxelizerConfig {
     @Config.Comment("You can use this property to fix any incorrectly detected overlays.\n" +

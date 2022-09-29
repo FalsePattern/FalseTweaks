@@ -45,7 +45,7 @@ public final class Modules {
 
     @StableAPI.Expose
     public static boolean itemVoxelizerActive() {
-        return ModuleConfig.ITEM_VOXELIZER;
+        return ModuleConfig.VOXELIZER;
     }
 
     @StableAPI.Expose

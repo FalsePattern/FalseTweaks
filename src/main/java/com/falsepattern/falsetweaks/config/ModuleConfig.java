@@ -48,9 +48,9 @@ public class ModuleConfig {
 
     @Config.Comment("Enable/Disable item voxelization. This fixes a huge amount of item render issues, but is still\n" +
                     "an experimental feature.\n" +
-                    "FPS impact: Very minor, breaking drawers still freezes the game")
+                    "Also includes the 3D rails.")
     @Config.DefaultBoolean(true)
-    public static boolean ITEM_VOXELIZER;
+    public static boolean VOXELIZER;
 
     @Config.Comment("Enables the Triangulator module. This also includes the ambient occlusion and smooth lighting fix," +
                     "along with the block crack fix.\n" +
@@ -69,7 +69,7 @@ public class ModuleConfig {
     public static boolean ITEM_RENDER_LISTS;
 
     @Config.Comment("Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
-                    "you can toggle said optimization here." +
+                    "you can toggle said optimization here.\n" +
                     "FPS impact: Tiny improvement near beacons")
     @Config.DefaultBoolean(true)
     public static boolean BEACON_OPTIMIZATION;
@@ -85,7 +85,7 @@ public class ModuleConfig {
                     "chunk loading, you MUST set this do Disable.\n" +
                     "NOTICE FOR NEODYMIUM USERS:\n" +
                     "If you use Neodymium, this module will automatically disable itself when set to Auto. Set it to\n" +
-                    "Enable to bypass." +
+                    "Enable to bypass.\n" +
                     "FPS impact: It depends")
     @Config.DefaultEnum("Auto")
     public static LeakFixState MEMORY_LEAK_FIX;
@@ -106,7 +106,7 @@ public class ModuleConfig {
             init(RenderListConfig.class);
         if (TRIANGULATOR)
             init(TriangulatorConfig.class);
-        if (ITEM_VOXELIZER)
+        if (VOXELIZER)
             init(VoxelizerConfig.class);
     }
 
