@@ -70,14 +70,16 @@ public final class LeakFix {
                 } else {
                     Share.log.info("Disabling leak fix because an AMD gpu was NOT detected.");
                 }
+                if (enabled && TriCompat.neodymiumInstalled()) {
+                    Share.log.warn("Neodymium detected! Disabling leak fix for maximum compatibility.\n" +
+                                   "If you still want to use it, set it to Enable in the config instead of Auto.");
+                    enabled = false;
+                }
                 break;
             case Enable:
                 Share.log.info("Enabling leak fix because of config flag.");
                 enabled = true;
                 break;
-        }
-        if (enabled && TriCompat.neodymiumInstalled()) {
-            enabled = false;
         }
         ENABLED = enabled;
     }

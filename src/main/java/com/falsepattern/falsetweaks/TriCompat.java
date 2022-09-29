@@ -47,7 +47,7 @@ public class TriCompat {
             if (NEODYMIUM) {
                 Share.log.warn("Neodymium detected! Incompatible modules will be disabled.");
                 Share.log.warn("Incompatible modules:");
-                Share.log.warn("Leak Fix");
+                Share.log.warn("Leak Fix (Change from Auto for Enable to bypass the safety check and enable it anyways)");
                 Share.log.warn("Quad Triangulation");
             }
         }
