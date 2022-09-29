@@ -1,6 +1,6 @@
 {
   "required": true,
-  "minVersion": "0.8.5",
+  "minVersion": "0.7.11",
   "package": "com.falsepattern.falsetweaks.mixin.mixins",
   "plugin": "com.falsepattern.falsetweaks.mixin.plugin.MixinPlugin",
   "refmap": "mixins.falsetweaks.refmap.json",
