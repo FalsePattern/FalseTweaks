@@ -38,10 +38,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
     static {
-        if (VoxelizerConfig.forcedLayers == null) {
+        if (VoxelizerConfig.FORCED_LAYERS == null) {
             Share.log.error("Overlay config broken.");
         }
-        for (val entry: VoxelizerConfig.forcedLayers) {
+        for (val entry: VoxelizerConfig.FORCED_LAYERS) {
             val parts = entry.split("=");
             if (parts.length != 2) {
                 Share.log.error("Invalid forced layer " + entry + " in overlay config! Format should be: texturename=number");

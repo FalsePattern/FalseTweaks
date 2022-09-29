@@ -23,9 +23,9 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
+import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.mixin.helper.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
-import com.falsepattern.falsetweaks.modules.voxelizer.strategy.RowColumnMergingStrategy;
 import lombok.val;
 
 import net.minecraft.client.renderer.Tessellator;
@@ -72,7 +72,7 @@ public class VoxelMesh {
         val texture = (ITextureAtlasSpriteMixin) iicon;
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
-            mesh = new VoxelMesh(RowColumnMergingStrategy.NoFlip, new Layer(iicon, 0.0625F));
+            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, new Layer(iicon, 0.0625F));
             texture.setVoxelMesh(mesh);
         }
         return mesh;

@@ -24,11 +24,13 @@
 package com.falsepattern.falsetweaks.config;
 
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.modules.voxelizer.strategy.StrategyPreset;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
 @Config(modid = Tags.MODID,
         category = "item_voxelizer")
+@Config.RequiresMcRestart
 public class VoxelizerConfig {
     @Config.Comment("You can use this property to fix any incorrectly detected overlays.\n" +
                     "Syntax: texture_name=layer, where layer is the multiplier.\n" +
@@ -38,8 +40,13 @@ public class VoxelizerConfig {
                     "Also supports negatives, but going below -1 is undefined behaviour. (-1 is used for the liquid inside potions by default)")
     @Config.DefaultStringList({"potion_overlay=-1"})
     @Config.LangKey("config.falsetweaks.voxelizer.forced_layers")
-    @Config.RequiresMcRestart
-    public static String[] forcedLayers;
+    public static String[] FORCED_LAYERS;
+
+    @Config.Comment("The merging strategy preset to use for the voxelized mesh optimization.\n" +
+                    "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.\n" +
+                    "FPS impact: Depends on setup.")
+    @Config.DefaultEnum("Regular_2")
+    public static StrategyPreset MESH_OPTIMIZATION_STRATEGY_PRESET;
 
     static {
         ConfigurationManager.selfInit();
