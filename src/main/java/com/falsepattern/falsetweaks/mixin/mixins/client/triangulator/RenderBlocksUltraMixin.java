@@ -32,6 +32,8 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
+import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.internal.Share;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -44,6 +46,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGrass;
@@ -52,6 +55,9 @@ import net.minecraft.block.BlockStairs;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 @Mixin(RenderBlocks.class)
 @Accessors(fluent = true,
@@ -122,6 +128,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private double[] bounds;
     @Setter
     private boolean reusePreviousStates;
+
+    private boolean disableCrackFix;
+
+    private boolean crackFixOff() {
+        return !TriangulatorConfig.FIX_BLOCK_CRACK || disableCrackFix;
+    }
 
     private static float avg(final float a, final float b) {
         return (a + b) / 2F;
@@ -673,7 +685,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private void preBounds(Facing.Direction skipDir) {
-        if (!TriangulatorConfig.FIX_BLOCK_CRACK) {
+        if (crackFixOff()) {
             return;
         }
         if (bounds == null) {
@@ -716,7 +728,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "RETURN"),
             require = 6)
     private void postBounds(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        if (!TriangulatorConfig.FIX_BLOCK_CRACK || bounds == null) {
+        if (crackFixOff() || bounds == null) {
             return;
         }
         renderMinX = bounds[0];
@@ -725,5 +737,48 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         renderMaxX = bounds[3];
         renderMaxY = bounds[4];
         renderMaxZ = bounds[5];
+    }
+
+    private static boolean isBlacklisted(Class<?> clazz) {
+        for (val element: getCrackFixBlacklist()) {
+            if (element.isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Inject(method = "renderBlockByRenderType",
+            at = @At("HEAD"),
+            require = 1)
+    private void exclusion(Block block, int x, int y, int z, CallbackInfoReturnable<Boolean> cir) {
+        disableCrackFix = isBlacklisted(block.getClass());
+    }
+
+    @Inject(method = "renderBlockByRenderType",
+            at = @At("RETURN"),
+            require = 1)
+    private void endExclusion(Block p_147805_1_, int p_147805_2_, int p_147805_3_, int p_147805_4_, CallbackInfoReturnable<Boolean> cir) {
+        disableCrackFix = false;
+    }
+
+    @Config.Ignore
+    private static String[] currentCrackFixBlacklistArr;
+    @Config.Ignore
+    private static Class<?>[] currentCrackFixBlacklistClasses;
+
+    private static Class<?>[] getCrackFixBlacklist() {
+        if (currentCrackFixBlacklistArr != TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST) {
+            currentCrackFixBlacklistArr = TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST;
+            currentCrackFixBlacklistClasses = Arrays.stream(currentCrackFixBlacklistArr).map((name) -> {
+                try {
+                    return Class.forName(name);
+                } catch (ClassNotFoundException e) {
+                    Share.LOG.info("Could not find class " + name + " for crack fix blacklist!");
+                    return null;
+                }
+            }).filter(Objects::nonNull).toArray(Class<?>[]::new);
+        }
+        return currentCrackFixBlacklistClasses;
     }
 }

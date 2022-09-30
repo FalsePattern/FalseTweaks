@@ -2,6 +2,7 @@ config.falsetweaks.triangulator.enable_quad_triangulation=Triangulator: Enable q
 config.falsetweaks.triangulator.fix_block_crack=Triangulator: Block edge crack fix
 config.falsetweaks.triangulator.render_hook_compat_mode=Triangulator: Render hook compatibility mode
 config.falsetweaks.triangulator.block_crack_fix_epsilon=Triangulator: Block crack fix epsilon
+config.falsetweaks.triangulator.block_crack_fix_blacklist=Triangulator: Block crack fix blacklist
 config.falsetweaks.voxelizer.forced_layers=Voxelizer: Forced layers
 config.falsetweaks.voxelizer.mesh_optimization_strategy=Voxelizer: Mesh optimization strategy
 config.falsetweaks.voxelizer.3d_rails=Voxelizer: 3D rails
