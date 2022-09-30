@@ -13,10 +13,12 @@ Highlights:
 - Sped up texture packing
 
 ## Fixing known problems
-| **Issue**                                                                                   | **Known causes** | **Potential solution**                                                                               |
-|---------------------------------------------------------------------------------------------|------------------|------------------------------------------------------------------------------------------------------|
-| Game crashes on startup, forge log says `MixinTargetAlreadyLoadedException`                 | CoFH Core        | Open `falsetweaks.cfg`, and under the `modules` category, set `B:STARTUP_OPTIMIZATIONS` to `false`.  |
-| Game crashes on startup, loading screen was already present (or fixing issue 1 didn't help) | Apparatus        | Open `falsetweaks.cfg`, and under the `general` category, set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
+| **Issue**                                                                                   | **Known causes** | **Potential solution**                                                                                    |
+|---------------------------------------------------------------------------------------------|------------------|-----------------------------------------------------------------------------------------------------------|
+| Game crashes on startup, forge log says `MixinTargetAlreadyLoadedException`                 | [unknown]        | Open `falsetweaks.cfg`, and under the `00_modules` category, set `B:STARTUP_OPTIMIZATIONS` to `false`.    |
+| Game crashes on startup, loading screen was already present (or fixing issue 1 didn't help) | Apparatus        | Open `falsetweaks.cfg`, and under the `triangulator` category, set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
+
+Any bugs concerning the known problems listed in this table will be closed without response. Read before you open issues.
 
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
