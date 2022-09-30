@@ -152,6 +152,9 @@ public enum Mixin implements IMixin {
     Voxelizer_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderBlocksMixin"),
     Voxelizer_VoxRenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderItemMixin"),
     Voxelizer_VoxTextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.TextureAtlasSpriteMixin"),
+
+    //Railcraft
+    Voxelizer_RCRenderTrackMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER).and(require(TargetedMod.RAILCRAFT)), "voxelizer.railcraft.RenderTrackMixin"),
     //endregion Voxelizer Module
 
     //region Misc Modules

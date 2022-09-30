@@ -1,3 +1,16 @@
+static def curse(curseDep) {
+    return "curse.maven:" + curseDep
+}
+
+def deobfCurse(curseDep) {
+    try {
+        return deobfMaven("https://cursemaven.com/", curse(curseDep))
+    } catch (Exception ignored) {
+        println("Failed to get dep " + curseDep + " from cursemaven. Grabbing from mirror.")
+        return deobfMaven("https://mvn.falsepattern.com/cursemaven/", curse(curseDep))
+    }
+}
+
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.22") {
         transitive = false
@@ -21,6 +34,10 @@ dependencies {
     }
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
+        transitive = false
+    }
+
+    compileOnly(deobfCurse("railcraft-51195:2458987")) {
         transitive = false
     }
 }

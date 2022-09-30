@@ -38,9 +38,16 @@ import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 
 public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
+    private static final ThreadLocal<Matrix4f> threadMatrix = ThreadLocal.withInitial(Matrix4f::new);
+
+    private static final float RAD_90DEG = (float)Math.toRadians(90);
+    private static final float RAD_NEG90DEG = (float)Math.toRadians(-90);
+    private static final float RAD_45DEG = (float)Math.toRadians(45);
+
     static {
         if (VoxelizerConfig.FORCED_LAYERS == null) {
             Share.log.error("Overlay config broken.");
@@ -81,57 +88,41 @@ public class VoxelRenderHelper {
             VoxelRenderListManager.INSTANCE.post();
         }
     }
-
-    public static void renderRail(RenderBlocks renderBlocks, BlockRailBase rail, int x, int y, int z) {
+    public static void renderRail(IBlockAccess blockAccess, BlockRailBase rail, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
         val tess = Compat.tessellator();
-        int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        IIcon iicon = renderBlocks.getBlockIconFromSideAndMetadata(rail, 0, meta);
-        if (renderBlocks.hasOverrideBlockTexture())
-        {
-            iicon = renderBlocks.overrideBlockTexture;
-        }
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
-
-        if (rail.isPowered())
-        {
-            meta &= 0x7;
-        }
-
-        tess.setBrightness(rail.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y, z));
+        tess.setBrightness(rail.getMixedBrightnessForBlock(blockAccess, x, y, z));
         tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);
-        val transform = new Matrix4f();
+        val transform = threadMatrix.get();
         transform.translation(x, y, z);
         transform.translate(0.5f, 0, 0.5f);
         switch (meta) {
             case 1:
-            case 2:
-            case 7:
-                transform.rotate((float) Math.toRadians(90), 0, 1, 0);
-                break;
-            case 4:
-            case 6:
-                transform.rotate((float) Math.toRadians(180), 0, 1, 0);
-                break;
-            case 3:
-            case 9:
-                transform.rotateY((float) Math.toRadians(-90));
-                break;
+            case 2: case 3: case 7: transform.rotateY(RAD_NEG90DEG); break;
+            case 8: transform.scale(-1, 1, -1); break;
+            case 9: transform.rotateY(RAD_90DEG);
         }
+        if (!mirrored)
+            transform.scale(-1, 1, -1);
         transform.translate(-0.5f, 0, -0.5f);
         switch (meta) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                transform.translate(0, 0.0625F, 0)
-                         .rotate((float)Math.toRadians(45), 1, 0, 0)
-                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                         .translate(0, 0, 0.0625F);
-                break;
-            default:
-                transform.rotate((float) Math.toRadians(90), 1, 0, 0);
-                break;
+            case 2: case 3: case 4: case 5: transform.translate(0, 0.0625F, 0)
+                                                     .rotateX(RAD_45DEG)
+                                                     .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                                                     .translate(0, 0, 0.0625F); break;
+            default: transform.rotateX(RAD_90DEG); break;
         }
         mesh.renderToTessellator(tess, 0, false, true, transform);
+    }
+
+    public static void renderRailVanilla(RenderBlocks renderBlocks, BlockRailBase rail, int x, int y, int z) {
+        int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+        IIcon iicon = renderBlocks.getBlockIconFromSideAndMetadata(rail, 0, meta);
+        if (renderBlocks.hasOverrideBlockTexture()) {
+            iicon = renderBlocks.overrideBlockTexture;
+        }
+        if (rail.isPowered())
+            meta &= 0x7;
+        renderRail(renderBlocks.blockAccess, rail, x, y, z, meta, iicon, false);
     }
 }

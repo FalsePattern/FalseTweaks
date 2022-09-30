@@ -43,7 +43,7 @@ public abstract class RenderBlocksMixin {
         if (!VoxelizerConfig.RAILS_3D) {
             return;
         }
-        VoxelRenderHelper.renderRail((RenderBlocks)(Object)this, rail, x, y, z);
+        VoxelRenderHelper.renderRailVanilla((RenderBlocks)(Object)this, rail, x, y, z);
         cir.setReturnValue(true);
     }
 

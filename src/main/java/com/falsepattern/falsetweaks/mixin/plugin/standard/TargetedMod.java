@@ -42,6 +42,7 @@ public enum TargetedMod implements ITargetedMod {
     CHROMATICRAFT("ChromatiCraft", false, startsWith("chromaticraft")),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     APPARATUS("Apparatus", false, startsWith("apparatus")),
+    RAILCRAFT("Railcraft", true, startsWith("railcraft")),
     ;
 
     @Getter
