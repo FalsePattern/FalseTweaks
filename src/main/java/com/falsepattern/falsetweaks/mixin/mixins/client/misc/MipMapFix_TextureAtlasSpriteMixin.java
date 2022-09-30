@@ -23,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
-import com.falsepattern.lib.util.MathUtil;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,8 +44,8 @@ public abstract class MipMapFix_TextureAtlasSpriteMixin {
         val baseImage = img[0];
         int w = baseImage.getWidth();
         int h = baseImage.getHeight();
-        int reqW = MathUtil.smallestEncompassingPowerOfTwo(Math.max(w, 16));
-        int reqH = MathUtil.smallestEncompassingPowerOfTwo(Math.max(h, 16));
+        int reqW = Math.max(w, 16);
+        int reqH = Math.max(h, 16);
         if (reqW != w || reqH != h) {
             for (int i = 0; i < img.length; i++) {
                 if (img[i] == null) {
