@@ -44,17 +44,19 @@ public abstract class MipMapFix_TextureAtlasSpriteMixin {
         val baseImage = img[0];
         int w = baseImage.getWidth();
         int h = baseImage.getHeight();
-        int reqW = Math.max(w, 16);
-        int reqH = Math.max(h, 16);
-        if (reqW != w || reqH != h) {
+        while (w < 16 || h < 16) {
+            w *= 2;
+            h *= 2;
+        }
+        if (baseImage.getWidth() != w || baseImage.getHeight() != h) {
             for (int i = 0; i < img.length; i++) {
                 if (img[i] == null) {
                     continue;
                 }
-                val newImage = new BufferedImage(reqW >>> i, reqH >>> i, BufferedImage.TYPE_INT_ARGB);
+                val newImage = new BufferedImage(w >>> i, h >>> i, BufferedImage.TYPE_INT_ARGB);
                 val gfx = newImage.createGraphics();
                 gfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                gfx.drawImage(img[i], 0, 0, reqW >>> i, reqH >>> i, null);
+                gfx.drawImage(img[i], 0, 0, w >>> i, h >>> i, null);
                 img[i] = newImage;
             }
         }
