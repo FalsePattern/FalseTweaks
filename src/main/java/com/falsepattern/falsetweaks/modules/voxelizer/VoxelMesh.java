@@ -37,6 +37,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class VoxelMesh {
     public static final float EPSILON = 0.0001f;
@@ -74,6 +75,18 @@ public class VoxelMesh {
         }
     }
 
+    public int xSize() {
+        return compiler.xSize;
+    }
+
+    public int ySize() {
+        return compiler.ySize;
+    }
+
+    public int zSize() {
+        return compiler.zSize;
+    }
+
     public static VoxelMesh getMesh(TextureAtlasSprite iicon) {
         val texture = (ITextureAtlasSpriteMixin) iicon;
         VoxelMesh mesh = texture.getVoxelMesh();
@@ -85,7 +98,7 @@ public class VoxelMesh {
     }
 
     public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
-        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY);
+        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null);
     }
 
     private static void setNormal(Tessellator tess, Vector3f normal) {
@@ -117,10 +130,13 @@ public class VoxelMesh {
     }
 
 
-    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform) {
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform, Function<Face, Boolean> trimmingFunction) {
         compile();
         val vec = workingVector.get();
         for (val face: faceCache) {
+            if (trimmingFunction != null && trimmingFunction.apply(face)) {
+                continue;
+            }
             float u1, v1, u2, v2;
             float EPSILON_OUT = overlayLayer * EPSILON;
             if (remapUV) {

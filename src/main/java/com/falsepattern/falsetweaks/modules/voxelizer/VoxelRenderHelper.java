@@ -139,7 +139,69 @@ public class VoxelRenderHelper {
                 transform.rotateX(RAD_90DEG);
                 break;
         }
-        mesh.renderToTessellator(tess, 0, false, true, transform);
+        mesh.renderToTessellator(tess, 0, false, true, transform, (face) -> {
+            //Notice: corner rails commented out because they have parts of the "wood" also on the edge of the mesh
+            switch (face.dir) {
+                case Up: {
+                    if (face.minY != 0)
+                        break;
+                    switch (meta) {
+                        case RAIL_FLAT_NORTH_SOUTH:
+                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                        case RAIL_FLAT_WEST_EAST:
+                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                    }
+                    break;
+                }
+                case Down: {
+                    if (face.maxY != mesh.ySize() - 1)
+                        break;
+                    switch (meta) {
+                        case RAIL_FLAT_NORTH_SOUTH:
+//                        case RAIL_CORNER_EAST_SOUTH:
+                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+                        case RAIL_FLAT_WEST_EAST:
+//                        case RAIL_CORNER_WEST_SOUTH:
+                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
+//                        case RAIL_CORNER_WEST_NORTH:
+//                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+//                        case RAIL_CORNER_EAST_NORTH:
+//                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                    }
+                    break;
+                }
+                case Right: {
+                    if (face.maxX != mesh.xSize() - 1)
+                        break;
+                    switch (meta) {
+//                        case RAIL_CORNER_WEST_NORTH:
+//                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
+//                        case RAIL_CORNER_WEST_SOUTH:
+//                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+//                        case RAIL_CORNER_EAST_SOUTH:
+//                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+//                        case RAIL_CORNER_EAST_NORTH:
+//                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                    }
+                    break;
+                }
+            }
+            return false;
+        });
+    }
+
+    private static boolean isBlockRailWithMetadata(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailMeta) {
+        val block = blockAccess.getBlock(x, y, z);
+        if (!(block instanceof BlockRailBase)) {
+            return false;
+        }
+        val meta = ((BlockRailBase)block).getBasicRailMetadata(blockAccess, null, x, y, z);
+        for (int expected : expectedRailMeta) {
+            if (expected == meta) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void renderRailVanilla(RenderBlocks renderBlocks, BlockRailBase rail, int x, int y, int z) {
