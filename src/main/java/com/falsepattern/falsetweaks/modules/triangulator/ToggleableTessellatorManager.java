@@ -47,6 +47,6 @@ public class ToggleableTessellatorManager {
     }
 
     public boolean isTriangulatorDisabled() {
-        return !Compat.enableTriangulation() || forceQuadRendering == 0;
+        return !Compat.enableTriangulation() || forceQuadRendering != 0;
     }
 }

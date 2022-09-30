@@ -228,7 +228,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public boolean isTriangulatorDisabled() {
-        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled() || forceQuadRendering == 0;
+        return ToggleableTessellatorManager.INSTANCE.isTriangulatorDisabled() || forceQuadRendering != 0;
     }
 
     @Override
