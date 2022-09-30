@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
+import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
 import lombok.val;
 
@@ -45,8 +46,14 @@ public class VoxelCompiler {
             zSize = this.layers.length;
             for (int i = 0; i < zSize; i++) {
                 TextureAtlasSprite tex = layers[i].texture;
-                x = Math.max(x, tex.getIconWidth());
-                y = Math.max(y, tex.getIconHeight());
+                int xTex = tex.getIconWidth();
+                int yTex = tex.getIconHeight();
+                if (((ITextureAtlasSpriteMixin)tex).useAnisotropicFiltering()) {
+                    xTex -= 16;
+                    yTex -= 16;
+                }
+                x = Math.max(x, xTex);
+                y = Math.max(y, yTex);
             }
             xSize = x;
             ySize = y;

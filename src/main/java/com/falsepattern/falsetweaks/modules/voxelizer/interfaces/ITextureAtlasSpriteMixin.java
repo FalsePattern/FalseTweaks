@@ -29,6 +29,11 @@ public interface ITextureAtlasSpriteMixin {
     VoxelMesh getVoxelMesh();
     void setVoxelMesh(VoxelMesh mesh);
 
-    int getFrameCounter();
+    int frameCounter();
+
+    int getRealWidth();
+    int getRealHeight();
+
+    boolean useAnisotropicFiltering();
     int[][] getFrameTextureDataSafe(int id);
 }

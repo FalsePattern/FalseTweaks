@@ -41,16 +41,25 @@ public class Layer {
     public int fetchAlpha(int x, int y, int W, int H) {
         x = xToReal(x, W);
         y = yToReal(y, H);
-        int argb = tex().getFrameTextureDataSafe(tex().getFrameCounter())[0][y * texture.getIconWidth() + x];
-        return (argb >>> 24) & 0xFF;
+        if (tex().useAnisotropicFiltering()) {
+            x += 8;
+            y += 8;
+        }
+        try {
+            int argb = tex().getFrameTextureDataSafe(tex().frameCounter())[0][y * texture.getIconWidth() + x];
+            return (argb >>> 24) & 0xFF;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println(texture.getIconName());
+            throw e;
+        }
     }
 
     private int xToReal(int x, int W) {
-        return x / (W / texture.getIconWidth());
+        return x / (W / tex().getRealWidth());
     }
 
     private int yToReal(int y, int H) {
-        return y / (H / texture.getIconHeight());
+        return y / (H / tex().getRealHeight());
     }
 
     public float fetchU(float x, float W) {
@@ -66,6 +75,6 @@ public class Layer {
     }
 
     public String textureIdentity() {
-        return texture.getIconName() + '|' + tex().getFrameCounter();
+        return texture.getIconName() + '|' + tex().frameCounter();
     }
 }

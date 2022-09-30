@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,14 +38,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 @Mixin(TextureAtlasSprite.class)
+@Accessors(fluent = true)
 public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixin {
     @Getter
     @Shadow
     protected int frameCounter;
 
+    @Getter
+    @Shadow
+    private boolean useAnisotropicFiltering;
+
     @Shadow public abstract int[][] getFrameTextureData(int p_147965_1_);
 
     @Shadow public abstract int getFrameCount();
+
+    @Shadow public abstract int getIconWidth();
+
+    @Shadow public abstract int getIconHeight();
 
     private VoxelMesh voxelMesh;
 
@@ -70,5 +80,15 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     public int[][] getFrameTextureDataSafe(int id) {
         id %= getFrameCount();
         return getFrameTextureData(id);
+    }
+
+    @Override
+    public int getRealWidth() {
+        return useAnisotropicFiltering ? getIconWidth() - 16 : getIconWidth();
+    }
+
+    @Override
+    public int getRealHeight() {
+        return useAnisotropicFiltering ? getIconHeight() - 16 : getIconHeight();
     }
 }
