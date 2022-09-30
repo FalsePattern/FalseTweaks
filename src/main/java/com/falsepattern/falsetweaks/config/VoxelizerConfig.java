@@ -45,7 +45,7 @@ public class VoxelizerConfig {
     @Config.Comment("The merging strategy preset to use for the voxelized mesh optimization.\n" +
                     "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.\n" +
                     "FPS impact: Depends on setup.")
-    @Config.DefaultEnum("Regular_2")
+    @Config.DefaultEnum("Best_2")
     @Config.LangKey("config.falsetweaks.voxelizer.mesh_optimization_strategy")
     public static StrategyPreset MESH_OPTIMIZATION_STRATEGY_PRESET;
 
