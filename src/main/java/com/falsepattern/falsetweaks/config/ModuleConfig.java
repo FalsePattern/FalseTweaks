@@ -96,6 +96,13 @@ public class ModuleConfig {
     @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
+
+    @Config.Comment("Forces all textures to be a power of two, and at least 16x16 in side.\n" +
+                    "This fixes mipmaps, but might result in some weird textures when a texture was NOT a power of two.\n" +
+                    "FPS impact: none")
+    @Config.DefaultBoolean(true)
+    public static boolean MIPMAP_FIX;
+
     static {
         ConfigurationManager.selfInit();
         //noinspection deprecation
