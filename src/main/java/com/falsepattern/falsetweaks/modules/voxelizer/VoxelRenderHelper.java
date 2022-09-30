@@ -48,6 +48,17 @@ public class VoxelRenderHelper {
     private static final float RAD_NEG90DEG = (float)Math.toRadians(-90);
     private static final float RAD_45DEG = (float)Math.toRadians(45);
 
+    private static final int RAIL_FLAT_NORTH_SOUTH = 0x0;
+    private static final int RAIL_FLAT_WEST_EAST = 0x1;
+    private static final int RAIL_RAMP_EAST = 0x2;
+    private static final int RAIL_RAMP_WEST = 0x3;
+    private static final int RAIL_RAMP_NORTH = 0x4;
+    private static final int RAIL_RAMP_SOUTH = 0x5;
+    private static final int RAIL_CORNER_EAST_SOUTH = 0x6;
+    private static final int RAIL_CORNER_WEST_SOUTH = 0x7;
+    private static final int RAIL_CORNER_WEST_NORTH = 0x8;
+    private static final int RAIL_CORNER_EAST_NORTH = 0x9;
+
     static {
         if (VoxelizerConfig.FORCED_LAYERS == null) {
             Share.log.error("Overlay config broken.");
@@ -97,20 +108,36 @@ public class VoxelRenderHelper {
         transform.translation(x, y, z);
         transform.translate(0.5f, 0, 0.5f);
         switch (meta) {
-            case 1:
-            case 2: case 3: case 7: transform.rotateY(RAD_NEG90DEG); break;
-            case 8: transform.scale(-1, 1, -1); break;
-            case 9: transform.rotateY(RAD_90DEG);
+            case RAIL_FLAT_WEST_EAST:
+            case RAIL_RAMP_EAST:
+            case RAIL_CORNER_WEST_SOUTH:
+                transform.rotateY(RAD_NEG90DEG);
+                break;
+            case RAIL_RAMP_SOUTH:
+            case RAIL_CORNER_WEST_NORTH:
+                transform.scale(-1, 1, -1);
+                break;
+            case RAIL_RAMP_WEST:
+            case RAIL_CORNER_EAST_NORTH:
+                transform.rotateY(RAD_90DEG);
+                break;
         }
         if (!mirrored)
             transform.scale(-1, 1, -1);
         transform.translate(-0.5f, 0, -0.5f);
         switch (meta) {
-            case 2: case 3: case 4: case 5: transform.translate(0, 0.0625F, 0)
-                                                     .rotateX(RAD_45DEG)
-                                                     .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                                                     .translate(0, 0, 0.0625F); break;
-            default: transform.rotateX(RAD_90DEG); break;
+            case RAIL_RAMP_EAST:
+            case RAIL_RAMP_WEST:
+            case RAIL_RAMP_NORTH:
+            case RAIL_RAMP_SOUTH:
+                transform.translate(0, 0.0625F, 0)
+                         .rotateX(RAD_45DEG)
+                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                         .translate(0, 0, 0.0625F);
+                break;
+            default:
+                transform.rotateX(RAD_90DEG);
+                break;
         }
         mesh.renderToTessellator(tess, 0, false, true, transform);
     }
