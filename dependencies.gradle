@@ -37,7 +37,5 @@ dependencies {
         transitive = false
     }
 
-    compileOnly(deobfCurse("railcraft-51195:2458987")) {
-        transitive = false
-    }
+    compileOnly(deobfCurse("railcraft-51195:2458987"))
 }
