@@ -24,11 +24,14 @@
 package com.falsepattern.falsetweaks;
 
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
@@ -58,6 +61,9 @@ public class Compat {
         if (Loader.isModLoaded("archaicfix")) {
             ArchaicFixCompat.init();
         }
+        if (Loader.isModLoaded("apparatus")) {
+            ApparatusCompat.init();
+        }
     }
 
     public static boolean enableTriangulation() {
@@ -69,6 +75,30 @@ public class Compat {
             return ArchaicFixCompat.threadTessellator();
         }
         return Tessellator.instance;
+    }
+
+    public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
+        if (ApparatusCompat.isApparatusPresent()) {
+            return ApparatusCompat.getAmbientOcclusionLightValue(block, x, y, z, blockAccess);
+        } else {
+            return block.getAmbientOcclusionLightValue();
+        }
+    }
+
+    private static class ApparatusCompat {
+        @Getter
+        private static boolean apparatusPresent = false;
+
+        private static void init() {
+            apparatusPresent = true;
+        }
+        public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
+            if (!(block instanceof IParaBlock))
+                return block.getAmbientOcclusionLightValue();
+
+            return ((IParaBlock) block).paraTile(blockAccess, x, y, z)
+                                       .getAmbientOcclusionLightValue();
+        }
     }
 
     private static class ArchaicFixCompat {

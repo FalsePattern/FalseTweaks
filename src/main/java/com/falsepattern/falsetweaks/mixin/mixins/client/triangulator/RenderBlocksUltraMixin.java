@@ -209,6 +209,13 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private Block getBlockOffset(int x, int y, int z, Vector3ic offset) {
         return blockAccess.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
     }
+    
+    private float getAmbientOcclusionLightValueOffset(int x, int y, int z, Vector3ic offset) {
+        x += offset.x();
+        y += offset.y();
+        z += offset.z();
+        return Compat.getAmbientOcclusionLightValue(blockAccess.getBlock(x, y, z), x, y, z, blockAccess);
+    }
 
     private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, Facing.Direction face) {
         return getMixedBrightnessForBlockOffset(x, y, z, offset, false, face);
@@ -356,10 +363,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         final int brightnessLeft, brightnessTopLeft, brightnessTop, brightnessTopRight,
                 brightnessRight, brightnessBottomRight, brightnessBottom, brightnessBottomLeft;
 
-        lightLeft = getBlockOffset(x, y, z, facing.left).getAmbientOcclusionLightValue();
-        lightRight = getBlockOffset(x, y, z, facing.right).getAmbientOcclusionLightValue();
-        lightBottom = getBlockOffset(x, y, z, facing.bottom).getAmbientOcclusionLightValue();
-        lightTop = getBlockOffset(x, y, z, facing.top).getAmbientOcclusionLightValue();
+        lightLeft = getAmbientOcclusionLightValueOffset(x, y, z, facing.left);
+        lightRight = getAmbientOcclusionLightValueOffset(x, y, z, facing.right);
+        lightBottom = getAmbientOcclusionLightValueOffset(x, y, z, facing.bottom);
+        lightTop = getAmbientOcclusionLightValueOffset(x, y, z, facing.top);
         brightnessLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.left, facing.face);
         brightnessRight = getMixedBrightnessForBlockOffset(x, y, z, facing.right, facing.face);
         brightnessBottom = getMixedBrightnessForBlockOffset(x, y, z, facing.bottom, facing.face);
@@ -373,7 +380,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             lightBottomLeft = lightLeft;
             brightnessBottomLeft = brightnessLeft;
         } else {
-            lightBottomLeft = getBlockOffset(x, y, z, facing.bottomLeft).getAmbientOcclusionLightValue();
+            lightBottomLeft = getAmbientOcclusionLightValueOffset(x, y, z, facing.bottomLeft);
             brightnessBottomLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomLeft, facing.face);
         }
 
@@ -381,7 +388,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             lightTopLeft = lightLeft;
             brightnessTopLeft = brightnessLeft;
         } else {
-            lightTopLeft = getBlockOffset(x, y, z, facing.topLeft).getAmbientOcclusionLightValue();
+            lightTopLeft = getAmbientOcclusionLightValueOffset(x, y, z, facing.topLeft);
             brightnessTopLeft = getMixedBrightnessForBlockOffset(x, y, z, facing.topLeft, facing.face);
         }
 
@@ -389,7 +396,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             lightBottomRight = lightRight;
             brightnessBottomRight = brightnessRight;
         } else {
-            lightBottomRight = getBlockOffset(x, y, z, facing.bottomRight).getAmbientOcclusionLightValue();
+            lightBottomRight = getAmbientOcclusionLightValueOffset(x, y, z, facing.bottomRight);
             brightnessBottomRight = getMixedBrightnessForBlockOffset(x, y, z, facing.bottomRight, facing.face);
         }
 
@@ -397,7 +404,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             lightTopRight = lightRight;
             brightnessTopRight = brightnessRight;
         } else {
-            lightTopRight = getBlockOffset(x, y, z, facing.topRight).getAmbientOcclusionLightValue();
+            lightTopRight = getAmbientOcclusionLightValueOffset(x, y, z, facing.topRight);
             brightnessTopRight = getMixedBrightnessForBlockOffset(x, y, z, facing.topRight, facing.face);
         }
 
@@ -407,7 +414,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             z -= facing.front.z();
         }
 
-        float aoFront = getBlockOffset(x, y, z, facing.front).getAmbientOcclusionLightValue();
+        float aoFront = getAmbientOcclusionLightValueOffset(x, y, z, facing.front);
         float aoTopLeft = (lightLeft + lightTopLeft + aoFront + lightTop) / 4.0F;
         float aoTopRight = (aoFront + lightTop + lightRight + lightTopRight) / 4.0F;
         float aoBottomRight = (lightBottom + aoFront + lightBottomRight + lightRight) / 4.0F;

@@ -45,11 +45,13 @@ public enum Mixin implements IMixin {
     Tri_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.RenderBlocksUltraMixin"),
     Tri_RenderBlocksCompatMixin(Side.CLIENT,
                                 condition(() -> ModuleConfig.TRIANGULATOR)
-                                        .and(condition(() -> TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)),
+                                        .and(condition(() -> TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)
+                                                     .or(require(TargetedMod.APPARATUS))),
                                 "triangulator.RenderBlocksCompatMixin"),
     Tri_RenderBlocksPerformanceMixin(Side.CLIENT,
                                      condition(() -> ModuleConfig.TRIANGULATOR)
-                                             .and(condition(() -> !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)),
+                                             .and(condition(() -> !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)
+                                                          .and(avoid(TargetedMod.APPARATUS))),
                                      "triangulator.RenderBlocksPerformanceMixin"),
     Tri_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.TessellatorMixin"),
     Tri_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.WorldRendererMixin"),

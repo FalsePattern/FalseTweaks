@@ -41,6 +41,7 @@ public enum TargetedMod implements ITargetedMod {
     FASTCRAFT("FastCraft", false, startsWith("fastcraft")),
     CHROMATICRAFT("ChromatiCraft", false, startsWith("chromaticraft")),
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
+    APPARATUS("Apparatus", false, startsWith("apparatus")),
     ;
 
     @Getter
