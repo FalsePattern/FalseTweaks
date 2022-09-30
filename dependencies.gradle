@@ -4,9 +4,9 @@ dependencies {
     }
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
-    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.11:dev")
+    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.12:dev")
 
-    compile("org.joml:joml:1.10.4")
+    compileOnly("org.joml:joml:1.10.5")
 
     compileOnly("curse.maven:redstone-paste-67508:2211249") {
         transitive = false
