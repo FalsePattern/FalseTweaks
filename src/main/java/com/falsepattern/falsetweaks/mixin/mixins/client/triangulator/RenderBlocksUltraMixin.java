@@ -332,18 +332,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                                           facing.face.ordinal());
     }
 
-    private boolean getIsTransparent(int x, int y, int z, Vector3ic offset, Facing.Direction dir) {
-        Block block = getBlockOffset(x, y, z, offset);
-        boolean materialTransparent = block.getCanBlockGrass();
-        if (block instanceof BlockSlab) {
-            boolean topSlab = (getBlockMetadataOffset(x, y, z, offset) & 8) != 0;
-            return (!topSlab || dir != Facing.Direction.FACE_YNEG) && (topSlab || dir != Facing.Direction.FACE_YPOS) ||
-                   materialTransparent;
-        } else {
-            return materialTransparent;
-        }
-    }
-
     private boolean renderFace(IFaceRenderer renderer, Facing facing) {
         Block block = state.block;
         int x = state.x;
@@ -376,10 +364,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         brightnessRight = getMixedBrightnessForBlockOffset(x, y, z, facing.right, facing.face);
         brightnessBottom = getMixedBrightnessForBlockOffset(x, y, z, facing.bottom, facing.face);
         brightnessTop = getMixedBrightnessForBlockOffset(x, y, z, facing.top, facing.face);
-        boolean transparentLeft = getIsTransparent(x, y, z, facing.left, facing.face);
-        boolean transparentRight = getIsTransparent(x, y, z, facing.right, facing.face);
-        boolean transparentBottom = getIsTransparent(x, y, z, facing.bottom, facing.face);
-        boolean transparentTop = getIsTransparent(x, y, z, facing.top, facing.face);
+        boolean transparentLeft = lightLeft == 1;
+        boolean transparentRight = lightRight == 1;
+        boolean transparentBottom = lightBottom == 1;
+        boolean transparentTop = lightTop == 1;
 
         if (!transparentLeft && !transparentBottom) {
             lightBottomLeft = lightLeft;
