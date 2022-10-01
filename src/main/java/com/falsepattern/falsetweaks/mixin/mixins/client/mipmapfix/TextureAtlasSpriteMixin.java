@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
+package com.falsepattern.falsetweaks.mixin.mixins.client.mipmapfix;
 
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,13 +34,13 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 @Mixin(TextureAtlasSprite.class)
-public abstract class MipMapFix_TextureAtlasSpriteMixin {
+public abstract class TextureAtlasSpriteMixin {
     @ModifyVariable(method = "loadSprite",
                     at = @At("HEAD"),
                     index = 1,
                     argsOnly = true,
                     require = 1)
-    private BufferedImage[] fixMipMap(BufferedImage[] img) {
+    private BufferedImage[] scaleUpMipMap(BufferedImage[] img) {
         val baseImage = img[0];
         int w = baseImage.getWidth();
         int h = baseImage.getHeight();

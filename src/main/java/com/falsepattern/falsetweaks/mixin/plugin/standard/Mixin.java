@@ -158,6 +158,12 @@ public enum Mixin implements IMixin {
     Voxelizer_RCRenderTrackMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER).and(require(TargetedMod.RAILCRAFT)), "voxelizer.railcraft.RenderTrackMixin"),
     //endregion Voxelizer Module
 
+    //region MipMap Fix Module
+    MipMapFix_TextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureAtlasSpriteMixin"),
+    MipMapFix_TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureMapMixin"),
+    MipMapFix_TextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureUtilMixin"),
+    //endregion MipMap Fix Module
+
     //region Misc Modules
     ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),
 
@@ -166,7 +172,6 @@ public enum Mixin implements IMixin {
 
     TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
 
-    MipMapFix_TextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "misc.MipMapFix_TextureAtlasSpriteMixin"),
     //endregion Misc Modules
     ;
 

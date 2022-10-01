@@ -97,9 +97,10 @@ public class ModuleConfig {
     public static boolean TE_TRANSPARENCY_FIX;
 
 
-    @Config.Comment("Forces all textures to be a power of two, and at least 16x16 in side.\n" +
-                    "This fixes mipmaps, but might result in some weird textures when a texture was NOT a power of two.\n" +
-                    "FPS impact: none")
+    @Config.Comment("Improves the mipmap system of minecraft with 2 things:\n" +
+                    "1. Every tiny texture is upscaled to at least 16x16 to allow for 4 mipmap levels, even if a mod has a texture smaller than 16x16.\n" +
+                    "2. Replaces the mipmap generation with a multithreaded system, which scales with the number of cores in your system.\n" +
+                    "FPS impact: none, but resource pack reload times (and startup time) are cut down by a lot")
     @Config.DefaultBoolean(true)
     public static boolean MIPMAP_FIX;
 
