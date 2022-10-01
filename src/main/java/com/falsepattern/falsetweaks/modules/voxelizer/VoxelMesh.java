@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
@@ -206,7 +207,13 @@ public class VoxelMesh {
     public void compile() {
         String currentIdentity = getIdentity(0, false);
         if (!Objects.equals(cacheIdentity, currentIdentity)) {
+            if (VoxelizerConfig.DEBUG_MESH_COMPILATION) {
+                Share.log.info("Starting compilation for mesh \"" + currentIdentity + "\"");
+            }
             faceCache = compiler.compile(strategy);
+            if (VoxelizerConfig.DEBUG_MESH_COMPILATION) {
+                Share.log.info("Compiled mesh \"" + currentIdentity + "\" with " + faceCache.size() + " faces!");
+            }
             cacheIdentity = currentIdentity;
         }
     }

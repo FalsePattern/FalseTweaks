@@ -55,6 +55,12 @@ public class VoxelizerConfig {
     @Config.DefaultBoolean(true)
     public static boolean RAILS_3D;
 
+    @Config.Comment("If set to true, the mesh compiler will print out detailed information when textures are compiled\n" +
+                    "into meshes.")
+    @Config.LangKey("config.falsetweaks.voxelizer.debug_mesh_compilation")
+    @Config.DefaultBoolean(false)
+    public static boolean DEBUG_MESH_COMPILATION;
+
     static {
         ConfigurationManager.selfInit();
     }
