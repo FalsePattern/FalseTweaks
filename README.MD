@@ -2,7 +2,7 @@
 
 FalsePattern's flagship tweaking, patching, and optimization mod.
 
-Highlights:
+List of major features:
 - Replaced minecraft's quad-based rendering with triangle-based rendering
 - Fixed ambient occlusion and smooth lighting (vanilla bugs MC-138211 and MC-43968)
 - Optimized beacon beam rendering
