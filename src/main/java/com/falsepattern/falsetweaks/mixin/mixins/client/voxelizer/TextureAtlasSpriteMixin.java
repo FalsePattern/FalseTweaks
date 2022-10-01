@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
+import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
@@ -34,6 +35,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -64,6 +66,13 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     private void compileStatic(CallbackInfo ci) {
         voxelMesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, new Layer((TextureAtlasSprite)(Object)this, 0.0625F));
         voxelMesh.compile();
+    }
+
+    @Inject(method = "getMinU",
+            at = @At("HEAD"),
+            require = 1)
+    private void trackLastUsedSprite(CallbackInfoReturnable<Float> cir) {
+        Data.setLastUsedSprite((TextureAtlasSprite) (Object) this);
     }
 
     @Override

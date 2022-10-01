@@ -23,7 +23,9 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
+import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
+import lombok.val;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,75 +48,34 @@ import net.minecraftforge.client.IItemRenderer;
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                     ordinal = 0),
-            locals = LocalCapture.CAPTURE_FAILHARD,
+            at = @At("HEAD"),
+            remap = false,
             require = 1)
-    private void voxelizedRenderer(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type,
-                                   CallbackInfo ci,
-                                   TextureManager texturemanager, Item item, Block block, IItemRenderer customRenderer, IIcon iicon, Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5, float f6) {
-        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, false);
-    }
-
-    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glDepthFunc(I)V",
-                       ordinal = 0),
-              remap = false,
-              require = 1)
-    private void noGlintBlend1(int func) {
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-    }
-
-    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glDepthFunc(I)V",
-                       ordinal = 1),
-              remap = false,
-              require = 1)
-    private void noGlintBlend2(int func) {
+    private void startManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+        Data.setManagedMode(true);
     }
 
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-            at = {@At(value = "INVOKE",
-                      target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                      ordinal = 1),
-                  @At(value = "INVOKE",
-                      target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                      ordinal = 2)},
-            locals = LocalCapture.CAPTURE_FAILHARD,
+            at = @At("RETURN"),
+            remap = false,
             require = 1)
-    private void voxelizedRendererGlint(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type,
-                                   CallbackInfo ci,
-                                   TextureManager texturemanager, Item item, Block block, IItemRenderer customRenderer, IIcon iicon, Tessellator tessellator, float f, float f1, float f2, float f3, float f4, float f5, float f6) {
-        VoxelRenderHelper.renderItemVoxelized((TextureAtlasSprite) iicon, true);
+    private void endManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+        Data.setManagedMode(false);
     }
 
-    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                       ordinal = 0),
-              require = 1)
-    private void voxelizedRendererKillOriginal(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
-
-    }
-
-    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                       ordinal = 1),
-              require = 1)
-    private void voxelizedRendererKillOriginalG1(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
-
-    }
-
-    @Redirect(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItemIn2D(Lnet/minecraft/client/renderer/Tessellator;FFFFIIF)V",
-                       ordinal = 2),
-              require = 1)
-    private void voxelizedRendererKillOriginalG2(Tessellator tess, float a, float b, float c, float d, int e, int f, float g) {
-
+    @Inject(method = "renderItemIn2D",
+            at = @At("HEAD"),
+            cancellable = true,
+            require = 1)
+    private static void forceVoxelized(Tessellator p_78439_0_, float p_78439_1_, float p_78439_2_, float p_78439_3_, float p_78439_4_, int p_78439_5_, int p_78439_6_, float p_78439_7_, CallbackInfo ci) {
+        val lastUsed = Data.getLastUsedSprite();
+        if (lastUsed != null && Data.isManagedMode()) {
+            val glint = Data.enchantmentGlintTextureBound;
+            VoxelRenderHelper.renderItemVoxelized(lastUsed);
+            if (!glint) {
+                Data.incrementCurrentItemLayer();
+            }
+            ci.cancel();
+        }
     }
 }

@@ -33,6 +33,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -76,24 +77,30 @@ public class VoxelRenderHelper {
             }
         }
     }
-    public static void renderItemVoxelized(TextureAtlasSprite iicon, boolean glint) {
+    public static void renderItemVoxelized(TextureAtlasSprite iicon) {
         val mesh = VoxelMesh.getMesh(iicon);
         val name = iicon.getIconName();
-        int layer = 0;
+        int layer;
         if (layers.containsKey(name)) {
             layer = layers.get(name) * 2;
-        } else if (name.endsWith("_overlay")) {
-            layer = 2;
+            if (Data.enchantmentGlintTextureBound) {
+                layer++;
+            }
+        } else {
+            layer = Data.getCurrentItemLayer() * 2;
+            if (Data.enchantmentGlintTextureBound) {
+                layer--;
+            }
         }
-        if (glint) {
-            layer++;
+        if (Data.enchantmentGlintTextureBound) {
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
         }
-        if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, glint)) {
+        if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, Data.enchantmentGlintTextureBound)) {
             return;
         }
         val tess = Compat.tessellator();
         tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, layer, glint);
+        mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound);
         tess.draw();
         if (ModuleConfig.ITEM_RENDER_LISTS) {
             VoxelRenderListManager.INSTANCE.post();
