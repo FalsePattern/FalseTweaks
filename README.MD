@@ -22,8 +22,6 @@ And all of these tweaks can be individually toggled on/off in the config!
 |------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 | Game crashes on startup,<br>forge log says `MixinTargetAlreadyLoadedException`                 | Under the `00_modules` category in the config,<br>set `B:STARTUP_OPTIMIZATIONS` to `false`.    |
 | Game crashes on startup,<br>loading screen was already present (or fixing issue 1 didn't help) | Under the `triangulator` category in the config,<br>set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
-| Crash with OptiFine                                                                            | Under the `00_modules` category in the config,<br>set `B:MIPMAP_FIX` to `false`.               |
-
 Any bug reports concerning the known problems listed in this table will be closed without response. Read before you open issues.
 
 ## Dependencies

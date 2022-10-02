@@ -29,6 +29,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.util.ReportedException;
 
 import cpw.mods.fml.common.ProgressManager;
 
@@ -47,6 +50,7 @@ public class MulticoreMipMapEngine {
         return thread;
     });
     private final ConcurrentLinkedDeque<String> completedTextures = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<ReportedException> exceptions = new ConcurrentLinkedDeque<>();
     private final ProgressManager.ProgressBar progressBar;
 
     private static IllegalStateException fatalError() {
@@ -62,8 +66,18 @@ public class MulticoreMipMapEngine {
 
     private void scheduleToThreadsI(TextureAtlasSprite sprite, int mipMapLevels) {
         service.execute(() -> {
-            sprite.generateMipmaps(mipMapLevels);
-            completedTextures.add(sprite.getIconName());
+            try {
+                sprite.generateMipmaps(mipMapLevels);
+                completedTextures.add(sprite.getIconName());
+            } catch (Throwable throwable1) {
+                CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
+                CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
+                crashreportcategory.addCrashSectionCallable("Sprite name", sprite::getIconName);
+                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " + sprite.getIconHeight());
+                crashreportcategory.addCrashSectionCallable("Sprite frames", () -> sprite.getFrameCount() + " frames");
+                crashreportcategory.addCrashSection("Mipmap levels", mipMapLevels);
+                exceptions.add(new ReportedException(crashreport));
+            }
         });
     }
 
@@ -78,6 +92,7 @@ public class MulticoreMipMapEngine {
     private void waitForWorkEndI() {
         service.shutdown();
         boolean terminated = false;
+        ReportedException firstException = null;
         while (!terminated) {
             try {
                 terminated = service.awaitTermination(10, TimeUnit.MILLISECONDS);
@@ -89,6 +104,17 @@ public class MulticoreMipMapEngine {
                 if (name != null)
                     progressBar.step(name);
             }
+            while (exceptions.size() > 0) {
+                val ex = exceptions.poll();
+                if (firstException == null) {
+                    firstException = ex;
+                }
+                Share.log.error(ex);
+            }
+        }
+        ProgressManager.pop(progressBar);
+        if (firstException != null) {
+            throw firstException;
         }
     }
 

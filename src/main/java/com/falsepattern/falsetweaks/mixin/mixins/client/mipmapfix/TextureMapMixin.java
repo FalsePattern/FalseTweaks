@@ -25,7 +25,9 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.mipmapfix;
 
 import com.falsepattern.falsetweaks.modules.mipmapfix.MulticoreMipMapEngine;
 import lombok.val;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -36,26 +38,52 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResourceManager;
 import cpw.mods.fml.common.ProgressManager;
 
+import java.util.Map;
+
 @SuppressWarnings("deprecation")
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin {
-    @Redirect(method = "loadTextureAtlas",
+    @Shadow private boolean skipFirst;
+
+    @Shadow @Final private Map<?, ?> mapRegisteredSprites;
+
+    @Inject(method = "loadTextureAtlas",
             at = @At(value = "INVOKE",
-                     target = "Lcpw/mods/fml/common/ProgressManager;push(Ljava/lang/String;I)Lcpw/mods/fml/common/ProgressManager$ProgressBar;",
-                     ordinal = 1),
+                     target = "Ljava/util/Map;values()Ljava/util/Collection;",
+                     ordinal = 0),
             require = 1)
-    private ProgressManager.ProgressBar initWorkers(String title, int steps) {
-        val theBar = ProgressManager.push(title, steps);
+    private void initWorkers(IResourceManager p_110571_1_, CallbackInfo ci) {
+        val theBar = ProgressManager.push("Mipmap generation", skipFirst ? 0 : this.mapRegisteredSprites.size());
         MulticoreMipMapEngine.initWorkers(theBar);
-        return theBar;
+    }
+
+    @Redirect(method = "loadTextureAtlas",
+              at = @At(value = "INVOKE",
+                       target = "Lcpw/mods/fml/common/ProgressManager;push(Ljava/lang/String;I)Lcpw/mods/fml/common/ProgressManager$ProgressBar;",
+                       ordinal = 1),
+              require = 0,
+              expect = 0)
+    private ProgressManager.ProgressBar noBar(String title, int steps) {
+        return null;
     }
 
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/common/ProgressManager$ProgressBar;step(Ljava/lang/String;)V",
                        ordinal = 1),
-              require = 1)
+              require = 0,
+              expect = 0)
     private void noStep(ProgressManager.ProgressBar bar, String message) {
+
+    }
+
+    @Redirect(method = "loadTextureAtlas",
+              at = @At(value = "INVOKE",
+                       target = "Lcpw/mods/fml/common/ProgressManager;pop(Lcpw/mods/fml/common/ProgressManager$ProgressBar;)V",
+                       ordinal = 1),
+              require = 0,
+              expect = 0)
+    private void noPop(ProgressManager.ProgressBar newTime) {
 
     }
 

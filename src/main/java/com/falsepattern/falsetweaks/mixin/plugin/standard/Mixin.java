@@ -161,7 +161,11 @@ public enum Mixin implements IMixin {
     //region MipMap Fix Module
     MipMapFix_TextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureAtlasSpriteMixin"),
     MipMapFix_TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureMapMixin"),
-    MipMapFix_TextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureUtilMixin"),
+    MipMapFix_TextureUtilMixin(Side.CLIENT,
+                               condition(() -> ModuleConfig.MIPMAP_FIX)
+                                       .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS))
+                                       .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                               "mipmapfix.TextureUtilMixin"),
     //endregion MipMap Fix Module
 
     //region Misc Modules
