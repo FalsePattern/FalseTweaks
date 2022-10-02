@@ -24,38 +24,27 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
-import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.client.IItemRenderer;
+import net.minecraft.entity.Entity;
 
 @Mixin(RenderItem.class)
 public abstract class RenderItemMixin {
-    @Inject(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+    @Inject(method = "doRender(Lnet/minecraft/entity/Entity;DDDFF)V",
             at = @At("HEAD"),
-            remap = false,
             require = 1)
-    private void startManagedMode(EntityItem p_77020_1_, IIcon p_77020_2_, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
+    private void startManagedMode(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
         Data.setManagedMode(true);
     }
 
-    @Inject(method = "renderDroppedItem(Lnet/minecraft/entity/item/EntityItem;Lnet/minecraft/util/IIcon;IFFFFI)V",
+    @Inject(method = "doRender(Lnet/minecraft/entity/Entity;DDDFF)V",
             at = @At("RETURN"),
-            remap = false,
             require = 1)
-    private void endManagedMode(EntityItem p_77020_1_, IIcon p_77020_2_, int p_77020_3_, float p_77020_4_, float p_77020_5_, float p_77020_6_, float p_77020_7_, int pass, CallbackInfo ci) {
+    private void endManagedMode(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 }

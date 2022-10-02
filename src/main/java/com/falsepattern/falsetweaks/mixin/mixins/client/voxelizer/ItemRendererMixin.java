@@ -26,40 +26,27 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
 import lombok.val;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.client.IItemRenderer;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
-    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
+    @Inject(method = "renderItemInFirstPerson",
             at = @At("HEAD"),
-            remap = false,
             require = 1)
-    private void startManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void startManagedMode(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(true);
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
+    @Inject(method = "renderItemInFirstPerson",
             at = @At("RETURN"),
-            remap = false,
             require = 1)
-    private void endManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void endManagedMode(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 
