@@ -46,7 +46,9 @@ public class Layer {
             y += 8;
         }
         try {
-            int argb = tex().getFrameTextureDataSafe(tex().frameCounter())[0][y * texture.getIconWidth() + x];
+            int frameCount = tex().frameCounter();
+            if (frameCount == 0) return 255;
+            int argb = tex().getFrameTextureDataSafe(frameCount)[0][y * texture.getIconWidth() + x];
             return (argb >>> 24) & 0xFF;
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println(texture.getIconName());
