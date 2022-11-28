@@ -17,8 +17,33 @@ This mod completely replaces Triangulator and AnimFix. Make sure you delete thes
 - Faster texture stitching, with an algorithm based on [Packing2D](https://github.com/Sciss/Packing2D)
 - Fixed block light leaks
 - Multithreaded mipmap generation (way faster resource pack switching)
+- Multilayer items (see below)
 
 And all of these tweaks can be individually toggled on/off in the config!
+
+## Using multilayer items
+Multilayer items are defined using mcmeta files, and require the VOXELIZER module to be enabled for them to function properly.
+
+Example mcmeta format for a 3-layer texture:
+```json
+{
+  "voxelLayers": {
+    "layers": [1.0, 1.0, 0.5]
+  }
+}
+```
+
+The mcmeta should be attached to the base texture without any layering, and the layers should have the name of the base
+texture with _0, _1, _2, ... numeric suffixes for each layer.
+
+Example file layout:
+```
+circuit.png
+circuit.png.mcmeta
+circuit_0.png
+circuit_1.png
+circuit_2.png
+```
 
 ## Fixing known problems
 | **Issue**                                                                                      | **Potential solution**                                                                         |

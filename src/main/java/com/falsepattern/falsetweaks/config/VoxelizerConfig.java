@@ -61,6 +61,11 @@ public class VoxelizerConfig {
     @Config.DefaultBoolean(false)
     public static boolean DEBUG_MESH_COMPILATION;
 
+    @Config.Comment("Item textures to disable voxelization for. Used for things like the sword of the cosmos, or the chisel offset wand.")
+    @Config.DefaultStringList({""})
+    @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
+    public static String[] EXCLUSION_LIST;
+
     static {
         ConfigurationManager.selfInit();
     }

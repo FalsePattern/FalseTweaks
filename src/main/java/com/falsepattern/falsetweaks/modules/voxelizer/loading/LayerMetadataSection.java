@@ -21,23 +21,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.voxelizer.interfaces;
+package com.falsepattern.falsetweaks.modules.voxelizer.loading;
 
-import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
-import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
+import net.minecraft.client.resources.data.IMetadataSection;
 
-public interface ITextureAtlasSpriteMixin {
-    VoxelMesh getVoxelMesh();
-    void setVoxelMesh(VoxelMesh mesh);
+import java.util.Arrays;
 
-    void layers(Layer... layers);
-    Layer[] layers();
+public class LayerMetadataSection implements IMetadataSection {
+    private final float[] thicknesses;
 
-    int frameCounter();
+    public LayerMetadataSection(float[] thicknesses) {
+        this.thicknesses = Arrays.copyOf(thicknesses, thicknesses.length);
+    }
 
-    int getRealWidth();
-    int getRealHeight();
-
-    boolean useAnisotropicFiltering();
-    int[][] getFrameTextureDataSafe(int id);
+    public float[] thicknesses() {
+        return Arrays.copyOf(thicknesses, thicknesses.length);
+    }
 }

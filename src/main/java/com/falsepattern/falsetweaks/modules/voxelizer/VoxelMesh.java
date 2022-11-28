@@ -92,7 +92,8 @@ public class VoxelMesh {
         val texture = (ITextureAtlasSpriteMixin) iicon;
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
-            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, new Layer(iicon, 0.0625F));
+            val layers = texture.layers();
+            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
             texture.setVoxelMesh(mesh);
         }
         return mesh;

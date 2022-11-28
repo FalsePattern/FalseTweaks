@@ -30,6 +30,8 @@ import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
+import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSection;
+import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSerializer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -47,6 +49,9 @@ public class ClientProxy extends CommonProxy {
         Share.LEAKFIX_CLASS_INITIALIZED = true;
         if (ModuleConfig.TRIANGULATOR)
             Calibration.registerBus();
+        if (ModuleConfig.VOXELIZER) {
+            Minecraft.getMinecraft().metadataSerializer_.registerMetadataSectionType(new LayerMetadataSerializer(), LayerMetadataSection.class);
+        }
     }
 
     @Override
