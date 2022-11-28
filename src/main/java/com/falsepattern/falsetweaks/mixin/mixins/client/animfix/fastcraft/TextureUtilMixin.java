@@ -43,7 +43,9 @@ public abstract class TextureUtilMixin {
     @Redirect(method = "generateMipmapData",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;p(IIIIZ)I",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private static int disableGenerateMipmapDataTweak(int a, int b, int c, int d, boolean e) {
         return func_147943_a(a, b, c, d, e);
     }
@@ -51,7 +53,9 @@ public abstract class TextureUtilMixin {
     @Redirect(method = "uploadTextureMipmap",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;i([[IIIIIZZ)Z",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private static boolean disableUploadTextureMipmapTweak(int[][] a, int b, int c, int d, int e, boolean f, boolean g) {
         return false;
     }

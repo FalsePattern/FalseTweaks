@@ -37,7 +37,9 @@ public abstract class DynamicTextureMixin {
     @Redirect(method = "updateDynamicTexture",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;j(Lnet/minecraft/client/renderer/texture/DynamicTexture;)V",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private void disableUpdateDynamicTextureTweak(DynamicTexture dt) {
 
     }

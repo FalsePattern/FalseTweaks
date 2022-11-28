@@ -39,7 +39,9 @@ public abstract class TextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;m(Lnet/minecraft/client/renderer/texture/Stitcher;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private void disableAddSpriteTweak(Stitcher stitcher, TextureAtlasSprite sprite) {
         stitcher.addSprite(sprite);
     }
@@ -47,7 +49,9 @@ public abstract class TextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;g(Lnet/minecraft/client/renderer/texture/Stitcher;Lnet/minecraft/client/renderer/texture/TextureMap;)V",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private void disableDoStitchTweak(Stitcher stitcher, TextureMap map) {
         stitcher.doStitch();
     }
@@ -55,7 +59,9 @@ public abstract class TextureMapMixin {
     @Redirect(method = "tick",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;h(Lnet/minecraft/client/renderer/texture/TextureMap;)V",
-                       remap = false))
+                       remap = false),
+              require = 0,
+              expect = 0)
     private void disableUpdateAnimationsTweak(TextureMap map) {
         map.updateAnimations();
     }
@@ -64,7 +70,9 @@ public abstract class TextureMapMixin {
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;l(Lnet/minecraft/client/renderer/texture/TextureMap;Ljava/lang/String;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",
                        remap = false),
-              remap = false)
+              remap = false,
+              require = 0,
+              expect = 0)
     private void disableSetTextureEntryTweak(TextureMap map, String str, TextureAtlasSprite sprite) {
     }
 }
