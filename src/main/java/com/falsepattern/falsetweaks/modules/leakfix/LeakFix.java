@@ -181,9 +181,8 @@ public final class LeakFix {
         long time = System.nanoTime();
         float secondsSinceLastGC = (time - lastGC) / 1000000000f;
         int cacheSize = getCachedBufferCount();
-        if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 &&
-                                       (cacheSize < (LeakFixConfig.CACHE_SIZE_TARGET / 2) ||
-                                        cacheSize > (LeakFixConfig.CACHE_SIZE_TARGET * 2)))) {
+        if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 && (cacheSize < (LeakFixConfig.CACHE_SIZE_TARGET / 2) ||
+                                                                  cacheSize > (LeakFixConfig.CACHE_SIZE_TARGET * 2)))) {
             gc();
             lastGC = time;
         }

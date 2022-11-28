@@ -34,12 +34,11 @@ import java.util.List;
 public class RowColumnMergingStrategy implements MergingStrategy {
     public static final RowColumnMergingStrategy NoFlip = new RowColumnMergingStrategy(false);
     public static final RowColumnMergingStrategy YesFlip = new RowColumnMergingStrategy(true);
+    private final boolean flipIteration;
 
     public static List<RowColumnMergingStrategy> all() {
         return Arrays.asList(NoFlip, YesFlip);
     }
-
-    private final boolean flipIteration;
 
     @Override
     public void merge(Face[][] faces) {

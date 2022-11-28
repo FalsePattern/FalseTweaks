@@ -61,12 +61,12 @@ public abstract class RenderTrackMixin {
             return;
         }
         cir.setReturnValue(true);
-        int meta = ((BlockRailBase)block).getBasicRailMetadata(world, null, x, y, z);
+        int meta = ((BlockRailBase) block).getBasicRailMetadata(world, null, x, y, z);
         TileEntity tile = world.getTileEntity(x, y, z);
         ITrackInstance track = null;
         IIcon icon;
         if (tile instanceof TileTrack) {
-            track = ((TileTrack)tile).getTrackInstance();
+            track = ((TileTrack) tile).getTrackInstance();
             icon = renderblocks.getIconSafe(track.getIcon());
         } else {
             icon = Blocks.rail.getIcon(0, 0);
@@ -78,10 +78,10 @@ public abstract class RenderTrackMixin {
         boolean mirror = false;
         if (track != null) {
             if (track instanceof ITrackSwitch) {
-                ITrackSwitch switchTrack = (ITrackSwitch)track;
+                ITrackSwitch switchTrack = (ITrackSwitch) track;
                 mirror = switchTrack.isMirrored();
             } else if (track instanceof TrackGated) {
-                renderGatedTrack(renderblocks, (TrackGated)track, x, y, z, meta);
+                renderGatedTrack(renderblocks, (TrackGated) track, x, y, z, meta);
             }
         }
         VoxelRenderHelper.renderRail(world, (BlockRailBase) block, x, y, z, meta, icon, mirror);

@@ -44,13 +44,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
-        if (LeakFix.ENABLED)
+        if (LeakFix.ENABLED) {
             LeakFix.registerBus();
+        }
         Share.LEAKFIX_CLASS_INITIALIZED = true;
-        if (ModuleConfig.TRIANGULATOR)
+        if (ModuleConfig.TRIANGULATOR) {
             Calibration.registerBus();
+        }
         if (ModuleConfig.VOXELIZER) {
-            Minecraft.getMinecraft().metadataSerializer_.registerMetadataSectionType(new LayerMetadataSerializer(), LayerMetadataSection.class);
+            Minecraft.getMinecraft().metadataSerializer_.registerMetadataSectionType(new LayerMetadataSerializer(),
+                                                                                     LayerMetadataSection.class);
         }
     }
 
@@ -68,7 +71,7 @@ public class ClientProxy extends CommonProxy {
         if (LeakFix.ENABLED) {
             LeakFix.gc();
         }
-        
+
         if (ModuleConfig.TRIANGULATOR) {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
             Compat.applyCompatibilityTweaks();

@@ -29,7 +29,8 @@ public class RegexHelper {
     }
 
     public static boolean classFileRegex(String toMatch) {
-        return toMatch.endsWith(".class") && !toMatch.startsWith("$") && !toMatch.endsWith("$.class") && !toMatch.equals("module-info.class");
+        return toMatch.endsWith(".class") && !toMatch.startsWith("$") && !toMatch.endsWith("$.class") &&
+               !toMatch.equals("module-info.class");
     }
 
     public static boolean modClassRegex(String toMatch) {

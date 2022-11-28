@@ -29,6 +29,7 @@ import org.joml.Vector3ic;
 import net.minecraft.client.renderer.RenderBlocks;
 
 public enum Facing {
+    // @formatter:off
     YNEG(Direction.FACE_YNEG,
          (rb) -> rb.renderMinY <= 0,
          0.5f,
@@ -81,7 +82,7 @@ public enum Facing {
          new Vector3i(0, 0, -1),
          new Vector3i(0, -1, 0),
          new Vector3i(1, 0, 0));
-
+    // @formatter:on
     public final Direction face;
     public final ShiftFunc shiftFunc;
     public final int worldUp;
@@ -120,11 +121,16 @@ public enum Facing {
         return shiftFunc.doShift(rb);
     }
 
-    public interface ShiftFunc {
-        boolean doShift(RenderBlocks rb);
+    public enum Direction {
+        FACE_YNEG,
+        FACE_YPOS,
+        FACE_ZNEG,
+        FACE_ZPOS,
+        FACE_XNEG,
+        FACE_XPOS
     }
 
-    public enum Direction {
-        FACE_YNEG, FACE_YPOS, FACE_ZNEG, FACE_ZPOS, FACE_XNEG, FACE_XPOS
+    public interface ShiftFunc {
+        boolean doShift(RenderBlocks rb);
     }
 }

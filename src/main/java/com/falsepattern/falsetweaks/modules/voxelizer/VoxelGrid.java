@@ -39,9 +39,15 @@ public class VoxelGrid {
 
 
     public int toIndex(int x, int y, int z) {
-        if (x < 0 || x >= xSize) return -1;
-        if (y < 0 || y >= ySize) return -1;
-        if (z < 0 || z >= zSize) return -1;
+        if (x < 0 || x >= xSize) {
+            return -1;
+        }
+        if (y < 0 || y >= ySize) {
+            return -1;
+        }
+        if (z < 0 || z >= zSize) {
+            return -1;
+        }
         return z * ySize * xSize + y * xSize + x;
     }
 

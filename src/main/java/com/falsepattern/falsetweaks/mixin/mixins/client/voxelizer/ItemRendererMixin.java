@@ -36,20 +36,6 @@ import net.minecraft.client.renderer.Tessellator;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
-    @Inject(method = "renderItemInFirstPerson",
-            at = @At("HEAD"),
-            require = 1)
-    private void startManagedMode(float p_78440_1_, CallbackInfo ci) {
-        Data.setManagedMode(true);
-    }
-
-    @Inject(method = "renderItemInFirstPerson",
-            at = @At("RETURN"),
-            require = 1)
-    private void endManagedMode(float p_78440_1_, CallbackInfo ci) {
-        Data.setManagedMode(false);
-    }
-
     @Inject(method = "renderItemIn2D",
             at = @At("HEAD"),
             cancellable = true,
@@ -64,5 +50,19 @@ public abstract class ItemRendererMixin {
             }
             ci.cancel();
         }
+    }
+
+    @Inject(method = "renderItemInFirstPerson",
+            at = @At("HEAD"),
+            require = 1)
+    private void startManagedMode(float p_78440_1_, CallbackInfo ci) {
+        Data.setManagedMode(true);
+    }
+
+    @Inject(method = "renderItemInFirstPerson",
+            at = @At("RETURN"),
+            require = 1)
+    private void endManagedMode(float p_78440_1_, CallbackInfo ci) {
+        Data.setManagedMode(false);
     }
 }

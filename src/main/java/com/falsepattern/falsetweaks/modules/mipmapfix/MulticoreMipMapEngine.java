@@ -32,7 +32,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
-
 import cpw.mods.fml.common.ProgressManager;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -44,17 +43,19 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MulticoreMipMapEngine {
     private static final ThreadLocal<MulticoreMipMapEngine> engine = new ThreadLocal<>();
-    private final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
-        val thread = new Thread(r);
-        thread.setName("FalseTweaks mipmap thread");
-        return thread;
-    });
+    private final ExecutorService service =
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
+                val thread = new Thread(r);
+                thread.setName("FalseTweaks mipmap thread");
+                return thread;
+            });
     private final ConcurrentLinkedDeque<String> completedTextures = new ConcurrentLinkedDeque<>();
     private final ConcurrentLinkedDeque<ReportedException> exceptions = new ConcurrentLinkedDeque<>();
     private final ProgressManager.ProgressBar progressBar;
 
     private static IllegalStateException fatalError() {
-        return new IllegalStateException("Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
+        return new IllegalStateException(
+                "Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
     }
 
     public static void initWorkers(ProgressManager.ProgressBar bar) {
@@ -62,6 +63,23 @@ public class MulticoreMipMapEngine {
             throw fatalError();
         }
         engine.set(new MulticoreMipMapEngine(bar));
+    }
+
+    public static void scheduleToThreads(TextureAtlasSprite sprite, int mipMapLevels) {
+        val e = engine.get();
+        if (e == null) {
+            throw fatalError();
+        }
+        e.scheduleToThreadsI(sprite, mipMapLevels);
+    }
+
+    public static void waitForWorkEnd() {
+        val e = engine.get();
+        if (e == null) {
+            throw fatalError();
+        }
+        e.waitForWorkEndI();
+        engine.set(null);
     }
 
     private void scheduleToThreadsI(TextureAtlasSprite sprite, int mipMapLevels) {
@@ -73,20 +91,13 @@ public class MulticoreMipMapEngine {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
                 crashreportcategory.addCrashSectionCallable("Sprite name", sprite::getIconName);
-                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " + sprite.getIconHeight());
+                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " +
+                                                                                 sprite.getIconHeight());
                 crashreportcategory.addCrashSectionCallable("Sprite frames", () -> sprite.getFrameCount() + " frames");
                 crashreportcategory.addCrashSection("Mipmap levels", mipMapLevels);
                 exceptions.add(new ReportedException(crashreport));
             }
         });
-    }
-
-    public static void scheduleToThreads(TextureAtlasSprite sprite, int mipMapLevels) {
-        val e = engine.get();
-        if (e == null) {
-            throw fatalError();
-        }
-        e.scheduleToThreadsI(sprite, mipMapLevels);
     }
 
     private void waitForWorkEndI() {
@@ -101,8 +112,9 @@ public class MulticoreMipMapEngine {
             }
             while (completedTextures.size() > 0) {
                 String name = completedTextures.poll();
-                if (name != null)
+                if (name != null) {
                     progressBar.step(name);
+                }
             }
             while (exceptions.size() > 0) {
                 val ex = exceptions.poll();
@@ -116,14 +128,5 @@ public class MulticoreMipMapEngine {
         if (firstException != null) {
             throw firstException;
         }
-    }
-
-    public static void waitForWorkEnd() {
-        val e = engine.get();
-        if (e == null) {
-            throw fatalError();
-        }
-        e.waitForWorkEndI();
-        engine.set(null);
     }
 }

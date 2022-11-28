@@ -36,6 +36,7 @@ public enum Dir {
 
     public final Vector3ic dir;
     public final int bit;
+
     Dir(int x, int y, int z, int bit) {
         dir = new Vector3i(x, y, z);
         this.bit = bit;
@@ -43,13 +44,20 @@ public enum Dir {
 
     public Dir opposite() {
         switch (this) {
-            case Right: return Left;
-            case Up: return Down;
-            case Front: return Back;
-            case Left: return Right;
-            case Down: return Up;
-            case Back: return Front;
-            default: throw new IllegalStateException();
+            case Right:
+                return Left;
+            case Up:
+                return Down;
+            case Front:
+                return Back;
+            case Left:
+                return Right;
+            case Down:
+                return Up;
+            case Back:
+                return Front;
+            default:
+                throw new IllegalStateException();
         }
     }
 }

@@ -52,14 +52,6 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
     public static final ExpandingRectMergingStrategy NoFlipYesInvLU;
     public static final ExpandingRectMergingStrategy YesFlipNoInvLU;
     public static final ExpandingRectMergingStrategy YesFlipYesInvLU;
-    
-    public static List<ExpandingRectMergingStrategy> all() {
-        return Arrays.asList(NoFlipNoInvRD, NoFlipYesInvRD, YesFlipNoInvRD, YesFlipYesInvRD,
-                             NoFlipNoInvRU, NoFlipYesInvRU, YesFlipNoInvRU, YesFlipYesInvRU,
-                             NoFlipNoInvLD, NoFlipYesInvLD, YesFlipNoInvLD, YesFlipYesInvLD,
-                             NoFlipNoInvLU, NoFlipYesInvLU, YesFlipNoInvLU, YesFlipYesInvLU);
-    }
-
 
     static {
         Expander expandRight = new Expander() {
@@ -148,9 +140,7 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
         };
         val builder = builder();
-        builder.inverseExpansion(false)
-               .horizontalExpander(expandRight)
-               .verticalExpander(expandDown);
+        builder.inverseExpansion(false).horizontalExpander(expandRight).verticalExpander(expandDown);
         NoFlipNoInvRD = builder.flipIteration(false).build();
         NoFlipYesInvRD = builder.inverseExpansion(true).build();
         YesFlipYesInvRD = builder.flipIteration(true).build();
@@ -172,46 +162,17 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
         YesFlipYesInvLU = builder.flipIteration(true).build();
         YesFlipNoInvLU = builder.inverseExpansion(false).build();
     }
+
     private final Expander horizontalExpander;
     private final Expander verticalExpander;
     private final boolean flipIteration;
     private final boolean inverseExpansion;
-    
-    @Override
-    public void merge(Face[][] faces) {
-        if (flipIteration) {
-            for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x); x = horizontalExpander.modifyValue(x)) {
-                for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y); y = verticalExpander.modifyValue(y)) {
-                    tryExpand(faces, x, y);
-                }
-            }
-        } else {
-            for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y); y = verticalExpander.modifyValue(y)) {
-                for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x); x = horizontalExpander.modifyValue(x)) {
-                    tryExpand(faces, x, y);
-                }
-            }
-        }
-    }
 
-    private void tryExpand(Face[][] faces, int x, int y) {
-        Face root = faces[y][x];
-        if (root == null || root.parent != null) {
-            return;
-        }
-        while (true) {
-            boolean expanded;
-            if (inverseExpansion) {
-                expanded = verticalExpander.expand(faces, root);
-                expanded |= horizontalExpander.expand(faces, root);
-            } else {
-                expanded = horizontalExpander.expand(faces, root);
-                expanded |= verticalExpander.expand(faces, root);
-            }
-            if (!expanded) {
-                break;
-            }
-        }
+    public static List<ExpandingRectMergingStrategy> all() {
+        return Arrays.asList(NoFlipNoInvRD, NoFlipYesInvRD, YesFlipNoInvRD, YesFlipYesInvRD, NoFlipNoInvRU,
+                             NoFlipYesInvRU, YesFlipNoInvRU, YesFlipYesInvRU, NoFlipNoInvLD, NoFlipYesInvLD,
+                             YesFlipNoInvLD, YesFlipYesInvLD, NoFlipNoInvLU, NoFlipYesInvLU, YesFlipNoInvLU,
+                             YesFlipYesInvLU);
     }
 
     private static boolean tryExpandRight(Face[][] faces, Face root) {
@@ -287,7 +248,7 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             return;
         }
         Face root = candidates.get(0);
-        for (val candidate: candidates.subList(1, candidates.size())) {
+        for (val candidate : candidates.subList(1, candidates.size())) {
             Face.tryMerge(root, candidate);
         }
     }
@@ -295,11 +256,55 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
     private static boolean isIneligible(Face face) {
         return face == null || face.parent != null;
     }
-    
+
+    @Override
+    public void merge(Face[][] faces) {
+        if (flipIteration) {
+            for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x);
+                 x = horizontalExpander.modifyValue(x)) {
+                for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y);
+                     y = verticalExpander.modifyValue(y)) {
+                    tryExpand(faces, x, y);
+                }
+            }
+        } else {
+            for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y);
+                 y = verticalExpander.modifyValue(y)) {
+                for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x);
+                     x = horizontalExpander.modifyValue(x)) {
+                    tryExpand(faces, x, y);
+                }
+            }
+        }
+    }
+
+    private void tryExpand(Face[][] faces, int x, int y) {
+        Face root = faces[y][x];
+        if (root == null || root.parent != null) {
+            return;
+        }
+        while (true) {
+            boolean expanded;
+            if (inverseExpansion) {
+                expanded = verticalExpander.expand(faces, root);
+                expanded |= horizontalExpander.expand(faces, root);
+            } else {
+                expanded = horizontalExpander.expand(faces, root);
+                expanded |= verticalExpander.expand(faces, root);
+            }
+            if (!expanded) {
+                break;
+            }
+        }
+    }
+
     private interface Expander {
         boolean expand(Face[][] faces, Face root);
+
         int startIndex(Face[][] faces);
+
         boolean shouldContinue(Face[][] faces, int index);
+
         int modifyValue(int index);
     }
 }

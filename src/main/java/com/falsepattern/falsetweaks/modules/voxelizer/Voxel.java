@@ -24,9 +24,6 @@
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
 public final class Voxel {
-    private Voxel() {
-        throw new UnsupportedOperationException();
-    }
     /*
     0000 0000
     7654 3210
@@ -40,8 +37,11 @@ public final class Voxel {
     public static final int OFFSET_LEFT = 5;
     public static final int OFFSET_DOWN = 6;
     public static final int OFFSET_UP = 7;
-
     public static final byte BITMASK_TYPE = 0x3;
+
+    private Voxel() {
+        throw new UnsupportedOperationException();
+    }
 
     public static VoxelType getType(byte voxel) {
         return VoxelType.fromNumber((voxel & BITMASK_TYPE) >>> OFFSET_TYPE);

@@ -91,8 +91,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                        target = "Lnet/minecraft/client/renderer/Tessellator;drawMode:I"),
               require = 1)
     private void forceDrawingTris(Tessellator instance, int value) {
-        if (!isTriangulatorDisabled() &&
-            value == GL11.GL_QUADS) {
+        if (!isTriangulatorDisabled() && value == GL11.GL_QUADS) {
             hackedQuadRendering = true;
             value = GL11.GL_TRIANGLES;
         } else {
@@ -183,7 +182,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             if (quadVerticesPutIntoBuffer == 4) {
                 int vertexSize = shaderOn() ? 18 : 8;
                 System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize, 3 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize,
+                                 3 * vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - vertexSize, vertexSize);
                 quadVerticesPutIntoBuffer = 0;
                 alternativeTriangulation = false;

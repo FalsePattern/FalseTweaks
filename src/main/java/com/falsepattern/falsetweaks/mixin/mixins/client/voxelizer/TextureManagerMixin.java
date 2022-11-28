@@ -38,6 +38,7 @@ public abstract class TextureManagerMixin {
             at = @At("HEAD"),
             require = 1)
     private void detectEnchantmentGlint(ResourceLocation p_110577_1_, CallbackInfo ci) {
-        Data.enchantmentGlintTextureBound = p_110577_1_.getResourcePath().equals("textures/misc/enchanted_item_glint.png");
+        Data.enchantmentGlintTextureBound =
+                p_110577_1_.getResourcePath().equals("textures/misc/enchanted_item_glint.png");
     }
 }

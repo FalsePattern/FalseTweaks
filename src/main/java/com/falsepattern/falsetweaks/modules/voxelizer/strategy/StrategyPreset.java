@@ -29,13 +29,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @StableAPI(since = "__INTERNAL__")
 public enum StrategyPreset {
-    @StableAPI.Expose
-    Unoptimized_0(NullMergingStrategy.NULL),
-    @StableAPI.Expose
-    Fast_1(RowColumnMergingStrategy.NoFlip),
-    @StableAPI.Expose
-    Best_2(ExpandingRectMergingStrategy.NoFlipNoInvRD)
-    ;
+    @StableAPI.Expose Unoptimized_0(NullMergingStrategy.NULL),
+    @StableAPI.Expose Fast_1(RowColumnMergingStrategy.NoFlip),
+    @StableAPI.Expose Best_2(ExpandingRectMergingStrategy.NoFlipNoInvRD);
     @StableAPI.Expose
     public final MergingStrategy strategy;
 }

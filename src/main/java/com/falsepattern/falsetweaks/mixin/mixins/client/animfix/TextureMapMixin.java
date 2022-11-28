@@ -46,7 +46,9 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     private static Profiler theProfiler;
     @Shadow
     private int mipmapLevels;
-    @Shadow @Final private String basePath;
+    @Shadow
+    @Final
+    private String basePath;
     private AnimationUpdateBatcher batcher;
 
     @Inject(method = "loadTexture",

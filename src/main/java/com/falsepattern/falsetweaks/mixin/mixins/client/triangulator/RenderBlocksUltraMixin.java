@@ -32,7 +32,6 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
-import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.internal.Share;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -65,6 +64,8 @@ import java.util.Objects;
 public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Shadow
     public static boolean fancyGrass;
+    private static String[] currentCrackFixBlacklistArr;
+    private static Class<?>[] currentCrackFixBlacklistClasses;
     @Shadow
     public boolean enableAO;
     @Shadow
@@ -95,7 +96,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public float colorGreenTopRight;
     @Shadow(aliases = "colorBlueTopRightF")
     public float colorBlueTopRight;
-
     @Shadow
     public double renderMinX;
     @Shadow
@@ -108,7 +108,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public double renderMaxY;
     @Shadow
     public double renderMaxZ;
-
     @Shadow
     public int brightnessTopLeft;
     @Shadow
@@ -117,7 +116,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public int brightnessBottomRight;
     @Shadow
     public int brightnessTopRight;
-
     private int countS;
     private int countB;
     private float lightSky;
@@ -128,12 +126,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private double[] bounds;
     @Setter
     private boolean reusePreviousStates;
-
     private boolean disableCrackFix;
-
-    private boolean crackFixOff() {
-        return !TriangulatorConfig.FIX_BLOCK_CRACK || disableCrackFix;
-    }
 
     private static float avg(final float a, final float b) {
         return (a + b) / 2F;
@@ -145,6 +138,34 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private static float diff(final float a, final float b) {
         return Math.abs(a - b);
+    }
+
+    private static boolean isBlacklisted(Class<?> clazz) {
+        for (val element : getCrackFixBlacklist()) {
+            if (element.isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Class<?>[] getCrackFixBlacklist() {
+        if (currentCrackFixBlacklistArr != TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST) {
+            currentCrackFixBlacklistArr = TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST;
+            currentCrackFixBlacklistClasses = Arrays.stream(currentCrackFixBlacklistArr).map((name) -> {
+                try {
+                    return Class.forName(name);
+                } catch (ClassNotFoundException e) {
+                    Share.LOG.info("Could not find class " + name + " for crack fix blacklist!");
+                    return null;
+                }
+            }).filter(Objects::nonNull).toArray(Class<?>[]::new);
+        }
+        return currentCrackFixBlacklistClasses;
+    }
+
+    private boolean crackFixOff() {
+        return !TriangulatorConfig.FIX_BLOCK_CRACK || disableCrackFix;
     }
 
     @Shadow
@@ -209,7 +230,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private Block getBlockOffset(int x, int y, int z, Vector3ic offset) {
         return blockAccess.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
     }
-    
+
     private float getAmbientOcclusionLightValueOffset(int x, int y, int z, Vector3ic offset) {
         x += offset.x();
         y += offset.y();
@@ -332,10 +353,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private boolean shouldSideBeRenderedQuick(Block block, int x, int y, int z, Facing facing) {
-        return block.shouldSideBeRendered(blockAccess,
-                                          x + facing.front.x(),
-                                          y + facing.front.y(),
-                                          z + facing.front.z(),
+        return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(),
                                           facing.face.ordinal());
     }
 
@@ -698,8 +716,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             return;
         }
 
-        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 ||
-            renderMaxX != 1 || renderMaxY != 1 || renderMaxZ != 1) {
+        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 || renderMaxX != 1 || renderMaxY != 1 ||
+            renderMaxZ != 1) {
             return;
         }
         val EPSILON = TriangulatorConfig.BLOCK_CRACK_FIX_EPSILON;
@@ -710,12 +728,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         renderMaxY += EPSILON;
         renderMaxZ += EPSILON;
         switch (skipDir) {
+            // @formatter:off
             case FACE_XNEG: renderMinX = bounds[0]; break;
             case FACE_YNEG: renderMinY = bounds[1]; break;
             case FACE_ZNEG: renderMinZ = bounds[2]; break;
             case FACE_XPOS: renderMaxX = bounds[3]; break;
             case FACE_YPOS: renderMaxY = bounds[4]; break;
             case FACE_ZPOS: renderMaxZ = bounds[5]; break;
+            // @formatter:on
         }
     }
 
@@ -734,15 +754,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         renderMaxZ = bounds[5];
     }
 
-    private static boolean isBlacklisted(Class<?> clazz) {
-        for (val element: getCrackFixBlacklist()) {
-            if (element.isAssignableFrom(clazz)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Inject(method = "renderBlockByRenderType",
             at = @At("HEAD"),
             require = 1)
@@ -755,25 +766,5 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             require = 1)
     private void endExclusion(Block p_147805_1_, int p_147805_2_, int p_147805_3_, int p_147805_4_, CallbackInfoReturnable<Boolean> cir) {
         disableCrackFix = false;
-    }
-
-    @Config.Ignore
-    private static String[] currentCrackFixBlacklistArr;
-    @Config.Ignore
-    private static Class<?>[] currentCrackFixBlacklistClasses;
-
-    private static Class<?>[] getCrackFixBlacklist() {
-        if (currentCrackFixBlacklistArr != TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST) {
-            currentCrackFixBlacklistArr = TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST;
-            currentCrackFixBlacklistClasses = Arrays.stream(currentCrackFixBlacklistArr).map((name) -> {
-                try {
-                    return Class.forName(name);
-                } catch (ClassNotFoundException e) {
-                    Share.LOG.info("Could not find class " + name + " for crack fix blacklist!");
-                    return null;
-                }
-            }).filter(Objects::nonNull).toArray(Class<?>[]::new);
-        }
-        return currentCrackFixBlacklistClasses;
     }
 }

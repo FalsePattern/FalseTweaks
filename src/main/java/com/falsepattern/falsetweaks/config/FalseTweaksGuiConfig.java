@@ -40,14 +40,18 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
 
     private static Class<?>[] fetchConfigClasses() {
         val result = new ArrayList<Class<?>>();
-        if (ModuleConfig.TRIANGULATOR)
+        if (ModuleConfig.TRIANGULATOR) {
             result.add(TriangulatorConfig.class);
-        if (ModuleConfig.ITEM_RENDER_LISTS)
+        }
+        if (ModuleConfig.ITEM_RENDER_LISTS) {
             result.add(RenderListConfig.class);
-        if (ModuleConfig.VOXELIZER)
+        }
+        if (ModuleConfig.VOXELIZER) {
             result.add(VoxelizerConfig.class);
-        if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
+        }
+        if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
             result.add(LeakFixConfig.class);
+        }
         return result.toArray(new Class<?>[0]);
     }
 }

@@ -44,12 +44,12 @@ public class VoxelMesh {
     public static final float EPSILON = 0.0001f;
     private static final Matrix4fc IDENTITY = new Matrix4f();
     private static final ThreadLocal<Vector3f> workingVector = ThreadLocal.withInitial(Vector3f::new);
+    public final float totalThickness;
     private final MergingStrategy strategy;
     private final Layer[] layers;
     private final float[] xOffsets;
     private final float[] yOffsets;
     private final float[] zOffsets;
-    public final float totalThickness;
     private final VoxelCompiler compiler;
     private List<Face> faceCache;
     private String cacheIdentity = null;
@@ -69,23 +69,11 @@ public class VoxelMesh {
         zOffsets[0] = offset;
         totalThickness = offset;
         for (int x = 0; x <= compiler.xSize; x++) {
-            xOffsets[x] = 1 - x / (float)compiler.xSize;
+            xOffsets[x] = 1 - x / (float) compiler.xSize;
         }
         for (int y = 0; y <= compiler.ySize; y++) {
-            yOffsets[y] = 1 - y / (float)compiler.ySize;
+            yOffsets[y] = 1 - y / (float) compiler.ySize;
         }
-    }
-
-    public int xSize() {
-        return compiler.xSize;
-    }
-
-    public int ySize() {
-        return compiler.ySize;
-    }
-
-    public int zSize() {
-        return compiler.zSize;
     }
 
     public static VoxelMesh getMesh(TextureAtlasSprite iicon) {
@@ -93,14 +81,11 @@ public class VoxelMesh {
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
             val layers = texture.layers();
-            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
+            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy,
+                                 layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
             texture.setVoxelMesh(mesh);
         }
         return mesh;
-    }
-
-    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
-        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null);
     }
 
     private static void setNormal(Tessellator tess, Vector3f normal) {
@@ -125,17 +110,31 @@ public class VoxelMesh {
         }
     }
 
-
     private static void addVertexWithUVWithTransform(Tessellator tess, Vector3f pos, float u, float v, Matrix4fc transform) {
         transform.transformPosition(pos);
         tess.addVertexWithUV(pos.x, pos.y, pos.z, u, v);
     }
 
+    public int xSize() {
+        return compiler.xSize;
+    }
+
+    public int ySize() {
+        return compiler.ySize;
+    }
+
+    public int zSize() {
+        return compiler.zSize;
+    }
+
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
+        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null);
+    }
 
     public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform, Function<Face, Boolean> trimmingFunction) {
         compile();
         val vec = workingVector.get();
-        for (val face: faceCache) {
+        for (val face : faceCache) {
             if (trimmingFunction != null && trimmingFunction.apply(face)) {
                 continue;
             }
@@ -153,6 +152,7 @@ public class VoxelMesh {
                 v2 = face.v2;
             }
             switch (face.dir) {
+                // @formatter:off
                 case Front: {
                     setupLighting(tess, vec.set(0, 0, 1), chunkSpace, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON, yOffsets[face.maxY + 1] - EPSILON, zOffsets[face.z + 1] + EPSILON_OUT), u1, v2, transform);
@@ -201,6 +201,7 @@ public class VoxelMesh {
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
                     break;
                 }
+                // @formatter:on
             }
         }
     }
@@ -227,7 +228,7 @@ public class VoxelMesh {
         if (overlayLayer > 0) {
             result.append("overlay").append(overlayLayer).append("!");
         }
-        for (val layer: layers) {
+        for (val layer : layers) {
             result.append(layer.textureIdentity()).append('&');
         }
         return result.toString();

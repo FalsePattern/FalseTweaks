@@ -60,7 +60,8 @@ public class TriangulatorConfig {
                     "FPS impact: None")
     @Config.LangKey("config.falsetweaks.triangulator.block_crack_fix_epsilon")
     @Config.DefaultDouble(0.0005)
-    @Config.RangeDouble(min = 0, max = 0.005)
+    @Config.RangeDouble(min = 0,
+                        max = 0.005)
     public static double BLOCK_CRACK_FIX_EPSILON;
 
     @Config.Comment("Block classes that have bugs when rendering with the crack fix can be put here to avoid manipulating them\n.")

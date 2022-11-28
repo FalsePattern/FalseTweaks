@@ -39,6 +39,7 @@ public class VoxelCompiler {
     public final int zSize;
 
     private final Layer[] layers;
+
     public VoxelCompiler(Layer... layers) {
         this.layers = Arrays.copyOf(layers, layers.length);
         {
@@ -48,7 +49,7 @@ public class VoxelCompiler {
                 TextureAtlasSprite tex = layers[i].texture;
                 int xTex = tex.getIconWidth();
                 int yTex = tex.getIconHeight();
-                if (((ITextureAtlasSpriteMixin)tex).useAnisotropicFiltering()) {
+                if (((ITextureAtlasSpriteMixin) tex).useAnisotropicFiltering()) {
                     xTex -= 16;
                     yTex -= 16;
                 }
@@ -60,23 +61,42 @@ public class VoxelCompiler {
         }
     }
 
+    private static void unwrap(Face[][] faces, List<Face> result) {
+        for (Face[] row : faces) {
+            unwrap(row, result);
+        }
+    }
+
+    private static void unwrap(Face[] faces, List<Face> result) {
+        for (Face f : faces) {
+            if (f != null && f.parent == null && !f.used) {
+                result.add(f);
+                f.used = true;
+            }
+        }
+    }
+
     public List<Face> compile(MergingStrategy strategy) {
         val voxels = new VoxelGrid(xSize, ySize, zSize);
-        for (int z = 0; z < zSize; z++)
-            for (int y = 0; y < ySize; y++)
+        for (int z = 0; z < zSize; z++) {
+            for (int y = 0; y < ySize; y++) {
                 for (int x = 0; x < xSize; x++) {
                     int alpha = layers[z].fetchAlpha(x, y, xSize, ySize);
                     voxels.setType(x, y, z, VoxelType.fromAlpha(alpha));
                 }
+            }
+        }
 
-        for (int z = -1; z < zSize; z++)
-            for (int y = -1; y < ySize; y++)
+        for (int z = -1; z < zSize; z++) {
+            for (int y = -1; y < ySize; y++) {
                 for (int x = -1; x < xSize; x++) {
                     int thisIndex = voxels.toIndex(x, y, z);
                     voxels.exchangeFaces(thisIndex, voxels.toIndex(x + 1, y, z), Dir.Right);
                     voxels.exchangeFaces(thisIndex, voxels.toIndex(x, y + 1, z), Dir.Down);
                     voxels.exchangeFaces(thisIndex, voxels.toIndex(x, y, z + 1), Dir.Front);
                 }
+            }
+        }
         List<Face> results = new ArrayList<>();
         //Allocate earlier for reuse
         Face[][] front = new Face[ySize][xSize];
@@ -90,7 +110,7 @@ public class VoxelCompiler {
         for (int z = 0; z < zSize; z++) {
             faceBuilder.z(z);
             Layer layer = layers[z];
-            for (val type: VoxelType.renderable()) {
+            for (val type : VoxelType.renderable()) {
                 //Front and back faces (2D merge)
                 //Plus top and bottom faces inlined into the loop
                 {
@@ -169,18 +189,5 @@ public class VoxelCompiler {
             }
         }
         return results;
-    }
-
-    private static void unwrap(Face[][] faces, List<Face> result) {
-        for (Face[] row : faces)
-            unwrap(row, result);
-    }
-
-    private static void unwrap(Face[] faces, List<Face> result) {
-        for (Face f: faces)
-            if (f != null && f.parent == null && !f.used) {
-                result.add(f);
-                f.used = true;
-            }
     }
 }

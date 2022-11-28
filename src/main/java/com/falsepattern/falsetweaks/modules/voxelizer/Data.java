@@ -37,14 +37,14 @@ public class Data {
     private static TextureAtlasSprite lastUsedSprite = null;
     private static boolean managedMode = false;
 
+    public static boolean isManagedMode() {
+        return managedMode;
+    }
+
     public static void setManagedMode(boolean managedMode) {
         currentItemLayer = 0;
         Data.managedMode = managedMode;
         lastUsedSprite = null;
-    }
-
-    public static boolean isManagedMode() {
-        return managedMode;
     }
 
     public static void incrementCurrentItemLayer() {

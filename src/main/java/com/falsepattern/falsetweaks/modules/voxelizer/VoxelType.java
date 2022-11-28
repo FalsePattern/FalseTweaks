@@ -24,35 +24,48 @@
 package com.falsepattern.falsetweaks.modules.voxelizer;
 
 public enum VoxelType {
-    Solid, SemiSolid, Transparent;
+    Solid,
+    SemiSolid,
+    Transparent;
 
     public static VoxelType[] renderable() {
         return new VoxelType[]{Solid, SemiSolid};
     }
 
-    public int toNumber() {
-        switch (this) {
-            case Transparent: return 0;
-            case SemiSolid: return 1;
-            case Solid: return 2;
-            default: throw new IllegalStateException();
-        }
-    }
-
     public static VoxelType fromNumber(int number) {
         switch (number) {
-            case 0: return Transparent;
-            case 1: return SemiSolid;
-            case 2: return Solid;
-            default: throw new IllegalArgumentException(Integer.toString(number));
+            case 0:
+                return Transparent;
+            case 1:
+                return SemiSolid;
+            case 2:
+                return Solid;
+            default:
+                throw new IllegalArgumentException(Integer.toString(number));
         }
     }
 
     public static VoxelType fromAlpha(int alpha) {
         switch (alpha) {
-            case 0: return Transparent;
-            case 255: return Solid;
-            default: return SemiSolid;
+            case 0:
+                return Transparent;
+            case 255:
+                return Solid;
+            default:
+                return SemiSolid;
+        }
+    }
+
+    public int toNumber() {
+        switch (this) {
+            case Transparent:
+                return 0;
+            case SemiSolid:
+                return 1;
+            case Solid:
+                return 2;
+            default:
+                throw new IllegalStateException();
         }
     }
 }

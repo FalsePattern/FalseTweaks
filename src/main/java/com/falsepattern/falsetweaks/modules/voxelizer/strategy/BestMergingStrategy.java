@@ -29,8 +29,9 @@ import lombok.val;
 import java.util.Arrays;
 import java.util.List;
 
-public class BestMergingStrategy implements MergingStrategy{
+public class BestMergingStrategy implements MergingStrategy {
     private final MergingStrategy[] strategies;
+
     public BestMergingStrategy(MergingStrategy... strategies) {
         this.strategies = Arrays.copyOf(strategies, strategies.length);
     }
@@ -56,9 +57,6 @@ public class BestMergingStrategy implements MergingStrategy{
                 bestFaceCountIndex = i;
             }
         }
-//        System.out.println(Arrays.toString(faceCounts));
-//        System.out.println(bestFaceCount);
-//        System.out.println("Reduction: " + (float)bestFaceCount / worstFaceCount);
         MergingStrategy.emplace(faces, sources[bestFaceCountIndex]);
     }
 }

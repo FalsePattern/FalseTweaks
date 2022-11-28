@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 @Mixin(TextureUtil.class)
 public abstract class TextureUtilMixin {
     private static ThreadLocal<int[]> threadLocalBuffer;
+
     @Inject(method = "<clinit>",
             at = @At("RETURN"),
             require = 1)

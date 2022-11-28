@@ -85,6 +85,7 @@ public class AnimationUpdateBatcher {
         thread.setDaemon(true);
         thread.start();
     }
+
     public boolean scheduleUpload(int[][] texture, int width, int height, int xOffset, int yOffset) {
         xOffset -= this.xOffset;
         yOffset -= this.yOffset;

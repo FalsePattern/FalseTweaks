@@ -45,9 +45,9 @@ public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
     private static final ThreadLocal<Matrix4f> threadMatrix = ThreadLocal.withInitial(Matrix4f::new);
 
-    private static final float RAD_90DEG = (float)Math.toRadians(90);
-    private static final float RAD_NEG90DEG = (float)Math.toRadians(-90);
-    private static final float RAD_45DEG = (float)Math.toRadians(45);
+    private static final float RAD_90DEG = (float) Math.toRadians(90);
+    private static final float RAD_NEG90DEG = (float) Math.toRadians(-90);
+    private static final float RAD_45DEG = (float) Math.toRadians(45);
 
     private static final int RAIL_FLAT_NORTH_SOUTH = 0x0;
     private static final int RAIL_FLAT_WEST_EAST = 0x1;
@@ -64,10 +64,11 @@ public class VoxelRenderHelper {
         if (VoxelizerConfig.FORCED_LAYERS == null) {
             Share.log.error("Overlay config broken.");
         }
-        for (val entry: VoxelizerConfig.FORCED_LAYERS) {
+        for (val entry : VoxelizerConfig.FORCED_LAYERS) {
             val parts = entry.split("=");
             if (parts.length != 2) {
-                Share.log.error("Invalid forced layer " + entry + " in overlay config! Format should be: texturename=number");
+                Share.log.error(
+                        "Invalid forced layer " + entry + " in overlay config! Format should be: texturename=number");
                 continue;
             }
             try {
@@ -77,6 +78,7 @@ public class VoxelRenderHelper {
             }
         }
     }
+
     public static void renderItemVoxelized(TextureAtlasSprite iicon) {
         val mesh = VoxelMesh.getMesh(iicon);
         val name = iicon.getIconName();
@@ -95,7 +97,8 @@ public class VoxelRenderHelper {
         if (Data.enchantmentGlintTextureBound) {
             GL11.glDepthFunc(GL11.GL_LEQUAL);
         }
-        if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, Data.enchantmentGlintTextureBound)) {
+        if (ModuleConfig.ITEM_RENDER_LISTS &&
+            VoxelRenderListManager.INSTANCE.pre(mesh, layer, Data.enchantmentGlintTextureBound)) {
             return;
         }
         val tess = Compat.tessellator();
@@ -106,6 +109,7 @@ public class VoxelRenderHelper {
             VoxelRenderListManager.INSTANCE.post();
         }
     }
+
     public static void renderRail(IBlockAccess blockAccess, BlockRailBase rail, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
         val tess = Compat.tessellator();
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
@@ -129,8 +133,9 @@ public class VoxelRenderHelper {
                 transform.rotateY(RAD_90DEG);
                 break;
         }
-        if (!mirrored)
+        if (!mirrored) {
             transform.scale(-1, 1, -1);
+        }
         transform.translate(-0.5f, 0, -0.5f);
         switch (meta) {
             case RAIL_RAMP_EAST:
@@ -150,45 +155,56 @@ public class VoxelRenderHelper {
             //Notice: corner rails commented out because they have parts of the "wood" also on the edge of the mesh
             switch (face.dir) {
                 case Up: {
-                    if (face.minY != 0)
+                    if (face.minY != 0) {
                         break;
+                    }
                     switch (meta) {
                         case RAIL_FLAT_NORTH_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH,
+                                                           RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH,
+                                                           RAIL_CORNER_WEST_SOUTH);
                         case RAIL_FLAT_WEST_EAST:
-                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST,
+                                                           RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH,
+                                                           RAIL_CORNER_WEST_NORTH);
                     }
                     break;
                 }
                 case Down: {
-                    if (face.maxY != mesh.ySize() - 1)
+                    if (face.maxY != mesh.ySize() - 1) {
                         break;
+                    }
                     switch (meta) {
                         case RAIL_FLAT_NORTH_SOUTH:
-//                        case RAIL_CORNER_EAST_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+                            //                        case RAIL_CORNER_EAST_SOUTH:
+                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH,
+                                                           RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH,
+                                                           RAIL_CORNER_WEST_NORTH);
                         case RAIL_FLAT_WEST_EAST:
-//                        case RAIL_CORNER_WEST_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
-//                        case RAIL_CORNER_WEST_NORTH:
-//                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
-//                        case RAIL_CORNER_EAST_NORTH:
-//                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                            //                        case RAIL_CORNER_WEST_SOUTH:
+                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST,
+                                                           RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH,
+                                                           RAIL_CORNER_EAST_NORTH);
+                        //                        case RAIL_CORNER_WEST_NORTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                        //                        case RAIL_CORNER_EAST_NORTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
                     }
                     break;
                 }
                 case Right: {
-                    if (face.maxX != mesh.xSize() - 1)
+                    if (face.maxX != mesh.xSize() - 1) {
                         break;
+                    }
                     switch (meta) {
-//                        case RAIL_CORNER_WEST_NORTH:
-//                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
-//                        case RAIL_CORNER_WEST_SOUTH:
-//                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
-//                        case RAIL_CORNER_EAST_SOUTH:
-//                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
-//                        case RAIL_CORNER_EAST_NORTH:
-//                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                        //                        case RAIL_CORNER_WEST_NORTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
+                        //                        case RAIL_CORNER_WEST_SOUTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+                        //                        case RAIL_CORNER_EAST_SOUTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                        //                        case RAIL_CORNER_EAST_NORTH:
+                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
                     }
                     break;
                 }
@@ -202,7 +218,7 @@ public class VoxelRenderHelper {
         if (!(block instanceof BlockRailBase)) {
             return false;
         }
-        val meta = ((BlockRailBase)block).getBasicRailMetadata(blockAccess, null, x, y, z);
+        val meta = ((BlockRailBase) block).getBasicRailMetadata(blockAccess, null, x, y, z);
         for (int expected : expectedRailMeta) {
             if (expected == meta) {
                 return true;
@@ -217,8 +233,9 @@ public class VoxelRenderHelper {
         if (renderBlocks.hasOverrideBlockTexture()) {
             iicon = renderBlocks.overrideBlockTexture;
         }
-        if (rail.isPowered())
+        if (rail.isPowered()) {
             meta &= 0x7;
+        }
         renderRail(renderBlocks.blockAccess, rail, x, y, z, meta, iicon, false);
     }
 }

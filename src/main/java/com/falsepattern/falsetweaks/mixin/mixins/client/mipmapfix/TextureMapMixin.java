@@ -43,9 +43,12 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin {
-    @Shadow private boolean skipFirst;
+    @Shadow
+    private boolean skipFirst;
 
-    @Shadow @Final private Map<?, ?> mapRegisteredSprites;
+    @Shadow
+    @Final
+    private Map<?, ?> mapRegisteredSprites;
 
     @Inject(method = "loadTextureAtlas",
             at = @At(value = "INVOKE",

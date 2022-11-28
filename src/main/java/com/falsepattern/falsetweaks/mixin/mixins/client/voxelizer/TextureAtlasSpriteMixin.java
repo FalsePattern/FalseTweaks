@@ -41,7 +41,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 @Mixin(TextureAtlasSprite.class)
-@Accessors(fluent = true, chain = false)
+@Accessors(fluent = true,
+           chain = false)
 public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixin {
     @Getter
     @Shadow
@@ -54,22 +55,27 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     @Getter
     @Setter
     private Layer[] layers;
-
-    @Shadow public abstract int[][] getFrameTextureData(int p_147965_1_);
-
-    @Shadow public abstract int getFrameCount();
-
-    @Shadow public abstract int getIconWidth();
-
-    @Shadow public abstract int getIconHeight();
-
     private VoxelMesh voxelMesh;
+
+    @Shadow
+    public abstract int[][] getFrameTextureData(int p_147965_1_);
+
+    @Shadow
+    public abstract int getFrameCount();
+
+    @Shadow
+    public abstract int getIconWidth();
+
+    @Shadow
+    public abstract int getIconHeight();
 
     @Inject(method = "clearFramesTextureData",
             at = @At(value = "HEAD"),
             require = 1)
     private void compileStatic(CallbackInfo ci) {
-        voxelMesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, layers == null ? new Layer[]{new Layer((TextureAtlasSprite)(Object)this, 0.0625F)} : layers);
+        voxelMesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy,
+                                  layers == null ? new Layer[]{new Layer((TextureAtlasSprite) (Object) this, 0.0625F)}
+                                                 : layers);
         voxelMesh.compile();
     }
 

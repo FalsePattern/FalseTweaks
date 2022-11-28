@@ -42,7 +42,8 @@ public class Compat {
     public static boolean neodymiumInstalled() {
         if (NEODYMIUM == null) {
             try {
-                NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
+                NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes(
+                        "makamys.neodymium.Neodymium") != null;
             } catch (IOException e) {
                 e.printStackTrace();
                 NEODYMIUM = false;
@@ -50,7 +51,8 @@ public class Compat {
             if (NEODYMIUM) {
                 Share.log.warn("Neodymium detected! Incompatible modules will be disabled.");
                 Share.log.warn("Incompatible modules:");
-                Share.log.warn("Leak Fix (Change from Auto for Enable to bypass the safety check and enable it anyways)");
+                Share.log.warn(
+                        "Leak Fix (Change from Auto for Enable to bypass the safety check and enable it anyways)");
                 Share.log.warn("Quad Triangulation");
             }
         }
@@ -71,7 +73,7 @@ public class Compat {
     }
 
     public static Tessellator tessellator() {
-        if(ArchaicFixCompat.isThreadedChunkUpdatingEnabled()) {
+        if (ArchaicFixCompat.isThreadedChunkUpdatingEnabled()) {
             return ArchaicFixCompat.threadTessellator();
         }
         return Tessellator.instance;
@@ -92,12 +94,13 @@ public class Compat {
         private static void init() {
             apparatusPresent = true;
         }
-        public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
-            if (!(block instanceof IParaBlock))
-                return block.getAmbientOcclusionLightValue();
 
-            return ((IParaBlock) block).paraTile(blockAccess, x, y, z)
-                                       .getAmbientOcclusionLightValue();
+        public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
+            if (!(block instanceof IParaBlock)) {
+                return block.getAmbientOcclusionLightValue();
+            }
+
+            return ((IParaBlock) block).paraTile(blockAccess, x, y, z).getAmbientOcclusionLightValue();
         }
     }
 

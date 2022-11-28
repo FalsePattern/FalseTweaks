@@ -33,6 +33,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         Deps.initDeps();
     }
+
     @Override
     public String[] getASMTransformerClass() {
         return new String[0];

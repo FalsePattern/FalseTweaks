@@ -29,8 +29,11 @@ import com.falsepattern.lib.dependencies.SemanticVersion;
 
 public class Deps {
     private static boolean initialized = false;
+
     public static void initDeps() {
-        if (initialized) return;
+        if (initialized) {
+            return;
+        }
         initialized = true;
         loadJoml();
     }

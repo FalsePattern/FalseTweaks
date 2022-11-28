@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true,
-        chain = false)
+           chain = false)
 public class ToggleableTessellatorManager {
     public static final ToggleableTessellatorManager INSTANCE = new ToggleableTessellatorManager();
 

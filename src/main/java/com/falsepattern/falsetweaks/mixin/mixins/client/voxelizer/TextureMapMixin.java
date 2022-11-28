@@ -47,11 +47,15 @@ import java.util.Map;
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin {
     private static final float BASE_THICKNESS = 0.0625F;
-    @Shadow @Final private Map<String, TextureAtlasSprite> mapRegisteredSprites;
+    @Shadow
+    @Final
+    private Map<String, TextureAtlasSprite> mapRegisteredSprites;
 
-    @Shadow protected abstract ResourceLocation completeResourceLocation(ResourceLocation p_147634_1_, int p_147634_2_);
+    @Shadow
+    protected abstract ResourceLocation completeResourceLocation(ResourceLocation p_147634_1_, int p_147634_2_);
 
-    @Shadow public abstract IIcon registerIcon(String p_94245_1_);
+    @Shadow
+    public abstract IIcon registerIcon(String p_94245_1_);
 
     @Inject(method = "loadTextureAtlas",
             at = @At(value = "INVOKE",
@@ -59,7 +63,7 @@ public abstract class TextureMapMixin {
             require = 1)
     private void loadExtraTexturesForLayers(IResourceManager manager, CallbackInfo ci) {
         val sprites = new HashMap<>(mapRegisteredSprites);
-        for (val sprite: sprites.entrySet()) {
+        for (val sprite : sprites.entrySet()) {
             val name = sprite.getKey();
             val iicon = sprite.getValue();
             val tex = (ITextureAtlasSpriteMixin) iicon;
@@ -72,7 +76,9 @@ public abstract class TextureMapMixin {
                     val thicknesses = layerMeta.thicknesses();
                     val layers = new Layer[thicknesses.length];
                     for (int i = 0; i < thicknesses.length; i++) {
-                        layers[thicknesses.length - 1 - i] = new Layer((TextureAtlasSprite) registerIcon(name + "_" + i), thicknesses[i] * BASE_THICKNESS);
+                        layers[thicknesses.length - 1 - i] =
+                                new Layer((TextureAtlasSprite) registerIcon(name + "_" + i),
+                                          thicknesses[i] * BASE_THICKNESS);
                         registerIcon(name + "_" + i);
                     }
                     tex.layers(layers);
@@ -80,7 +86,8 @@ public abstract class TextureMapMixin {
                     tex.layers(new Layer(iicon, BASE_THICKNESS));
                 }
             } catch (RuntimeException runtimeexception) {
-                cpw.mods.fml.client.FMLClientHandler.instance().trackBrokenTexture(complete, runtimeexception.getMessage());
+                cpw.mods.fml.client.FMLClientHandler.instance()
+                                                    .trackBrokenTexture(complete, runtimeexception.getMessage());
             } catch (IOException ioexception1) {
                 cpw.mods.fml.client.FMLClientHandler.instance().trackMissingTexture(complete);
             }

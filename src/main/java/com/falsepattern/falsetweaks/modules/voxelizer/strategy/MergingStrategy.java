@@ -26,13 +26,6 @@ package com.falsepattern.falsetweaks.modules.voxelizer.strategy;
 import com.falsepattern.falsetweaks.modules.voxelizer.Face;
 
 public interface MergingStrategy {
-    void merge(Face[][] faces);
-    default void mergeSide(Face[] faces) {
-        for (int i = 0; i < faces.length - 1; i++) {
-            Face.tryMerge(faces[i], faces[i + 1]);
-        }
-    }
-
     static Face[][] clone(Face[][] faces) {
         Face[][] result = new Face[faces.length][];
         for (int y = 0; y < faces.length; y++) {
@@ -66,5 +59,13 @@ public interface MergingStrategy {
             }
         }
         return n;
+    }
+
+    void merge(Face[][] faces);
+
+    default void mergeSide(Face[] faces) {
+        for (int i = 0; i < faces.length - 1; i++) {
+            Face.tryMerge(faces[i], faces[i + 1]);
+        }
     }
 }

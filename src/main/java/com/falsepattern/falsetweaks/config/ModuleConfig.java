@@ -108,14 +108,18 @@ public class ModuleConfig {
         ConfigurationManager.selfInit();
         //noinspection deprecation
         init(DeprecatedConfig.class);
-        if (MEMORY_LEAK_FIX != LeakFixState.Disable)
+        if (MEMORY_LEAK_FIX != LeakFixState.Disable) {
             init(LeakFixConfig.class);
-        if (ITEM_RENDER_LISTS)
+        }
+        if (ITEM_RENDER_LISTS) {
             init(RenderListConfig.class);
-        if (TRIANGULATOR)
+        }
+        if (TRIANGULATOR) {
             init(TriangulatorConfig.class);
-        if (VOXELIZER)
+        }
+        if (VOXELIZER) {
             init(VoxelizerConfig.class);
+        }
     }
 
     @SneakyThrows
