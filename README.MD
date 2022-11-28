@@ -38,11 +38,11 @@ texture with _0, _1, _2, ... numeric suffixes for each layer.
 
 Example file layout:
 ```
-circuit.png
-circuit.png.mcmeta
-circuit_0.png
-circuit_1.png
-circuit_2.png
+myItem.png
+myItem.png.mcmeta
+myItem_0.png
+myItem_1.png
+myItem_2.png
 ```
 
 ## Fixing known problems
