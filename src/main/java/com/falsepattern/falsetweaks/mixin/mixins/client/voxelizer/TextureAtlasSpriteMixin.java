@@ -87,6 +87,9 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
 
     @Override
     public int[][] getFrameTextureDataSafe(int id) {
+        if (getFrameCount() == 0) {
+            return null;
+        }
         id %= getFrameCount();
         return getFrameTextureData(id);
     }
