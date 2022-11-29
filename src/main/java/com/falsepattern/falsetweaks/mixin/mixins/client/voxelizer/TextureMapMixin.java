@@ -59,7 +59,8 @@ public abstract class TextureMapMixin {
 
     @Inject(method = "loadTextureAtlas",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/Minecraft;getGLMaximumTextureSize()I"),
+                     target = "Lnet/minecraft/client/renderer/texture/TextureMap;registerIcons()V",
+                     shift = At.Shift.AFTER),
             require = 1)
     private void loadExtraTexturesForLayers(IResourceManager manager, CallbackInfo ci) {
         val sprites = new HashMap<>(mapRegisteredSprites);
