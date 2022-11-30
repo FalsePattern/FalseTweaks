@@ -26,7 +26,6 @@ package com.falsepattern.falsetweaks.modules.voxelizer;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -47,12 +46,7 @@ public class Layer {
             y += 8;
         }
         try {
-            val frameData = tex().getFrameTextureDataSafe(tex().frameCounter());
-            if (frameData == null) {
-                return 255;
-            }
-            int argb = frameData[0][y * texture.getIconWidth() + x];
-            return (argb >>> 24) & 0xFF;
+            return tex().getFrameAlphaData(tex().frameCounter(), x, y);
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println(texture.getIconName());
             throw e;

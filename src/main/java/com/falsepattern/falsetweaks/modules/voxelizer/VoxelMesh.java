@@ -37,6 +37,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -51,7 +52,7 @@ public class VoxelMesh {
     private final float[] yOffsets;
     private final float[] zOffsets;
     private final VoxelCompiler compiler;
-    private List<Face> faceCache;
+    private Map<VoxelType, List<Face>> faceCache;
     private String cacheIdentity = null;
 
     public VoxelMesh(MergingStrategy strategy, Layer... layers) {
@@ -127,14 +128,14 @@ public class VoxelMesh {
         return compiler.zSize;
     }
 
-    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV) {
-        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null);
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, VoxelType type) {
+        renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null, type);
     }
 
-    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform, Function<Face, Boolean> trimmingFunction) {
+    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform, Function<Face, Boolean> trimmingFunction, VoxelType type) {
         compile();
         val vec = workingVector.get();
-        for (val face : faceCache) {
+        for (val face : faceCache.get(type)) {
             if (trimmingFunction != null && trimmingFunction.apply(face)) {
                 continue;
             }

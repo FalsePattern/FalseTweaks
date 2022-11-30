@@ -23,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
-import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
@@ -31,6 +30,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSp
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -57,6 +57,8 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     private Layer[] layers;
     private VoxelMesh voxelMesh;
 
+    private byte[][] alphaData;
+
     @Shadow
     public abstract int[][] getFrameTextureData(int p_147965_1_);
 
@@ -72,11 +74,17 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     @Inject(method = "clearFramesTextureData",
             at = @At(value = "HEAD"),
             require = 1)
-    private void compileStatic(CallbackInfo ci) {
-        voxelMesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy,
-                                  layers == null ? new Layer[]{new Layer((TextureAtlasSprite) (Object) this, 0.0625F)}
-                                                 : layers);
-        voxelMesh.compile();
+    private void extractAlpha(CallbackInfo ci) {
+        val frameCount = getFrameCount();
+        alphaData = new byte[frameCount][];
+        for (int i = 0; i < frameCount; i++) {
+            val frameData = getFrameTextureData(i)[0];
+            val alpha = new byte[frameData.length];
+            for (int j = 0; j < frameData.length; j++) {
+                alpha[j] = (byte) ((frameData[j] >>> 24) & 0xFF);
+            }
+            alphaData[i] = alpha;
+        }
     }
 
     @Inject(method = "getMinU",
@@ -97,12 +105,23 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
     }
 
     @Override
-    public int[][] getFrameTextureDataSafe(int id) {
-        if (getFrameCount() == 0) {
-            return null;
+    public int getFrameAlphaData(int id, int x, int y) {
+        if (alphaData == null || alphaData.length == 0) {
+            val fc = getFrameCount();
+            if (fc == 0) {
+                return 255;
+            }
+            id %= fc;
+            val textureData = getFrameTextureData(id);
+            if (textureData == null) {
+                return 255;
+            } else {
+                return (textureData[0][y * getIconWidth() + x] >>> 24) & 0xFF;
+            }
+        } else {
+            id %= alphaData.length;
+            return alphaData[id][y * getIconWidth() + x];
         }
-        id %= getFrameCount();
-        return getFrameTextureData(id);
     }
 
     @Override

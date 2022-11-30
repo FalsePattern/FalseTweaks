@@ -43,5 +43,5 @@ public interface ITextureAtlasSpriteMixin {
 
     boolean useAnisotropicFiltering();
 
-    int[][] getFrameTextureDataSafe(int id);
+    int getFrameAlphaData(int id, int x, int y);
 }

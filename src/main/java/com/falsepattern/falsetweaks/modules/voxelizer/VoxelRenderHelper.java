@@ -36,6 +36,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.IIcon;
@@ -103,8 +104,15 @@ public class VoxelRenderHelper {
         }
         val tess = Compat.tessellator();
         tess.startDrawingQuads();
-        mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound);
+        mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound, VoxelType.Solid);
         tess.draw();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        tess.startDrawingQuads();
+        mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound, VoxelType.SemiSolid);
+        tess.draw();
+        GL11.glDisable(GL11.GL_BLEND);
         if (ModuleConfig.ITEM_RENDER_LISTS) {
             VoxelRenderListManager.INSTANCE.post();
         }
@@ -210,7 +218,7 @@ public class VoxelRenderHelper {
                 }
             }
             return false;
-        });
+        }, VoxelType.Solid);
     }
 
     private static boolean isBlockRailWithMetadata(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailMeta) {
