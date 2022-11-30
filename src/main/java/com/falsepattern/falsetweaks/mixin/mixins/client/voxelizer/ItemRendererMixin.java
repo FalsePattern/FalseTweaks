@@ -25,14 +25,15 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
-import lombok.val;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import lombok.*;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.IItemRenderer;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.*;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -52,17 +53,19 @@ public abstract class ItemRendererMixin {
         }
     }
 
-    @Inject(method = "renderItemInFirstPerson",
+    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
             at = @At("HEAD"),
+            remap = false,
             require = 1)
-    private void startManagedMode(float p_78440_1_, CallbackInfo ci) {
+    private void startManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
         Data.setManagedMode(true);
     }
 
-    @Inject(method = "renderItemInFirstPerson",
+    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",
             at = @At("RETURN"),
+            remap = false,
             require = 1)
-    private void endManagedMode(float p_78440_1_, CallbackInfo ci) {
+    private void endManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 }

@@ -31,7 +31,9 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VoxelCompiler {
     public final int xSize;
@@ -76,7 +78,7 @@ public class VoxelCompiler {
         }
     }
 
-    public List<Face> compile(MergingStrategy strategy) {
+    public Map<VoxelType, List<Face>> compile(MergingStrategy strategy) {
         val voxels = new VoxelGrid(xSize, ySize, zSize);
         for (int z = 0; z < zSize; z++) {
             for (int y = 0; y < ySize; y++) {
@@ -97,7 +99,7 @@ public class VoxelCompiler {
                 }
             }
         }
-        List<Face> results = new ArrayList<>();
+        val finalResult = new HashMap<VoxelType, List<Face>>();
         //Allocate earlier for reuse
         Face[][] front = new Face[ySize][xSize];
         Face[][] back = new Face[ySize][xSize];
@@ -111,6 +113,7 @@ public class VoxelCompiler {
             faceBuilder.z(z);
             Layer layer = layers[z];
             for (val type : VoxelType.renderable()) {
+                val results = finalResult.computeIfAbsent(type, ignored -> new ArrayList<>());
                 //Front and back faces (2D merge)
                 //Plus top and bottom faces inlined into the loop
                 {
@@ -186,8 +189,9 @@ public class VoxelCompiler {
                     unwrap(left, results);
                     unwrap(right, results);
                 }
+                finalResult.put(type, results);
             }
         }
-        return results;
+        return finalResult;
     }
 }

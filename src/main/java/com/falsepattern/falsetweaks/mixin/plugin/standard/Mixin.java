@@ -28,15 +28,12 @@ import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.*;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
@@ -70,27 +67,27 @@ public enum Mixin implements IMixin {
     Tri_OFTessellatorVanillaMixin(Side.CLIENT,
                                   condition(() -> ModuleConfig.TRIANGULATOR)
                                           .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS))
-                                          .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), 
+                                          .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
                                   "triangulator.optifine.TessellatorVanillaMixin"),
     Tri_OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT,
                                                condition(() -> ModuleConfig.TRIANGULATOR)
                                                        .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
-                                           "triangulator.optifine.TessellatorVanillaOrOldOptifineMixin"),
+                                               "triangulator.optifine.TessellatorVanillaOrOldOptifineMixin"),
     Tri_OFTessellatorOptiFineMixin(Side.CLIENT,
                                    condition(() -> ModuleConfig.TRIANGULATOR)
-                                           .and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), 
+                                           .and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
                                    "triangulator.optifine.TessellatorOptiFineMixin"),
-    
+
     //ChromatiCraft
     Tri_CCRuneRendererMixin(Side.CLIENT,
                             condition(() -> ModuleConfig.TRIANGULATOR)
                                     .and(require(TargetedMod.CHROMATICRAFT)),
                             "triangulator.chromaticraft.RuneRendererMixin"),
-    
+
     //RedstonePaste
     Tri_RedstonePasteHighlighterMixin(Side.CLIENT,
                                       condition(() -> ModuleConfig.TRIANGULATOR)
-                                              .and(require(TargetedMod.REDSTONEPASTE)), 
+                                              .and(require(TargetedMod.REDSTONEPASTE)),
                                       "triangulator.redstonepaste.RedstonePasteHighlighterMixin"),
 
     //endregion Triangulator Module
@@ -124,7 +121,7 @@ public enum Mixin implements IMixin {
     LeakFix_OFWorldRendererVanillaMixin(Side.CLIENT,
                                         condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
                                                 .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                             .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS))), 
+                                                             .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS))),
                                         "leakfix.optifine.WorldRendererVanillaMixin"),
     LeakFix_OFWorldRendererOptifineMixin(Side.CLIENT,
                                          condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
@@ -149,6 +146,8 @@ public enum Mixin implements IMixin {
 
     //region Voxelizer Module
     Voxelizer_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.ItemRendererMixin"),
+    Voxelizer_Optifine_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER)
+            .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "voxelizer.OFItemRendererMixin"),
     Voxelizer_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderBlocksMixin"),
     Voxelizer_RenderItemMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.RenderItemMixin"),
     Voxelizer_TextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.VOXELIZER), "voxelizer.TextureAtlasSpriteMixin"),
