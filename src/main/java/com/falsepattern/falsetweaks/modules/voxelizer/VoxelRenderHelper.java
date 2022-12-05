@@ -106,13 +106,16 @@ public class VoxelRenderHelper {
         tess.startDrawingQuads();
         mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound, VoxelType.Solid);
         tess.draw();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
+        if (!Data.enchantmentGlintTextureBound) {
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        }
         tess.startDrawingQuads();
         mesh.renderToTessellator(tess, layer, Data.enchantmentGlintTextureBound, VoxelType.SemiSolid);
         tess.draw();
-        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPopAttrib();
         if (ModuleConfig.ITEM_RENDER_LISTS) {
             VoxelRenderListManager.INSTANCE.post();
         }
