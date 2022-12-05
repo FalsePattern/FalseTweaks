@@ -120,7 +120,7 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
             }
         } else {
             id %= alphaData.length;
-            return alphaData[id][y * getIconWidth() + x];
+            return alphaData[id][y * getIconWidth() + x] & 0xFF;
         }
     }
 
