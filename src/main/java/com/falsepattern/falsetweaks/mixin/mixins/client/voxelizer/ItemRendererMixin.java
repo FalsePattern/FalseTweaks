@@ -64,7 +64,6 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",
             at = @At("HEAD"),
-            remap = false,
             require = 1)
     private void startManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
         Data.setManagedMode(true);
@@ -72,7 +71,6 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "renderItemInFirstPerson",
             at = @At("HEAD"),
-            remap = false,
             require = 1)
     private void startManagedMode3(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(true);
@@ -88,7 +86,6 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",
             at = @At("RETURN"),
-            remap = false,
             require = 1)
     private void endManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
         Data.setManagedMode(false);
@@ -96,7 +93,6 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "renderItemInFirstPerson",
             at = @At("RETURN"),
-            remap = false,
             require = 1)
     private void endManagedMode3(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(false);
