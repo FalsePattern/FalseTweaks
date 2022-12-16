@@ -126,6 +126,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private double[] bounds;
     @Setter
     private boolean reusePreviousStates;
+    @Setter
+    private boolean enableMultiRenderReuse;
     private boolean disableCrackFix;
 
     private static float avg(final float a, final float b) {
@@ -536,6 +538,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         drewSomething |= renderFace(this::renderFaceXPos, Facing.XPOS);
 
         this.enableAO = false;
+        if (drewSomething && enableMultiRenderReuse) {
+            reusePreviousStates = true;
+        }
         return drewSomething;
     }
 

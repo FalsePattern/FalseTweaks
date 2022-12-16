@@ -28,5 +28,7 @@ import net.minecraft.block.Block;
 public interface IRenderBlocksMixin {
     void reusePreviousStates(boolean state);
 
+    void enableMultiRenderReuse(boolean state);
+
     boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b);
 }
