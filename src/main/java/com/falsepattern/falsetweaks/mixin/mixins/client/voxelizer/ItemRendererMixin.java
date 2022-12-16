@@ -57,7 +57,23 @@ public abstract class ItemRendererMixin {
             at = @At("HEAD"),
             remap = false,
             require = 1)
-    private void startManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void startManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+        Data.setManagedMode(true);
+    }
+
+    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",
+            at = @At("HEAD"),
+            remap = false,
+            require = 1)
+    private void startManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
+        Data.setManagedMode(true);
+    }
+
+    @Inject(method = "renderItemInFirstPerson",
+            at = @At("HEAD"),
+            remap = false,
+            require = 1)
+    private void startManagedMode3(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(true);
     }
 
@@ -65,7 +81,23 @@ public abstract class ItemRendererMixin {
             at = @At("RETURN"),
             remap = false,
             require = 1)
-    private void endManagedMode(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void endManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+        Data.setManagedMode(false);
+    }
+
+    @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",
+            at = @At("RETURN"),
+            remap = false,
+            require = 1)
+    private void endManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
+        Data.setManagedMode(false);
+    }
+
+    @Inject(method = "renderItemInFirstPerson",
+            at = @At("RETURN"),
+            remap = false,
+            require = 1)
+    private void endManagedMode3(float p_78440_1_, CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 }

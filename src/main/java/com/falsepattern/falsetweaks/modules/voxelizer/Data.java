@@ -35,15 +35,24 @@ public class Data {
     @Getter
     @Setter
     private static TextureAtlasSprite lastUsedSprite = null;
-    private static boolean managedMode = false;
+    private static int managedMode = 0;
 
     public static boolean isManagedMode() {
-        return managedMode;
+        return managedMode != 0;
     }
 
     public static void setManagedMode(boolean managedMode) {
-        currentItemLayer = 0;
-        Data.managedMode = managedMode;
+        if (managedMode) {
+            Data.managedMode++;
+        } else {
+            Data.managedMode--;
+        }
+        if (Data.managedMode < 0) {
+            Data.managedMode = 0;
+        }
+        if (Data.managedMode == 1 && managedMode || Data.managedMode == 0 && !managedMode) {
+            currentItemLayer = 0;
+        }
         lastUsedSprite = null;
     }
 
