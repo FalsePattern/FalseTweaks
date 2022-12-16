@@ -61,10 +61,19 @@ public class VoxelizerConfig {
     @Config.DefaultBoolean(false)
     public static boolean DEBUG_MESH_COMPILATION;
 
-    @Config.Comment("Item textures to disable voxelization for. Used for things like the sword of the cosmos, or the chisel offset wand.")
-    @Config.DefaultStringList({""})
+    @Config.Comment("Item textures to disable voxelization for. Used to fix issues with certain items.\n" +
+                    "This is a PREFIX check, so you can also just specify a mod ID, and all items from it will skip getting voxelized.\n" +
+                    "Syntax: modid:texturename")
+    @Config.DefaultStringList({"avaritia:infinity"})
     @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
     public static String[] EXCLUSION_LIST;
+
+    public static boolean isExcluded(String textureName) {
+        for (String s : EXCLUSION_LIST) {
+            if (textureName.startsWith(s)) return true;
+        }
+        return false;
+    }
 
     static {
         ConfigurationManager.selfInit();

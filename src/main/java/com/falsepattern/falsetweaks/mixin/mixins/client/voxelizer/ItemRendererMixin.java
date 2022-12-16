@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
+import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
 import lombok.*;
@@ -43,7 +44,7 @@ public abstract class ItemRendererMixin {
             require = 1)
     private static void forceVoxelized(Tessellator p_78439_0_, float p_78439_1_, float p_78439_2_, float p_78439_3_, float p_78439_4_, int p_78439_5_, int p_78439_6_, float p_78439_7_, CallbackInfo ci) {
         val lastUsed = Data.getLastUsedSprite();
-        if (lastUsed != null && Data.isManagedMode()) {
+        if (lastUsed != null && Data.isManagedMode() && !VoxelizerConfig.isExcluded(lastUsed.getIconName())) {
             val glint = Data.enchantmentGlintTextureBound;
             VoxelRenderHelper.renderItemVoxelized(lastUsed);
             if (!glint) {
