@@ -143,7 +143,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private static boolean isBlacklisted(Class<?> clazz) {
-        for (val element : getCrackFixBlacklist()) {
+        val blacklist = getCrackFixBlacklist();
+        if (blacklist == null) return false;
+        for (val element : blacklist) {
             if (element.isAssignableFrom(clazz)) {
                 return true;
             }
