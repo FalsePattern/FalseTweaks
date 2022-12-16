@@ -157,16 +157,16 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
-                //Target vertex layout: ABC DAC
-                System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize,
-                                 vertexSize);
-                alternativeTriangulation = false;
-            } else {
                 //Target vertex layout: ABD DBC
                 System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex,
                                  2 * vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize),
+                                 vertexSize);
+                alternativeTriangulation = false;
+            } else {
+                //Target vertex layout: ABC DAC
+                System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize,
                                  vertexSize);
             }
             vertexCount += 2;
