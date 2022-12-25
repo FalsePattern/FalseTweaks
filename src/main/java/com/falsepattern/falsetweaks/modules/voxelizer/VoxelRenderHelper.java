@@ -148,20 +148,22 @@ public class VoxelRenderHelper {
             transform.scale(-1, 1, -1);
         }
         transform.translate(-0.5f, 0, -0.5f);
+        float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
         switch (meta) {
             case RAIL_RAMP_EAST:
             case RAIL_RAMP_WEST:
             case RAIL_RAMP_NORTH:
             case RAIL_RAMP_SOUTH:
-                transform.translate(0, 0.0625F, 0)
+                transform.translate(0, offset, 0)
                          .rotateX(RAD_45DEG)
                          .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                         .translate(0, 0, 0.0625F);
+                         .translate(0, 0, offset);
                 break;
             default:
                 transform.rotateX(RAD_90DEG);
                 break;
         }
+        transform.scale(1, 1, (float) VoxelizerConfig.RAIL_THICKNESS);
         mesh.renderToTessellator(tess, 0, false, true, transform, (face) -> {
             //Notice: corner rails commented out because they have parts of the "wood" also on the edge of the mesh
             switch (face.dir) {

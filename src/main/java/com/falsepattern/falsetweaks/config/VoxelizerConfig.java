@@ -68,6 +68,12 @@ public class VoxelizerConfig {
     @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
     public static String[] EXCLUSION_LIST;
 
+    @Config.Comment("The thickness of the 3D rails. Doesn't require game restart. 1 is vanilla thickness.\n" +
+                    "FPS impact: basically none")
+    @Config.LangKey("config.falsetweaks.voxelizer.rail_thickness")
+    @Config.DefaultDouble(1)
+    public static double RAIL_THICKNESS;
+
     public static boolean isExcluded(String textureName) {
         for (String s : EXCLUSION_LIST) {
             if (textureName.startsWith(s)) return true;
