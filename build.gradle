@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern56
+//version: 1656003793falsepattern59
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -257,7 +257,9 @@ minecraft {
     runDir = "run"
 
     if (replaceGradleTokenInFile) {
-        replaceIn replaceGradleTokenInFile
+        for (file in replaceGradleTokenInFile.split(',')) {
+            replaceIn file
+        }
         if(gradleTokenModId) {
             replace gradleTokenModId, modId
         }
@@ -307,16 +309,22 @@ dependencies {
         annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
         annotationProcessor("com.google.guava:guava:24.1.1-jre")
         annotationProcessor("com.google.code.gson:gson:2.8.6")
-        annotationProcessor("com.llamalad7:MixinExtras:0.1.0-gasstation")
-        annotationProcessor("org.spongepowered:mixin:0.8.5-gasstation_5")
-        compile("org.spongepowered:mixin:0.8.5-gasstation_5")
+        annotationProcessor("com.llamalad7:MixinExtras:0.1.1-gasstation")
+        annotationProcessor("org.spongepowered:mixin:0.8.5-gasstation_7")
+        compile("org.spongepowered:mixin:0.8.5-gasstation_7")
         compile("com.llamalad7:MixinExtras:0.1.1-gasstation")
-        compile("com.falsepattern:00gasstation-mc1.7.10:0.4.1:dev")
+        compile("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
     } else if(hasMixinDeps.toBoolean()) {
         runtime("com.llamalad7:MixinExtras:0.1.1-gasstation")
-        runtime("org.spongepowered:mixin:0.8.5-gasstation_5")
-        runtime("com.falsepattern:00gasstation-mc1.7.10:0.4.1:dev")
+        runtime("org.spongepowered:mixin:0.8.5-gasstation_7")
+        runtime("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
     }
+    // Latest LWJGL
+    compile "org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209"
+    compile "org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209"
+    minecraftNatives "org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209"
+    minecraftDeps "org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209"
+    minecraftDeps "org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209"
 }
 
 apply from: 'dependencies.gradle'
