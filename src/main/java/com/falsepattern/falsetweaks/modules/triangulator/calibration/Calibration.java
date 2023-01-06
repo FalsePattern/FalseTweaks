@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator.calibration;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.text.FormattedText;
 import lombok.AccessLevel;
@@ -90,14 +91,15 @@ public class Calibration {
         if (gpuHash().equals(CalibrationConfig.GPU_HASH)) {
             return;
         }
-        val alert = FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
-        val text = alert.toChatText();
-        val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
-        for (val t : text) {
-            t.getChatStyle().setChatClickEvent(ce);
-            ((EntityPlayerSP) e.entity).addChatMessage(t);
+        if (ModuleConfig.TRIANGULATOR) {
+            val alert = FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
+            val text = alert.toChatText();
+            val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
+            for (val t : text) {
+                t.getChatStyle().setChatClickEvent(ce);
+                ((EntityPlayerSP) e.entity).addChatMessage(t);
+            }
         }
-
     }
 
     public static class CalibrationCommand extends CommandBase {

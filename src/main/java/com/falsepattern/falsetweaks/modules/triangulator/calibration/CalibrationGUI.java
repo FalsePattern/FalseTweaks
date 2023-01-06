@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.modules.triangulator.calibration;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.compat.GuiLabel;
+import com.falsepattern.lib.text.FormattedText;
 import lombok.val;
 import lombok.var;
 import org.lwjgl.opengl.GL11;
@@ -33,6 +34,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -106,7 +108,9 @@ public class CalibrationGUI extends GuiScreen {
                 break;
             case ID_APPLY:
                 Calibration.setCalibration(flip);
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                val mc = Minecraft.getMinecraft();
+                mc.displayGuiScreen(null);
+                FormattedText.parse(EnumChatFormatting.GREEN + I18n.format("chat.triangulator.calibrated.message")).addChatMessage(mc.thePlayer);
                 break;
         }
     }
