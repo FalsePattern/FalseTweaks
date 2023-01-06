@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.modules.animfix;
 
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
@@ -31,18 +32,13 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.texture.TextureMap;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-public class AnimationUpdateBatcher {
-    public static TextureMap currentAtlas = null;
-    public static AnimationUpdateBatcher batcher = null;
-    public static String currentName = null;
-
+public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
     private final int mipLevels;
     private final int xOffset;
     private final int yOffset;
@@ -66,7 +62,7 @@ public class AnimationUpdateBatcher {
     private volatile boolean running = true;
 
     @SneakyThrows
-    public AnimationUpdateBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
+    DefaultAnimationUpdateBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
         this.mipLevels = mipLevel;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
@@ -85,6 +81,7 @@ public class AnimationUpdateBatcher {
         thread.start();
     }
 
+    @Override
     public boolean scheduleUpload(int[][] texture, int width, int height, int xOffset, int yOffset) {
         xOffset -= this.xOffset;
         yOffset -= this.yOffset;
@@ -105,6 +102,7 @@ public class AnimationUpdateBatcher {
         return true;
     }
 
+    @Override
     public void terminate() {
         running = false;
         thread.interrupt();
@@ -112,6 +110,24 @@ public class AnimationUpdateBatcher {
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void upload() {
+        batchingSemaphore.release();
+        while (!uploadingSemaphore.tryAcquire()) {
+            Thread.yield();
+        }
+        for (int i = 0; i <= mipLevels; i++) {
+            memory.position(offsets[i]);
+            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, i, xOffset >>> i, yOffset >>> i, width >>> i, height >>> i,
+                                 GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, memory);
+        }
+        batchingSemaphore.release();
+        while (!uploadingSemaphore.tryAcquire()) {
+            Thread.yield();
         }
     }
 
@@ -174,23 +190,6 @@ public class AnimationUpdateBatcher {
             width >>>= 1;
             height >>>= 1;
             w >>>= 1;
-        }
-    }
-
-    @SneakyThrows
-    public void upload() {
-        batchingSemaphore.release();
-        while (!uploadingSemaphore.tryAcquire()) {
-            Thread.yield();
-        }
-        for (int i = 0; i <= mipLevels; i++) {
-            memory.position(offsets[i]);
-            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, i, xOffset >>> i, yOffset >>> i, width >>> i, height >>> i,
-                                 GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, memory);
-        }
-        batchingSemaphore.release();
-        while (!uploadingSemaphore.tryAcquire()) {
-            Thread.yield();
         }
     }
 }

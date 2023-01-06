@@ -25,7 +25,10 @@ package com.falsepattern.falsetweaks.proxy;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.api.Modules;
+import com.falsepattern.falsetweaks.api.animfix.BatcherRegistry;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.modules.animfix.DefaultAnimationUpdateBatcherFactory;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
@@ -54,6 +57,9 @@ public class ClientProxy extends CommonProxy {
         if (ModuleConfig.VOXELIZER) {
             Minecraft.getMinecraft().metadataSerializer_.registerMetadataSectionType(new LayerMetadataSerializer(),
                                                                                      LayerMetadataSection.class);
+        }
+        if (Modules.textureOptimizationsActive()) {
+            BatcherRegistry.registerBatcherFactory(new DefaultAnimationUpdateBatcherFactory(), 0);
         }
     }
 

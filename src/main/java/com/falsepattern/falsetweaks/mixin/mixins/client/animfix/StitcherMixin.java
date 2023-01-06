@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
-import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcher;
+import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
 import com.falsepattern.falsetweaks.modules.animfix.stitching.TooBigException;
 import com.falsepattern.falsetweaks.modules.animfix.stitching.TurboStitcher;
@@ -93,10 +93,10 @@ public abstract class StitcherMixin {
             currentHeight = masterStitcher.height;
             stitchSlots.clear();
             stitchSlots.addAll(masterStitcher.getSlots());
-            ((ITextureMapMixin) AnimationUpdateBatcher.currentAtlas).initializeBatcher(batchingStitcher.x,
-                                                                                       batchingStitcher.y,
-                                                                                       batchingStitcher.width,
-                                                                                       batchingStitcher.height);
+            ((ITextureMapMixin) AnimationUpdateBatcherRegistry.currentAtlas).initializeBatcher(batchingStitcher.x,
+                                                                                               batchingStitcher.y,
+                                                                                               batchingStitcher.width,
+                                                                                               batchingStitcher.height);
         } catch (TooBigException ignored) {
             throw new StitcherException(null,
                                         "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");

@@ -23,7 +23,8 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
-import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcher;
+import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
+import com.falsepattern.falsetweaks.modules.animfix.DefaultAnimationUpdateBatcher;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -48,9 +49,9 @@ public abstract class TextureUtilMixin {
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
-        if (AnimationUpdateBatcher.batcher != null) {
+        if (AnimationUpdateBatcherRegistry.batcher != null) {
             theProfiler.startSection("copyToBatch");
-            boolean ended = AnimationUpdateBatcher.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
+            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
             theProfiler.endSection();
             if (ended) {
                 ci.cancel();
