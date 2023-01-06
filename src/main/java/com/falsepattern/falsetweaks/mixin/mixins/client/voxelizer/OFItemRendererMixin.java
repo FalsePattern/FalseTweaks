@@ -1,11 +1,14 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.*;
 
 @Pseudo
 @Mixin(targets = "ItemRendererOF", remap = false)

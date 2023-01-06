@@ -24,7 +24,6 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
 import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
-import com.falsepattern.falsetweaks.modules.animfix.DefaultAnimationUpdateBatcher;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

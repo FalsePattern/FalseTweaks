@@ -23,8 +23,8 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
-import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
+import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
