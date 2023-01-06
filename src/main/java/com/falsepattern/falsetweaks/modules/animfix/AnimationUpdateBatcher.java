@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks.modules.animfix;
 import com.falsepattern.falsetweaks.Tags;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.var;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -36,8 +37,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AnimationUpdateBatcher {
     public static TextureMap currentAtlas = null;
@@ -52,19 +51,19 @@ public class AnimationUpdateBatcher {
     private final int[] offsets;
     private final IntBuffer memory;
 
-    private final List<int[][]> queuedTextures1 = new ArrayList<>();
-    private final List<int[]> queuedDimensions1 = new ArrayList<>();
-    private final List<int[][]> queuedTextures2 = new ArrayList<>();
-    private final List<int[]> queuedDimensions2 = new ArrayList<>();
+    private static class Buffer {
+        public final List<int[][]> queuedTextures = new ArrayList<>();
+        public final List<int[]> queuedDimensions = new ArrayList<>();
+        public int queuedCount = 0;
+    }
 
-    private final AtomicInteger queuedCount1 = new AtomicInteger(0);
-    private final AtomicInteger queuedCount2 = new AtomicInteger(0);
+    private volatile Buffer backBuffer = new Buffer();
+
     private final Semaphore batchingSemaphore = new Semaphore(0);
-    private final Semaphore uploadingSemaphore = new Semaphore(1);
+    private final Semaphore uploadingSemaphore = new Semaphore(0);
     private final Thread thread;
-    private final AtomicBoolean flipped = new AtomicBoolean(false);
 
-    private final AtomicBoolean running = new AtomicBoolean(true);
+    private volatile boolean running = true;
 
     @SneakyThrows
     public AnimationUpdateBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
@@ -92,9 +91,8 @@ public class AnimationUpdateBatcher {
         if (xOffset < 0 || xOffset >= this.width || yOffset < 0 || yOffset >= this.height) {
             return false;
         }
-        boolean f = flipped.get();
-        int i = (f ? queuedCount2 : queuedCount1).getAndIncrement();
-        val dimList = (f ? queuedDimensions2 : queuedDimensions1);
+        int i = backBuffer.queuedCount++;
+        val dimList = backBuffer.queuedDimensions;
         while (dimList.size() <= i) {
             dimList.add(new int[4]);
         }
@@ -103,33 +101,59 @@ public class AnimationUpdateBatcher {
         dims[1] = height;
         dims[2] = xOffset;
         dims[3] = yOffset;
-        (f ? queuedTextures2 : queuedTextures1).add(texture);
+        backBuffer.queuedTextures.add(texture);
         return true;
     }
 
     public void terminate() {
-        running.set(false);
+        running = false;
         thread.interrupt();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @SneakyThrows
     private void run() {
-        while (running.get()) {
-            try {
-                batchingSemaphore.acquire();
-            } catch (InterruptedException ignored) {
-                continue;
+        var frontBuffer = new Buffer();
+        var backBuffer = this.backBuffer;
+        while (running) {
+            uploadingSemaphore.release();
+            while (running) {
+                try {
+                    batchingSemaphore.acquire();
+                    break;
+                } catch (InterruptedException ignored) {
+                }
             }
-            val f = flipped.get();
-            int i = (f ? queuedCount1 : queuedCount2).get() - 1;
-            val dfb = f ? queuedDimensions1 : queuedDimensions2;
-            val tfb = f ? queuedTextures1 : queuedTextures2;
+            if (!running) {
+                return;
+            }
+            {
+                val tmp = frontBuffer;
+                frontBuffer = backBuffer;
+                this.backBuffer = backBuffer = tmp;
+            }
+            uploadingSemaphore.release();
+            while (running) {
+                try {
+                    batchingSemaphore.acquire();
+                    break;
+                } catch (InterruptedException ignored) {
+                }
+            }
+            if (!running) {
+                return;
+            }
+            int i = frontBuffer.queuedCount - 1;
+            val dfb = frontBuffer.queuedDimensions;
+            val tfb = frontBuffer.queuedTextures;
             for (; i >= 0; i--) {
                 batchUpload(dfb.get(i), tfb.remove(i));
             }
-            (f ? queuedCount1 : queuedCount2).set(0);
-            flipped.set(!flipped.get());
-            uploadingSemaphore.release();
+            frontBuffer.queuedCount = 0;
         }
     }
 
@@ -155,6 +179,7 @@ public class AnimationUpdateBatcher {
 
     @SneakyThrows
     public void upload() {
+        batchingSemaphore.release();
         while (!uploadingSemaphore.tryAcquire()) {
             Thread.yield();
         }
@@ -164,5 +189,8 @@ public class AnimationUpdateBatcher {
                                  GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, memory);
         }
         batchingSemaphore.release();
+        while (!uploadingSemaphore.tryAcquire()) {
+            Thread.yield();
+        }
     }
 }
