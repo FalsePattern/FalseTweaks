@@ -183,6 +183,7 @@ public enum Mixin implements IMixin {
     TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
 
     Profiler_MinecraftMixin(Side.CLIENT, condition(() -> ModuleConfig.PROFILER_IMPROVEMENTS), "misc.Profiler_MinecraftMixin"),
+    Profiler_ProfilerMixin(Side.CLIENT, condition(() -> ModuleConfig.PROFILER_IMPROVEMENTS), "misc.Profiler_ProfilerMixin"),
 
     //endregion Misc Modules
     ;
