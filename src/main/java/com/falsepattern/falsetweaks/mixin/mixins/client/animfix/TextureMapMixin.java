@@ -110,7 +110,7 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
     private void flushBatchAnimations(CallbackInfo ci) {
         AnimationUpdateBatcherRegistry.batcher = null;
         if (batcher != null) {
-            theProfiler.endStartSection("uploadBatch");
+            theProfiler.startSection("uploadBatch");
             batcher.upload();
             theProfiler.endSection();
         }
