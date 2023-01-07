@@ -96,13 +96,17 @@ public class ModuleConfig {
     @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
-
     @Config.Comment("Improves the mipmap system of minecraft with 2 things:\n" +
                     "1. Every tiny texture is upscaled to at least 16x16 to allow for 4 mipmap levels, even if a mod has a texture smaller than 16x16.\n" +
                     "2. Replaces the mipmap generation with a multithreaded system, which scales with the number of cores in your system.\n" +
                     "FPS impact: none, but resource pack reload times (and startup time) are cut down by a lot")
     @Config.DefaultBoolean(true)
     public static boolean MIPMAP_FIX;
+
+    @Config.Comment("Fixes some misleading profiler categories (used in the Shift+F3 pie chart)\n" +
+                    "FPS impact: None")
+    @Config.DefaultBoolean(true)
+    public static boolean PROFILER_IMPROVEMENTS;
 
     static {
         ConfigurationManager.selfInit();

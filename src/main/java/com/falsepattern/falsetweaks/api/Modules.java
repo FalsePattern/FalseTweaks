@@ -64,6 +64,11 @@ public final class Modules {
     }
 
     @StableAPI.Expose
+    public static boolean profilerImprovementsActive() {
+        return ModuleConfig.PROFILER_IMPROVEMENTS;
+    }
+
+    @StableAPI.Expose
     public static boolean tileEntityTransparencyFixActive() {
         return ModuleConfig.TE_TRANSPARENCY_FIX;
     }
