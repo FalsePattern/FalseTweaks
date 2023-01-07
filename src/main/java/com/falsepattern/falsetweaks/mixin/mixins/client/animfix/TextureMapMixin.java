@@ -94,13 +94,23 @@ public abstract class TextureMapMixin implements ITextureMapMixin {
         AnimationUpdateBatcherRegistry.batcher = batcher;
     }
 
+    @Redirect(method = "updateAnimations",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;updateAnimation()V"),
+              require = 1)
+    private void profileAnimationUpdate(TextureAtlasSprite sprite) {
+        theProfiler.startSection(sprite.getIconName());
+        sprite.updateAnimation();
+        theProfiler.endSection();
+    }
+
     @Inject(method = "updateAnimations",
             at = @At(value = "RETURN"),
             require = 1)
     private void flushBatchAnimations(CallbackInfo ci) {
         AnimationUpdateBatcherRegistry.batcher = null;
         if (batcher != null) {
-            theProfiler.startSection("uploadBatch");
+            theProfiler.endStartSection("uploadBatch");
             batcher.upload();
             theProfiler.endSection();
         }
