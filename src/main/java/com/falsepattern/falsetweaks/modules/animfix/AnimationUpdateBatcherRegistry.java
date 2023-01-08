@@ -61,4 +61,8 @@ public class AnimationUpdateBatcherRegistry {
         }
         throw new IllegalStateException("Could not construct animation update batcher");
     }
+
+    static {
+        registerBatcherFactory(DefaultAnimationUpdateBatcher::new, 0);
+    }
 }
