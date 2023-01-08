@@ -18,6 +18,7 @@ This mod completely replaces Triangulator and AnimFix. Make sure you delete thes
 - Fixed block light leaks
 - Multithreaded mipmap generation (way faster resource pack switching)
 - Multilayer items (see below)
+- An improved version of the Shift+F3 profiler
 
 And all of these tweaks can be individually toggled on/off in the config!
 
