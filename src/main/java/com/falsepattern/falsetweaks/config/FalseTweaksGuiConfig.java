@@ -52,6 +52,9 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
             result.add(LeakFixConfig.class);
         }
+        if (ModuleConfig.ADVANCED_PROFILER) {
+            result.add(ProfilerConfig.class);
+        }
         return result.toArray(new Class<?>[0]);
     }
 }

@@ -23,47 +23,60 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
+import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
 import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
+import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.profiler.Profiler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-@Mixin(TextureUtil.class)
-@SideOnly(Side.CLIENT)
-public abstract class TextureUtilMixin {
+import java.util.List;
+
+@Mixin(TextureMap.class)
+public abstract class TextureMap_UnprofiledMixin implements ITextureMapMixin {
     private static Profiler theProfiler;
 
-    @Inject(method = "uploadTextureMipmap",
+    @Inject(method = "updateAnimations",
             at = @At(value = "HEAD"),
-            cancellable = true,
             require = 1)
-    private static void uploadTextureBatchable(int[][] texture, int width, int height, int xOffset, int yOffset, boolean ignored1, boolean ignored2, CallbackInfo ci) {
+    private void beginBatchAnimations(CallbackInfo ci) {
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
-        if (AnimationUpdateBatcherRegistry.batcher != null) {
-            theProfiler.startSection("copyToBatch");
-            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
-            theProfiler.endSection();
-            if (ended) {
-                ci.cancel();
-                return;
-            }
-        }
-        theProfiler.startSection("uploadUnbatched");
+        theProfiler.startSection("updateAnimations");
+        AnimationUpdateBatcherRegistry.batcher = getBatcher();
     }
 
-    @Inject(method = "uploadTextureMipmap",
+    @Redirect(method = "updateAnimations",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;updateAnimation()V"),
+              require = 1)
+    private void profileAnimationUpdate(TextureAtlasSprite sprite) {
+        theProfiler.startSection(sprite.getIconName());
+        sprite.updateAnimation();
+        theProfiler.endSection();
+    }
+
+    @Inject(method = "updateAnimations",
             at = @At(value = "RETURN"),
             require = 1)
-    private static void uploadUnbatchedEnd(CallbackInfo ci) {
+    private void flushBatchAnimations(CallbackInfo ci) {
+        AnimationUpdateBatcherRegistry.batcher = null;
+        if (getBatcher() != null) {
+            theProfiler.startSection("uploadBatch");
+            getBatcher().upload();
+            theProfiler.endSection();
+        }
         theProfiler.endSection();
     }
 }

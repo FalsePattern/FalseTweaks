@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
+package com.falsepattern.falsetweaks.mixin.mixins.client.profiler;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +40,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 @Mixin(Minecraft.class)
-public abstract class Profiler_MinecraftMixin {
+public abstract class MinecraftMixin {
     @Shadow @Final public Profiler mcProfiler;
 
     @Inject(method = "runTick",

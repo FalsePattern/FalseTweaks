@@ -63,9 +63,9 @@ public final class Modules {
         return ModuleConfig.BEACON_OPTIMIZATION;
     }
 
-    @StableAPI.Expose
-    public static boolean profilerImprovementsActive() {
-        return ModuleConfig.PROFILER_IMPROVEMENTS;
+    @StableAPI.Expose(since = "2.2.0")
+    public static boolean advancedProfilerActive() {
+        return ModuleConfig.ADVANCED_PROFILER;
     }
 
     @StableAPI.Expose

@@ -23,6 +23,9 @@
 
 package com.falsepattern.falsetweaks.modules.animfix.interfaces;
 
+import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
+
 public interface ITextureMapMixin {
     void initializeBatcher(int offsetX, int offsetY, int width, int height);
+    IAnimationUpdateBatcher getBatcher();
 }

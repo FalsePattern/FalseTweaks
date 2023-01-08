@@ -27,7 +27,6 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
-import lombok.SneakyThrows;
 
 @Config(modid = Tags.MODID,
         category = "00_modules")
@@ -103,32 +102,24 @@ public class ModuleConfig {
     @Config.DefaultBoolean(true)
     public static boolean MIPMAP_FIX;
 
-    @Config.Comment("Fixes some misleading profiler categories (used in the Shift+F3 pie chart)\n" +
-                    "FPS impact: None")
+    @Config.Comment("Replaces the minecraft profiler with fully custom logic (used in the Shift+F3 pie chart)\n" +
+                    "Also check the profiler config category!\n" +
+                    "FPS impact: Slightly faster profiler")
     @Config.DefaultBoolean(true)
-    public static boolean PROFILER_IMPROVEMENTS;
+    public static boolean ADVANCED_PROFILER;
 
     static {
         ConfigurationManager.selfInit();
-        //noinspection deprecation
-        init(DeprecatedConfig.class);
-        if (MEMORY_LEAK_FIX != LeakFixState.Disable) {
-            init(LeakFixConfig.class);
-        }
-        if (ITEM_RENDER_LISTS) {
-            init(RenderListConfig.class);
-        }
-        if (TRIANGULATOR) {
-            init(TriangulatorConfig.class);
-        }
-        if (VOXELIZER) {
-            init(VoxelizerConfig.class);
-        }
+        LeakFixConfig.init();
+        ProfilerConfig.init();
+        RenderListConfig.init();
+        TriangulatorConfig.init();
+        VoxelizerConfig.init();
     }
 
-    @SneakyThrows
-    private static void init(Class<?> clazz) {
-        Class.forName(clazz.getName(), true, clazz.getClassLoader());
+    //This is here to make the static initializer run
+    public static void init() {
+
     }
 
 }

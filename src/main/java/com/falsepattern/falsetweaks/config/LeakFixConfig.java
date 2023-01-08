@@ -44,4 +44,9 @@ public class LeakFixConfig {
     static {
         ConfigurationManager.selfInit();
     }
+
+    //This is here to make the static initializer run
+    public static void init() {
+
+    }
 }

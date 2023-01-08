@@ -23,6 +23,8 @@
 
 package com.falsepattern.falsetweaks;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
+
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
@@ -32,6 +34,7 @@ import java.util.Map;
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         Deps.initDeps();
+        ModuleConfig.init();
     }
 
     @Override

@@ -27,17 +27,20 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID)
-@Deprecated
-public class DeprecatedConfig {
-    @Config.Comment("This category is deprecated. If you used FalseTweaks in previous alpha versions," +
-                    "delete this file and let it regenerate. This category will be removed from the code once the mod" +
-                    "leaves alpha.\n" +
-                    "(changing this config value does nothing, this is just a notification)")
-    @Config.DefaultBoolean(true)
-    public static boolean AAAA_DEPRECATED_AAAA;
+@Config(modid = Tags.MODID,
+        category = "profiler")
+public class ProfilerConfig {
+    @Config.Comment("Enable this to dump the profiler data to a file when the F3 profiler is closed.")
+    @Config.LangKey("config.falsetweaks.profiler.dump")
+    @Config.DefaultBoolean(false)
+    public static boolean DUMP_ON_CLOSE;
 
     static {
         ConfigurationManager.selfInit();
+    }
+
+    //This is here to make the static initializer run
+    public static void init() {
+
     }
 }
