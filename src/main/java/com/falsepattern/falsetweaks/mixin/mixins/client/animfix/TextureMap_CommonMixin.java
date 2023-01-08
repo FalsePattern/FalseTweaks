@@ -27,7 +27,6 @@ import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
 import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
 import lombok.Getter;
-import lombok.Setter;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -27,13 +27,11 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonWriter;
 import lombok.val;
 
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class ProfilingNode {
     public final ProfilingNode parent;

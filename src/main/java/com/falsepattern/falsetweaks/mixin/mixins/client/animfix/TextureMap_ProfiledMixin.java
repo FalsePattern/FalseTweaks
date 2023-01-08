@@ -23,12 +23,9 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
-import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
 import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -37,19 +34,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.profiler.Profiler;
-
-import java.util.List;
 
 @Mixin(TextureMap.class)
 public abstract class TextureMap_ProfiledMixin implements ITextureMapMixin {
+    private static Profiler theProfiler;
 
     @Inject(method = "updateAnimations",
             at = @At(value = "HEAD"),
             require = 1)
     private void beginBatchAnimations(CallbackInfo ci) {
+        if (theProfiler == null) {
+            theProfiler = Minecraft.getMinecraft().mcProfiler;
+        }
+        theProfiler.startSection("updateAnimations");
         AnimationUpdateBatcherRegistry.batcher = getBatcher();
+    }
+
+    @Redirect(method = "updateAnimations",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;updateAnimation()V"),
+              require = 1)
+    private void profileAnimationUpdate(TextureAtlasSprite sprite) {
+        theProfiler.startSection(sprite.getIconName());
+        sprite.updateAnimation();
+        theProfiler.endSection();
     }
 
     @Inject(method = "updateAnimations",
@@ -58,7 +67,10 @@ public abstract class TextureMap_ProfiledMixin implements ITextureMapMixin {
     private void flushBatchAnimations(CallbackInfo ci) {
         AnimationUpdateBatcherRegistry.batcher = null;
         if (getBatcher() != null) {
+            theProfiler.startSection("uploadBatch");
             getBatcher().upload();
+            theProfiler.endSection();
         }
+        theProfiler.endSection();
     }
 }
