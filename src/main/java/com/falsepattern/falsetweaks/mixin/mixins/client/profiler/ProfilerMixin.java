@@ -122,7 +122,8 @@ public abstract class ProfilerMixin {
             }
             long delta = current.end();
             if (delta > 100_000_000L) {
-                logger.warn("Something's taking too long! '" + current.fullName() + "' took approx " + delta / 1_000_000.0D + " ms");
+                logger.warn("Something's taking too long! '" + current.fullName() + "' took approx " +
+                            delta / 1_000_000.0D + " ms");
             }
 
             current = current.parent;
@@ -161,7 +162,8 @@ public abstract class ProfilerMixin {
         val globalAverageMultiplier = 1.00f / (float) history.size();
         val unspecTime = nodeTime - totalChildTime.get();
         if (unspecTime > 0) {
-            result.add(new Profiler.Result("unspecified", unspecTime * localPercentMultiplier, unspecTime * globalAverageMultiplier));
+            result.add(new Profiler.Result("unspecified", unspecTime * localPercentMultiplier,
+                                           unspecTime * globalAverageMultiplier));
         }
         childTimes.forEach((key, value) -> {
             result.add(new Profiler.Result(key, value * localPercentMultiplier, value * globalAverageMultiplier));

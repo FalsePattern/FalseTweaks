@@ -29,8 +29,10 @@ import com.falsepattern.lib.StableAPI;
 public interface IAnimationUpdateBatcher {
     @StableAPI.Expose
     boolean scheduleUpload(int[][] texture, int width, int height, int xOffset, int yOffset);
+
     @StableAPI.Expose
     void terminate();
+
     @StableAPI.Expose
     void upload();
 }

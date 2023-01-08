@@ -42,7 +42,8 @@ public abstract class TextureUtil_UnprofiledMixin {
             require = 1)
     private static void uploadTextureBatchable(int[][] texture, int width, int height, int xOffset, int yOffset, boolean ignored1, boolean ignored2, CallbackInfo ci) {
         if (AnimationUpdateBatcherRegistry.batcher != null) {
-            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
+            boolean ended =
+                    AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
             if (ended) {
                 ci.cancel();
             }

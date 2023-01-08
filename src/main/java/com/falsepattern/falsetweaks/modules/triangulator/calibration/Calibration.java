@@ -92,7 +92,8 @@ public class Calibration {
             return;
         }
         if (ModuleConfig.TRIANGULATOR) {
-            val alert = FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
+            val alert =
+                    FormattedText.parse(EnumChatFormatting.RED + I18n.format("chat.triangulator.calibration.message"));
             val text = alert.toChatText();
             val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
             for (val t : text) {

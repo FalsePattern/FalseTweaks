@@ -36,12 +36,16 @@ import java.util.List;
 import java.util.Map;
 
 public class AnimationUpdateBatcherRegistry {
+    private static final List<Integer> priorities = new ArrayList<>();
+    private static final Map<Integer, IAnimationUpdateBatcherFactory> factories = new HashMap<>();
     public static TextureMap currentAtlas = null;
     public static IAnimationUpdateBatcher batcher = null;
     public static String currentName = null;
 
-    private static final List<Integer> priorities = new ArrayList<>();
-    private static final Map<Integer, IAnimationUpdateBatcherFactory> factories = new HashMap<>();
+    static {
+        registerBatcherFactory(DefaultAnimationUpdateBatcher::new, 0);
+    }
+
     public static void registerBatcherFactory(IAnimationUpdateBatcherFactory factory, int priority) {
         while (priorities.contains(priority)) {
             priority++;
@@ -52,7 +56,7 @@ public class AnimationUpdateBatcherRegistry {
     }
 
     public static IAnimationUpdateBatcher newBatcher(int xOffset, int yOffset, int width, int height, int mipLevel) {
-        for (val priority: priorities) {
+        for (val priority : priorities) {
             val factory = factories.get(priority);
             val batcher = factory.createBatcher(xOffset, yOffset, width, height, mipLevel);
             if (batcher != null) {
@@ -60,9 +64,5 @@ public class AnimationUpdateBatcherRegistry {
             }
         }
         throw new IllegalStateException("Could not construct animation update batcher");
-    }
-
-    static {
-        registerBatcherFactory(DefaultAnimationUpdateBatcher::new, 0);
     }
 }

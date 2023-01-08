@@ -40,6 +40,7 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
+    // @formatter:off
     //region Triangulator Module
     Tri_QuadComparatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.QuadComparatorMixin"),
     Tri_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.RenderBlocksUltraMixin"),
@@ -191,6 +192,7 @@ public enum Mixin implements IMixin {
     TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
     //endregion Misc Modules
     ;
+    // @formatter:on
 
     @Getter
     private final Side side;

@@ -50,7 +50,8 @@ public abstract class TextureUtil_ProfiledMixin {
         }
         if (AnimationUpdateBatcherRegistry.batcher != null) {
             theProfiler.startSection("copyToBatch");
-            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
+            boolean ended =
+                    AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
             theProfiler.endSection();
             if (ended) {
                 ci.cancel();

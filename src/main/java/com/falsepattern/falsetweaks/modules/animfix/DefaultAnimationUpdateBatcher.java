@@ -46,19 +46,10 @@ public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
     private final int height;
     private final int[] offsets;
     private final IntBuffer memory;
-
-    private static class Buffer {
-        public final List<int[][]> queuedTextures = new ArrayList<>();
-        public final List<int[]> queuedDimensions = new ArrayList<>();
-        public int queuedCount = 0;
-    }
-
-    private volatile Buffer backBuffer = new Buffer();
-
     private final Semaphore batchingSemaphore = new Semaphore(0);
     private final Semaphore uploadingSemaphore = new Semaphore(0);
     private final Thread thread;
-
+    private volatile Buffer backBuffer = new Buffer();
     private volatile boolean running = true;
 
     @SneakyThrows
@@ -191,5 +182,11 @@ public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
             height >>>= 1;
             w >>>= 1;
         }
+    }
+
+    private static class Buffer {
+        public final List<int[][]> queuedTextures = new ArrayList<>();
+        public final List<int[]> queuedDimensions = new ArrayList<>();
+        public int queuedCount = 0;
     }
 }

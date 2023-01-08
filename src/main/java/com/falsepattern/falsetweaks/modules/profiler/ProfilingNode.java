@@ -23,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.modules.profiler;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.stream.JsonWriter;
 import lombok.val;
 
@@ -35,19 +34,20 @@ import java.util.Map;
 
 public class ProfilingNode {
     public final ProfilingNode parent;
-    @Expose public final String name;
+    public final String name;
     public final Map<String, ProfilingNode> childrenMap = new HashMap<>();
-    @Expose public long totalTime = 0L;
-    @Expose private final List<ProfilingNode> children = new ArrayList<>();
+    private final List<ProfilingNode> children = new ArrayList<>();
+    public long totalTime = 0L;
     private long start;
-
-    public static ProfilingNode createRoot() {
-        return new ProfilingNode(null, "");
-    }
+    private String fullNameString = null;
 
     private ProfilingNode(ProfilingNode parent, String name) {
         this.parent = parent;
         this.name = name.intern();
+    }
+
+    public static ProfilingNode createRoot() {
+        return new ProfilingNode(null, "");
     }
 
     public void start() {
@@ -68,8 +68,6 @@ public class ProfilingNode {
         });
     }
 
-    private String fullNameString = null;
-
     public String fullName() {
         if (fullNameString == null) {
             fullNameString = (parent.parent != null ? parent.fullName() + "." + name : name).intern();
@@ -78,10 +76,16 @@ public class ProfilingNode {
     }
 
     public ProfilingNode findChild(String[] path, int index) {
-        if (path == null || path.length == 0) return null;
-        if (index == path.length) return this;
+        if (path == null || path.length == 0) {
+            return null;
+        }
+        if (index == path.length) {
+            return this;
+        }
         val node = path[index];
-        if (!childrenMap.containsKey(node)) return null;
+        if (!childrenMap.containsKey(node)) {
+            return null;
+        }
         return childrenMap.get(node).findChild(path, index + 1);
     }
 

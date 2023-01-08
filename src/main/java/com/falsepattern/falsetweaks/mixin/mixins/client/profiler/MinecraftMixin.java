@@ -41,7 +41,9 @@ import java.util.List;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
-    @Shadow @Final public Profiler mcProfiler;
+    @Shadow
+    @Final
+    public Profiler mcProfiler;
 
     @Inject(method = "runTick",
             at = @At(value = "FIELD",
@@ -96,7 +98,7 @@ public abstract class MinecraftMixin {
         } else if (time < 100_000) {
             suffix = "us";
             time /= 1_000;
-        }else if (time < 100_000_000) {
+        } else if (time < 100_000_000) {
             suffix = "ms";
             time /= 1_000_000;
         } else {

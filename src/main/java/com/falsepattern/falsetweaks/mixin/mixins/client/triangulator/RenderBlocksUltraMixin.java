@@ -144,7 +144,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private static boolean isBlacklisted(Class<?> clazz) {
         val blacklist = getCrackFixBlacklist();
-        if (blacklist == null) return false;
+        if (blacklist == null) {
+            return false;
+        }
         for (val element : blacklist) {
             if (element.isAssignableFrom(clazz)) {
                 return true;
@@ -379,12 +381,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             y += facing.front.y();
             z += facing.front.z();
         }
-
+        // @formatter:off
         final float lightLeft, lightTopLeft, lightTop, lightTopRight,
                 lightRight, lightBottomRight, lightBottom, lightBottomLeft;
         final int brightnessLeft, brightnessTopLeft, brightnessTop, brightnessTopRight,
                 brightnessRight, brightnessBottomRight, brightnessBottom, brightnessBottomLeft;
-
+        // @formatter:on
         lightLeft = getAmbientOcclusionLightValueOffset(x, y, z, facing.left);
         lightRight = getAmbientOcclusionLightValueOffset(x, y, z, facing.right);
         lightBottom = getAmbientOcclusionLightValueOffset(x, y, z, facing.bottom);
@@ -472,6 +474,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
 
         boolean useCustomColor = state.useCustomColor;
+
+        // @formatter:off
         if (useCustomColor || facing.face == Facing.Direction.FACE_YPOS) {
             this.colorRedTopLeft = this.colorRedBottomLeft = this.colorRedBottomRight = this.colorRedTopRight = state.r * facing.brightness;
             this.colorGreenTopLeft = this.colorGreenBottomLeft = this.colorGreenBottomRight = this.colorGreenTopRight = state.g * facing.brightness;
@@ -481,6 +485,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             this.colorGreenTopLeft = this.colorGreenBottomLeft = this.colorGreenBottomRight = this.colorGreenTopRight = facing.brightness;
             this.colorBlueTopLeft = this.colorBlueBottomLeft = this.colorBlueBottomRight = this.colorBlueTopRight = facing.brightness;
         }
+        // @formatter:on
 
         this.colorRedTopLeft *= aoTopLeft;
         this.colorGreenTopLeft *= aoTopLeft;
@@ -746,7 +751,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
     }
 
-    @Inject(method = {"renderFaceXNeg", "renderFaceXPos", "renderFaceYNeg", "renderFaceYPos", "renderFaceZNeg", "renderFaceZPos"},
+    @Inject(method = {"renderFaceXNeg",
+                      "renderFaceXPos",
+                      "renderFaceYNeg",
+                      "renderFaceYPos",
+                      "renderFaceZNeg",
+                      "renderFaceZPos"},
             at = @At(value = "RETURN"),
             require = 6)
     private void postBounds(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {

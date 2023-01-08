@@ -74,15 +74,17 @@ public class VoxelizerConfig {
     @Config.DefaultDouble(1)
     public static double RAIL_THICKNESS;
 
-    public static boolean isExcluded(String textureName) {
-        for (String s : EXCLUSION_LIST) {
-            if (textureName.startsWith(s)) return true;
-        }
-        return false;
-    }
-
     static {
         ConfigurationManager.selfInit();
+    }
+
+    public static boolean isExcluded(String textureName) {
+        for (String s : EXCLUSION_LIST) {
+            if (textureName.startsWith(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //This is here to make the static initializer run

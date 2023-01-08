@@ -36,6 +36,7 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 
 @RequiredArgsConstructor
 public enum Mixin implements IMixin {
+    // @formatter:off
     //region Startup Optimizations Module
     //region Minecraft->client
     DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.DirectoryDiscovererMixin"),
@@ -44,6 +45,7 @@ public enum Mixin implements IMixin {
     ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModDiscovererMixin"),
     //endregion Minecraft->client
     //endregion Startup Optimizations Module
+    // @formatter:on
     ;
 
     @Getter

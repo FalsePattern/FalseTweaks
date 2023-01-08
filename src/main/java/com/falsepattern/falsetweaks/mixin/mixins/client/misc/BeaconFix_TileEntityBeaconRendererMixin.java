@@ -85,11 +85,13 @@ public abstract class BeaconFix_TileEntityBeaconRendererMixin extends TileEntity
             displayList = GLAllocation.generateDisplayLists(1);
             GL11.glNewList(displayList, GL11.GL_COMPILE);
             Tessellator tess = Compat.tessellator();
+            // @formatter:off
             GL11.glPushAttrib(GL11.GL_ENABLE_BIT |
                               GL11.GL_TEXTURE_BIT |
                               GL11.GL_COLOR_BUFFER_BIT |
                               GL11.GL_DEPTH_BUFFER_BIT |
                               GL11.GL_TRANSFORM_BIT);
+            // @formatter:on
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);

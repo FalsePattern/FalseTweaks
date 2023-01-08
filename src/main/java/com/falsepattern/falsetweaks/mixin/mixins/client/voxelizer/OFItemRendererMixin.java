@@ -11,7 +11,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 @Pseudo
-@Mixin(targets = "ItemRendererOF", remap = false)
+@Mixin(targets = "ItemRendererOF",
+       remap = false)
 @SuppressWarnings("UnresolvedMixinReference")
 public abstract class OFItemRendererMixin {
     @Inject(method = "func_78443_a(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",

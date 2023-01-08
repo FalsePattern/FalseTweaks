@@ -110,7 +110,8 @@ public class CalibrationGUI extends GuiScreen {
                 Calibration.setCalibration(flip);
                 val mc = Minecraft.getMinecraft();
                 mc.displayGuiScreen(null);
-                FormattedText.parse(EnumChatFormatting.GREEN + I18n.format("chat.triangulator.calibrated.message")).addChatMessage(mc.thePlayer);
+                FormattedText.parse(EnumChatFormatting.GREEN + I18n.format("chat.triangulator.calibrated.message"))
+                             .addChatMessage(mc.thePlayer);
                 break;
         }
     }

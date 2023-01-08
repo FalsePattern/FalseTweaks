@@ -35,35 +35,36 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
-@Mixin(value = RenderingRegistry.class, remap = false)
+@Mixin(value = RenderingRegistry.class,
+       remap = false)
 public abstract class RenderingRegistryMixin {
     @Inject(method = "renderWorldBlock",
             at = @At("HEAD"),
             require = 1)
     private void startRenderWorldBlockMark(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId, CallbackInfoReturnable<Boolean> cir) {
-        ((IRenderBlocksMixin)renderer).enableMultiRenderReuse(true);
+        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(true);
     }
 
     @Inject(method = "renderWorldBlock",
             at = @At("RETURN"),
             require = 1)
     private void endRenderWorldBlockMark(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId, CallbackInfoReturnable<Boolean> cir) {
-        ((IRenderBlocksMixin)renderer).enableMultiRenderReuse(false);
-        ((IRenderBlocksMixin)renderer).reusePreviousStates(false);
+        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(false);
+        ((IRenderBlocksMixin) renderer).reusePreviousStates(false);
     }
 
     @Inject(method = "renderInventoryBlock",
             at = @At("HEAD"),
             require = 1)
     private void startRenderInventoryBlockMark(RenderBlocks renderer, Block block, int metadata, int modelID, CallbackInfo ci) {
-        ((IRenderBlocksMixin)renderer).enableMultiRenderReuse(true);
+        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(true);
     }
 
     @Inject(method = "renderInventoryBlock",
             at = @At("RETURN"),
             require = 1)
     private void endRenderInventoryBlockMark(RenderBlocks renderer, Block block, int metadata, int modelID, CallbackInfo ci) {
-        ((IRenderBlocksMixin)renderer).enableMultiRenderReuse(false);
-        ((IRenderBlocksMixin)renderer).reusePreviousStates(false);
+        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(false);
+        ((IRenderBlocksMixin) renderer).reusePreviousStates(false);
     }
 }
