@@ -12,14 +12,14 @@ def deobfCurse(curseDep) {
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.24") {
+    compileOnly("org.projectlombok:lombok:[1.18.24,1.19)") {
         transitive = false
     }
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    annotationProcessor("org.projectlombok:lombok:[1.18.24,1.19)")
 
-    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.14:dev")
+    compile("com.falsepattern:falsepatternlib-mc1.7.10:[0.10.14,0.11):dev")
 
-    compileOnly("org.joml:joml:1.10.5")
+    compileOnly("org.joml:joml:[1.10.5,1.11)")
 
     compileOnly("curse.maven:redstone-paste-67508:2211249") {
         transitive = false
