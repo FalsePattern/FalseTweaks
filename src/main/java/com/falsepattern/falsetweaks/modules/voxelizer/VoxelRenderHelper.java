@@ -50,6 +50,7 @@ public class VoxelRenderHelper {
     private static final float RAD_NEG90DEG = (float) Math.toRadians(-90);
     private static final float RAD_45DEG = (float) Math.toRadians(45);
 
+    //Rail directions
     private static final int RAIL_FLAT_NORTH_SOUTH = 0x0;
     private static final int RAIL_FLAT_WEST_EAST = 0x1;
     private static final int RAIL_RAMP_EAST = 0x2;
@@ -121,7 +122,7 @@ public class VoxelRenderHelper {
         }
     }
 
-    public static void renderRail(IBlockAccess blockAccess, BlockRailBase rail, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
+    public static void renderRail(IBlockAccess blockAccess, BlockRailBase rail, int x, int y, int z, int railDirection, IIcon iicon, boolean mirrored) {
         val tess = Compat.tessellator();
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
         tess.setBrightness(rail.getMixedBrightnessForBlock(blockAccess, x, y, z));
@@ -129,7 +130,7 @@ public class VoxelRenderHelper {
         val transform = threadMatrix.get();
         transform.translation(x, y, z);
         transform.translate(0.5f, 0, 0.5f);
-        switch (meta) {
+        switch (railDirection) {
             case RAIL_FLAT_WEST_EAST:
             case RAIL_RAMP_EAST:
             case RAIL_CORNER_WEST_SOUTH:
@@ -149,7 +150,7 @@ public class VoxelRenderHelper {
         }
         transform.translate(-0.5f, 0, -0.5f);
         float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
-        switch (meta) {
+        switch (railDirection) {
             case RAIL_RAMP_EAST:
             case RAIL_RAMP_WEST:
             case RAIL_RAMP_NORTH:
@@ -171,15 +172,15 @@ public class VoxelRenderHelper {
                     if (face.minY != 0) {
                         break;
                     }
-                    switch (meta) {
+                    switch (railDirection) {
                         case RAIL_FLAT_NORTH_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH,
-                                                           RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH,
-                                                           RAIL_CORNER_WEST_SOUTH);
+                            return isBlockRailWithDirection(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH,
+                                                            RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH,
+                                                            RAIL_CORNER_WEST_SOUTH);
                         case RAIL_FLAT_WEST_EAST:
-                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST,
-                                                           RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH,
-                                                           RAIL_CORNER_WEST_NORTH);
+                            return isBlockRailWithDirection(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST,
+                                                            RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH,
+                                                            RAIL_CORNER_WEST_NORTH);
                     }
                     break;
                 }
@@ -187,17 +188,17 @@ public class VoxelRenderHelper {
                     if (face.maxY != mesh.ySize() - 1) {
                         break;
                     }
-                    switch (meta) {
+                    switch (railDirection) {
                         case RAIL_FLAT_NORTH_SOUTH:
                             //                        case RAIL_CORNER_EAST_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH,
-                                                           RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH,
-                                                           RAIL_CORNER_WEST_NORTH);
+                            return isBlockRailWithDirection(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH,
+                                                            RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH,
+                                                            RAIL_CORNER_WEST_NORTH);
                         case RAIL_FLAT_WEST_EAST:
                             //                        case RAIL_CORNER_WEST_SOUTH:
-                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST,
-                                                           RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH,
-                                                           RAIL_CORNER_EAST_NORTH);
+                            return isBlockRailWithDirection(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST,
+                                                            RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH,
+                                                            RAIL_CORNER_EAST_NORTH);
                         //                        case RAIL_CORNER_WEST_NORTH:
                         //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
                         //                        case RAIL_CORNER_EAST_NORTH:
@@ -209,7 +210,7 @@ public class VoxelRenderHelper {
                     if (face.maxX != mesh.xSize() - 1) {
                         break;
                     }
-                    switch (meta) {
+                    switch (railDirection) {
                         //                        case RAIL_CORNER_WEST_NORTH:
                         //                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
                         //                        case RAIL_CORNER_WEST_SOUTH:
@@ -226,14 +227,15 @@ public class VoxelRenderHelper {
         }, VoxelType.Solid);
     }
 
-    private static boolean isBlockRailWithMetadata(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailMeta) {
+    private static boolean isBlockRailWithDirection(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailDirection) {
         val block = blockAccess.getBlock(x, y, z);
         if (!(block instanceof BlockRailBase)) {
             return false;
         }
-        val meta = ((BlockRailBase) block).getBasicRailMetadata(blockAccess, null, x, y, z);
-        for (int expected : expectedRailMeta) {
-            if (expected == meta) {
+        //Apply 4 bit mask for EndlessIDs compat
+        val railDirection = ((BlockRailBase) block).getBasicRailMetadata(blockAccess, null, x, y, z) & 0xF;
+        for (int expected : expectedRailDirection) {
+            if (expected == railDirection) {
                 return true;
             }
         }
@@ -241,14 +243,15 @@ public class VoxelRenderHelper {
     }
 
     public static void renderRailVanilla(RenderBlocks renderBlocks, BlockRailBase rail, int x, int y, int z) {
-        int meta = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        IIcon iicon = renderBlocks.getBlockIconFromSideAndMetadata(rail, 0, meta);
+        //Apply 4 bit mask for EndlessIDs compat
+        int railDirection = renderBlocks.blockAccess.getBlockMetadata(x, y, z) & 0xF;
+        IIcon iicon = renderBlocks.getBlockIconFromSideAndMetadata(rail, 0, railDirection);
         if (renderBlocks.hasOverrideBlockTexture()) {
             iicon = renderBlocks.overrideBlockTexture;
         }
         if (rail.isPowered()) {
-            meta &= 0x7;
+            railDirection &= 0x7;
         }
-        renderRail(renderBlocks.blockAccess, rail, x, y, z, meta, iicon, false);
+        renderRail(renderBlocks.blockAccess, rail, x, y, z, railDirection, iicon, false);
     }
 }
