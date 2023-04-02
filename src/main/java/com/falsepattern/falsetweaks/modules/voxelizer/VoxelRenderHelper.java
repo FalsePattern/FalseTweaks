@@ -29,9 +29,12 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.lib.util.MathUtil;
+import com.github.matt159.therighttrack.common.blocks.tracks.BlockTrackBase;
+import com.github.matt159.therighttrack.common.util.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
+import net.minecraftforge.common.util.ForgeDirection;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -253,5 +256,129 @@ public class VoxelRenderHelper {
             railDirection &= 0x7;
         }
         renderRail(renderBlocks.blockAccess, rail, x, y, z, railDirection, iicon, false);
+    }
+
+    private static final int BLOCK_TRACK_SOUTH = 0x0;
+    private static final int BLOCK_TRACK_WEST  = 0x1;
+    private static final int BLOCK_TRACK_NORTH = 0x2;
+    private static final int BLOCK_TRACK_EAST  = 0x3;
+
+    public static void renderTrack(IBlockAccess world, BlockTrackBase track, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
+        val tess = Compat.tessellator();
+        val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
+        tess.setBrightness(track.getMixedBrightnessForBlock(world, x, y, z));
+        tess.setColorOpaque_F(1.0F, 1.0F, 1.0F);
+        val transform = threadMatrix.get();
+        transform.translation(x, y, z);
+        transform.translate(0.5f, 0, 0.5f);
+
+        switch (meta & Constants.BIT_MASK_DIR_IN) {
+            case BLOCK_TRACK_EAST:
+                transform.rotateY(RAD_NEG90DEG);
+                break;
+            case BLOCK_TRACK_SOUTH:
+                transform.scale(-1, 1, -1);
+                break;
+            case BLOCK_TRACK_WEST:
+                transform.rotateY(RAD_90DEG);
+                break;
+        }
+
+        if (!mirrored) {
+            transform.scale(-1, 1, -1);
+        }
+
+        transform.translate(-0.5f, 0, -0.5f);
+        float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
+        switch (meta) {
+//            case RAIL_RAMP_EAST:
+//            case RAIL_RAMP_WEST:
+//            case RAIL_RAMP_NORTH:
+//            case RAIL_RAMP_SOUTH:
+//                transform.translate(0, offset, 0)
+//                        .rotateX(RAD_45DEG)
+//                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+//                        .translate(0, 0, offset);
+//                break;
+            default:
+                transform.rotateX(RAD_90DEG);
+                break;
+        }
+        transform.scale(1, 1, (float) VoxelizerConfig.RAIL_THICKNESS);
+        mesh.renderToTessellator(tess, 0, false, true, transform, (face) -> {
+            //Notice: corner rails commented out because they have parts of the "wood" also on the edge of the mesh
+//            switch (face.dir) {
+//                case Up: {
+//                    if (face.minY != 0) {
+//                        break;
+//                    }
+//                    switch (meta) {
+//                        case RAIL_FLAT_NORTH_SOUTH:
+//                            return isBlockRailWithDirection(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH,
+//                                    RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH,
+//                                    RAIL_CORNER_WEST_SOUTH);
+//                        case RAIL_FLAT_WEST_EAST:
+//                            return isBlockRailWithDirection(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST,
+//                                    RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH,
+//                                    RAIL_CORNER_WEST_NORTH);
+//                    }
+//                    break;
+//                }
+//                case Down: {
+//                    if (face.maxY != mesh.ySize() - 1) {
+//                        break;
+//                    }
+//                    switch (meta) {
+//                        case RAIL_FLAT_NORTH_SOUTH:
+//                            //                        case RAIL_CORNER_EAST_SOUTH:
+//                            return isBlockRailWithDirection(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH,
+//                                    RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH,
+//                                    RAIL_CORNER_WEST_NORTH);
+//                        case RAIL_FLAT_WEST_EAST:
+//                            //                        case RAIL_CORNER_WEST_SOUTH:
+//                            return isBlockRailWithDirection(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST,
+//                                    RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH,
+//                                    RAIL_CORNER_EAST_NORTH);
+//                        //                        case RAIL_CORNER_WEST_NORTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+//                        //                        case RAIL_CORNER_EAST_NORTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+//                    }
+//                    break;
+//                }
+//                case Right: {
+//                    if (face.maxX != mesh.xSize() - 1) {
+//                        break;
+//                    }
+//                    switch (meta) {
+//                        //                        case RAIL_CORNER_WEST_NORTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
+//                        //                        case RAIL_CORNER_WEST_SOUTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+//                        //                        case RAIL_CORNER_EAST_SOUTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+//                        //                        case RAIL_CORNER_EAST_NORTH:
+//                        //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+//                    }
+//                    break;
+//                }
+//            }
+            return false;
+        }, VoxelType.Solid);
+    }
+
+    private static boolean isBlockTrackWithDirection(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailDirection) {
+        val block = blockAccess.getBlock(x, y, z);
+        if (!(block instanceof BlockTrackBase)) {
+            return false;
+        }
+        //Apply 4 bit mask for EndlessIDs compat
+        val railDirection = ((BlockTrackBase) block).getBasicRailMetadata(blockAccess, null, x, y, z);
+        for (int expected : expectedRailDirection) {
+            if (expected == railDirection) {
+                return true;
+            }
+        }
+        return false;
     }
 }
