@@ -29,7 +29,8 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.lib.util.MathUtil;
-import com.github.matt159.therighttrack.common.blocks.tracks.BlockTrackBase;
+import com.github.matt159.therighttrack.api.tracks.BlockTrackBase;
+import com.github.matt159.therighttrack.api.tracks.TrackTools;
 import com.github.matt159.therighttrack.common.util.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -52,6 +53,7 @@ public class VoxelRenderHelper {
     private static final float RAD_90DEG = (float) Math.toRadians(90);
     private static final float RAD_NEG90DEG = (float) Math.toRadians(-90);
     private static final float RAD_45DEG = (float) Math.toRadians(45);
+    private static final float RAD_NEG45DEG = (float) Math.toRadians(-45);
 
     //Rail directions
     private static final int RAIL_FLAT_NORTH_SOUTH = 0x0;
@@ -263,6 +265,8 @@ public class VoxelRenderHelper {
     private static final int BLOCK_TRACK_NORTH = 0x2;
     private static final int BLOCK_TRACK_EAST  = 0x3;
 
+    private static final int SLOPE_TYPE_MASK = 0x60;
+
     public static void renderTrack(IBlockAccess world, BlockTrackBase track, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
         val tess = Compat.tessellator();
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
@@ -284,26 +288,25 @@ public class VoxelRenderHelper {
                 break;
         }
 
-        if (!mirrored) {
-            transform.scale(-1, 1, -1);
-        }
+//        if (!mirrored) {
+//            transform.scale(-1, 1, -1);
+//        }
 
         transform.translate(-0.5f, 0, -0.5f);
         float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
-        switch (meta) {
-//            case RAIL_RAMP_EAST:
-//            case RAIL_RAMP_WEST:
-//            case RAIL_RAMP_NORTH:
-//            case RAIL_RAMP_SOUTH:
-//                transform.translate(0, offset, 0)
-//                        .rotateX(RAD_45DEG)
-//                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-//                        .translate(0, 0, offset);
-//                break;
+        switch ((meta & SLOPE_TYPE_MASK) >> 5) {
+            case 0x1:
+            case 0x2:
+                transform.translate(0, offset, 0)
+                        .rotateX(RAD_45DEG)
+                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                        .translate(0, 0, offset);
+                break;
             default:
                 transform.rotateX(RAD_90DEG);
                 break;
         }
+
         transform.scale(1, 1, (float) VoxelizerConfig.RAIL_THICKNESS);
         mesh.renderToTessellator(tess, 0, false, true, transform, (face) -> {
             //Notice: corner rails commented out because they have parts of the "wood" also on the edge of the mesh
@@ -367,14 +370,14 @@ public class VoxelRenderHelper {
         }, VoxelType.Solid);
     }
 
-    private static boolean isBlockTrackWithDirection(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailDirection) {
+    private static boolean isBlockTrackWithDirection(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection... expectedRailDirection) {
         val block = blockAccess.getBlock(x, y, z);
         if (!(block instanceof BlockTrackBase)) {
             return false;
         }
-        //Apply 4 bit mask for EndlessIDs compat
-        val railDirection = ((BlockTrackBase) block).getBasicRailMetadata(blockAccess, null, x, y, z);
-        for (int expected : expectedRailDirection) {
+
+        val railDirection = TrackTools.getInputDirectionAt(blockAccess, x, y, z);
+        for (ForgeDirection expected : expectedRailDirection) {
             if (expected == railDirection) {
                 return true;
             }
