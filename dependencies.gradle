@@ -38,4 +38,6 @@ dependencies {
     }
 
     compileOnly(deobfCurse("railcraft-51195:2458987"))
+
+    runtimeOnly("com.falsepattern:endlessids-mc1.7.10:1.5-alpha0005:dev");
 }
