@@ -33,7 +33,6 @@ import java.util.Map;
 @IFMLLoadingPlugin.Name(Tags.MODID)
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
-        Deps.initDeps();
         ModuleConfig.init();
     }
 
