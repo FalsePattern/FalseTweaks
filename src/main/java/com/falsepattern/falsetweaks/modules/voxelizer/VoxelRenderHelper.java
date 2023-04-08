@@ -296,9 +296,14 @@ public class VoxelRenderHelper {
         float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
         switch ((meta & SLOPE_TYPE_MASK) >> 5) {
             case 0x1:
-            case 0x2:
                 transform.translate(0, offset, 0)
                         .rotateX(RAD_45DEG)
+                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                        .translate(0, 0, offset);
+                break;
+            case 0x2:
+                transform.translate(0, 1 + offset, 0)
+                        .rotateX((float) Math.toRadians(135))
                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
                         .translate(0, 0, offset);
                 break;
