@@ -30,6 +30,7 @@ import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.lib.util.MathUtil;
 import com.github.matt159.therighttrack.api.tracks.BlockTrackBase;
+import com.github.matt159.therighttrack.api.tracks.TrackSloping;
 import com.github.matt159.therighttrack.api.tracks.TrackTools;
 import com.github.matt159.therighttrack.common.util.Constants;
 import gnu.trove.map.TObjectIntMap;
@@ -260,13 +261,6 @@ public class VoxelRenderHelper {
         renderRail(renderBlocks.blockAccess, rail, x, y, z, railDirection, iicon, false);
     }
 
-    private static final int BLOCK_TRACK_SOUTH = 0x0;
-    private static final int BLOCK_TRACK_WEST  = 0x1;
-    private static final int BLOCK_TRACK_NORTH = 0x2;
-    private static final int BLOCK_TRACK_EAST  = 0x3;
-
-    private static final int SLOPE_TYPE_MASK = 0x60;
-
     public static void renderTrack(IBlockAccess world, BlockTrackBase track, int x, int y, int z, int meta, IIcon iicon, boolean mirrored) {
         val tess = Compat.tessellator();
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
@@ -276,38 +270,36 @@ public class VoxelRenderHelper {
         transform.translation(x, y, z);
         transform.translate(0.5f, 0, 0.5f);
 
-        switch (meta & Constants.BIT_MASK_DIR_IN) {
-            case BLOCK_TRACK_EAST:
+        switch (TrackTools.getInputDirectionFromMeta(meta)) {
+            case EAST:
                 transform.rotateY(RAD_NEG90DEG);
                 break;
-            case BLOCK_TRACK_SOUTH:
+            case SOUTH:
                 transform.scale(-1, 1, -1);
                 break;
-            case BLOCK_TRACK_WEST:
+            case WEST:
                 transform.rotateY(RAD_90DEG);
                 break;
+            case NORTH:
+                //do nothing
         }
-
-//        if (!mirrored) {
-//            transform.scale(-1, 1, -1);
-//        }
 
         transform.translate(-0.5f, 0, -0.5f);
         float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
-        switch ((meta & SLOPE_TYPE_MASK) >> 5) {
-            case 0x1:
+        switch (TrackSloping.getTrackSlopingFromMeta(meta)) {
+            case Up:
                 transform.translate(0, offset, 0)
                         .rotateX(RAD_45DEG)
                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
                         .translate(0, 0, offset);
                 break;
-            case 0x2:
+            case Down:
                 transform.translate(0, 1 + offset, 0)
                         .rotateX((float) Math.toRadians(135))
                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
                         .translate(0, 0, offset);
                 break;
-            default:
+            case None:
                 transform.rotateX(RAD_90DEG);
                 break;
         }
