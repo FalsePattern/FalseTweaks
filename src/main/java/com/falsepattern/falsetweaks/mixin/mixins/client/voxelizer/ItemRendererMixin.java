@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelRenderHelper;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,6 +41,8 @@ import net.minecraftforge.client.IItemRenderer;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
+    @Shadow private ItemStack itemToRender;
+
     @Inject(method = "renderItemIn2D",
             at = @At("HEAD"),
             cancellable = true,
@@ -61,21 +64,36 @@ public abstract class ItemRendererMixin {
             remap = false,
             require = 1)
     private void startManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
-        Data.setManagedMode(true);
+        if (p_78443_2_ == null) return;
+        val item = p_78443_2_.getItem();
+        if (item == null) return;
+        if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
+            Data.setManagedMode(true);
+        }
     }
 
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;I)V",
             at = @At("HEAD"),
             require = 1)
     private void startManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
-        Data.setManagedMode(true);
+        if (p_78443_2_ == null) return;
+        val item = p_78443_2_.getItem();
+        if (item == null) return;
+        if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
+            Data.setManagedMode(true);
+        }
     }
 
     @Inject(method = "renderItemInFirstPerson",
             at = @At("HEAD"),
             require = 1)
     private void startManagedMode3(float p_78440_1_, CallbackInfo ci) {
-        Data.setManagedMode(true);
+        if (itemToRender == null) return;
+        val item = itemToRender.getItem();
+        if (item == null) return;
+        if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
+            Data.setManagedMode(true);
+        }
     }
 
     @Inject(method = "renderItem(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;ILnet/minecraftforge/client/IItemRenderer$ItemRenderType;)V",

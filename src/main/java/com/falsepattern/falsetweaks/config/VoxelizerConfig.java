@@ -27,6 +27,12 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.StrategyPreset;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
+import lombok.val;
+
+import net.minecraft.launchwrapper.Launch;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Config(modid = Tags.MODID,
         category = "voxelizer")
@@ -63,10 +69,18 @@ public class VoxelizerConfig {
 
     @Config.Comment("Item textures to disable voxelization for. Used to fix issues with certain items.\n" +
                     "This is a PREFIX check, so you can also just specify a mod ID, and all items from it will skip getting voxelized.\n" +
+                    "Needs a game restart to apply changes (cached for performance).\n" +
                     "Syntax: modid:texturename")
     @Config.DefaultStringList({"avaritia:infinity"})
     @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
     public static String[] EXCLUSION_LIST;
+
+    @Config.Comment("Classes to disable voxelization for. Used to fix issues with certain items.\n" +
+                    "This is an instanceof check, so superclasses are also checked.\n" +
+                    "Needs a game restart to apply changes (cached for performance).")
+    @Config.DefaultStringList({"cofh.lib.render.IFluidOverlayItem"})
+    @Config.LangKey("config.falsetweaks.voxelizer.class_exclusion_list")
+    public static String[] CLASS_EXCLUSION_LIST;
 
     @Config.Comment("The thickness of the 3D rails. Doesn't require game restart. 1 is vanilla thickness.\n" +
                     "FPS impact: basically none")
@@ -78,12 +92,52 @@ public class VoxelizerConfig {
         ConfigurationManager.selfInit();
     }
 
+    @Config.Ignore
+    private static final Set<String> knownExcludes = new HashSet<>();
+    @Config.Ignore
+    private static final Set<String> knownIncludes = new HashSet<>();
+
     public static boolean isExcluded(String textureName) {
+        if (knownExcludes.contains(textureName)) {
+            return true;
+        }
+        if (knownIncludes.contains(textureName)) {
+            return false;
+        }
         for (String s : EXCLUSION_LIST) {
             if (textureName.startsWith(s)) {
+                knownExcludes.add(textureName);
                 return true;
             }
         }
+        knownIncludes.add(textureName);
+        return false;
+    }
+
+    @Config.Ignore
+    private static final Set<Class<?>> knownClassExcludes = new HashSet<>();
+    @Config.Ignore
+    private static final Set<Class<?>> knownClassIncludes = new HashSet<>();
+
+    public static boolean isClassExcluded(Class<?> clazz) {
+        if (knownClassExcludes.contains(clazz)) {
+            return true;
+        }
+        if (knownClassIncludes.contains(clazz)) {
+            return false;
+        }
+        for (String s : CLASS_EXCLUSION_LIST) {
+            try {
+                if (Launch.classLoader.getClassBytes(s) != null) {
+                        val excluded = Class.forName(s);
+                        if (excluded.isAssignableFrom(clazz)) {
+                            knownClassExcludes.add(clazz);
+                            return true;
+                        }
+                }
+            } catch (Throwable ignored) {}
+        }
+        knownClassIncludes.add(clazz);
         return false;
     }
 

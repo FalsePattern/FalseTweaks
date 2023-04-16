@@ -8,6 +8,7 @@ config.falsetweaks.voxelizer.mesh_optimization_strategy=Voxelizer: Mesh optimiza
 config.falsetweaks.voxelizer.3d_rails=Voxelizer: 3D rails
 config.falsetweaks.voxelizer.debug_mesh_compilation=Voxelizer: Debug mesh compilation
 config.falsetweaks.voxelizer.exclusion_list=Voxelizer: Texture exclusion list
+config.falsetweaks.voxelizer.class_exclusion_list=Voxelizer: Class exclusion list
 config.falsetweaks.voxelizer.rail_thickness=Voxelizer: Rail thickness
 config.falsetweaks.leakfix.cache_size_target=Memory Leak Fix: Cache size target
 config.falsetweaks.item_render_lists.max_buffer_size=Item Render Lists: Maximum buffer size
