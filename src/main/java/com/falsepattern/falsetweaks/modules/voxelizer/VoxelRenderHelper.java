@@ -30,9 +30,8 @@ import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.lib.util.MathUtil;
 import com.github.matt159.therighttrack.api.tracks.BlockTrackBase;
-import com.github.matt159.therighttrack.api.tracks.TrackSloping;
-import com.github.matt159.therighttrack.api.tracks.TrackTools;
-import com.github.matt159.therighttrack.common.util.Constants;
+import com.github.matt159.therighttrack.api.tracks.TrackMeta;
+import com.github.matt159.therighttrack.api.tracks.TrackMode;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
@@ -270,37 +269,54 @@ public class VoxelRenderHelper {
         transform.translation(x, y, z);
         transform.translate(0.5f, 0, 0.5f);
 
-        switch (TrackTools.getInputDirectionFromMeta(meta)) {
-            case EAST:
-                transform.rotateY(RAD_NEG90DEG);
-                break;
-            case SOUTH:
-                transform.scale(-1, 1, -1);
-                break;
-            case WEST:
-                transform.rotateY(RAD_90DEG);
-                break;
-            case NORTH:
-                //do nothing
+        TrackMeta trackMeta = TrackMeta.of(meta);
+
+        if (trackMeta.getMode() != TrackMode.VERTICAL) {
+            switch (trackMeta.getDirection()) {
+                case EAST:
+                    transform.rotateY(RAD_NEG90DEG);
+                    break;
+                case SOUTH:
+                    transform.scale(-1, 1, -1);
+                    break;
+                case WEST:
+                    transform.rotateY(RAD_90DEG);
+                    break;
+                case NORTH:
+                    //do nothing
+            }
+        } else {
+            switch (trackMeta.getDirection()) {
+                case EAST:
+                    transform.rotateY(RAD_90DEG);
+                    transform.translate(0F, 0F, 0.0625F);
+                    break;
+                case SOUTH:
+                    transform.translate(0F, 0F, 0.0625F);
+                    break;
+                case WEST:
+                    transform.rotateY(RAD_NEG90DEG);
+                    transform.translate(0F, 0F, 0.0625F);
+                    break;
+                case NORTH:
+                    transform.translate(0F, 0F, 1F);
+                    break;
+            }
         }
 
         transform.translate(-0.5f, 0, -0.5f);
         float offset = (float) (0.0625 * VoxelizerConfig.RAIL_THICKNESS);
-        switch (TrackSloping.getTrackSlopingFromMeta(meta)) {
-            case Up:
+        switch (trackMeta.getMode()) {
+            case SLOPED:
                 transform.translate(0, offset, 0)
                         .rotateX(RAD_45DEG)
                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
                         .translate(0, 0, offset);
                 break;
-            case Down:
-                transform.translate(0, 1 + offset, 0)
-                        .rotateX((float) Math.toRadians(135))
-                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                        .translate(0, 0, offset);
-                break;
-            case None:
+            case TURNING:
+            case STRAIGHT:
                 transform.rotateX(RAD_90DEG);
+            case VERTICAL:
                 break;
         }
 
@@ -373,7 +389,8 @@ public class VoxelRenderHelper {
             return false;
         }
 
-        val railDirection = TrackTools.getInputDirectionAt(blockAccess, x, y, z);
+        val railDirection = TrackMeta.of(blockAccess.getBlockMetadata(x, y, z))
+                                     .getDirection();
         for (ForgeDirection expected : expectedRailDirection) {
             if (expected == railDirection) {
                 return true;
