@@ -43,6 +43,12 @@ public class VertexAPI {
         VertexInfo.allocateExtraVertexSlots(count, indices, optiFineIndices);
     }
 
+    /**
+     * Used for correcting any custom tessellator size/stride/offset logic.
+     * @param current The "vanilla" vertex size to be corrected
+     * @param multiplier The amount of vertices to compute the size/stride/offset for
+     * @return The computed value
+     */
     @StableAPI.Expose
     public static int recomputeVertexInfo(int current, int multiplier) {
         return VertexInfo.recomputeVertexInfo(current, multiplier);
