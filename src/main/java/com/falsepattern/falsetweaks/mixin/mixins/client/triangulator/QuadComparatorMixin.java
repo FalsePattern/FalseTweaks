@@ -23,12 +23,15 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
+import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IQuadComparatorMixin;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.util.QuadComparator;
@@ -84,7 +87,22 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
         }
         cir.setReturnValue(
                 compare(aObj, bObj, this.field_147630_a, this.field_147628_b, this.field_147629_c, this.field_147627_d,
-                        shaderMode ? 18 : 8));
+                        VertexInfo.recomputeVertexInfo(shaderMode ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1)));
+    }
+
+    @ModifyConstant(method = "compare(Ljava/lang/Integer;Ljava/lang/Integer;)I",
+                    constant = {@Constant(intValue = 8),
+                                @Constant(intValue = 9),
+                                @Constant(intValue = 10),
+                                @Constant(intValue = 16),
+                                @Constant(intValue = 17),
+                                @Constant(intValue = 18),
+                                @Constant(intValue = 24),
+                                @Constant(intValue = 25),
+                                @Constant(intValue = 26)},
+                    require = 18)
+    private int extendOffsets(int constant) {
+        return VertexInfo.recomputeVertexInfo(constant / 8, 1) + constant % 8;
     }
 
     @Override

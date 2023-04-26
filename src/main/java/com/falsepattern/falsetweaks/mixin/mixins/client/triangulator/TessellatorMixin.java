@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
+import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IQuadComparatorMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import lombok.Getter;
@@ -36,7 +37,9 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -60,6 +63,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow
     private int vertexCount;
 
+    @Shadow private int color;
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -153,7 +157,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         }
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
-            int vertexSize = shaderOn() ? 18 : 8;
+            int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
@@ -180,7 +184,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             //Target vertex layout: BCDA
             quadVerticesPutIntoBuffer++;
             if (quadVerticesPutIntoBuffer == 4) {
-                int vertexSize = shaderOn() ? 18 : 8;
+                int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
                 System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize,
                                  3 * vertexSize);
@@ -253,8 +257,36 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         return comparator;
     }
 
+    @ModifyConstant(method = "addVertex",
+                    constant = @Constant(intValue = 32),
+                    require = 1)
+    private int extendAddVertexCap(int constant) {
+        return VertexInfo.recomputeVertexInfo(constant >>> 2, drawingTris ? 3 : 4);
+    }
+
+    @ModifyConstant(method = "addVertex",
+                    constant = @Constant(intValue = 8),
+                    require = 1)
+    private int extendAddVertexStep(int constant) {
+        return VertexInfo.recomputeVertexInfo(constant, 1);
+    }
+
+    @ModifyConstant(method = "draw",
+                    constant = @Constant(intValue = 32),
+                    require = 6)
+    private int extendDrawStride(int constant) {
+        return VertexInfo.recomputeVertexInfo(constant >>> 2, 4);
+    }
+
+    @ModifyConstant(method = "draw",
+                    constant = @Constant(intValue = 8),
+                    require = 2)
+    private int extendDrawOffset(int constant) {
+        return VertexInfo.recomputeVertexInfo(constant, 1);
+    }
+
     @Override
     public int hackQuadCounting(int constant) {
-        return drawingTris ? (constant / 4) * 3 : constant;
+        return VertexInfo.recomputeVertexInfo(constant >>> 2, drawingTris ? 3 : 4);
     }
 }
