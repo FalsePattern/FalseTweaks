@@ -41,7 +41,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 
 import java.util.List;
 
-@Mixin(value = TextureMap.class, priority = 998)
+@Mixin(value = TextureMap.class, priority = 1000)
 public abstract class TextureMap_CommonMixin implements ITextureMapMixin {
     @Shadow
     private int mipmapLevels;
