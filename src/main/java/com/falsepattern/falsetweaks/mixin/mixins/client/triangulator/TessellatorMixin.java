@@ -273,7 +273,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 32),
-                    require = 6)
+                    require = 5, // OptiFine
+                    allow = 6) // Vanilla
     private int extendDrawStride(int constant) {
         return VertexInfo.recomputeVertexInfo(constant >>> 2, 4);
     }
