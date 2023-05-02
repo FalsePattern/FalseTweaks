@@ -102,7 +102,7 @@ public abstract class QuadComparatorMixin implements IQuadComparatorMixin {
                                 @Constant(intValue = 26)},
                     require = 18)
     private int extendOffsets(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant / 8, 1) + constant % 8;
+        return VertexInfo.recomputeVertexInfo(8, constant >>> 3) + (constant & 0xF);
     }
 
     @Override
