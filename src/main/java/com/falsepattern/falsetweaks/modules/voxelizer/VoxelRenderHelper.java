@@ -273,32 +273,33 @@ public class VoxelRenderHelper {
 
         if (trackMeta.getMode() != TrackMode.VERTICAL) {
             switch (trackMeta.getDirection()) {
-                case EAST:
-                    transform.rotateY(RAD_NEG90DEG);
-                    break;
-                case SOUTH:
+                case NORTH:
                     transform.scale(-1, 1, -1);
                     break;
-                case WEST:
+                case EAST:
                     transform.rotateY(RAD_90DEG);
                     break;
-                case NORTH:
+                case SOUTH:
                     //do nothing
+                    break;
+                case WEST:
+                    transform.rotateY(RAD_NEG90DEG);
+                    break;
             }
         } else {
             switch (trackMeta.getDirection()) {
-                case EAST:
+                case WEST:
                     transform.rotateY(RAD_90DEG);
                     transform.translate(0F, 0F, 0.0625F);
                     break;
-                case SOUTH:
+                case NORTH:
                     transform.translate(0F, 0F, 0.0625F);
                     break;
-                case WEST:
+                case EAST:
                     transform.rotateY(RAD_NEG90DEG);
                     transform.translate(0F, 0F, 0.0625F);
                     break;
-                case NORTH:
+                case SOUTH:
                     transform.translate(0F, 0F, 1F);
                     break;
             }
@@ -309,9 +310,9 @@ public class VoxelRenderHelper {
         switch (trackMeta.getMode()) {
             case SLOPED:
                 transform.translate(0, offset, 0)
-                        .rotateX(RAD_45DEG)
-                        .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                        .translate(0, 0, offset);
+                         .rotateX(RAD_45DEG)
+                         .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
+                         .translate(0, 0.0625F, offset);
                 break;
             case TURNING:
             case STRAIGHT:
@@ -381,21 +382,5 @@ public class VoxelRenderHelper {
 //            }
             return false;
         }, VoxelType.Solid);
-    }
-
-    private static boolean isBlockTrackWithDirection(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection... expectedRailDirection) {
-        val block = blockAccess.getBlock(x, y, z);
-        if (!(block instanceof BlockTrackBase)) {
-            return false;
-        }
-
-        val railDirection = TrackMeta.of(blockAccess.getBlockMetadata(x, y, z))
-                                     .getDirection();
-        for (ForgeDirection expected : expectedRailDirection) {
-            if (expected == railDirection) {
-                return true;
-            }
-        }
-        return false;
     }
 }
