@@ -88,4 +88,7 @@ public interface ToggleableTessellator {
 
     @StableAPI.Expose
     boolean isTriangulatorDisabled();
+
+    @StableAPI.Expose(since = "2.4.0")
+    boolean drawingTris();
 }

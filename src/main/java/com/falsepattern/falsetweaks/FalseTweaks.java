@@ -37,6 +37,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
      name = Tags.MODNAME,
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.GROUPNAME + ".config.FalseTweaksGuiFactory",
+     acceptableRemoteVersions = "*",
      dependencies = "required-after:falsepatternlib@[0.11.1,);")
 public class FalseTweaks {
 

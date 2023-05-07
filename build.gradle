@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern65
+//version: 1656003793falsepattern66
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -1069,7 +1069,7 @@ def deobf(String sourceURL, String rawFileName) {
     }
 
     download.run {
-        src "http://jenkins.usrv.eu:8081/nexus/content/repositories/releases/com/github/parker8283/BON2/$bon2Version-CUSTOM/BON2-$bon2Version-CUSTOM-all.jar"
+        src "https://github.com/FalsePattern/ExampleMod1.7.10/raw/main/blobs/BON2-2.5.1.jar"
         dest bon2File
         quiet true
         overwrite false

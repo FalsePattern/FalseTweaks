@@ -29,7 +29,10 @@ import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -83,6 +86,16 @@ public abstract class TessellatorOptiFineMixin implements ITessellatorMixin {
                 drawMode = GL11.GL_QUADS;
             }
         }
+    }
+
+    @SuppressWarnings("MixinAnnotationTarget")
+    @ModifyConstant(method = "addVertex",
+                    constant = @Constant(intValue = 4),
+                    slice = @Slice(from = @At(value = "FIELD",
+                                              target = "Lnet/minecraft/client/renderer/Tessellator;vertexCount:I")),
+                    require = 1)
+    private int fixNoExpandAlignment(int constant) {
+        return quadTriangulationActive() ? 3 : 4;
     }
 
     @Inject(method = "addVertex",
