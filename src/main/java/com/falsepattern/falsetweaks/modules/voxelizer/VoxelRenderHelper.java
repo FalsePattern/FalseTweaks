@@ -35,16 +35,14 @@ import com.github.matt159.therighttrack.api.tracks.TrackMode;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.val;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class VoxelRenderHelper {
     private static final TObjectIntMap<String> layers = new TObjectIntHashMap<>();
@@ -312,13 +310,11 @@ public class VoxelRenderHelper {
                 transform.translate(0, offset, 0)
                          .rotateX(RAD_45DEG)
                          .scale(1, MathUtil.SQRT_2, MathUtil.SQRT_2)
-                         .translate(0, 0.0625F, offset);
+                         .translate(0, 0, offset);
                 break;
             case TURNING:
             case STRAIGHT:
                 transform.rotateX(RAD_90DEG);
-            case VERTICAL:
-                break;
         }
 
         transform.scale(1, 1, (float) VoxelizerConfig.RAIL_THICKNESS);
