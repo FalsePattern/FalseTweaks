@@ -269,38 +269,19 @@ public class VoxelRenderHelper {
 
         TrackMeta trackMeta = TrackMeta.of(meta);
 
-        if (trackMeta.getMode() != TrackMode.VERTICAL) {
-            switch (trackMeta.getDirection()) {
-                case NORTH:
-                    transform.scale(-1, 1, -1);
-                    break;
-                case EAST:
-                    transform.rotateY(RAD_90DEG);
-                    break;
-                case SOUTH:
-                    //do nothing
-                    break;
-                case WEST:
-                    transform.rotateY(RAD_NEG90DEG);
-                    break;
-            }
-        } else {
-            switch (trackMeta.getDirection()) {
-                case WEST:
-                    transform.rotateY(RAD_90DEG);
-                    transform.translate(0F, 0F, 0.0625F);
-                    break;
-                case NORTH:
-                    transform.translate(0F, 0F, 0.0625F);
-                    break;
-                case EAST:
-                    transform.rotateY(RAD_NEG90DEG);
-                    transform.translate(0F, 0F, 0.0625F);
-                    break;
-                case SOUTH:
-                    transform.translate(0F, 0F, 1F);
-                    break;
-            }
+        switch (trackMeta.getDirection()) {
+            case NORTH:
+                transform.scale(-1, 1, -1);
+                break;
+            case EAST:
+                transform.rotateY(RAD_90DEG);
+                break;
+            case SOUTH:
+                //do nothing
+                break;
+            case WEST:
+                transform.rotateY(RAD_NEG90DEG);
+                break;
         }
 
         transform.translate(-0.5f, 0, -0.5f);
