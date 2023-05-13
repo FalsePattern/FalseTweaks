@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern66
+//version: 1656003793falsepattern67
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -755,7 +755,7 @@ if (curseForgeProjectId != "" && System.getenv("CURSEFORGE_TOKEN") != null) {
             addGameVersion project.minecraft.version
             addGameVersion "Forge"
             mainArtifact(jar) {
-                displayName = "$modName version: $modVersion"
+                displayName = "$modName $modVersion"
             }
         }
         options {
