@@ -42,7 +42,6 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 public enum Mixin implements IMixin {
     // @formatter:off
     //region Triangulator Module
-    Tri_QuadComparatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.QuadComparatorMixin"),
     Tri_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.RenderBlocksUltraMixin"),
     Tri_RenderBlocksCompatMixin(Side.CLIENT,
                                 condition(() -> ModuleConfig.TRIANGULATOR)

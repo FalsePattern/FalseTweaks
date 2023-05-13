@@ -27,23 +27,20 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.renderer.Tessellator;
-
-import java.util.Comparator;
+import net.minecraft.client.util.QuadComparator;
 
 @Mixin(Tessellator.class)
 public abstract class TessellatorVanillaMixin implements ITessellatorMixin {
-    @ModifyArg(method = {"getVertexState"},
-               at = @At(value = "INVOKE",
-                        target = "Ljava/util/PriorityQueue;<init>(ILjava/util/Comparator;)V",
-                        remap = false),
-               index = 1,
-               require = 1)
-    private Comparator<?> hackQuadComparator_MIXIN(Comparator<?> comparator) {
-        return hackQuadComparator(comparator);
+    @Redirect(method = "getVertexState",
+              at = @At(value = "NEW",
+                       target = "([IFFF)Lnet/minecraft/client/util/QuadComparator;"),
+              require = 1)
+    private QuadComparator customComparator(int[] vertices, float playerX, float playerY, float playerZ) {
+        return createQuadComparator(vertices, playerX, playerY, playerZ);
     }
 
     //Intvalue 72 is for optifine compat

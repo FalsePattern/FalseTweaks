@@ -21,10 +21,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.triangulator.quadcomparator;
 
-public interface IQuadComparatorMixin {
-    void enableTriMode();
-
-    void enableShaderMode();
+public interface CenterComputer {
+    float getCenter(float x, float y, float z, int[] vertexData, int i, int vertexSize);
 }

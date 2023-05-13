@@ -27,8 +27,11 @@ import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
-import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IQuadComparatorMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.CenterComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.QuadCenterComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.SmartComparator;
+import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.TriCenterComputer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -46,8 +49,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
-
-import java.util.Comparator;
+import net.minecraft.client.util.QuadComparator;
 
 @Mixin(Tessellator.class)
 @Accessors(fluent = true,
@@ -246,15 +248,14 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     }
 
     @Override
-    public Comparator<?> hackQuadComparator(Comparator<?> comparator) {
+    public QuadComparator createQuadComparator(int[] vertices, float playerX, float playerY, float playerZ) {
+        CenterComputer computer;
         if (drawingTris) {
-            IQuadComparatorMixin comp = (IQuadComparatorMixin) comparator;
-            comp.enableTriMode();
-            if (shaderOn) {
-                comp.enableShaderMode();
-            }
+            computer = TriCenterComputer.INSTANCE;
+        } else {
+            computer = QuadCenterComputer.INSTANCE;
         }
-        return comparator;
+        return new SmartComparator(vertices, playerX, playerY, playerZ, computer, shaderOn);
     }
 
     @ModifyConstant(method = "addVertex",

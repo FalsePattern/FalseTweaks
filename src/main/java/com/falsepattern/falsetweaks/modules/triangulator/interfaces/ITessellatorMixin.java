@@ -23,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
 
-import java.util.Comparator;
+import net.minecraft.client.util.QuadComparator;
 
 public interface ITessellatorMixin {
     void alternativeTriangulation(boolean state);
@@ -40,7 +40,7 @@ public interface ITessellatorMixin {
 
     void shaderOn(boolean state);
 
-    Comparator<?> hackQuadComparator(Comparator<?> comparator);
+    QuadComparator createQuadComparator(int[] vertices, float playerX, float playerY, float playerZ);
 
     int hackQuadCounting(int constant);
 
