@@ -21,29 +21,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.triangulator.sorting;
 
-import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import lombok.Data;
+import org.joml.Vector3f;
 
-public interface ITessellatorMixin {
-    void alternativeTriangulation(boolean state);
-
-    boolean alternativeTriangulation();
-
-    boolean drawingTris();
-
-    boolean hackedQuadRendering();
-
-    boolean quadTriangulationActive();
-
-    boolean shaderOn();
-
-    void shaderOn(boolean state);
-
-    TesselatorVertexState getVertexStateBSP(float viewX, float viewY, float viewZ);
-
-    void setVertexStateBSP(TesselatorVertexState tvs);
-
-    void triangulate();
+@Data
+public class TreeNode {
+    public Vector3f normal;
+    public Vector3f origin;
+    public TIntList triangleRefs;
+    public int frontRef;
+    public int backRef;
+    public TreeNode(Vector3f normal, Vector3f origin, TIntList triangleRefs, int frontRef, int backRef) {
+        this.normal = new Vector3f(normal);
+        this.origin = new Vector3f(origin);
+        this.triangleRefs = new TIntArrayList(triangleRefs);
+        this.frontRef = frontRef;
+        this.backRef = backRef;
+    }
 }

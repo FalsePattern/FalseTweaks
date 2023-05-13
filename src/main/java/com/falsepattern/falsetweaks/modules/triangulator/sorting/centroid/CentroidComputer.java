@@ -21,29 +21,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid;
 
-import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
+import org.joml.Vector3f;
 
-public interface ITessellatorMixin {
-    void alternativeTriangulation(boolean state);
-
-    boolean alternativeTriangulation();
-
-    boolean drawingTris();
-
-    boolean hackedQuadRendering();
-
-    boolean quadTriangulationActive();
-
-    boolean shaderOn();
-
-    void shaderOn(boolean state);
-
-    TesselatorVertexState getVertexStateBSP(float viewX, float viewY, float viewZ);
-
-    void setVertexStateBSP(TesselatorVertexState tvs);
-
-    void triangulate();
+public interface CentroidComputer {
+    void getCentroid(int[] vertexData, int i, int vertexSize, Vector3f output);
 }

@@ -21,8 +21,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.quadcomparator;
+package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-public interface CenterComputer {
-    float getCenter(float x, float y, float z, int[] vertexData, int i, int vertexSize);
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+
+import net.minecraft.client.renderer.RenderGlobal;
+
+@Mixin(RenderGlobal.class)
+public abstract class RenderGlobalMixin {
+    @ModifyConstant(method = "sortAndRender",
+                    constant = @Constant(doubleValue = 1.0D,
+                                         ordinal = 0),
+                    require = 1)
+    private double fasterSorting(double constant) {
+        return 0.1D;
+    }
 }

@@ -21,29 +21,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.triangulator.sorting;
 
 import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
 
-public interface ITessellatorMixin {
-    void alternativeTriangulation(boolean state);
-
-    boolean alternativeTriangulation();
-
-    boolean drawingTris();
-
-    boolean hackedQuadRendering();
-
-    boolean quadTriangulationActive();
-
-    boolean shaderOn();
-
-    void shaderOn(boolean state);
-
-    TesselatorVertexState getVertexStateBSP(float viewX, float viewY, float viewZ);
-
-    void setVertexStateBSP(TesselatorVertexState tvs);
-
-    void triangulate();
+public class BSPTessellatorVertexState extends TesselatorVertexState {
+    public final ChunkBSPTree bspTree;
+    public BSPTessellatorVertexState(int[] rawBuffer, int rawBufferIndex, int vertexCount, boolean hasTexture, boolean hasBrightness, boolean hasNormals, boolean hasColor, ChunkBSPTree bspTree) {
+        super(rawBuffer, rawBufferIndex, vertexCount, hasTexture, hasBrightness, hasNormals, hasColor);
+        this.bspTree = bspTree;
+    }
 }

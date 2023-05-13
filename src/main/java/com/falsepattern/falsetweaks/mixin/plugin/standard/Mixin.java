@@ -53,6 +53,7 @@ public enum Mixin implements IMixin {
                                              .and(condition(() -> !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)
                                                           .and(avoid(TargetedMod.APPARATUS))),
                                      "triangulator.RenderBlocksPerformanceMixin"),
+    Tri_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.RenderGlobalMixin"),
     Tri_RenderingRegistryMixin(Side.CLIENT,
                                condition(() -> ModuleConfig.TRIANGULATOR),
                                "triangulator.RenderingRegistryMixin"),

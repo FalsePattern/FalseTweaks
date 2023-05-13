@@ -28,28 +28,31 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.shader.TesselatorVertexState;
 import net.minecraft.client.util.QuadComparator;
 
 @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
 @Mixin(Tessellator.class)
 public abstract class TessellatorFoamFixMixin implements ITessellatorMixin {
-    @Redirect(method = "getVertexState_foamfix_old",
-              at = @At(value = "NEW",
-                       target = "([IFFF)Lnet/minecraft/client/util/QuadComparator;"),
-              require = 1)
-    private QuadComparator customComparator(int[] vertices, float playerX, float playerY, float playerZ) {
-        return createQuadComparator(vertices, playerX, playerY, playerZ);
+    @Inject(method = "getVertexState_foamfix_old",
+            at = @At(value = "HEAD"),
+            cancellable = true,
+            require = 1)
+    private void bspSort(float p_147564_1_, float p_147564_2_, float p_147564_3_, CallbackInfoReturnable<TesselatorVertexState> cir) {
+        cir.setReturnValue(getVertexStateBSP(p_147564_1_, p_147564_2_, p_147564_3_));
     }
 
-    //Intvalue 72 is for optifine compat
-    @ModifyConstant(method = "getVertexState_foamfix_old",
-                    constant = {@Constant(intValue = 32), @Constant(intValue = 72)},
-                    require = 1)
-    private int hackQuadCounting_MIXIN(int constant) {
-        return hackQuadCounting(constant);
+    @Inject(method = {"setVertexState", "setVertexState_foamfix_old"},
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void bspSort(TesselatorVertexState p_147565_1_, CallbackInfo ci) {
+        setVertexStateBSP(p_147565_1_);
     }
 }

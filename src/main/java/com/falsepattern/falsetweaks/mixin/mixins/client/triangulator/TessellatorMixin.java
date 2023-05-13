@@ -28,16 +28,18 @@ import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
-import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.CenterComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.QuadCenterComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.SmartComparator;
-import com.falsepattern.falsetweaks.modules.triangulator.quadcomparator.TriCenterComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.BSPTessellatorVertexState;
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.ChunkBSPTree;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -49,7 +51,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
 
 @Mixin(Tessellator.class)
 @Accessors(fluent = true,
@@ -66,6 +67,15 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     private int vertexCount;
 
     @Shadow private int color;
+    @Shadow private int rawBufferSize;
+    @Shadow private boolean hasTexture;
+    @Shadow private boolean hasBrightness;
+    @Shadow private boolean hasColor;
+    @Shadow private boolean hasNormals;
+    @Shadow private double xOffset;
+    @Shadow private double yOffset;
+    @Shadow private double zOffset;
+    @Shadow @Final public static Tessellator instance;
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -84,11 +94,19 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             at = @At(value = "HEAD"),
             require = 1)
     private void resetState(CallbackInfo ci) {
+        bspTree = null;
         drawingTris = false;
         hackedQuadRendering = false;
         quadTriangulationTemporarilySuspended = false;
         alternativeTriangulation = false;
         quadVerticesPutIntoBuffer = 0;
+    }
+
+    @Inject(method = "draw",
+            at = @At(value = "HEAD"),
+            require = 1)
+    private void drawKillBSP(CallbackInfoReturnable<Integer> cir) {
+        bspTree = null;
     }
 
     @Redirect(method = "startDrawing",
@@ -109,19 +127,59 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         drawMode = value;
     }
 
-    /**
-     * @author SirFell
-     * <p>
-     * Fixes <a href="https://github.com/MinecraftForge/MinecraftForge/issues/981">MinecraftForge#981</a> . Crash on <a href="https://github.com/MinecraftForge/MinecraftForge/issues/981#issuecomment-57375939">bad moder rendering"(©LexManos)</a> of transparent/translucent blocks when they draw nothing.
-     */
-    @Inject(method = "getVertexState",
-            at = @At("HEAD"),
-            cancellable = true)
-    public void getVertexStateNatural0Safe(float x, float y, float z, CallbackInfoReturnable<TesselatorVertexState> cir) {
+    private ChunkBSPTree bspTree;
+
+    @Override
+    public TesselatorVertexState getVertexStateBSP(float viewX, float viewY, float viewZ) {
         if (this.rawBufferIndex <= 0) {
-            cir.setReturnValue(null);
-            cir.cancel();
+            this.bspTree = null;
+            return null;
         }
+        int[] srcBuf;
+        ChunkBSPTree bspTree;
+        if (this.bspTree == null) {
+            val originalSnapshot = new int[this.rawBufferIndex];
+            System.arraycopy(rawBuffer, 0, originalSnapshot, 0, originalSnapshot.length);
+            bspTree = new ChunkBSPTree(drawingTris, shaderOn);
+            bspTree.buildTree(originalSnapshot);
+            srcBuf = originalSnapshot;
+        } else {
+            bspTree = this.bspTree;
+            srcBuf = bspTree.polygonHolder.getVertexData();
+            this.bspTree = null;
+        }
+        bspTree.traverse(new Vector3f((float) (viewX + xOffset), (float) (viewY + yOffset), (float) (viewZ + zOffset)));
+        val stride = bspTree.polygonHolder.vertexStride;
+        int[] stateSnapshot = new int[this.rawBufferIndex];
+        for (int j = 0, n = bspTree.polygonList.size(); j < n; j++) {
+            val i = bspTree.polygonList.get(j);
+            System.arraycopy(srcBuf, i * stride, stateSnapshot, j * stride, stride);
+        }
+        System.arraycopy(stateSnapshot, 0, rawBuffer, 0, stateSnapshot.length);
+        return new BSPTessellatorVertexState(stateSnapshot, this.rawBufferIndex, this.vertexCount, this.hasTexture, this.hasBrightness, this.hasNormals, this.hasColor, bspTree);
+    }
+
+    @Override
+    public void setVertexStateBSP(TesselatorVertexState tvs) {
+        while (tvs.getRawBuffer().length > rawBufferSize && rawBufferSize > 0) {
+            rawBufferSize <<= 1;
+        }
+        if (rawBufferSize > rawBuffer.length) {
+            rawBuffer = new int[rawBufferSize];
+        }
+        if (tvs instanceof BSPTessellatorVertexState) {
+            val bsp = (BSPTessellatorVertexState)tvs;
+            bspTree = bsp.bspTree;
+        } else {
+            bspTree = null;
+        }
+        System.arraycopy(tvs.getRawBuffer(), 0, this.rawBuffer, 0, tvs.getRawBuffer().length);
+        this.rawBufferIndex = tvs.getRawBufferIndex();
+        this.vertexCount = tvs.getVertexCount();
+        this.hasTexture = tvs.getHasTexture();
+        this.hasBrightness = tvs.getHasBrightness();
+        this.hasColor = tvs.getHasColor();
+        this.hasNormals = tvs.getHasNormals();
     }
 
     @Override
@@ -247,17 +305,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         shaderOn = state;
     }
 
-    @Override
-    public QuadComparator createQuadComparator(int[] vertices, float playerX, float playerY, float playerZ) {
-        CenterComputer computer;
-        if (drawingTris) {
-            computer = TriCenterComputer.INSTANCE;
-        } else {
-            computer = QuadCenterComputer.INSTANCE;
-        }
-        return new SmartComparator(vertices, playerX, playerY, playerZ, computer, shaderOn);
-    }
-
     @ModifyConstant(method = "addVertex",
                     constant = @Constant(intValue = 32),
                     require = 1)
@@ -286,10 +333,5 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                     allow = 2)   // Vanilla
     private int extendDrawOffset(int constant) {
         return VertexInfo.recomputeVertexInfo(constant, 1);
-    }
-
-    @Override
-    public int hackQuadCounting(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant >>> 2, drawingTris ? 3 : 4);
     }
 }
