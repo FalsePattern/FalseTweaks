@@ -27,11 +27,14 @@ import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates;
+import stubpackage.Config;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.world.IBlockAccess;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
@@ -66,6 +69,9 @@ public class Compat {
         if (Loader.isModLoaded("apparatus")) {
             ApparatusCompat.init();
         }
+        if (FMLClientHandler.instance().hasOptifine()) {
+            OptiFineCompat.init();
+        }
     }
 
     public static boolean enableTriangulation() {
@@ -77,6 +83,13 @@ public class Compat {
             return ArchaicFixCompat.threadTessellator();
         }
         return Tessellator.instance;
+    }
+
+    public static boolean isShaders() {
+        if (OptiFineCompat.isShadersModPresent()) {
+            return OptiFineCompat.isShaders();
+        }
+        return false;
     }
 
     public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
@@ -115,6 +128,24 @@ public class Compat {
 
         public static Tessellator threadTessellator() {
             return ThreadedChunkUpdates.getThreadTessellator();
+        }
+    }
+
+    private static class OptiFineCompat {
+        @Getter
+        private static boolean isShadersModPresent = false;
+        @Getter
+        private static boolean isOptiFinePresent = false;
+
+        private static void init() {
+            isOptiFinePresent = true;
+            try {
+                isShadersModPresent = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
+            } catch (IOException ignored) {}
+        }
+
+        public static boolean isShaders() {
+            return Config.isShaders();
         }
     }
 }

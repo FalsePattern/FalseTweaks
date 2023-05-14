@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
@@ -138,7 +139,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         if (this.bspTree == null) {
             val originalSnapshot = new int[this.rawBufferIndex];
             System.arraycopy(rawBuffer, 0, originalSnapshot, 0, originalSnapshot.length);
-            bspTree = new ChunkBSPTree(drawingTris, shaderOn);
+            bspTree = new ChunkBSPTree(drawingTris, Compat.isShaders());
             bspTree.buildTree(originalSnapshot);
             srcBuf = originalSnapshot;
         } else {

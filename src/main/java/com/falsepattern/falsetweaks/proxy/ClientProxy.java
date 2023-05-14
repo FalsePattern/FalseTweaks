@@ -74,7 +74,7 @@ public class ClientProxy extends CommonProxy {
 
         if (ModuleConfig.TRIANGULATOR) {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
-            Compat.applyCompatibilityTweaks();
         }
+        Compat.applyCompatibilityTweaks();
     }
 }
