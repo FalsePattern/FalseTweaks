@@ -66,8 +66,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow
     private int vertexCount;
 
-    @Shadow private int color;
-    @Shadow private int rawBufferSize;
     @Shadow private boolean hasTexture;
     @Shadow private boolean hasBrightness;
     @Shadow private boolean hasColor;
@@ -161,25 +159,12 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @Override
     public void setVertexStateBSP(TesselatorVertexState tvs) {
-        while (tvs.getRawBuffer().length > rawBufferSize && rawBufferSize > 0) {
-            rawBufferSize <<= 1;
-        }
-        if (rawBufferSize > rawBuffer.length) {
-            rawBuffer = new int[rawBufferSize];
-        }
         if (tvs instanceof BSPTessellatorVertexState) {
             val bsp = (BSPTessellatorVertexState)tvs;
             bspTree = bsp.bspTree;
         } else {
             bspTree = null;
         }
-        System.arraycopy(tvs.getRawBuffer(), 0, this.rawBuffer, 0, tvs.getRawBuffer().length);
-        this.rawBufferIndex = tvs.getRawBufferIndex();
-        this.vertexCount = tvs.getVertexCount();
-        this.hasTexture = tvs.getHasTexture();
-        this.hasBrightness = tvs.getHasBrightness();
-        this.hasColor = tvs.getHasColor();
-        this.hasNormals = tvs.getHasNormals();
     }
 
     @Override
