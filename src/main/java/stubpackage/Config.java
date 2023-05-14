@@ -24,7 +24,7 @@
 package stubpackage;
 
 /**
- * OptiFine interop.
+ * OptiFine compat.
  */
 public class Config {
     public static boolean isShaders() {

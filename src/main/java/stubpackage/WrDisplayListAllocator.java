@@ -21,10 +21,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.leakfix.stubpackage;
+package stubpackage;
 
 /**
- * Placeholder class, remapped and deleted during compilation.
+ * OptiFine compat.
  */
 public class WrDisplayListAllocator {
     public void resetAllocatedLists() {
