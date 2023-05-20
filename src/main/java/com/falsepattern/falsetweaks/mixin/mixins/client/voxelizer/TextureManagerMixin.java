@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,7 +39,11 @@ public abstract class TextureManagerMixin {
             at = @At("HEAD"),
             require = 1)
     private void detectEnchantmentGlint(ResourceLocation p_110577_1_, CallbackInfo ci) {
-        Data.enchantmentGlintTextureBound =
-                p_110577_1_.getResourcePath().equals("textures/misc/enchanted_item_glint.png");
+        boolean bound = false;
+        if (p_110577_1_ != null) {
+            val resPath = p_110577_1_.getResourcePath();
+            bound = "textures/misc/enchanted_item_glint.png".equals(resPath);
+        }
+        Data.enchantmentGlintTextureBound = bound;
     }
 }
