@@ -34,7 +34,8 @@ public abstract class RenderGlobalMixin {
     @ModifyConstant(method = "sortAndRender",
                     constant = @Constant(doubleValue = 1.0D,
                                          ordinal = 0),
-                    require = 1)
+                    require = 0,
+                    expect = 0)
     private double fasterSorting(double constant) {
         return 0.1D;
     }
