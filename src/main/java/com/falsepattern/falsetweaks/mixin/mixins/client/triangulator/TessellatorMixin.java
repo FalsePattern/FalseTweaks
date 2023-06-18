@@ -53,6 +53,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
 
+import java.util.Arrays;
+
 @Mixin(Tessellator.class)
 @Accessors(fluent = true,
            chain = false)
@@ -75,6 +77,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow private double yOffset;
     @Shadow private double zOffset;
     @Shadow @Final public static Tessellator instance;
+    @Shadow(aliases = {"rawBufferSize"})
+    public int field_78388_E;
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -204,6 +208,11 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
+            int newIndex = rawBufferIndex + 2 * vertexSize;
+            if (newIndex >= field_78388_E) {
+                field_78388_E *= 2;
+                rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
+            }
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
