@@ -78,7 +78,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow private double zOffset;
     @Shadow @Final public static Tessellator instance;
     @Shadow(aliases = {"rawBufferSize"})
-    public int field_78388_E;
+    public int field_78388_E; // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -201,6 +201,19 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         }
     }
 
+    private void ensureRawBufferHasExtraSpaceFor(int numberOfInts) {
+        int newIndex = rawBufferIndex + numberOfInts;
+        if (newIndex >= field_78388_E) {
+            if (field_78388_E < 0x10000) {
+                field_78388_E = 0x10000;
+            }
+            while (newIndex >= field_78388_E) {
+                field_78388_E *= 2;
+            }
+            rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
+        }
+    }
+
     private void fixAOTriangles() {
         if (quadTriangulationTemporarilySuspended) {
             return;
@@ -208,11 +221,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
             int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
-            int newIndex = rawBufferIndex + 2 * vertexSize;
-            if (newIndex >= field_78388_E) {
-                field_78388_E *= 2;
-                rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
-            }
+            ensureRawBufferHasExtraSpaceFor(2 * vertexSize);
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
@@ -240,6 +249,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             quadVerticesPutIntoBuffer++;
             if (quadVerticesPutIntoBuffer == 4) {
                 int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
+                ensureRawBufferHasExtraSpaceFor(vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize,
                                  3 * vertexSize);
