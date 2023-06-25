@@ -98,12 +98,15 @@ public class MemeProfiler {
         currentTick = null;
     }
 
-    public static void beginWorldRenderer() {
+    public static void beginWorldRenderer(int centerX, int centerY, int centerZ) {
         if (!prof.profilingEnabled)
             return;
         currentRenderer = new JsonObject();
         currentTick.add(currentRenderer);
         val ns = System.nanoTime();
+        currentRenderer.addProperty("centerX", centerX);
+        currentRenderer.addProperty("centerY", centerY);
+        currentRenderer.addProperty("centerZ", centerZ);
         currentRenderer.addProperty("nanos", ns);
     }
 

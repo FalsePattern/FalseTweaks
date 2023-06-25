@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.lmoa;
 
 import com.falsepattern.falsetweaks.mprof.MemeProfiler;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,13 +38,23 @@ import net.minecraft.entity.EntityLivingBase;
 public abstract class WorldRendererMixin {
     @Shadow private int bytesDrawn;
 
+    @Shadow public int posX;
+
+    @Shadow public int posY;
+
+    @Shadow public int posZ;
+
     @Inject(method = "updateRenderer",
             at = @At(value = "FIELD",
                      target = "Lnet/minecraft/client/renderer/WorldRenderer;needsUpdate:Z",
                      ordinal = 1),
             require = 1)
     private void startRenderer(EntityLivingBase p_147892_1_, CallbackInfo ci) {
-        MemeProfiler.beginWorldRenderer();
+        val centerX = posX + 8;
+        val centerY = posY + 8;
+        val centerZ = posZ + 8;
+
+        MemeProfiler.beginWorldRenderer(centerX, centerY, centerZ);
     }
 
     @Inject(method = "updateRenderer",
