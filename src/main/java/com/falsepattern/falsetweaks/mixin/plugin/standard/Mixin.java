@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.always;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
@@ -191,6 +192,12 @@ public enum Mixin implements IMixin {
 
     TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
     //endregion Misc Modules
+
+    //region Lmoa
+    LMOA_WorldRendererMixin(Side.CLIENT, always(), "lmoa.WorldRendererMixin"),
+    LMOA_RenderGlobalMixin(Side.CLIENT, always(), "lmoa.RenderGlobalMixin"),
+    //endregion Lmoa
+
     ;
     // @formatter:on
 
