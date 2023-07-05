@@ -76,17 +76,16 @@ public class ModuleConfig {
     @Config.Comment("Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
                     "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
                     "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
-                    "which gets emphasized on modern AMD windows drivers, and on MESA with linux. This patch\n" +
+                    "which gets emphasized on 21.X/22.X AMD windows drivers, and on MESA 21.X/22.X with linux. This patch\n" +
                     "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
                     "deleting these renderlists based on usage. Requires a game restart to apply.\n" +
                     "NOTICE FOR OPTIFINE USERS:\n" +
-                    "Setting this to Auto or Enable blocks Smooth and Multi-Core chunkloading. If you want multicore\n" +
+                    "Setting this to Enable blocks Smooth and Multi-Core chunkloading. If you want multicore\n" +
                     "chunk loading, you MUST set this do Disable.\n" +
                     "NOTICE FOR NEODYMIUM USERS:\n" +
-                    "If you use Neodymium, this module will automatically disable itself when set to Auto. Set it to\n" +
-                    "Enable to bypass.\n" +
+                    "Setting this to Enable may break Neodymium's render pipeline.\n" +
                     "FPS impact: It depends")
-    @Config.DefaultEnum("Auto")
+    @Config.DefaultEnum("Disable")
     public static LeakFixState MEMORY_LEAK_FIX;
 
     @Config.Comment("Transparent tile entities (beacons, for instance) might render behind other tile entities that are\n" +

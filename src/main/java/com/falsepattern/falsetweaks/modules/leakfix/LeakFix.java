@@ -43,7 +43,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LeakFix {
-    public static final boolean ENABLED;
+    public static final boolean ENABLED = ModuleConfig.MEMORY_LEAK_FIX == LeakFixState.Enable;
     private static final LeakFix INSTANCE = new LeakFix();
     private static final TIntList freshAllocations = new TIntArrayList();
     private static final TIntList reusableAllocations = new TIntArrayList();
@@ -56,34 +56,6 @@ public final class LeakFix {
     private static int misses = 0;
 
     private static long lastGC = 0;
-
-    static {
-        boolean enabled = false;
-        switch (ModuleConfig.MEMORY_LEAK_FIX) {
-            default:
-                Share.log.info("Disabling leak fix because of config flag.");
-                break;
-            case Auto:
-                boolean isAMD = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("amd");
-                if (isAMD) {
-                    Share.log.info("Enabling leak fix because an AMD gpu was detected.");
-                    enabled = true;
-                } else {
-                    Share.log.info("Disabling leak fix because an AMD gpu was NOT detected.");
-                }
-                if (enabled && Compat.neodymiumInstalled()) {
-                    Share.log.warn("Neodymium detected! Disabling leak fix for maximum compatibility.\n" +
-                                   "If you still want to use it, set it to Enable in the config instead of Auto.");
-                    enabled = false;
-                }
-                break;
-            case Enable:
-                Share.log.info("Enabling leak fix because of config flag.");
-                enabled = true;
-                break;
-        }
-        ENABLED = enabled;
-    }
 
     public static int getCachedBufferCount() {
         return freshAllocations.size() + reusableAllocations.size();
@@ -144,7 +116,7 @@ public final class LeakFix {
 
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Pre e) {
-        if (LeakFix.ENABLED) {
+        if (ENABLED) {
             if (e.type.equals(RenderGameOverlayEvent.ElementType.DEBUG)) {
                 debugText = true;
                 return;
