@@ -173,32 +173,32 @@ public class VoxelMesh {
                 case Left: {
                     setupLighting(tess, vec.set(1, 0, 0), chunkSpace, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v2, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] - EPSILON + EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
                     break;
                 }
                 case Right: {
                     setupLighting(tess, vec.set(-1, 0, 0), chunkSpace, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.minY] + EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v2, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] + EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] - EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v2, transform);
                     break;
                 }
                 case Up: {
                     setupLighting(tess, vec.set(0, 1, 0), chunkSpace, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v2, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.minY] - EPSILON + EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u2, v1, transform);
                     break;
                 }
                 case Down: {
                     setupLighting(tess, vec.set(0, -1, 0), chunkSpace, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u2, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v1, transform);
-                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v1, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.maxX + 1] - EPSILON - EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u2, v2, transform);
+                    addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z] - EPSILON - EPSILON_OUT), u1, v2, transform);
                     addVertexWithUVWithTransform(tess, vec.set(xOffsets[face.minX] + EPSILON + EPSILON_OUT, yOffsets[face.maxY + 1] + EPSILON - EPSILON_OUT, zOffsets[face.z + 1] + EPSILON + EPSILON_OUT), u1, v1, transform);
                     break;
                 }

@@ -143,7 +143,7 @@ public class VoxelCompiler {
                                 rowBack[x] = faceBuilder.dir(Dir.Back).build();
                             }
                             //Top and Bottom
-                            faceBuilder.v1(layer.fetchV(y + 0.5f, ySize)).v2(layer.fetchV(y + 0.5f, ySize));
+                            faceBuilder.v1(layer.fetchV(y + 0.01f, ySize)).v2(layer.fetchV(y + 0.99f, ySize));
                             if (voxels.getFace(x, y, z, Dir.Up)) {
                                 top[x] = faceBuilder.dir(Dir.Up).build();
                             }
@@ -172,8 +172,8 @@ public class VoxelCompiler {
                         }
                         faceBuilder.minY(y)
                                    .maxY(y)
-                                   .u1(layer.fetchU(x + 0.5f, xSize))
-                                   .u2(layer.fetchU(x + 0.5f, xSize))
+                                   .u1(layer.fetchU(x + 0.01f, xSize))
+                                   .u2(layer.fetchU(x + 0.99f, xSize))
                                    .v1(layer.fetchV(y + 0.01f, ySize))
                                    .v2(layer.fetchV(y + 0.99f, ySize));
 
