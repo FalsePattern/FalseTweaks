@@ -94,6 +94,11 @@ public class ModuleConfig {
     @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
+    @Config.Comment("3D particles (experimental)\n" +
+                    "FPS impact: Unknown")
+    @Config.DefaultBoolean(false)
+    public static boolean CUBIC_PARTICLES;
+
     @Config.Comment("Improves the mipmap system of minecraft with 2 things:\n" +
                     "1. Every tiny texture is upscaled to at least 16x16 to allow for 4 mipmap levels, even if a mod has a texture smaller than 16x16.\n" +
                     "2. Replaces the mipmap generation with a multithreaded system, which scales with the number of cores in your system.\n" +
