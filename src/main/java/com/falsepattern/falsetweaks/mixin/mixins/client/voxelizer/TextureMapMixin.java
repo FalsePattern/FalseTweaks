@@ -23,6 +23,8 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
+import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.config.VoxelizerConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSection;
@@ -73,9 +75,15 @@ public abstract class TextureMapMixin {
             try {
                 val resource = manager.getResource(complete);
                 val layerMeta = (LayerMetadataSection) resource.getMetadata("voxelLayers");
+                if (VoxelizerConfig.VERBOSE_LOG)
+                    Share.log.info("__VOXELIZER__ " + name);
                 if (layerMeta != null) {
                     val thicknesses = layerMeta.thicknesses();
                     val layers = new Layer[thicknesses.length];
+                    if (VoxelizerConfig.VERBOSE_LOG) {
+                        Share.log.info("__VOXELIZER__ FOUND LAYERS!");
+                        Share.log.info("__VOXELIZER__ Layer count: " + thicknesses.length);
+                    }
                     for (int i = 0; i < thicknesses.length; i++) {
                         layers[thicknesses.length - 1 - i] =
                                 new Layer((TextureAtlasSprite) registerIcon(name + "_" + i),
@@ -84,6 +92,8 @@ public abstract class TextureMapMixin {
                     }
                     tex.layers(layers);
                 } else {
+                    if (VoxelizerConfig.VERBOSE_LOG)
+                        Share.log.info("__VOXELIZER__ NO LAYERS!");
                     tex.layers(new Layer(iicon, BASE_THICKNESS));
                 }
             } catch (RuntimeException runtimeexception) {

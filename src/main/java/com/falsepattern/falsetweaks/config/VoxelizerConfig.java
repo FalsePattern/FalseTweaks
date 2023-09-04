@@ -88,6 +88,12 @@ public class VoxelizerConfig {
     @Config.DefaultDouble(1)
     public static double RAIL_THICKNESS;
 
+    @Config.Comment("Extremely verbose debug logging. This will spam your log.\n" +
+                    "Only useful on resource pack reloads.")
+    @Config.LangKey("config.falsetweaks.voxelizer.verbose_log")
+    @Config.DefaultBoolean(false)
+    public static boolean VERBOSE_LOG;
+
     static {
         ConfigurationManager.selfInit();
     }
