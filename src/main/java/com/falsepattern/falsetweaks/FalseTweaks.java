@@ -38,7 +38,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.GROUPNAME + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
-     dependencies = "required-after:falsepatternlib@[0.11.1,);")
+     dependencies = "required-after:falsepatternlib@[0.12.1,);")
 public class FalseTweaks {
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".proxy.ClientProxy",

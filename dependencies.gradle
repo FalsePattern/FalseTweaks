@@ -12,22 +12,17 @@ def deobfCurse(curseDep) {
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok:[1.18.24,1.19)") {
-        transitive = false
-    }
-    annotationProcessor("org.projectlombok:lombok:[1.18.24,1.19)")
+    compileOnly("org.projectlombok:lombok:1.18.28")
 
-    implementation("com.falsepattern:falsepatternlib-mc1.7.10:[0.11.1, 0.12):dev")
+    annotationProcessor("org.projectlombok:lombok:1.18.28")
+
+    implementation("com.falsepattern:falsepatternlib-mc1.7.10:0.12.1:dev")
 
     implementation("org.joml:joml:1.10.5")
 
-    compileOnly("curse.maven:redstone-paste-67508:2211249") {
-        transitive = false
-    }
+    compileOnly("curse.maven:redstone-paste-67508:2211249")
 
-    compileOnly("curse.maven:chromaticraft-235590:3574503") {
-        transitive = false
-    }
+    compileOnly(deobfMaven("https://mvn.falsepattern.com/stripped", "reikakalseki:chromaticraft:v33a"))
 
     compileOnly("com.github.embeddedt:ArchaicFix:c6e3fc6") {
         transitive = false
