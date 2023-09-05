@@ -21,15 +21,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid;
+package com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint;
 
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.SharedMath;
 import lombok.val;
 import org.joml.Vector3f;
 
-public class QuadCentroidComputer implements CentroidComputer {
-    public static final QuadCentroidComputer INSTANCE = new QuadCentroidComputer();
+public class TriangleMidpointComputer implements MidpointComputer {
+    public static final TriangleMidpointComputer INSTANCE = new TriangleMidpointComputer();
     @Override
-    public void getCentroid(int[] vertexData, int i, int vertexSize, Vector3f output) {
+    public void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output) {
         val ax = Float.intBitsToFloat(vertexData[i]);
         val ay = Float.intBitsToFloat(vertexData[i + 1]);
         val az = Float.intBitsToFloat(vertexData[i + 2]);
@@ -39,13 +40,15 @@ public class QuadCentroidComputer implements CentroidComputer {
         val cx = Float.intBitsToFloat(vertexData[i + vertexSize * 2]);
         val cy = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 1]);
         val cz = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 2]);
-        val dx = Float.intBitsToFloat(vertexData[i + vertexSize * 3]);
-        val dy = Float.intBitsToFloat(vertexData[i + vertexSize * 3 + 1]);
-        val dz = Float.intBitsToFloat(vertexData[i + vertexSize * 3 + 2]);
 
-        val xCentroid = (ax + bx + cx + dx) / 4f;
-        val yCentroid = (ay + by + cy + dy) / 4f;
-        val zCentroid = (az + bz + cz + dz) / 4f;
-        output.set(xCentroid, yCentroid, zCentroid);
+        val xMin = Math.min(Math.min(ax, bx), cx);
+        val yMin = Math.min(Math.min(ay, by), cy);
+        val zMin = Math.min(Math.min(az, bz), cz);
+
+        val xMax = Math.max(Math.max(ax, bx), cx);
+        val yMax = Math.max(Math.max(ay, by), cy);
+        val zMax = Math.max(Math.max(az, bz), cz);
+
+        SharedMath.getMidpoint(xMin, yMin, zMin, xMax, yMax, zMax, output);
     }
 }

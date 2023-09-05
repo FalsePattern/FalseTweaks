@@ -27,9 +27,9 @@ import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.NormalAreaComputer;
 import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.QuadAreaComputer;
 import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.TriangleAreaComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid.CentroidComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid.QuadCentroidComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid.TriangleCentroidComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.MidpointComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.QuadMidpointComputer;
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.TriangleMidpointComputer;
 import lombok.Getter;
 import org.joml.Vector3f;
 
@@ -42,13 +42,13 @@ public class PolygonHolder {
     private final int polygonSize;
     private final int vertexSize;
     public final int vertexStride;
-    private final CentroidComputer centroidComputer;
+    private final MidpointComputer midpointComputer;
     private final NormalAreaComputer areaComputer;
 
     public PolygonHolder(boolean triangleMode, boolean shaderMode) {
         this.polygonSize = triangleMode ? 3 : 4;
         vertexSize = VertexInfo.recomputeVertexInfo(shaderMode ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
-        centroidComputer = triangleMode ? TriangleCentroidComputer.INSTANCE : QuadCentroidComputer.INSTANCE;
+        midpointComputer = triangleMode ? TriangleMidpointComputer.INSTANCE : QuadMidpointComputer.INSTANCE;
         areaComputer = triangleMode ? TriangleAreaComputer.INSTANCE : QuadAreaComputer.INSTANCE;
         vertexStride = polygonSize * vertexSize;
     }
@@ -62,8 +62,8 @@ public class PolygonHolder {
         vertexData = null;
     }
 
-    public void centroid(int polygon, Vector3f output) {
-        centroidComputer.getCentroid(vertexData, polygon * vertexStride, vertexSize, output);
+    public void midpoint(int polygon, Vector3f output) {
+        midpointComputer.getMidpoint(vertexData, polygon * vertexStride, vertexSize, output);
     }
 
     public float area(int polygon) {

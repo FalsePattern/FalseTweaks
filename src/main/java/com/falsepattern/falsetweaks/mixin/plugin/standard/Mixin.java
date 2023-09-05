@@ -61,15 +61,16 @@ public enum Mixin implements IMixin {
     Tri_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.TessellatorMixin"),
     Tri_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.TRIANGULATOR), "triangulator.WorldRendererMixin"),
 
+    Tri_BSPSortMixin (Side.CLIENT,
+                      condition(() -> ModuleConfig.TRIANGULATOR && ModuleConfig.BSP_SORTING)
+                              .and(avoid(TargetedMod.FOAMFIX)),
+                      "triangulator.TessellatorBSPSortingMixin"),
+
     //FoamFix
-    Tri_FFTessellatorVanillaMixin(Side.CLIENT,
-                                  condition(() -> ModuleConfig.TRIANGULATOR)
-                                          .and(avoid(TargetedMod.FOAMFIX)),
-                                  "triangulator.foamfix.TessellatorVanillaMixin"),
-    Tri_FFTessellatorFoamFixMixin(Side.CLIENT,
-                                  condition(() -> ModuleConfig.TRIANGULATOR)
-                                          .and(require(TargetedMod.FOAMFIX)),
-                                  "triangulator.foamfix.TessellatorFoamFixMixin"),
+    Tri_BSPSortFoamFixMixin(Side.CLIENT,
+                            condition(() -> ModuleConfig.TRIANGULATOR && ModuleConfig.BSP_SORTING)
+                                    .and(require(TargetedMod.FOAMFIX)),
+                            "triangulator.foamfix.TessellatorBSPSortingMixin"),
 
     //OptiFine
     Tri_OFTessellatorVanillaMixin(Side.CLIENT,

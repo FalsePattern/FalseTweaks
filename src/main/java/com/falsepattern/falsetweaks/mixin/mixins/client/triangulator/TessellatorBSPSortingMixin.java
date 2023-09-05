@@ -21,24 +21,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.foamfix;
+package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
 
 @Mixin(Tessellator.class)
-public abstract class TessellatorVanillaMixin implements ITessellatorMixin {
+public abstract class TessellatorBSPSortingMixin implements ITessellatorMixin {
     @Inject(method = "getVertexState",
             at = @At(value = "HEAD"),
             cancellable = true,

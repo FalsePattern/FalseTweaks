@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator.sorting.area;
 
+import com.falsepattern.falsetweaks.modules.triangulator.sorting.SharedMath;
 import lombok.val;
 import org.joml.Vector3f;
 
@@ -31,12 +32,17 @@ public class TriangleAreaComputer implements NormalAreaComputer {
     private final Vector3f buf = new Vector3f();
     @Override
     public float getArea(int[] vertexData, int i, int vertexSize) {
-        getNormal(vertexData, i, vertexSize, buf);
-        return buf.lengthSquared() / 4;
+        getNormalUnscaled(vertexData, i, vertexSize, buf);
+        return SharedMath.unscaledNormalToArea(buf);
     }
 
     @Override
     public void getNormal(int[] vertexData, int i, int vertexSize, Vector3f output) {
+        getNormalUnscaled(vertexData, i, vertexSize, output);
+        output.normalize();
+    }
+
+    private void getNormalUnscaled(int[] vertexData, int i, int vertexSize, Vector3f output) {
         val ax = Float.intBitsToFloat(vertexData[i]);
         val ay = Float.intBitsToFloat(vertexData[i + 1]);
         val az = Float.intBitsToFloat(vertexData[i + 2]);
@@ -46,6 +52,7 @@ public class TriangleAreaComputer implements NormalAreaComputer {
         val cx = Float.intBitsToFloat(vertexData[i + vertexSize * 2]);
         val cy = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 1]);
         val cz = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 2]);
-        output.set(bx - ax, by - ay, bz - az).cross(cx - ax, cy - ay, cz - az);
+        SharedMath.getTriangleNormalUnscaled(ax, ay, az, bx, by, bz, cx, cy, cz, output);
     }
+
 }

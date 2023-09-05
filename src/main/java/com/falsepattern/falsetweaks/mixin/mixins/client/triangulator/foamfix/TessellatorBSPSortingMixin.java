@@ -21,7 +21,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-//keep in sync with TessellatorVanillaMixin
+//keep in sync with TessellatorBSPSortingMixin
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.foamfix;
 
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
@@ -40,7 +40,7 @@ import net.minecraft.client.util.QuadComparator;
 
 @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
 @Mixin(Tessellator.class)
-public abstract class TessellatorFoamFixMixin implements ITessellatorMixin {
+public abstract class TessellatorBSPSortingMixin implements ITessellatorMixin {
     @Inject(method = "getVertexState_foamfix_old",
             at = @At(value = "HEAD"),
             cancellable = true,

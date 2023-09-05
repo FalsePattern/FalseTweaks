@@ -65,27 +65,27 @@ public class ChunkBSPTree {
     private static int findSplitCandidate(TIntList list, PolygonHolder holder) {
         Vector3f center = new Vector3f();
         int n = list.size();
-        Vector3f centroid = new Vector3f();
+        Vector3f midpoint = new Vector3f();
         for (int j = 0; j < n; j++) {
             val i = list.get(j);
-            holder.centroid(i, centroid);
-            center.add(centroid);
+            holder.midpoint(i, midpoint);
+            center.add(midpoint);
         }
         center.div(n);
 
         int candidatePolygon = list.get(0);
         float candidateArea = holder.area(candidatePolygon);
-        Vector3f candidateCentroid = new Vector3f();
-        holder.centroid(candidatePolygon, candidateCentroid);
+        Vector3f candidateMidpoint = new Vector3f();
+        holder.midpoint(candidatePolygon, candidateMidpoint);
         for (int j = 0; j < n; j++) {
             val i = list.get(j);
             val area = holder.area(i);
             if (area > candidateArea ||
                 (area == candidateArea &&
-                 centroid.distanceSquared(center) < candidateCentroid.distanceSquared(center))) {
+                 midpoint.distanceSquared(center) < candidateMidpoint.distanceSquared(center))) {
                 candidatePolygon = i;
                 candidateArea = area;
-                candidateCentroid.set(centroid);
+                candidateMidpoint.set(midpoint);
             }
         }
         return candidatePolygon;
@@ -105,11 +105,11 @@ public class ChunkBSPTree {
         val backList = new TIntArrayList();
         val nodeList = new TIntArrayList();
 
-        Vector3f centroid = new Vector3f();
+        Vector3f midpoint = new Vector3f();
         for (int j = 0, length = list.size(); j < length; j++) {
             val i = list.get(j);
-            polygonHolder.centroid(i, centroid);
-            float factor = normal.dot(centroid.sub(origin));
+            polygonHolder.midpoint(i, midpoint);
+            float factor = normal.dot(midpoint.sub(origin));
             if (factor == 0) {
                 nodeList.add(i);
             } else if (factor > 0) {
@@ -135,7 +135,7 @@ public class ChunkBSPTree {
             if (nextDelta < 5) {
                 val candidate = findSplitCandidate(frontList, polygonHolder);
                 polygonHolder.normal(candidate, nextNormal);
-                polygonHolder.centroid(candidate, nextOrigin);
+                polygonHolder.midpoint(candidate, nextOrigin);
             }
             frontIndex = buildTree(nextNormal, nextOrigin, nextDelta, frontList, depth + 1);
 
@@ -152,7 +152,7 @@ public class ChunkBSPTree {
             if (nextDelta < 5) {
                 val candidate = findSplitCandidate(backList, polygonHolder);
                 polygonHolder.normal(candidate, nextNormal);
-                polygonHolder.centroid(candidate, nextOrigin);
+                polygonHolder.midpoint(candidate, nextOrigin);
             }
 
             backIndex = buildTree(nextNormal, nextOrigin, nextDelta, backList, depth + 1);

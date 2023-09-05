@@ -59,6 +59,11 @@ public class ModuleConfig {
     @Config.DefaultBoolean(true)
     public static boolean TRIANGULATOR;
 
+    @Config.Comment("Enable an optimized, BSP-tree based vertex sorting algorithm for transparent blocks.\n" +
+                    "FPS impact: A little bit less stuttering when moving around with a lot of stained glass-like blocks around")
+    @Config.DefaultBoolean(true)
+    public static boolean BSP_SORTING;
+
     @Config.Comment("Dropped and held items are re-rendered every frame, generating a lot of\n" +
                     "unnecessary CPU load because of the very inefficient way the rendering is done.\n" +
                     "With this enabled, FalseTweaks will cache pre-rendered versions of items into RenderLists\n" +
@@ -111,6 +116,7 @@ public class ModuleConfig {
                     "FPS impact: Slightly faster profiler")
     @Config.DefaultBoolean(true)
     public static boolean ADVANCED_PROFILER;
+
 
     static {
         ConfigurationManager.selfInit();

@@ -21,10 +21,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.centroid;
+package com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint;
 
 import org.joml.Vector3f;
 
-public interface CentroidComputer {
-    void getCentroid(int[] vertexData, int i, int vertexSize, Vector3f output);
+public interface MidpointComputer {
+    void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output);
 }
