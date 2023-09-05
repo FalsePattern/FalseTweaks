@@ -52,6 +52,7 @@ myItem_2.png
 | Game crashes on startup,<br>forge log says `MixinTargetAlreadyLoadedException`                 | Under the `00_modules` category in the config,<br>set `B:STARTUP_OPTIMIZATIONS` to `false`.    |
 | Game crashes on startup,<br>loading screen was already present (or fixing issue 1 didn't help) | Under the `triangulator` category in the config,<br>set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
 | Crash with OptiFine                                                                            | Under the `00_modules` category in the config,<br>set `B:MIPMAP_FIX` to `false`.               |
+| Crash with ShadersModCore                                                                      | Standalone shadersmod is unsupported, use optifine instead.                                    | 
 | Flickering blocks when using optifine shaders and PBR resource packs                           | Under the `00_modules` category in the config,<br>set `B:TEXTURE_OPTIMIZATIONS` to `false`.    |
 
 Any bug reports concerning the known problems listed in this table will be closed without response. Read before you open issues.
