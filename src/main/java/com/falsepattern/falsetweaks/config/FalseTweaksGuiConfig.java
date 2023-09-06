@@ -55,6 +55,9 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         if (ModuleConfig.ADVANCED_PROFILER) {
             result.add(ProfilerConfig.class);
         }
+        if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
+            result.add(TranslucentBlockLayersConfig.class);
+        }
         return result.toArray(new Class<?>[0]);
     }
 }
