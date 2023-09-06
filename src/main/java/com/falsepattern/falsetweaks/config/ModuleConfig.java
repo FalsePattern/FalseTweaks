@@ -99,6 +99,13 @@ public class ModuleConfig {
     @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
+    @Config.Comment("Makes translucent geometry of chunks render slightly closer to the camera. (experimental)\n" +
+                    "This reduces Z-Fighting on blocks which have overlapping opaque and translucent geometry,\n" +
+                    "at the cost of far away geometry sometimes rendering on top of opaque geometry. (>100~ blocks)\n" +
+                    "FPS impact: Unknown")
+    @Config.DefaultBoolean(false)
+    public static boolean BLOCK_LAYER_TRANSPARENCY_FIX;
+
     @Config.Comment("3D particles (experimental)\n" +
                     "FPS impact: Unknown")
     @Config.DefaultBoolean(false)
@@ -125,6 +132,7 @@ public class ModuleConfig {
         RenderListConfig.init();
         TriangulatorConfig.init();
         VoxelizerConfig.init();
+        TranslucentBlockLayersConfig.init();
     }
 
     //This is here to make the static initializer run
