@@ -41,7 +41,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 
 import java.util.List;
 
-@Mixin(TextureMap.class)
+@Mixin(value = TextureMap.class, priority = 1000)
 public abstract class TextureMap_CommonMixin implements ITextureMapMixin {
     @Shadow
     private int mipmapLevels;
@@ -68,17 +68,17 @@ public abstract class TextureMap_CommonMixin implements ITextureMapMixin {
     }
 
     @Redirect(method = "loadTextureAtlas",
-              at = @At(value = "INVOKE",
-                       target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-                       ordinal = 0),
-              require = 1)
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
+                    ordinal = 0),
+            require = 1)
     private boolean storeAnimatedInBatch(List<TextureAtlasSprite> listAnimatedSprites, Object obj) {
         TextureAtlasSprite sprite = (TextureAtlasSprite) obj;
         listAnimatedSprites.add(sprite);
-        AnimationUpdateBatcherRegistry.batcher = batcher;
-        TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(),
-                                        sprite.getOriginX(), sprite.getOriginY(), false, false);
-        AnimationUpdateBatcherRegistry.batcher = null;
+                AnimationUpdateBatcherRegistry.batcher = batcher;
+            TextureUtil.uploadTextureMipmap(sprite.getFrameTextureData(0), sprite.getIconWidth(), sprite.getIconHeight(),
+                    sprite.getOriginX(), sprite.getOriginY(), false, false);
+            AnimationUpdateBatcherRegistry.batcher = null;
         return true;
     }
 
