@@ -24,9 +24,7 @@ dependencies {
 
     compileOnly(deobfMaven("https://mvn.falsepattern.com/stripped", "reikakalseki:chromaticraft:v33a"))
 
-    compileOnly("com.github.embeddedt:ArchaicFix:c6e3fc6") {
-        transitive = false
-    }
+    compileOnly(deobf("https://github.com/embeddedt/ArchaicFix/releases/download/0.6.2/archaicfix-0.6.2.jar"))
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
         transitive = false
