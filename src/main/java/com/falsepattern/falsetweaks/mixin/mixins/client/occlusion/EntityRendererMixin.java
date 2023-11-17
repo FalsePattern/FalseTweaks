@@ -14,7 +14,9 @@ public class EntityRendererMixin {
     /**
      * @reason RenderGlobalMixin#performCullingUpdates needs to know the chunk update deadline and the partial tick time
      */
-    @Inject(method = "renderWorld", at = @At("HEAD"))
+    @Inject(method = "renderWorld",
+            at = @At("HEAD"),
+            require = 1)
     private void getRendererUpdateDeadline(float partialTickTime, long chunkUpdateDeadline, CallbackInfo ci) {
         OcclusionHelpers.chunkUpdateDeadline = chunkUpdateDeadline;
         OcclusionHelpers.partialTickTime = partialTickTime;

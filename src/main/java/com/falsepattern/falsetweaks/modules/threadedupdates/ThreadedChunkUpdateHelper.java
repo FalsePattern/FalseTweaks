@@ -125,7 +125,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList) {
-        final int updateQueueSize = ModuleConfig.CHUNK_UPDATE_THREADS * 64;
+        final int updateQueueSize = ModuleConfig.CHUNK_UPDATE_THREADS * 32;
         taskQueue.clear();
         for(int i = 0; i < updateQueueSize && i < toUpdateList.size(); i++) {
             WorldRenderer wr = toUpdateList.get(i);

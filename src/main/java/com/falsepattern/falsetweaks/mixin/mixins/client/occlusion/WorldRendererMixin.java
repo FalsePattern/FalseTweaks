@@ -44,17 +44,27 @@ public class WorldRendererMixin implements IWorldRenderer {
 
     private OcclusionWorker.CullInfo ft$cullInfo;
 
-    @Inject(method = "<init>*", at = @At("RETURN"))
+    @Inject(method = "<init>*",
+            at = @At("RETURN"),
+            require = 1)
     private void init(CallbackInfo ci) {
         this.ft$cullInfo = new OcclusionWorker.CullInfo();
     }
 
-    @Inject(method = "markDirty", at = @At("TAIL"))
+    @Inject(method = "markDirty",
+            at = @At("TAIL"),
+            require = 1)
     private void resetOcclusionFlag(CallbackInfo ci) {
         this.isWaitingOnOcclusionQuery = false;
     }
 
-    @Inject(method = "updateRenderer", at = @At(value = "FIELD", opcode = Opcodes.PUTSTATIC, target = "Lnet/minecraft/world/chunk/Chunk;isLit:Z", ordinal = 0), cancellable = true)
+    @Inject(method = "updateRenderer",
+            at = @At(value = "FIELD",
+                     opcode = Opcodes.PUTSTATIC,
+                     target = "Lnet/minecraft/world/chunk/Chunk;isLit:Z",
+                     ordinal = 0),
+            require = 1,
+            cancellable = true)
     private void bailOnEmptyChunk(EntityLivingBase view, CallbackInfo ci) {
         if(worldObj.getChunkFromBlockCoords(posX, posZ) instanceof EmptyChunk) {
             if (tileEntityRenderers.size() > 0) {

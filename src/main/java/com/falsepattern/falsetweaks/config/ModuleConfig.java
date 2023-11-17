@@ -129,7 +129,7 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean OCCLUSION_TWEAKS;
 
-    @Config.Comment("Enables the 1.8-style occlusion culling originally developed by CoFHTweaks. Not compatible with ArchaicFix")
+    @Config.Comment("EXPERIMENTAL: Enables multi-threaded chunk updating. At the moment it only works if enableOcclusionTweaks is turned on.")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;

@@ -2,8 +2,12 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer;
+import com.falsepattern.falsetweaks.modules.occlusion.OcclusionWorker;
+import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,23 +25,30 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 @Mixin(value = RenderGlobal.class, priority = -2)
-public abstract class RenderGlobalMixin {
+public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     /**
      * Queue a renderer to be updated.
      */
-    @Inject(method = "markBlocksForUpdate", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "markBlocksForUpdate",
+            at = @At("HEAD"),
+            cancellable = true,
+            require = 1)
     private void handleOffthreadUpdate(int x1, int y1, int z1, int x2, int y2, int z2, CallbackInfo ci) {
         ci.cancel();
         OcclusionHelpers.renderer.handleOffthreadUpdate(x1, y1, z1, x2, y2, z2);
     }
 
-    @Redirect(method = "renderEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderManager;renderEntitySimple(Lnet/minecraft/entity/Entity;F)Z"))
+    @Redirect(method = "renderEntities",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/entity/RenderManager;renderEntitySimple(Lnet/minecraft/entity/Entity;F)Z"),
+              require = 1)
     private boolean skipRenderingIfNotVisible(RenderManager instance, Entity entity, float tick) {
         return OcclusionHelpers.renderer.skipRenderingIfNotVisible(instance, entity, tick);
     }
@@ -51,67 +62,113 @@ public abstract class RenderGlobalMixin {
         return OcclusionHelpers.renderer.getDebugInfoRenders();
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>",
+            at = @At("RETURN"),
+            require = 1)
     private void initBetterLists(Minecraft p_i1249_1_, CallbackInfo ci) {
         OcclusionHelpers.renderer = new OcclusionRenderer((RenderGlobal)(Object)this);
         OcclusionHelpers.renderer.initBetterLists();
     }
 
-    @Redirect(method = "loadRenderers", at = @At(value = "INVOKE", target = "Ljava/util/List;clear()V", ordinal = 0))
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/util/List;clear()V",
+                       ordinal = 0),
+              require = 1)
     private void clearRendererUpdateQueue(List instance) {
         OcclusionHelpers.renderer.clearRendererUpdateQueue(instance);
     }
 
-    @Redirect(method = { "loadRenderers", "markRenderersForNewPosition" }, at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0))
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "INVOKE",
+                       target = "LWrUpdates;makeWorldRenderer(Lnet/minecraft/world/World;Ljava/util/List;IIII)Lnet/minecraft/client/renderer/WorldRenderer;"),
+              expect = 0)
+    @Dynamic
+    private WorldRenderer optifineMakeWorldRenderer(World worldObj, List tileEntities, int x, int y, int z, int glRenderListBase) {
+        return new WorldRenderer(worldObj, tileEntities, x, y, z, glRenderListBase);
+    }
+
+    @Redirect(method = { "loadRenderers", "markRenderersForNewPosition" },
+              at = @At(value = "INVOKE",
+                       target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
+                       ordinal = 0),
+              require = 2)
     private boolean sortAndAddRendererUpdateQueue(List instance, Object renderer) {
         return false;
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OpenGlCapsChecker;checkARBOcclusion()Z"))
+    @Redirect(method = "<init>",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/OpenGlCapsChecker;checkARBOcclusion()Z"),
+              require = 1)
     private boolean neverEnableOcclusion() {
         return false;
     }
 
-    @Inject(method = "updateRenderers", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateRenderers",
+            at = @At("HEAD"),
+            require = 1,
+            cancellable = true)
     private void performCullingUpdates(EntityLivingBase view, boolean p_72716_2_, CallbackInfoReturnable<Boolean> cir) {
         OcclusionHelpers.renderer.performCullingUpdates(view, p_72716_2_);
         cir.setReturnValue(true);
     }
 
-    @Inject(method = "setWorldAndLoadRenderers", at = @At("HEAD"))
+    @Inject(method = "setWorldAndLoadRenderers",
+            at = @At("HEAD"),
+            require = 1)
     private void setWorkerWorld(WorldClient world, CallbackInfo ci) {
         OcclusionHelpers.worker.setWorld((RenderGlobal)(Object)this, world);
     }
 
-    @Inject(method = "loadRenderers", at = @At("HEAD"))
+    @Inject(method = "loadRenderers",
+            at = @At("HEAD"),
+            require = 1)
     private void resetLoadedRenderers(CallbackInfo ci) {
         OcclusionHelpers.renderer.resetLoadedRenderers();
     }
 
-    @Inject(method = "loadRenderers", at = @At("TAIL"))
+    @Inject(method = "loadRenderers",
+            at = @At("TAIL"),
+            require = 1)
     private void resetOcclusionWorker(CallbackInfo ci) {
         OcclusionHelpers.renderer.resetOcclusionWorker();
     }
 
-    @Redirect(method = "loadRenderers", at = @At(value = "INVOKE", target = "Ljava/util/Arrays;sort([Ljava/lang/Object;Ljava/util/Comparator;)V", ordinal = 0))
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/util/Arrays;sort([Ljava/lang/Object;Ljava/util/Comparator;)V",
+                       ordinal = 0),
+              require = 1)
     private void skipSort2(Object[] ts, Comparator<?> comparator) {
 
     }
 
-    @Redirect(method = "loadRenderers", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/WorldRenderer;markDirty()V", ordinal = 0))
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/WorldRenderer;markDirty()V",
+                       ordinal = 0),
+              require = 1)
     private void markRendererInvisible(WorldRenderer instance) {
         OcclusionHelpers.renderer.markRendererInvisible(instance);
     }
 
-    @Redirect(method = "markRenderersForNewPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/WorldRenderer;setPosition(III)V"))
+    @Redirect(method = "markRenderersForNewPosition",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/WorldRenderer;setPosition(III)V"),
+              require = 1)
     private void setPositionAndMarkInvisible(WorldRenderer wr, int x, int y, int z) {
         OcclusionHelpers.renderer.setPositionAndMarkInvisible(wr, x, y, z);
     }
 
-    @Inject(method = "markRenderersForNewPosition", at = @At("TAIL"))
+    @Inject(method = "markRenderersForNewPosition",
+            at = @At("TAIL"),
+            require = 1)
     private void runWorker(int p_72722_1_, int p_72722_2_, int p_72722_3_, CallbackInfo ci) {
         OcclusionHelpers.renderer.runWorker(p_72722_1_, p_72722_2_, p_72722_3_);
     }
+
+    private EntityLivingBase ft$view;
 
     /**
      * @author skyboy, embeddedt
@@ -119,7 +176,13 @@ public abstract class RenderGlobalMixin {
      */
     @Overwrite
     public int sortAndRender(EntityLivingBase view, int pass, double tick) {
-        return OcclusionHelpers.renderer.sortAndRender(view, pass, tick);
+        ft$view = view;
+        return ft$doSortAndRender(pass, tick);
+    }
+
+    @Override
+    public int ft$doSortAndRender(int pass, double tick) {
+        return OcclusionHelpers.renderer.sortAndRender(ft$view, pass, tick);
     }
 
     /**

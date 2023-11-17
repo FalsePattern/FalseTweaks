@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.proxy;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.asm.FalseTweaksTransformer;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
@@ -38,6 +39,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSeria
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraftforge.client.ClientCommandHandler;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -47,6 +49,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        if (!FMLClientHandler.instance().hasOptifine()) {
+            //Load perf
+            FalseTweaksTransformer.TRANSFORMERS.remove(FalseTweaksTransformer.OPTIFINE_DEOPTIMIZER);
+        }
         if (LeakFix.ENABLED) {
             LeakFix.registerBus();
         }

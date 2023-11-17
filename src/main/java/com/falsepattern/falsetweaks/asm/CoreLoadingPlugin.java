@@ -21,24 +21,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks;
+package com.falsepattern.falsetweaks.asm;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
 
-@IFMLLoadingPlugin.MCVersion("1.7.10")
-@IFMLLoadingPlugin.Name(Tags.MODID)
+@IFMLLoadingPlugin.TransformerExclusions(Tags.GROUPNAME + ".asm")
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         ModuleConfig.init();
     }
-
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return new String[] {
+                Tags.GROUPNAME + ".asm.FalseTweaksTransformer"
+        };
     }
 
     @Override
@@ -53,6 +54,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
+
     }
 
     @Override

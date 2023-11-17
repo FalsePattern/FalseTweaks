@@ -368,26 +368,24 @@ public class OcclusionRenderer {
         }
         rg.theWorld.theProfiler.endSection();
 
-        if(pass == 1){
-            rg.theWorld.theProfiler.startSection("alpha_sort");
-            if(distanceSquared(cam.getX(), cam.getY(), cam.getZ(), rg.prevRenderSortX, rg.prevRenderSortY, rg.prevRenderSortZ) > 1) {
-                rg.prevRenderSortX = cam.getX();
-                rg.prevRenderSortY = cam.getY();
-                rg.prevRenderSortZ = cam.getZ();
+        rg.theWorld.theProfiler.startSection("alpha_sort");
+        if(distanceSquared(cam.getX(), cam.getY(), cam.getZ(), rg.prevRenderSortX, rg.prevRenderSortY, rg.prevRenderSortZ) > 1) {
+            rg.prevRenderSortX = cam.getX();
+            rg.prevRenderSortY = cam.getY();
+            rg.prevRenderSortZ = cam.getZ();
 
-                alphaSortProgress = 0;
-            }
-
-            int amt = rg.renderersLoaded < 27 ? rg.renderersLoaded : Math.max(rg.renderersLoaded >> 1, 27);
-            if (alphaSortProgress < amt) {
-                int amountPerFrame = 1;
-                for (int i = 0; i < amountPerFrame && alphaSortProgress < amt; ++i) {
-                    WorldRenderer r = sortedWorldRenderers[alphaSortProgress++];
-                    r.updateRendererSort(view);
-                }
-            }
-            rg.theWorld.theProfiler.endSection();
+            alphaSortProgress = 0;
         }
+
+        int amt = rg.renderersLoaded < 27 ? rg.renderersLoaded : Math.max(rg.renderersLoaded >> 1, 27);
+        if (alphaSortProgress < amt) {
+            int amountPerFrame = 1;
+            for (int i = 0; i < amountPerFrame && alphaSortProgress < amt; ++i) {
+                WorldRenderer r = sortedWorldRenderers[alphaSortProgress++];
+                r.updateRendererSort(view);
+            }
+        }
+        rg.theWorld.theProfiler.endSection();
 
         rg.theWorld.theProfiler.endStartSection("render");
         RenderHelper.disableStandardItemLighting();

@@ -42,11 +42,6 @@ import net.minecraft.util.AxisAlignedBB;
 @Mixin(WorldRenderer.class)
 @Accessors(fluent = true)
 public abstract class WorldRendererMixin implements IWorldRendererMixin {
-    @Override
-    public int bytesDrawn() {
-        return bytesDrawn;
-    }
-
     @Shadow
     public int posXClip;
     @Shadow
