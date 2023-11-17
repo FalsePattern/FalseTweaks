@@ -24,9 +24,9 @@
 package com.falsepattern.falsetweaks;
 
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
-import org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates;
 import stubpackage.Config;
 
 import net.minecraft.block.Block;
@@ -63,6 +63,7 @@ public class Compat {
     }
 
     public static void applyCompatibilityTweaks() {
+        ThreadingCompat.init();
         if (Loader.isModLoaded("archaicfix")) {
             ArchaicFixCompat.init();
         }
@@ -79,6 +80,9 @@ public class Compat {
     }
 
     public static Tessellator tessellator() {
+        if (ThreadingCompat.isThreadedChunkUpdatingEnabled()) {
+            return ThreadedChunkUpdates.getThreadTessellator();
+        }
         if (ArchaicFixCompat.isThreadedChunkUpdatingEnabled()) {
             return ArchaicFixCompat.threadTessellator();
         }
@@ -123,11 +127,25 @@ public class Compat {
         private static boolean isThreadedChunkUpdatingEnabled;
 
         private static void init() {
-            isThreadedChunkUpdatingEnabled = ThreadedChunkUpdates.isEnabled();
+            isThreadedChunkUpdatingEnabled =  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
         }
 
         public static Tessellator threadTessellator() {
-            return ThreadedChunkUpdates.getThreadTessellator();
+            return  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
+        }
+    }
+
+    private static class ThreadingCompat {
+
+        @Getter
+        private static boolean isThreadedChunkUpdatingEnabled;
+
+        private static void init() {
+            isThreadedChunkUpdatingEnabled = com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
+        }
+
+        public static Tessellator threadTessellator() {
+            return com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
         }
     }
 

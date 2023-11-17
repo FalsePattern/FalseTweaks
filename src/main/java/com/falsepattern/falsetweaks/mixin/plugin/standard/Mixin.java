@@ -139,6 +139,37 @@ public enum Mixin implements IMixin {
                                          "leakfix.optifine.WorldRendererOptifineMixin"),
     //endregion Memory Leak Fix Module
 
+    //region Occlusion Tweaks Module
+    Occlusion_ChunkMixin(Side.CLIENT,
+                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
+                         "occlusion.ChunkMixin"),
+    Occlusion_EntityRendererMixin(Side.CLIENT,
+                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
+                         "occlusion.EntityRendererMixin"),
+    Occlusion_GuiVideoSettingsMixin(Side.CLIENT,
+                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
+                         "occlusion.GuiVideoSettingsMixin"),
+    Occlusion_RenderGlobalMixin(Side.CLIENT,
+                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
+                         "occlusion.RenderGlobalMixin"),
+    Occlusion_WorldRendererMixin(Side.CLIENT,
+                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
+                         "occlusion.WorldRendererMixin"),
+    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.PlayerManagerMixin"),
+    Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsMixin"),
+    Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsOptionsMixin"),
+
+    //endregion Occlusion Tweaks Module
+
+    //region Threaded Chunk Updates
+
+    ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.RenderBlocksMixin"),
+    ThreadedUpdates_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.TessellatorMixin"),
+    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.TessellatorMixin_Debug"),
+    ThreadedUpdates_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.WorldRendererMixin"),
+
+    //endregion Threaded Chunk Updates
+
     //region Texture Optimizations Module
     AnimFix_TextureMap_UnprofiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && !ModuleConfig.ADVANCED_PROFILER), "animfix.TextureMap_UnprofiledMixin"),
     AnimFix_TextureMap_ProfiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && ModuleConfig.ADVANCED_PROFILER), "animfix.TextureMap_ProfiledMixin"),

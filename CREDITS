@@ -1,4 +1,11 @@
 --------------------------------
+The chunk occlusion tweaks and multithreaded chunk updates are taken from ArchaicFix, which is also licensed under LGPLv3.
+The occlusion module's implementation also has a separate license:
+--------------------------------
+The occlusion culling module is directly derived from CoFHTweaks, itself derived from Minecraft 1.8.
+As such that component is not considered to be under LGPL3. Please refer to
+[its LICENSE](src/main/java/com/falsepattern/falsetweaks/modules/occlusion/LICENSE) for more information.
+--------------------------------
 Packing2D Copyright (c) 2013 papuja
 
 The code inside the com.falsepattern.falsetweaks.modules.animfix.stitching.packing2d package is based on MIT code.

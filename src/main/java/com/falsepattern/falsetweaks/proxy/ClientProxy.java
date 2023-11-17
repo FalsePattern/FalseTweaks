@@ -27,8 +27,10 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
+import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSection;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSerializer;
@@ -36,6 +38,7 @@ import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSeria
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraftforge.client.ClientCommandHandler;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
@@ -54,6 +57,17 @@ public class ClientProxy extends CommonProxy {
         if (ModuleConfig.VOXELIZER) {
             Minecraft.getMinecraft().metadataSerializer_.registerMetadataSectionType(new LayerMetadataSerializer(),
                                                                                      LayerMetadataSection.class);
+        }
+        if (ModuleConfig.OCCLUSION_TWEAKS) {
+            OcclusionHelpers.init();
+        }
+    }
+
+    @Override
+    public void init(FMLInitializationEvent e) {
+        if (ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES) {
+            ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper();
+            ThreadedChunkUpdateHelper.instance.init();
         }
     }
 

@@ -34,6 +34,7 @@ import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWit
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {
+    ARCHAICFIX("ArchaicFix", false, startsWith("archaicfix")),
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
     OPTIFINE_WITHOUT_SHADERS("OptiFine without shaders", false,
                              startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.negate())),

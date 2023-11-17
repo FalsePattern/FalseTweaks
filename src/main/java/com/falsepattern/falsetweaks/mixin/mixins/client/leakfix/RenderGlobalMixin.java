@@ -26,6 +26,8 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.leakfix;
 import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
@@ -58,5 +60,13 @@ public abstract class RenderGlobalMixin {
         if (!LeakFix.ENABLED) {
             GLAllocation.deleteDisplayLists(list);
         }
+    }
+
+    @ModifyConstant(method = "<init>",
+                    constant = @Constant(intValue = 34,
+                                         ordinal = 0),
+                    require = 1)
+    private int expandRenderDistance(int constant) {
+        return (64 + 1) * 2;
     }
 }
