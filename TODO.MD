@@ -2,7 +2,7 @@
 ## Occlusion
 - [x] OptiFine shaderless compat
 - [x] OptiFine integrated shader compat
-- [ ] Shader compat - TODO BROKEN SHADOWS, NEEDS FIX, CRITICAL
+- [x] Shader compat - TODO BROKEN SHADOWS, NEEDS FIX, CRITICAL
 
 ## Threading
 - [ ] OptiFine shaderless compat

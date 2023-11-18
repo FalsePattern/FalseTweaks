@@ -23,24 +23,24 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
 
-import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
-import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import shadersmod.client.ShadersRender;
 
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.WorldRenderer;
 
-@Mixin(EntityRenderer.class)
-public abstract class EntityRendererMixin {
-    @Dynamic
-    @Redirect(method = "renderWorld",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/RenderGlobal;renderAllSortedRenderers(ID)I"),
-              require = 3)
-    private int fixSortAndRender(RenderGlobal instance, int pass, double tick) {
-        return ((IRenderGlobalMixin)instance).ft$doSortAndRender(pass, tick);
+@Mixin(ShadersRender.class)
+public class ShadersRendererMixin {
+    private static WorldRenderer[] ft$nullArray;
+    @Redirect(method = "renderShadowMap",
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderGlobal;worldRenderers:[Lnet/minecraft/client/renderer/WorldRenderer;"),
+              require = 1)
+    private static WorldRenderer[] disableShadowMapFrustrumToggling(RenderGlobal instance) {
+        if (ft$nullArray == null)
+            return (ft$nullArray = new WorldRenderer[0]);
+        return ft$nullArray;
     }
 }

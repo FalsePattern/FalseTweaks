@@ -16,7 +16,10 @@ dependencies {
 
     annotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    implementation("com.falsepattern:falsepatternlib-mc1.7.10:0.12.1:dev")
+    compileOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.0.0-pre01:api")
+    runtimeOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.0.0-pre01:dev")
+
+    compileOnly(deobfMaven("https://mvn.falsepattern.com/stripped", "optifine:shadersmod-stripped:1.7.10-hd_u7"))
 
     implementation("org.joml:joml:1.10.5")
 

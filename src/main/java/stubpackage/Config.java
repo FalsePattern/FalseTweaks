@@ -30,4 +30,8 @@ public class Config {
     public static boolean isShaders() {
         return false;
     }
+
+    public static boolean isFogOff() {
+        return false;
+    }
 }

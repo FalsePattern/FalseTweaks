@@ -23,14 +23,21 @@
 
 package com.falsepattern.falsetweaks.asm;
 
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalDeOptimizer;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.asm.SmartTransformer;
+import com.falsepattern.lib.optifine.OptiFineTransformerHooks;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +47,10 @@ import java.util.List;
 @Accessors(fluent = true)
 public class FalseTweaksTransformer implements SmartTransformer {
     private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
+
+    static {
+        OptiFineTransformerHooks.disableOptiFinePatch("blo");
+    }
 
     public static RenderGlobalDeOptimizer OPTIFINE_DEOPTIMIZER = new RenderGlobalDeOptimizer();
     public static final List<IClassNodeTransformer> TRANSFORMERS = new ArrayList<>(Arrays.asList(

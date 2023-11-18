@@ -21,15 +21,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.occlusion.interfaces;
+package stubpackage.net.minecraft.client.renderer;
 
-public interface IRenderGlobalMixin {
-    int ft$doSortAndRender(int pass, double tick);
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResourceManager;
 
+public class EntityRenderer extends net.minecraft.client.renderer.EntityRenderer {
     /**
-     * OptiFine Compat
+     * OptiFine-added field
      */
-    default void ft$setSortedRendererCount(int value) {
+    public boolean fogStandard;
 
+    public EntityRenderer(Minecraft p_i45076_1_, IResourceManager p_i45076_2_) {
+        super(p_i45076_1_, p_i45076_2_);
     }
 }

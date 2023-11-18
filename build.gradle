@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern67
+//version: 1656003793falsepattern70
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -132,6 +132,8 @@ propertyDefaultIfUnset("mixinConfigs", "")
 propertyDefaultIfUnset("mixinPluginPreInit", "")
 propertyDefaultIfUnset("mixinPluginMinimumVersion", "0.8.5")
 propertyDefaultIfUnset("remapStubs", false)
+propertyDefaultIfUnset("apiPackages", null)
+propertyDefaultIfUnset("apiPackagesNoRecurse", null)
 
 propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
@@ -147,20 +149,31 @@ String javaSourceDir = "src/main/java/"
 String scalaSourceDir = "src/main/scala/"
 String kotlinSourceDir = "src/main/kotlin/"
 
-String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/")
-String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/")
-String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/")
-if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
-    throw new GradleException("Could not resolve \"modGroup\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
+def verifyPackage(thePackage, propName) {
+    String javaSourceDir = "src/main/java/"
+    String scalaSourceDir = "src/main/scala/"
+    String kotlinSourceDir = "src/main/kotlin/"
+    String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
+        throw new GradleException("Could not resolve \"${propName}\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
+    }
 }
 
+verifyPackage("", "modGroup")
+
 if(apiPackage) {
-    targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
-        throw new GradleException("Could not resolve \"apiPackage\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
-    }
+    verifyPackage(apiPackage, "apiPackage")
+}
+
+
+if (apiPackages) {
+    apiPackages.tokenize(';').forEach { it -> verifyPackage(it, "apiPackages")}
+}
+
+if (apiPackagesNoRecurse) {
+    apiPackagesNoRecurse.tokenize(';').forEach { it -> verifyPackage(it, "apiPackagesNoRecurse")}
 }
 
 if(accessTransformersFile) {
@@ -175,9 +188,9 @@ if(usesMixins.toBoolean()) {
         throw new GradleException("\"usesMixins\" requires \"mixinsPackage\" to be set!")
     }
 
-    targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
-    targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
-    targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
     if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
         throw new GradleException("Could not resolve \"mixinsPackage\"! Could not find " + targetPackageJava + " or " + targetPackageScala  + " or " + targetPackageKotlin)
     }
@@ -281,6 +294,10 @@ if(file("addon.gradle").exists()) {
 
 apply from: 'repositories.gradle'
 
+if(file('repositories_override.gradle').exists()) {
+    apply from: 'repositories_override.gradle'
+}
+
 configurations {
     for (config in [shadowImplementation, shadowCompile, shadeCompile]) {
         implementation.extendsFrom(shadeCompile)
@@ -334,6 +351,10 @@ dependencies {
 }
 
 apply from: 'dependencies.gradle'
+
+if(file('dependencies_override.gradle').exists()) {
+    apply from: 'dependencies_override.gradle'
+}
 
 def mixinDir = new File(project.buildDir, 'mixins')
 if (!mixinDir.exists()) {
@@ -602,11 +623,29 @@ task devJar(type: Jar) {
 
 task apiJar(type: Jar) {
     from (sourceSets.main.allSource) {
-        include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackage)
+            include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackages)
+            apiPackages.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
+            }
+        if (apiPackagesNoRecurse)
+            apiPackagesNoRecurse.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/*'
+            }
     }
 
     from (sourceSets.main.output) {
-        include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackage)
+            include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackages)
+            apiPackages.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
+            }
+        if (apiPackagesNoRecurse)
+            apiPackagesNoRecurse.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/*'
+            }
     }
 
     from (sourceSets.main.resources.srcDirs) {
@@ -627,7 +666,7 @@ compileJava.dependsOn(copySrgs)
 artifacts {
     archives sourcesJar
     archives devJar
-    if(apiPackage) {
+    if(apiPackage || apiPackages || apiPackagesNoRecurse) {
         archives apiJar
     }
 }
@@ -683,7 +722,7 @@ publishing {
                 artifact source: sourcesJar, classifier: "sources"
             }
             artifact source: usesShadowedDependencies.toBoolean() ? shadowDevJar : devJar, classifier: "dev"
-            if (apiPackage) {
+            if (apiPackage || apiPackages || apiPackagesNoRecurse) {
                 artifact source: apiJar, classifier: "api"
             }
 

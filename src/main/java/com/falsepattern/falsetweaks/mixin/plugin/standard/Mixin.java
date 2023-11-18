@@ -159,7 +159,8 @@ public enum Mixin implements IMixin {
     Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsMixin"),
     Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsOptionsMixin"),
     Occluision_Optifine_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.RenderGlobalMixin"),
-    Occluision_Optifine_EntityRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.EntityRendererMixin"),
+    Occluision_Optifine_ShadersRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.optifine.ShadersRendererMixin"),
+//    Occluision_Optifine_EntityRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.EntityRendererMixin"),
 
     //endregion Occlusion Tweaks Module
 

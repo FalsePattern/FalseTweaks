@@ -168,21 +168,13 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
         OcclusionHelpers.renderer.runWorker(p_72722_1_, p_72722_2_, p_72722_3_);
     }
 
-    private EntityLivingBase ft$view;
-
     /**
      * @author skyboy, embeddedt
      * @reason Update logic
      */
     @Overwrite
     public int sortAndRender(EntityLivingBase view, int pass, double tick) {
-        ft$view = view;
-        return ft$doSortAndRender(pass, tick);
-    }
-
-    @Override
-    public int ft$doSortAndRender(int pass, double tick) {
-        return OcclusionHelpers.renderer.sortAndRender(ft$view, pass, tick);
+        return OcclusionHelpers.renderer.sortAndRender(view, pass, tick);
     }
 
     /**

@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
@@ -32,7 +33,6 @@ import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellator
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
-import com.falsepattern.lib.internal.Share;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -162,7 +162,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                 try {
                     return Class.forName(name);
                 } catch (ClassNotFoundException e) {
-                    Share.LOG.info("Could not find class " + name + " for crack fix blacklist!");
+                    Share.log.info("Could not find class " + name + " for crack fix blacklist!");
                     return null;
                 }
             }).filter(Objects::nonNull).toArray(Class<?>[]::new);

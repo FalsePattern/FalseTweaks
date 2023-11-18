@@ -14,4 +14,12 @@ repositories {
         name = "jitpack"
         url = "https://mvn.falsepattern.com/jitpack"
     }
+
+    maven {
+        name "mvnpattern_stripped"
+        url = "https://mvn.falsepattern.com/stripped"
+        content {
+            includeGroup "optifine"
+        }
+    }
 }

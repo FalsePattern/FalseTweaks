@@ -1,5 +1,9 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import lombok.val;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiVideoSettings;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -352,7 +356,7 @@ public class OcclusionRenderer {
                 rg.worldRenderersCheckIndex = (rg.worldRenderersCheckIndex + 1) % rg.renderersLoaded;
                 WorldRenderer rend = sortedWorldRenderers[rg.worldRenderersCheckIndex];
 
-                if ((rend.isInFrustum & rend.isVisible) & (rend.needsUpdate || !rend.isInitialized) & !(this.mc.theWorld.getChunkFromBlockCoords(rend.posX, rend.posZ) instanceof EmptyChunk)) {
+                if (rend.isVisible & (rend.needsUpdate || !rend.isInitialized) & !(this.mc.theWorld.getChunkFromBlockCoords(rend.posX, rend.posZ) instanceof EmptyChunk)) {
                     addRendererToUpdateQueue(rend);
                 }
             }
@@ -388,20 +392,39 @@ public class OcclusionRenderer {
         rg.theWorld.theProfiler.endSection();
 
         rg.theWorld.theProfiler.endStartSection("render");
+        if (Compat.isOptiFineFogOff(this.mc.entityRenderer)) {
+            GL11.glDisable(GL11.GL_FOG);
+        }
         RenderHelper.disableStandardItemLighting();
         int k = rg.renderSortedRenderers(0, rg.renderersLoaded, pass, tick);
+        ((IRenderGlobalMixin)rg).ft$setSortedRendererCount(rg.renderersLoaded);
 
         rg.theWorld.theProfiler.endSection();
         return k;
     }
 
     public int sortAndRender(int start, int end, int pass, double tick) {
-        CameraInfo cam = CameraInfo.getInstance();
+        boolean shadowPass = Compat.isShadowPass();
+        val cam = CameraInfo.getInstance();
+        double eX, eY, eZ;
+        if (shadowPass) {
+            val entitylivingbase = this.mc.renderViewEntity;
+            eX = entitylivingbase.lastTickPosX + (entitylivingbase.posX - entitylivingbase.lastTickPosX) * tick;
+            eY = entitylivingbase.lastTickPosY + (entitylivingbase.posY - entitylivingbase.lastTickPosY) * tick;
+            eZ = entitylivingbase.lastTickPosZ + (entitylivingbase.posZ - entitylivingbase.lastTickPosZ) * tick;
+        } else {
+            eX = cam.getEyeX();
+            eY = cam.getEyeY();
+            eZ = cam.getEyeZ();
+        }
 
         RenderList[] allRenderLists = rg.allRenderLists;
         for (int i = 0; i < allRenderLists.length; ++i) {
             allRenderLists[i].resetList();
         }
+
+        if (shadowPass)
+            end = rg.worldRenderers.length;
 
         int loopStart = start;
         int loopEnd = end;
@@ -413,7 +436,7 @@ public class OcclusionRenderer {
             dir = -1;
         }
 
-        if (pass == 0 && mc.gameSettings.showDebugInfo) {
+        if (!shadowPass && pass == 0 && mc.gameSettings.showDebugInfo) {
 
             mc.theWorld.theProfiler.startSection("debug_info");
             int renderersNotInitialized = 0, renderersBeingClipped = 0, renderersBeingOccluded = 0;
@@ -448,12 +471,20 @@ public class OcclusionRenderer {
 
         mc.theWorld.theProfiler.startSection("setup_lists");
         int glListsRendered = 0, allRenderListsLength = 0;
-        WorldRenderer[] sortedWorldRenderers = rg.sortedWorldRenderers;
+        WorldRenderer[] sortedWorldRenderers = shadowPass ? rg.worldRenderers : rg.sortedWorldRenderers;
 
         for (int i = loopStart; i != loopEnd; i += dir) {
             WorldRenderer rend = sortedWorldRenderers[i];
 
-            if (rend.isVisible && rend.isInFrustum & !rend.skipRenderPass[pass]) {
+            boolean isVisible = false, isInFrustum = false;
+            if (shadowPass) {
+                isVisible = rend.isVisible;
+                isInFrustum = rend.isInFrustum;
+                rend.isVisible = true;
+                rend.isInFrustum = true;
+            }
+
+            if ((rend.isVisible && rend.isInFrustum) && !rend.skipRenderPass[pass]) {
 
                 int renderListIndex;
 
@@ -469,11 +500,15 @@ public class OcclusionRenderer {
                         rg.allRenderLists = allRenderLists = Arrays.copyOf(allRenderLists, renderListIndex + 1);
                         allRenderLists[renderListIndex] = new RenderList();
                     }
-                    allRenderLists[renderListIndex].setupRenderList(rend.posXMinus, rend.posYMinus, rend.posZMinus, cam.getEyeX(), cam.getEyeY(), cam.getEyeZ());
+                    allRenderLists[renderListIndex].setupRenderList(rend.posXMinus, rend.posYMinus, rend.posZMinus, eX, eY, eZ);
                 }
 
                 allRenderLists[renderListIndex].addGLRenderList(rend.getGLCallListForPass(pass));
                 ++glListsRendered;
+            }
+            if (shadowPass) {
+                rend.isVisible = isVisible;
+                rend.isInFrustum = isInFrustum;
             }
         }
 

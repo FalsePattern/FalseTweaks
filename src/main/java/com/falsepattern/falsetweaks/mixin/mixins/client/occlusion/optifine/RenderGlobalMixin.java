@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
 
+import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +43,7 @@ import java.util.List;
 
 //Removing optifine patches to allow ours to apply
 @Mixin(value = RenderGlobal.class, priority = -3)
-public abstract class RenderGlobalMixin {
+public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     @Shadow public WorldClient theWorld;
 
     @Shadow public int renderDistanceChunks;
@@ -84,6 +85,13 @@ public abstract class RenderGlobalMixin {
     @Shadow private int glRenderListBase;
 
     public List field_72767_j;
+
+    private int countSortedWorldRenderers;
+
+    @Override
+    public void ft$setSortedRendererCount(int value) {
+        countSortedWorldRenderers = value;
+    }
 
     /**
      * @author FalsePattern
