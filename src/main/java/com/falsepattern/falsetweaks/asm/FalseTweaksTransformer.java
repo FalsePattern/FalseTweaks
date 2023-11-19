@@ -19,6 +19,7 @@ package com.falsepattern.falsetweaks.asm;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalDeOptimizer;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.asm.SmartTransformer;
 import com.falsepattern.lib.optifine.OptiFineTransformerHooks;
@@ -37,7 +38,8 @@ public class FalseTweaksTransformer implements SmartTransformer {
     private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
 
     static {
-        OptiFineTransformerHooks.disableOptiFinePatch("blo");
+        if (ModuleConfig.OCCLUSION_TWEAKS)
+            OptiFineTransformerHooks.disableOptiFinePatch("blo");
     }
 
     public static RenderGlobalDeOptimizer OPTIFINE_DEOPTIMIZER = new RenderGlobalDeOptimizer();

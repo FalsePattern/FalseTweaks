@@ -27,10 +27,7 @@
 
 package com.falsepattern.falsetweaks.api;
 
-import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.StableAPI;
 
 import java.util.Optional;
@@ -78,16 +75,14 @@ public final class Modules {
     }
 
     @StableAPI.Expose
+    @Deprecated
     public static Optional<Boolean> leakFixActive() {
-        if (Share.LEAKFIX_CLASS_INITIALIZED) {
-            return Optional.of(LeakFix.ENABLED);
-        } else {
-            return ModuleConfig.MEMORY_LEAK_FIX == LeakFixState.Disable ? Optional.of(Boolean.FALSE) : Optional.empty();
-        }
+        return Optional.of(ModuleConfig.OCCLUSION_TWEAKS);
     }
 
     @StableAPI.Expose
+    @Deprecated
     public static boolean leakFixMixinsInjected() {
-        return ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable;
+        return ModuleConfig.OCCLUSION_TWEAKS;
     }
 }

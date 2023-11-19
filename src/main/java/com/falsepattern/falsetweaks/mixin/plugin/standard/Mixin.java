@@ -19,7 +19,6 @@ package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
@@ -94,65 +93,19 @@ public enum Mixin implements IMixin {
 
     //endregion Triangulator Module
 
-    //region Memory Leak Fix Module
-    LeakFix_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable), "leakfix.RenderGlobalMixin"),
-    LeakFix_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable), "leakfix.WorldRendererMixin"),
-
-    //FastCraft
-    LeakFix_FCGLAllocationMixin(Side.CLIENT,
-                                condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                        .and(require(TargetedMod.FASTCRAFT)),
-                                "leakfix.fastcraft.GLAllocationMixin"),
-
-    //OptiFine
-    LeakFix_OFGameSettingsOptifineMixin(Side.CLIENT,
-                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                                .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                             .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
-                                        "leakfix.optifine.GameSettingsOptifineMixin"),
-    LeakFix_OFGuiVideoSettingsOptifineMixin(Side.CLIENT,
-                                            condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                                    .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                                 .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
-                                            "leakfix.optifine.GuiVideoSettingsOptifineMixin"),
-    LeakFix_OFRenderGlobalOptifineMixin(Side.CLIENT,
-                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                                .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                             .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
-                                        "leakfix.optifine.RenderGlobalOptiFineMixin"),
-    LeakFix_OFWorldRendererVanillaMixin(Side.CLIENT,
-                                        condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                                .and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                             .and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS))),
-                                        "leakfix.optifine.WorldRendererVanillaMixin"),
-    LeakFix_OFWorldRendererOptifineMixin(Side.CLIENT,
-                                         condition(() -> ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable)
-                                                 .and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)
-                                                              .or(require(TargetedMod.OPTIFINE_WITH_SHADERS))),
-                                         "leakfix.optifine.WorldRendererOptifineMixin"),
-    //endregion Memory Leak Fix Module
-
     //region Occlusion Tweaks Module
-    Occlusion_ChunkMixin(Side.CLIENT,
-                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
-                         "occlusion.ChunkMixin"),
-    Occlusion_EntityRendererMixin(Side.CLIENT,
-                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
-                         "occlusion.EntityRendererMixin"),
-    Occlusion_GuiVideoSettingsMixin(Side.CLIENT,
-                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
-                         "occlusion.GuiVideoSettingsMixin"),
-    Occlusion_RenderGlobalMixin(Side.CLIENT,
-                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
-                         "occlusion.RenderGlobalMixin"),
-    Occlusion_WorldRendererMixin(Side.CLIENT,
-                         condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
-                         "occlusion.WorldRendererMixin"),
-    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.PlayerManagerMixin"),
+    Occlusion_ChunkMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.ChunkMixin"),
+    Occlusion_EntityRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.EntityRendererMixin"),
+    Occlusion_GuiVideoSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.GuiVideoSettingsMixin"),
+    Occlusion_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.RenderGlobalMixin"),
+    Occlusion_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.WorldRendererMixin"),
+    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.PlayerManagerMixin"),
     Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsMixin"),
     Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsOptionsMixin"),
     Occluision_Optifine_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.RenderGlobalMixin"),
     Occluision_Optifine_ShadersRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.optifine.ShadersRendererMixin"),
+    Occluision_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GameSettingsOptifineMixin"),
+    Occluision_Optifine_OFGuiVideoSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GuiVideoSettingsOptifineMixin"),
 
     //endregion Occlusion Tweaks Module
 

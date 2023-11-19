@@ -21,7 +21,7 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.asm.FalseTweaksTransformer;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFix;
+import com.falsepattern.falsetweaks.modules.occlusion.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
@@ -47,9 +47,6 @@ public class ClientProxy extends CommonProxy {
             //Load perf
             FalseTweaksTransformer.TRANSFORMERS.remove(FalseTweaksTransformer.OPTIFINE_DEOPTIMIZER);
         }
-        if (LeakFix.ENABLED) {
-            LeakFix.registerBus();
-        }
         Share.LEAKFIX_CLASS_INITIALIZED = true;
         if (ModuleConfig.TRIANGULATOR) {
             Calibration.registerBus();
@@ -59,6 +56,7 @@ public class ClientProxy extends CommonProxy {
                                                                                      LayerMetadataSection.class);
         }
         if (ModuleConfig.OCCLUSION_TWEAKS) {
+            LeakFix.registerBus();
             OcclusionHelpers.init();
         }
     }
@@ -82,9 +80,7 @@ public class ClientProxy extends CommonProxy {
                         VoxelRenderListManager.INSTANCE);
             }
         }
-        if (LeakFix.ENABLED) {
-            LeakFix.gc();
-        }
+        LeakFix.gc();
 
         if (ModuleConfig.TRIANGULATOR) {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());

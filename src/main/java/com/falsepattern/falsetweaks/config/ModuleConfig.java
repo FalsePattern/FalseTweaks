@@ -18,7 +18,6 @@
 package com.falsepattern.falsetweaks.config;
 
 import com.falsepattern.falsetweaks.Tags;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
@@ -71,21 +70,6 @@ public class ModuleConfig {
                     "FPS impact: Tiny improvement near beacons")
     @Config.DefaultBoolean(true)
     public static boolean BEACON_OPTIMIZATION;
-
-    @Config.Comment("Another renderlist tweak. Minecraft preallocates 55 thousand renderlists for the chunk rendering.\n" +
-                    "The main advantage of this is reduced buffer allocations, so theoretically, it's faster.\n" +
-                    "Unfortunately, by not clearing these buffers, they start leaking a LOT of memory over time,\n" +
-                    "which gets emphasized on 21.X/22.X AMD windows drivers, and on MESA 21.X/22.X with linux. This patch\n" +
-                    "Replaces the preallocated block by a dynamic allocation system, with each chunk creating and\n" +
-                    "deleting these renderlists based on usage. Requires a game restart to apply.\n" +
-                    "NOTICE FOR OPTIFINE USERS:\n" +
-                    "Setting this to Enable blocks Smooth and Multi-Core chunkloading. If you want multicore\n" +
-                    "chunk loading, you MUST set this do Disable.\n" +
-                    "NOTICE FOR NEODYMIUM USERS:\n" +
-                    "Setting this to Enable may break Neodymium's render pipeline.\n" +
-                    "FPS impact: It depends")
-    @Config.DefaultEnum("Disable")
-    public static LeakFixState MEMORY_LEAK_FIX;
 
     @Config.Comment("Transparent tile entities (beacons, for instance) might render behind other tile entities that are\n" +
                     "actually BEHIND the transparent part. Sorting the tile entities before rendering fixes this bug.\n" +
@@ -143,7 +127,6 @@ public class ModuleConfig {
 
     static {
         ConfigurationManager.selfInit();
-        LeakFixConfig.init();
         ProfilerConfig.init();
         RenderListConfig.init();
         TriangulatorConfig.init();

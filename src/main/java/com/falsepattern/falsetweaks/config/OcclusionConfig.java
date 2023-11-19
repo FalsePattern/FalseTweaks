@@ -56,6 +56,16 @@ public class OcclusionConfig {
     public static int DYNAMIC_CHUNK_UPDATES_DEADLINE;
 
 
+    @Config.Comment("The occlusion caller uses a dynamic allocation for renderlists.\n" +
+                    "You can set this to any value above zero, but setting it too high will eat a bit more VRAM. 4096 is\n" +
+                    "a decent safe point.\n" +
+                    "FPS impact: zero when tuned right")
+    @Config.RangeInt(min = 0)
+    @Config.LangKey("config.falsetweaks.occlusion.cache_size_target")
+    @Config.DefaultInt(4096)
+    public static int CACHE_SIZE_TARGET;
+
+
     static {
         ConfigurationManager.selfInit();
     }

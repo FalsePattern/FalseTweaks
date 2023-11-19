@@ -18,9 +18,14 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
 
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import stubpackage.WrDisplayListAllocator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -35,7 +40,6 @@ import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-//Removing optifine patches to allow ours to apply
 @Mixin(value = RenderGlobal.class,
        priority = -3)
 public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
@@ -99,8 +103,14 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     @Shadow
     private int glRenderListBase;
 
+    @SuppressWarnings("MissingUnique")
     public List field_72767_j;
 
+    @Dynamic
+    @Shadow(remap = false)
+    public WrDisplayListAllocator displayListAllocator;
+
+    @SuppressWarnings({"MissingUnique", "FieldCanBeLocal", "unused", "AddedMixinMembersNamePattern"})
     private int countSortedWorldRenderers;
 
     @Override
@@ -267,5 +277,24 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
                 }
             }
         }
+    }
+
+    @Dynamic
+    @Redirect(method = "<init>",
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderGlobal;displayListAllocator:LWrDisplayListAllocator;",
+                       opcode = Opcodes.PUTFIELD,
+                       remap = false),
+              require = 1)
+    private void noAllocator(RenderGlobal rg, WrDisplayListAllocator param) {
+    }
+
+    @Dynamic
+    @Redirect(method = "deleteAllDisplayLists",
+              at = @At(value = "INVOKE",
+                       target = "LWrDisplayListAllocator;deleteDisplayLists()V",
+                       remap = false),
+              require = 1)
+    private void noDelete(WrDisplayListAllocator allocator) {
     }
 }

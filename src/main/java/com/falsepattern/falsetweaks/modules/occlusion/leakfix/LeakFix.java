@@ -15,10 +15,9 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.leakfix;
+package com.falsepattern.falsetweaks.modules.occlusion.leakfix;
 
-import com.falsepattern.falsetweaks.config.LeakFixConfig;
-import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import lombok.AccessLevel;
@@ -28,6 +27,7 @@ import lombok.val;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,7 +35,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LeakFix {
-    public static final boolean ENABLED = ModuleConfig.MEMORY_LEAK_FIX == LeakFixState.Enable;
     private static final LeakFix INSTANCE = new LeakFix();
     private static final TIntList freshAllocations = new TIntArrayList();
     private static final TIntList reusableAllocations = new TIntArrayList();
@@ -61,20 +60,20 @@ public final class LeakFix {
         allocs = 0;
         int reusables = reusableAllocations.size();
         for (int i = 0; i < reusables; i++) {
-            GL11.glDeleteLists(reusableAllocations.get(i), 3);
+            GL11.glDeleteLists(reusableAllocations.get(i), 2);
         }
         reusableAllocations.clear();
         int currentSize = freshAllocations.size();
-        int targetSize = LeakFixConfig.CACHE_SIZE_TARGET;
+        int targetSize = OcclusionConfig.CACHE_SIZE_TARGET;
         int allocationCount = targetSize - currentSize;
         if (allocationCount > 0) {
-            int base = GL11.glGenLists(allocationCount * 3);
+            int base = GL11.glGenLists(allocationCount * 2);
             for (int i = 0; i < allocationCount; i++) {
-                freshAllocations.add(base + i * 3);
+                freshAllocations.add(base + i * 2);
             }
         } else if (allocationCount < 0) {
             for (int i = currentSize - 1; i >= targetSize; i--) {
-                GL11.glDeleteLists(freshAllocations.removeAt(i), 3);
+                GL11.glDeleteLists(freshAllocations.removeAt(i), 2);
             }
         }
     }
@@ -94,49 +93,42 @@ public final class LeakFix {
             return freshAllocations.removeAt(fresh - 1);
         }
         misses++;
-        return GL11.glGenLists(3);
+        return GL11.glGenLists(2);
     }
 
     public static void releaseWorldRendererBuffer(int buffer) {
         activeBufferCount--;
-        for (int i = 0; i < 3; i++) {
-            GL11.glNewList(buffer + i, GL11.GL_COMPILE);
-            GL11.glEndList();
-        }
         reusableAllocations.add(buffer);
     }
 
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Pre e) {
-        if (ENABLED) {
-            if (e.type.equals(RenderGameOverlayEvent.ElementType.DEBUG)) {
-                debugText = true;
-                return;
-            }
-            if (!debugText || !(e instanceof RenderGameOverlayEvent.Text) ||
-                !e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
-                return;
-            }
-            debugText = false;
-            val txt = (RenderGameOverlayEvent.Text) e;
-            txt.right.add(null);
-            txt.right.add("[FalseTweaks Leak Fix]");
-            int active = LeakFix.getActiveBufferCount();
-            int cached = LeakFix.getCachedBufferCount();
-            int total = active + cached;
-            txt.right.add("Total chunk renderers: " + total);
-            txt.right.add("Active chunk renderers: " + active);
-            txt.right.add("Cached chunk renderers: " + cached);
-            if (Minecraft.getMinecraft().mcProfiler.profilingEnabled) {
-                //Verbose info
-                txt.right.add("Allocations since last GC cycle: " + allocs);
-                txt.right.add("Total allocations: " + totalAllocs);
-                txt.right.add(
-                        "Total allocation cache hits: " + hits + " (" + (int) ((100f / totalAllocs) * hits) + "%)");
-                txt.right.add(
-                        "Total allocation cache misses: " + misses + " (" + (int) ((100f / totalAllocs) * misses) +
-                        "%)");
-            }
+        if (e.type.equals(RenderGameOverlayEvent.ElementType.DEBUG)) {
+            debugText = true;
+            return;
+        }
+        if (!debugText || !(e instanceof RenderGameOverlayEvent.Text) ||
+            !e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
+            return;
+        }
+        debugText = false;
+        val txt = (RenderGameOverlayEvent.Text) e;
+        txt.right.add(null);
+        txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.title"));
+        int active = LeakFix.getActiveBufferCount();
+        int cached = LeakFix.getCachedBufferCount();
+        int total = active + cached;
+        txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.total", total));
+        txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.active", active));
+        txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.cached", cached));
+        if (Minecraft.getMinecraft().mcProfiler.profilingEnabled) {
+            //Verbose info
+            txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.alloc.gc", allocs));
+            txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.alloc.total", totalAllocs));
+            txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.alloc.hits",
+                                      hits, (int) ((100f / totalAllocs) * hits)));
+            txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.alloc.miss",
+                                      misses, (int) ((100f / totalAllocs) * misses)));
         }
     }
 
@@ -145,8 +137,8 @@ public final class LeakFix {
         long time = System.nanoTime();
         float secondsSinceLastGC = (time - lastGC) / 1000000000f;
         int cacheSize = getCachedBufferCount();
-        if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 && (cacheSize < (LeakFixConfig.CACHE_SIZE_TARGET / 2) ||
-                                                                  cacheSize > (LeakFixConfig.CACHE_SIZE_TARGET * 2)))) {
+        if (secondsSinceLastGC > 5 || (secondsSinceLastGC > 1 && (cacheSize < (OcclusionConfig.CACHE_SIZE_TARGET / 2) ||
+                                                                  cacheSize > (OcclusionConfig.CACHE_SIZE_TARGET * 2)))) {
             gc();
             lastGC = time;
         }

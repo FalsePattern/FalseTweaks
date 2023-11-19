@@ -18,7 +18,6 @@
 package com.falsepattern.falsetweaks.config;
 
 import com.falsepattern.falsetweaks.Tags;
-import com.falsepattern.falsetweaks.modules.leakfix.LeakFixState;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
 import lombok.val;
@@ -42,9 +41,6 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         }
         if (ModuleConfig.VOXELIZER) {
             result.add(VoxelizerConfig.class);
-        }
-        if (ModuleConfig.MEMORY_LEAK_FIX != LeakFixState.Disable) {
-            result.add(LeakFixConfig.class);
         }
         if (ModuleConfig.ADVANCED_PROFILER) {
             result.add(ProfilerConfig.class);
