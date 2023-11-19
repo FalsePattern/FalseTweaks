@@ -3,11 +3,13 @@ package com.falsepattern.falsetweaks.modules.threadedupdates;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.IRenderGlobalListener;
 import com.falsepattern.falsetweaks.modules.occlusion.IRendererUpdateOrderProvider;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.google.common.base.Preconditions;
 import lombok.SneakyThrows;
+import lombok.val;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,6 +19,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.shader.TesselatorVertexState;
 import net.minecraft.world.ChunkCache;
+
+import cpw.mods.fml.common.Loader;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -113,9 +117,18 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         OcclusionHelpers.renderer.ft$addRenderGlobalListener(this);
         MAIN_THREAD = Thread.currentThread();
 
-        Share.log.info("Creating " + ModuleConfig.CHUNK_UPDATE_THREADS + " chunk builder" + (ModuleConfig.CHUNK_UPDATE_THREADS > 1 ? "s" : ""));
-        for(int i = 0; i < ModuleConfig.CHUNK_UPDATE_THREADS; i++) {
-            new Thread(this::runThread, "Chunk Update Worker Thread #" + i).start();
+        int threads = OcclusionConfig.CHUNK_UPDATE_THREADS;
+        if (threads == 0)
+            threads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+
+        Share.log.info("Creating " + threads + " chunk builder" + (threads > 1 ? "s" : ""));
+        String nameBase = "Chunk Update Worker Thread #";
+        if (Loader.isModLoaded("lumina"))
+            nameBase = "$LUMI_NO_RELIGHT" + nameBase;
+        for(int i = 0; i < threads; i++) {
+            val t = new Thread(this::runThread, nameBase + i);
+            t.setDaemon(true);
+            t.start();
         }
     }
 
@@ -125,14 +138,14 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList) {
-        final int updateQueueSize = ModuleConfig.CHUNK_UPDATE_THREADS * 32;
+        final int updateQueueSize = OcclusionConfig.CHUNK_UPDATE_THREADS * OcclusionConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
         taskQueue.clear();
         for(int i = 0; i < updateQueueSize && i < toUpdateList.size(); i++) {
             WorldRenderer wr = toUpdateList.get(i);
             UpdateTask task = ((IRendererUpdateResultHolder)wr).ft$getRendererUpdateTask();
 
             if(wr.distanceToEntitySquared(Minecraft.getMinecraft().renderViewEntity) < 16 * 16) {
-                if(!ModuleConfig.DISABLE_BLOCKING_CHUNK_UPDATES){
+                if(!OcclusionConfig.DISABLE_BLOCKING_CHUNK_UPDATES){
                     urgentTaskQueue.add(wr);
                 } else {
                     task.important = true;

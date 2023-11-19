@@ -40,6 +40,6 @@ public abstract class PlayerManagerMixin {
                                           ordinal = 0)},
                     require = 1)
     private int expandViewDistance(int constant) {
-        return 64;
+        return 32;
     }
 }

@@ -24,7 +24,7 @@
 package com.falsepattern.falsetweaks;
 
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates;
+import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import stubpackage.Config;
@@ -141,11 +141,11 @@ public class Compat {
         private static boolean isThreadedChunkUpdatingEnabled;
 
         private static void init() {
-            isThreadedChunkUpdatingEnabled = com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
+            isThreadedChunkUpdatingEnabled = ThreadedChunkUpdates.isEnabled();
         }
 
         public static Tessellator threadTessellator() {
-            return com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
+            return ThreadedChunkUpdates.getThreadTessellator();
         }
     }
 

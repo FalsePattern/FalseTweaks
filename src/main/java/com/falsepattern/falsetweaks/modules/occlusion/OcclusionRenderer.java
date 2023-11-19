@@ -1,5 +1,6 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
@@ -257,11 +258,13 @@ public class OcclusionRenderer {
 
         if (!rg.worldRenderersToUpdate.isEmpty()) {
             ++frameCounter;
-            boolean doUpdateAcceleration = cameraStaticTime > 2 && !OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES
-                    && !OcclusionHelpers.DEBUG_NO_UPDATE_ACCELERATION;
-            /* If the camera is not moving, assume a deadline of 30 FPS. */
+            boolean doUpdateAcceleration = cameraStaticTime > 2 &&
+                                           !OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES &&
+                                           !OcclusionHelpers.DEBUG_NO_UPDATE_ACCELERATION &&
+                                           OcclusionConfig.DYNAMIC_CHUNK_UPDATES_DEADLINE > 0;
+            /* If the camera is not moving, assume a deadline of N FPS. */
             rebuildChunks(view, !doUpdateAcceleration ? OcclusionHelpers.chunkUpdateDeadline
-                    : mc.entityRenderer.renderEndNanoTime + (1_000_000_000L / 30L));
+                    : mc.entityRenderer.renderEndNanoTime + (1_000_000_000L / OcclusionConfig.DYNAMIC_CHUNK_UPDATES_DEADLINE));
         }
 
         rg.theWorld.theProfiler.endStartSection("scan");

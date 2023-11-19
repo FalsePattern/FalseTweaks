@@ -155,21 +155,21 @@ public enum Mixin implements IMixin {
     Occlusion_WorldRendererMixin(Side.CLIENT,
                          condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)),
                          "occlusion.WorldRendererMixin"),
-    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.PlayerManagerMixin"),
-    Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsMixin"),
-    Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.ARCHAICFIX)), "occlusion.GameSettingsOptionsMixin"),
+    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.PlayerManagerMixin"),
+    Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsMixin"),
+    Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsOptionsMixin"),
     Occluision_Optifine_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.RenderGlobalMixin"),
     Occluision_Optifine_ShadersRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.optifine.ShadersRendererMixin"),
-//    Occluision_Optifine_EntityRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.EntityRendererMixin"),
 
     //endregion Occlusion Tweaks Module
 
     //region Threaded Chunk Updates
 
-    ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.RenderBlocksMixin"),
-    ThreadedUpdates_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.TessellatorMixin"),
-    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.TessellatorMixin_Debug"),
-    ThreadedUpdates_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(avoid(TargetedMod.ARCHAICFIX)), "threadedupdates.WorldRendererMixin"),
+    ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES), "threadedupdates.RenderBlocksMixin"),
+    ThreadedUpdates_TessellatorMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES), "threadedupdates.TessellatorMixin"),
+    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES), "threadedupdates.TessellatorMixin_Debug"),
+    ThreadedUpdates_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES), "threadedupdates.WorldRendererMixin"),
+    ThreadedUpdates_Optifine_ShadersMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS && ModuleConfig.THREADED_CHUNK_UPDATES).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "threadedupdates.optifine.ShadersMixin"),
 
     //endregion Threaded Chunk Updates
 

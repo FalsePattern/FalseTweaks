@@ -13,12 +13,16 @@ import net.minecraft.client.renderer.Tessellator;
 @Mixin(value = Tessellator.class)
 public abstract class TessellatorMixin_Debug {
 
-    @Inject(method = {"setVertexState", "func_154352_a", "setColorRGBA_F", "setColorRGBA", "startDrawing", "addTranslation", "setTranslation", "addVertexWithUV", "setNormal", "setColorOpaque", "addVertex", "setColorOpaque_I", "reset", "setBrightness", "startDrawingQuads", "disableColor", "setColorRGBA_I", "setTextureUV", "setColorOpaque_F"}, at = @At("HEAD"))
+    @Inject(method = {"setVertexState", "func_154352_a", "setColorRGBA_F", "setColorRGBA", "startDrawing", "addTranslation", "setTranslation", "addVertexWithUV", "setNormal", "setColorOpaque", "addVertex", "setColorOpaque_I", "reset", "setBrightness", "startDrawingQuads", "disableColor", "setColorRGBA_I", "setTextureUV", "setColorOpaque_F"},
+            at = @At("HEAD"),
+            require = 1)
     private void verifyThreadIsCorrect(CallbackInfo ci) {
         verifyThreadIsCorrect();
     }
 
-    @Inject(method = {"getVertexState", "draw"}, at = @At("HEAD"))
+    @Inject(method = {"getVertexState", "draw"},
+            at = @At("HEAD"),
+            require = 1)
     private void verifyThreadIsCorrect(CallbackInfoReturnable cir) {
         verifyThreadIsCorrect();
     }

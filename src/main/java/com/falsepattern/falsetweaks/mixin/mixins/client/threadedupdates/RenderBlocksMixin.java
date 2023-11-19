@@ -1,8 +1,9 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
+import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
-import com.falsepattern.falsetweaks.modules.threadedupdates.api.ThreadedChunkUpdates;
+import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,9 +17,13 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraftforge.client.ForgeHooksClient;
 
 @Mixin(RenderBlocks.class)
-public class RenderBlocksMixin {
+public abstract class RenderBlocksMixin {
 
-    @Inject(method = "renderBlockByRenderType", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;setBlockBoundsBasedOnState(Lnet/minecraft/world/IBlockAccess;III)V"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "renderBlockByRenderType",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/block/Block;setBlockBoundsBasedOnState(Lnet/minecraft/world/IBlockAccess;III)V"),
+            cancellable = true,
+            locals = LocalCapture.CAPTURE_FAILHARD)
     private void cancelRenderDelegatedToDifferentThread(Block block, int x, int y, int z, CallbackInfoReturnable<Boolean> cir, int renderType) {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
@@ -33,6 +38,7 @@ public class RenderBlocksMixin {
         if ((mainThread ? pass >= 0 : true) && (mainThread ? offThreadBlock : !offThreadBlock)) {
             // Cancel rendering block if it's delegated to a different thread.
             cir.setReturnValue(mainThread ? task.result[pass].renderedSomething : false);
+            OptiFineCompat.popEntity();
         }
     }
 

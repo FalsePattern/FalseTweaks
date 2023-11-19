@@ -40,6 +40,6 @@ public abstract class GameSettingsOptionsMixin {
                                          ordinal = 0),
                     require = 1)
     private static float expandRenderDistance(float constant) {
-        return 64.0F;
+        return 32.0f;
     }
 }

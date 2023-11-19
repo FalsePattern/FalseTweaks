@@ -188,86 +188,76 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
      * @reason _
      */
     @Overwrite
-    public void markRenderersForNewPosition(int p_72722_1_, int p_72722_2_, int p_72722_3_)
+    public void markRenderersForNewPosition(int posX, int posY, int posZ)
     {
-        p_72722_1_ -= 8;
-        p_72722_2_ -= 8;
-        p_72722_3_ -= 8;
+        posX -= 8;
+        posY -= 8;
+        posZ -= 8;
         this.minBlockX = Integer.MAX_VALUE;
         this.minBlockY = Integer.MAX_VALUE;
         this.minBlockZ = Integer.MAX_VALUE;
         this.maxBlockX = Integer.MIN_VALUE;
         this.maxBlockY = Integer.MIN_VALUE;
         this.maxBlockZ = Integer.MIN_VALUE;
-        int l = this.renderChunksWide * 16;
-        int i1 = l / 2;
+        int renderBlocksWide = this.renderChunksWide * 16;
+        int halfWide = renderBlocksWide / 2;
 
-        for (int j1 = 0; j1 < this.renderChunksWide; ++j1)
+        for (int chunkW = 0; chunkW < this.renderChunksWide; ++chunkW)
         {
-            int k1 = j1 * 16;
-            int l1 = k1 + i1 - p_72722_1_;
+            int blockW = chunkW * 16;
+            int centerW = blockW + halfWide - posX;
 
-            if (l1 < 0)
-            {
-                l1 -= l - 1;
+            if (centerW < 0) {
+                centerW -= renderBlocksWide - 1;
             }
 
-            l1 /= l;
-            k1 -= l1 * l;
+            centerW /= renderBlocksWide;
+            blockW -= centerW * renderBlocksWide;
 
-            if (k1 < this.minBlockX)
-            {
-                this.minBlockX = k1;
+            if (blockW < this.minBlockX) {
+                this.minBlockX = blockW;
             }
 
-            if (k1 > this.maxBlockX)
-            {
-                this.maxBlockX = k1;
+            if (blockW > this.maxBlockX) {
+                this.maxBlockX = blockW;
             }
 
-            for (int i2 = 0; i2 < this.renderChunksDeep; ++i2)
-            {
-                int j2 = i2 * 16;
-                int k2 = j2 + i1 - p_72722_3_;
+            for (int chunkD = 0; chunkD < this.renderChunksDeep; ++chunkD) {
+                int blockD = chunkD * 16;
+                int centerD = blockD + halfWide - posZ;
 
-                if (k2 < 0)
-                {
-                    k2 -= l - 1;
+                if (centerD < 0) {
+                    centerD -= renderBlocksWide - 1;
                 }
 
-                k2 /= l;
-                j2 -= k2 * l;
+                centerD /= renderBlocksWide;
+                blockD -= centerD * renderBlocksWide;
 
-                if (j2 < this.minBlockZ)
-                {
-                    this.minBlockZ = j2;
+                if (blockD < this.minBlockZ) {
+                    this.minBlockZ = blockD;
                 }
 
-                if (j2 > this.maxBlockZ)
-                {
-                    this.maxBlockZ = j2;
+                if (blockD > this.maxBlockZ) {
+                    this.maxBlockZ = blockD;
                 }
 
-                for (int l2 = 0; l2 < this.renderChunksTall; ++l2)
+                for (int chunkT = 0; chunkT < this.renderChunksTall; ++chunkT)
                 {
-                    int i3 = l2 * 16;
+                    int blockT = chunkT * 16;
 
-                    if (i3 < this.minBlockY)
-                    {
-                        this.minBlockY = i3;
+                    if (blockT < this.minBlockY) {
+                        this.minBlockY = blockT;
                     }
 
-                    if (i3 > this.maxBlockY)
-                    {
-                        this.maxBlockY = i3;
+                    if (blockT > this.maxBlockY) {
+                        this.maxBlockY = blockT;
                     }
 
-                    WorldRenderer worldrenderer = this.worldRenderers[(i2 * this.renderChunksTall + l2) * this.renderChunksWide + j1];
+                    WorldRenderer worldrenderer = this.worldRenderers[(chunkD * this.renderChunksTall + chunkT) * this.renderChunksWide + chunkW];
                     boolean flag = worldrenderer.needsUpdate;
-                    worldrenderer.setPosition(k1, i3, j2);
+                    worldrenderer.setPosition(blockW, blockT, blockD);
 
-                    if (!flag && worldrenderer.needsUpdate)
-                    {
+                    if (!flag && worldrenderer.needsUpdate) {
                         this.field_72767_j.add(worldrenderer);
                     }
                 }

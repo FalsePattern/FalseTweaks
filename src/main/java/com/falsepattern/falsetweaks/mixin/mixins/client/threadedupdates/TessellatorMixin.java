@@ -29,7 +29,8 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
 
     @Shadow private boolean isDrawing;
 
-    @Shadow private int rawBufferSize;
+    @Shadow(aliases = {"rawBufferSize"})
+    public int field_78388_E; // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
 
     @Shadow private boolean hasTexture;
 
@@ -57,11 +58,11 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
         hasColor |= state.getHasColor();
         hasNormals |= state.getHasNormals();
 
-        while(rawBufferSize < rawBufferIndex + state.getRawBuffer().length) {
-            rawBufferSize *= 2;
+        while(field_78388_E < rawBufferIndex + state.getRawBuffer().length) {
+            field_78388_E *= 2;
         }
-        if(rawBufferSize > rawBuffer.length) {
-            rawBuffer = Arrays.copyOf(rawBuffer, rawBufferSize);
+        if(field_78388_E > rawBuffer.length) {
+            rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
         }
 
         System.arraycopy(state.getRawBuffer(), 0, rawBuffer, rawBufferIndex, state.getRawBufferIndex());
@@ -77,7 +78,10 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
 
     /** @reason Allow using multiple tessellator instances concurrently by removing static field access in alternate
      * instances. */
-    @Redirect(method = "reset", at = @At(value = "INVOKE", target = "Ljava/nio/ByteBuffer;clear()Ljava/nio/Buffer;"))
+    @Redirect(method = "reset",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/nio/ByteBuffer;clear()Ljava/nio/Buffer;"),
+              require = 1)
     private Buffer removeStaticBufferAccessOutsideSingleton(ByteBuffer buffer) {
         if(((Object)this) == Tessellator.instance) {
             return buffer.clear();

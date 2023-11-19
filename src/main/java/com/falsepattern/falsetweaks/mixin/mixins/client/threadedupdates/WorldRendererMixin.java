@@ -21,7 +21,9 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
 
     private ThreadedChunkUpdateHelper.UpdateTask arch$updateTask;
 
-    @Inject(method = "updateRenderer", at = @At("HEAD"))
+    @Inject(method = "updateRenderer",
+            at = @At("HEAD"),
+            require = 1)
     private void setLastWorldRendererSingleton(CallbackInfo ci) {
         ThreadedChunkUpdateHelper.lastWorldRenderer = ((WorldRenderer)(Object)this);
     }
@@ -37,7 +39,10 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
         postRenderBlocks(pass, entity);
     }
 
-    @Inject(method = "updateRenderer", at = @At(value="INVOKE", target = "Lnet/minecraft/client/renderer/RenderBlocks;renderBlockByRenderType(Lnet/minecraft/block/Block;III)Z"))
+    @Inject(method = "updateRenderer",
+            at = @At(value="INVOKE",
+                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderBlockByRenderType(Lnet/minecraft/block/Block;III)Z"),
+            require = 1)
     private void resetStack(CallbackInfo ci) {
         // Make sure the stack doesn't leak
         ThreadedChunkUpdateHelper.renderBlocksStack.reset();
@@ -51,7 +56,9 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
         return arch$updateTask;
     }
 
-    @Inject(method = "markDirty", at = @At("RETURN"))
+    @Inject(method = "markDirty",
+            at = @At("RETURN"),
+            require = 1)
     private void notifyDirty(CallbackInfo ci) {
         ThreadedChunkUpdateHelper.instance.onWorldRendererDirty((WorldRenderer)(Object)this);
     }
