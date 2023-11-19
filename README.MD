@@ -6,6 +6,7 @@ FalsePattern's flagship tweaking, patching, and optimization mod.
 This mod completely replaces Triangulator and AnimFix. Make sure you delete these two mods before installing FalseTweaks.
 
 ## List of major features:
+- Multithreaded chunk rendering (compatible with OptiFine and FastCraft)
 - Replaced minecraft's quad-based rendering with triangle-based rendering
 - Fixed ambient occlusion and smooth lighting (vanilla bugs MC-138211 and MC-43968)
 - Optimized beacon beam rendering
@@ -47,14 +48,15 @@ myItem_2.png
 ```
 
 ## Fixing known problems
-| **Issue**                                                                                      | **Potential solution**                                                                         |
-|------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| Game crashes on startup,<br>forge log says `MixinTargetAlreadyLoadedException`                 | Under the `00_modules` category in the config,<br>set `B:STARTUP_OPTIMIZATIONS` to `false`.    |
-| Game crashes on startup,<br>loading screen was already present (or fixing issue 1 didn't help) | Under the `triangulator` category in the config,<br>set `B:RENDER_HOOK_COMPAT_MODE` to `true`. |
-| Crash with OptiFine                                                                            | Under the `00_modules` category in the config,<br>set `B:MIPMAP_FIX` to `false`.               |
-| Crash with ShadersModCore                                                                      | Standalone shadersmod is unsupported, use optifine instead.                                    |
-| Crash with "IllegalArgumentException: Comparison method violates its general contract!"        | Under the `00_modules` category in the config,<br>set `B:TE_TRANSPARENCY_FIX` to `false`.      |
-| Flickering blocks when using optifine shaders and PBR resource packs                           | Under the `00_modules` category in the config,<br>set `B:TEXTURE_OPTIMIZATIONS` to `false`.    |
+| **Issue**                                                                                      | **Potential solution**                                                                                                                                |
+|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Game crashes on startup,<br>forge log says `MixinTargetAlreadyLoadedException`                 | Under the `00_modules` category in the config,<br>set `B:STARTUP_OPTIMIZATIONS` to `false`.                                                           |
+| Game crashes on startup,<br>loading screen was already present (or fixing issue 1 didn't help) | Under the `triangulator` category in the config,<br>set `B:RENDER_HOOK_COMPAT_MODE` to `true`.                                                        |
+| Crash with OptiFine                                                                            | Under the `00_modules` category in the config,<br>set `B:MIPMAP_FIX` to `false`.                                                                      |
+| Crash with ShadersModCore                                                                      | Standalone shadersmod is unsupported, use optifine instead.                                                                                           |
+| Crash with "IllegalArgumentException: Comparison method violates its general contract!"        | Under the `00_modules` category in the config,<br>set `B:TE_TRANSPARENCY_FIX` to `false`.                                                             |
+| Flickering blocks when using optifine shaders and PBR resource packs                           | Under the `00_modules` category in the config,<br>set `B:TEXTURE_OPTIMIZATIONS` to `false`.                                                           |
+| Crash with ArchaicFix                                                                          | Disable the occlusion culling feature in ArchaicFix if you enable the one in FalseTweaks. (The FalseTweaks one is compatible with FastCraft/OptiFine) |
 
 Any bug reports concerning the known problems listed in this table will be closed without response. Read before you open issues.
 

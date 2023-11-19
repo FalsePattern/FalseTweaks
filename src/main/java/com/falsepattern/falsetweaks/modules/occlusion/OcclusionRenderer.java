@@ -395,7 +395,7 @@ public class OcclusionRenderer {
         rg.theWorld.theProfiler.endSection();
 
         rg.theWorld.theProfiler.endStartSection("render");
-        if (Compat.isOptiFineFogOff(this.mc.entityRenderer)) {
+        if (Compat.OptiFineCompat.isOptiFineFogOff(this.mc.entityRenderer)) {
             GL11.glDisable(GL11.GL_FOG);
         }
         RenderHelper.disableStandardItemLighting();
@@ -407,7 +407,7 @@ public class OcclusionRenderer {
     }
 
     public int sortAndRender(int start, int end, int pass, double tick) {
-        boolean shadowPass = Compat.isShadowPass();
+        boolean shadowPass = Compat.OptiFineCompat.isShadowPass();
         val cam = CameraInfo.getInstance();
         double eX, eY, eZ;
         if (shadowPass) {

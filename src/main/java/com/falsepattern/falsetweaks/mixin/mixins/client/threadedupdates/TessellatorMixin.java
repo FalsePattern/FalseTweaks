@@ -84,6 +84,11 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
         hasColor |= state.getHasColor();
         hasNormals |= state.getHasNormals();
 
+        //Hurr durr
+        if (field_78388_E == 0) {
+            field_78388_E = 0x10000;
+        }
+
         while (field_78388_E < rawBufferIndex + state.getRawBuffer().length) {
             field_78388_E *= 2;
         }

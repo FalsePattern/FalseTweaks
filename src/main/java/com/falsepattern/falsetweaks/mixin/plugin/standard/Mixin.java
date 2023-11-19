@@ -94,18 +94,30 @@ public enum Mixin implements IMixin {
     //endregion Triangulator Module
 
     //region Occlusion Tweaks Module
+
+    //For 32chunk render distance without optifine
+    Occlusion_PlayerManagerMixin(Side.COMMON, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.PlayerManagerMixin"),
+
     Occlusion_ChunkMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.ChunkMixin"),
     Occlusion_EntityRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.EntityRendererMixin"),
     Occlusion_GuiVideoSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.GuiVideoSettingsMixin"),
     Occlusion_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.RenderGlobalMixin"),
     Occlusion_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.WorldRendererMixin"),
-    Occlusion_PlayerManagerMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS), "occlusion.PlayerManagerMixin"),
     Occlusion_GameSettingsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsMixin"),
     Occlusion_GameSettingsOptionsMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(avoid(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.GameSettingsOptionsMixin"),
-    Occluision_Optifine_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.RenderGlobalMixin"),
-    Occluision_Optifine_ShadersRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.optifine.ShadersRendererMixin"),
-    Occluision_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GameSettingsOptifineMixin"),
-    Occluision_Optifine_OFGuiVideoSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GuiVideoSettingsOptifineMixin"),
+
+    //OptiFine
+    Occlusion_Optifine_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.RenderGlobalMixin"),
+    Occlusion_Optifine_ShadersRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITH_SHADERS)), "occlusion.optifine.ShadersRendererMixin"),
+    Occlusion_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GameSettingsOptifineMixin"),
+    Occlusion_Optifine_OFGuiVideoSettingsOptifineMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifine.GuiVideoSettingsOptifineMixin"),
+
+    //FastCraft
+    Occlusion_FastCraft_GLAllocationMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.FASTCRAFT)), "occlusion.fastcraft.GLAllocationMixin"),
+    Occlusion_FastCraft_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.FASTCRAFT)), "occlusion.fastcraft.EntityRendererMixin"),
+
+    //Both of them
+    Occlusion_OptiFastCraft_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.OCCLUSION_TWEAKS).and(require(TargetedMod.FASTCRAFT).or(require(TargetedMod.OPTIFINE_WITHOUT_SHADERS)).or(require(TargetedMod.OPTIFINE_WITH_SHADERS))), "occlusion.optifastcraft.RenderGlobalMixin"),
 
     //endregion Occlusion Tweaks Module
 

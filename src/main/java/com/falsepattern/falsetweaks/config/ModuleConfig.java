@@ -103,7 +103,7 @@ public class ModuleConfig {
     public static boolean ADVANCED_PROFILER;
 
     @Config.Comment("Enables the 1.8-style occlusion culling originally developed by CoFHTweaks.\n" +
-                    "Not compatible with ArchaicFix's occlusion tweaks, quad triangulation, or FastCraft.\n" +
+                    "Not compatible with ArchaicFix's occlusion tweaks.\n" +
                     "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
                     "FPS impact: Potentially huge gains, much faster chunk rendering")
     @Config.DefaultBoolean(true)
@@ -111,6 +111,7 @@ public class ModuleConfig {
     public static boolean OCCLUSION_TWEAKS;
 
     @Config.Comment("Enables multi-threaded chunk updating. It only works if enableOcclusionTweaks is turned on.\n" +
+                    "Not compatible with quad triangulation (automatically disables it if you turn this on)\n" +
                     "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
                     "FPS impact: Depends on your CPU, but should be pretty good on modern CPUs")
     @Config.DefaultBoolean(true)

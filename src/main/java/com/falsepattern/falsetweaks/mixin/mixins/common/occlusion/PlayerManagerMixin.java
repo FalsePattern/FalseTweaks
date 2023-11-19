@@ -15,7 +15,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
+package com.falsepattern.falsetweaks.mixin.mixins.common.occlusion;
 
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +32,8 @@ public abstract class PlayerManagerMixin {
                                          ordinal = 0),
                                 @Constant(intValue = 32,
                                           ordinal = 0)},
-                    require = 1)
+                    require = 0,
+                    expect = 0)
     private int expandViewDistance(int constant) {
         return 32;
     }
