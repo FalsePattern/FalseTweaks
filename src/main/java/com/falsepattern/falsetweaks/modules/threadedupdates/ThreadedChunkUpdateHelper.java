@@ -30,12 +30,18 @@ import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.shader.TesselatorVertexState;
 import net.minecraft.world.ChunkCache;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -45,6 +51,7 @@ import java.util.Queue;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
@@ -140,22 +147,49 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         OcclusionHelpers.renderer.ft$setRendererUpdateOrderProvider(rendererUpdateOrderProvider);
         OcclusionHelpers.renderer.ft$addRenderGlobalListener(this);
         MAIN_THREAD = Thread.currentThread();
+        FMLCommonHandler.instance().bus().register(this);
+        spawnThreads();
+    }
 
+    private AtomicBoolean run = null;
+    private Thread[] currentThreads = null;
+    private int threadCount = 0;
+
+    private void spawnThreads() {
         int threads = ThreadingConfig.CHUNK_UPDATE_THREADS;
-        if (threads == 0) {
-            threads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-        }
 
+        if (threads == 0)
+            threads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+
+        if (threadCount == threads) {
+            return;
+        }
+        if (run != null)
+            run.set(false);
+        if (currentThreads != null)
+            for (val thread: currentThreads)
+                thread.interrupt();
         Share.log.info("Creating " + threads + " chunk builder" + (threads > 1 ? "s" : ""));
         String nameBase = "Chunk Update Worker Thread #";
         if (Loader.isModLoaded("lumina")) {
             nameBase = "$LUMI_NO_RELIGHT" + nameBase;
         }
+        run = new AtomicBoolean(true);
+        currentThreads = new Thread[threads];
+        threadCount = threads;
         for (int i = 0; i < threads; i++) {
-            val t = new Thread(this::runThread, nameBase + i);
+            val t = new Thread(() -> this.runThread(run), nameBase + i);
+            currentThreads[i] = t;
             t.setDaemon(true);
             t.start();
         }
+    }
+
+    @SubscribeEvent
+    public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent e) {
+        if (!e.modID.equals(Tags.MODID))
+            return;
+        spawnThreads();
     }
 
     private void preRendererUpdates(List<WorldRenderer> toUpdateList) {
@@ -213,27 +247,28 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     @SneakyThrows
-    private void runThread() {
-        while (true) {
-            WorldRenderer wr = taskQueue.take();
-            UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-            task.started = true;
+    private void runThread(AtomicBoolean run) {
+        while (run.get()) {
             try {
-                doChunkUpdate(wr);
-            } catch (Exception e) {
-                Share.log.error("Failed to update chunk " + worldRendererToString(wr));
-                e.printStackTrace();
-                for (UpdateTask.Result r : task.result) {
-                    r.clear();
+                WorldRenderer wr = taskQueue.take();
+                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                task.started = true;
+                try {
+                    doChunkUpdate(wr);
+                } catch (Exception e) {
+                    Share.log.error("Failed to update chunk " + worldRendererToString(wr), e);
+                    for (UpdateTask.Result r : task.result) {
+                        r.clear();
+                    }
+                    ((ICapturableTessellator) threadTessellator.get()).discard();
                 }
-                ((ICapturableTessellator) threadTessellator.get()).discard();
+                if (!task.important) {
+                    finishedTasks.add(wr);
+                } else {
+                    finishedTasks.addFirst(wr);
+                }
+            } catch (InterruptedException ignored) {
             }
-            if (!task.important) {
-                finishedTasks.add(wr);
-            } else {
-                finishedTasks.addFirst(wr);
-            }
-
         }
     }
 

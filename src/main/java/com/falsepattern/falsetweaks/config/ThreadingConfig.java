@@ -31,7 +31,6 @@ public class ThreadingConfig {
     @Config.LangKey("config.falsetweaks.threading.threads")
     @Config.DefaultInt(1)
     @Config.RangeInt(min = 0)
-    @Config.RequiresMcRestart
     public static int CHUNK_UPDATE_THREADS;
 
     @Config.Comment("The maximum amount of queued chunk updates per thread.\n" +
