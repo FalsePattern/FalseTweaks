@@ -126,16 +126,25 @@ public class ModuleConfig {
 
     @Config.Comment("Enables the 1.8-style occlusion culling originally developed by CoFHTweaks.\n" +
                     "Not compatible with ArchaicFix's occlusion tweaks, or FastCraft.\n" +
-                    "COMPATIBLE WITH OPTIFINE AND SHADERS")
+                    "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
+                    "FPS impact: Potentially huge gains, much faster chunk rendering")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean OCCLUSION_TWEAKS;
 
     @Config.Comment("Enables multi-threaded chunk updating. It only works if enableOcclusionTweaks is turned on.\n" +
-                    "COMPATIBLE WITH OPTIFINE AND SHADERS")
+                    "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
+                    "FPS impact: Depends on your CPU, but should be pretty good on modern CPUs")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
+
+    @Config.Comment("Improves the performance of the minecraft sky mesh.\n" +
+                    "Also fixes the weird white lines that some OptiFine shaderpacks get with huge render distances.\n" +
+                    "FPS impact: Negligible gain")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean SKY_MESH_OPTIMIZATION;
 
 
     static {
