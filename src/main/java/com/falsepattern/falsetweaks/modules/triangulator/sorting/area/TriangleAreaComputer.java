@@ -30,6 +30,7 @@ import org.joml.Vector3f;
 public class TriangleAreaComputer implements NormalAreaComputer {
     public static final TriangleAreaComputer INSTANCE = new TriangleAreaComputer();
     private final Vector3f buf = new Vector3f();
+
     @Override
     public float getArea(int[] vertexData, int i, int vertexSize) {
         getNormalUnscaled(vertexData, i, vertexSize, buf);

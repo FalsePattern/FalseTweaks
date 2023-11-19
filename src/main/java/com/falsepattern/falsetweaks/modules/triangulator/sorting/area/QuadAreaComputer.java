@@ -31,6 +31,7 @@ import org.joml.Vector3f;
 public class QuadAreaComputer implements NormalAreaComputer {
     public static final QuadAreaComputer INSTANCE = new QuadAreaComputer();
     private final Vector3f buf = new Vector3f();
+
     @Override
     public float getArea(int[] vertexData, int i, int vertexSize) {
         val ax = Float.intBitsToFloat(vertexData[i]);

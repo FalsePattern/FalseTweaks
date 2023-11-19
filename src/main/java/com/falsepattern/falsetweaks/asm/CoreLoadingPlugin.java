@@ -35,11 +35,10 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         ModuleConfig.init();
     }
+
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {
-                Tags.GROUPNAME + ".asm.FalseTweaksTransformer"
-        };
+        return new String[]{Tags.GROUPNAME + ".asm.FalseTweaksTransformer"};
     }
 
     @Override

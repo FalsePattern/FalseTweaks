@@ -1,14 +1,15 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
 import lombok.val;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.entity.EntityLivingBase;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.entity.EntityLivingBase;
 
 import java.nio.FloatBuffer;
 
@@ -33,15 +34,14 @@ public abstract class TranslucentBlockLayers_RenderGlobalMixin {
     @Inject(method = "sortAndRender",
             at = @At("HEAD"),
             require = 1)
-    private void offsetProjection(EntityLivingBase entityLivingBase,
-                                  int renderPass,
-                                  double partialTick,
-                                  CallbackInfoReturnable<Integer> cir) {
-        if (renderPass != 1)
+    private void offsetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+        if (renderPass != 1) {
             return;
+        }
 
-        if (fltw$matrixBuffer == null)
+        if (fltw$matrixBuffer == null) {
             fltw$matrixBuffer = BufferUtils.createFloatBuffer(16);
+        }
 
         val lastMatrixMode = GL11.glGetInteger(GL11.GL_MATRIX_MODE);
         GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -69,12 +69,10 @@ public abstract class TranslucentBlockLayers_RenderGlobalMixin {
     @Inject(method = "sortAndRender",
             at = @At("RETURN"),
             require = 1)
-    private void resetProjection(EntityLivingBase entityLivingBase,
-                                 int renderPass,
-                                 double partialTick,
-                                 CallbackInfoReturnable<Integer> cir) {
-        if (renderPass != 1)
+    private void resetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+        if (renderPass != 1) {
             return;
+        }
 
         val lastMatrixMode = GL11.glGetInteger(GL11.GL_MATRIX_MODE);
 

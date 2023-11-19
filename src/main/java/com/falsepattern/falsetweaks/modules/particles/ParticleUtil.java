@@ -49,48 +49,42 @@ public class ParticleUtil {
         tess.setColorOpaque_F(pr * luminosity, pg * luminosity, pb * luminosity);
     }
 
-    private static void drawXPos(Tessellator tessellator, double minY, double maxY, double minZ, double maxZ,
-                                 double x, double u1, double v1, double u2, double v2) {
+    private static void drawXPos(Tessellator tessellator, double minY, double maxY, double minZ, double maxZ, double x, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(x, maxY, minZ, u2, v1);
         tessellator.addVertexWithUV(x, maxY, maxZ, u1, v1);
         tessellator.addVertexWithUV(x, minY, maxZ, u1, v2);
         tessellator.addVertexWithUV(x, minY, minZ, u2, v2);
     }
 
-    private static void drawXNeg(Tessellator tessellator, double minY, double maxY, double minZ, double maxZ,
-                                 double x, double u1, double v1, double u2, double v2) {
+    private static void drawXNeg(Tessellator tessellator, double minY, double maxY, double minZ, double maxZ, double x, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(x, maxY, maxZ, u2, v1);
         tessellator.addVertexWithUV(x, maxY, minZ, u1, v1);
         tessellator.addVertexWithUV(x, minY, minZ, u1, v2);
         tessellator.addVertexWithUV(x, minY, maxZ, u2, v2);
     }
 
-    private static void drawYPos(Tessellator tessellator, double minX, double maxX, double minZ, double maxZ,
-                                 double y, double u1, double v1, double u2, double v2) {
+    private static void drawYPos(Tessellator tessellator, double minX, double maxX, double minZ, double maxZ, double y, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(minX, y, maxZ, u2, v1);
         tessellator.addVertexWithUV(maxX, y, maxZ, u1, v1);
         tessellator.addVertexWithUV(maxX, y, minZ, u1, v2);
         tessellator.addVertexWithUV(minX, y, minZ, u2, v2);
     }
 
-    private static void drawYNeg(Tessellator tessellator, double minX, double maxX, double minZ, double maxZ,
-                                 double y, double u1, double v1, double u2, double v2) {
+    private static void drawYNeg(Tessellator tessellator, double minX, double maxX, double minZ, double maxZ, double y, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(maxX, y, maxZ, u2, v1);
         tessellator.addVertexWithUV(minX, y, maxZ, u1, v1);
         tessellator.addVertexWithUV(minX, y, minZ, u1, v2);
         tessellator.addVertexWithUV(maxX, y, minZ, u2, v2);
     }
 
-    private static void drawZPos(Tessellator tessellator, double minX, double maxX, double minY, double maxY,
-                                 double z, double u1, double v1, double u2, double v2) {
+    private static void drawZPos(Tessellator tessellator, double minX, double maxX, double minY, double maxY, double z, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(maxX, maxY, z, u2, v1);
         tessellator.addVertexWithUV(minX, maxY, z, u1, v1);
         tessellator.addVertexWithUV(minX, minY, z, u1, v2);
         tessellator.addVertexWithUV(maxX, minY, z, u2, v2);
     }
 
-    private static void drawZNeg(Tessellator tessellator, double minX, double maxX, double minY, double maxY,
-                                 double z, double u1, double v1, double u2, double v2) {
+    private static void drawZNeg(Tessellator tessellator, double minX, double maxX, double minY, double maxY, double z, double u1, double v1, double u2, double v2) {
         tessellator.addVertexWithUV(minX, maxY, z, u2, v1);
         tessellator.addVertexWithUV(maxX, maxY, z, u1, v1);
         tessellator.addVertexWithUV(maxX, minY, z, u1, v2);

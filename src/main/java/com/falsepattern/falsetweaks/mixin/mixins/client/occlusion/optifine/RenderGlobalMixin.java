@@ -42,47 +42,68 @@ import java.util.Arrays;
 import java.util.List;
 
 //Removing optifine patches to allow ours to apply
-@Mixin(value = RenderGlobal.class, priority = -3)
+@Mixin(value = RenderGlobal.class,
+       priority = -3)
 public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
-    @Shadow public WorldClient theWorld;
+    @Shadow
+    public WorldClient theWorld;
 
-    @Shadow public int renderDistanceChunks;
+    @Shadow
+    public int renderDistanceChunks;
 
-    @Shadow public Minecraft mc;
+    @Shadow
+    public Minecraft mc;
 
-    @Shadow public WorldRenderer[] worldRenderers;
+    @Shadow
+    public WorldRenderer[] worldRenderers;
 
-    @Shadow public int renderChunksWide;
+    @Shadow
+    public int renderChunksWide;
 
-    @Shadow public int renderChunksTall;
+    @Shadow
+    public int renderChunksTall;
 
-    @Shadow public int renderChunksDeep;
+    @Shadow
+    public int renderChunksDeep;
 
-    @Shadow public WorldRenderer[] sortedWorldRenderers;
+    @Shadow
+    public WorldRenderer[] sortedWorldRenderers;
 
-    @Shadow public int minBlockX;
+    @Shadow
+    public int minBlockX;
 
-    @Shadow public int minBlockY;
+    @Shadow
+    public int minBlockY;
 
-    @Shadow public int minBlockZ;
+    @Shadow
+    public int minBlockZ;
 
-    @Shadow public int maxBlockX;
+    @Shadow
+    public int maxBlockX;
 
-    @Shadow public int maxBlockY;
+    @Shadow
+    public int maxBlockY;
 
-    @Shadow public int maxBlockZ;
+    @Shadow
+    public int maxBlockZ;
 
-    @Shadow public List tileEntities;
+    @Shadow
+    public List tileEntities;
 
-    @Shadow public abstract void onStaticEntitiesChanged();
+    @Shadow
+    public abstract void onStaticEntitiesChanged();
 
-    @Shadow private boolean occlusionEnabled;
+    @Shadow
+    private boolean occlusionEnabled;
 
-    @Shadow private int renderEntitiesStartupCounter;
+    @Shadow
+    private int renderEntitiesStartupCounter;
 
-    @Shadow private IntBuffer glOcclusionQueryBase;
+    @Shadow
+    private IntBuffer glOcclusionQueryBase;
 
-    @Shadow private int glRenderListBase;
+    @Shadow
+    private int glRenderListBase;
 
     public List field_72767_j;
 
@@ -98,19 +119,15 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
      * @reason Optifine Unpatch
      */
     @Overwrite
-    public void loadRenderers()
-    {
-        if (this.theWorld != null)
-        {
+    public void loadRenderers() {
+        if (this.theWorld != null) {
             Blocks.leaves.setGraphicsLevel(this.mc.gameSettings.fancyGraphics);
             Blocks.leaves2.setGraphicsLevel(this.mc.gameSettings.fancyGraphics);
             this.renderDistanceChunks = this.mc.gameSettings.renderDistanceChunks;
             int i;
 
-            if (this.worldRenderers != null)
-            {
-                for (i = 0; i < this.worldRenderers.length; ++i)
-                {
+            if (this.worldRenderers != null) {
+                for (i = 0; i < this.worldRenderers.length; ++i) {
                     this.worldRenderers[i].stopRendering();
                 }
             }
@@ -131,25 +148,20 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
             this.maxBlockZ = this.renderChunksDeep;
             int l;
 
-            for (l = 0; l < this.field_72767_j.size(); ++l)
-            {
-                ((WorldRenderer)this.field_72767_j.get(l)).needsUpdate = false;
+            for (l = 0; l < this.field_72767_j.size(); ++l) {
+                ((WorldRenderer) this.field_72767_j.get(l)).needsUpdate = false;
             }
 
             this.field_72767_j.clear();
             this.tileEntities.clear();
             this.onStaticEntitiesChanged();
 
-            for (l = 0; l < this.renderChunksWide; ++l)
-            {
-                for (int i1 = 0; i1 < this.renderChunksTall; ++i1)
-                {
-                    for (int j1 = 0; j1 < this.renderChunksDeep; ++j1)
-                    {
+            for (l = 0; l < this.renderChunksWide; ++l) {
+                for (int i1 = 0; i1 < this.renderChunksTall; ++i1) {
+                    for (int j1 = 0; j1 < this.renderChunksDeep; ++j1) {
                         this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] = new WorldRenderer(this.theWorld, this.tileEntities, l * 16, i1 * 16, j1 * 16, this.glRenderListBase + j);
 
-                        if (this.occlusionEnabled)
-                        {
+                        if (this.occlusionEnabled) {
                             this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].glOcclusionQuery = this.glOcclusionQueryBase.get(k);
                         }
 
@@ -165,13 +177,13 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
                 }
             }
 
-            if (this.theWorld != null)
-            {
+            if (this.theWorld != null) {
                 EntityLivingBase entitylivingbase = this.mc.renderViewEntity;
 
-                if (entitylivingbase != null)
-                {
-                    this.markRenderersForNewPosition(MathHelper.floor_double(entitylivingbase.posX), MathHelper.floor_double(entitylivingbase.posY), MathHelper.floor_double(entitylivingbase.posZ));
+                if (entitylivingbase != null) {
+                    this.markRenderersForNewPosition(MathHelper.floor_double(entitylivingbase.posX),
+                                                     MathHelper.floor_double(entitylivingbase.posY),
+                                                     MathHelper.floor_double(entitylivingbase.posZ));
                     Arrays.sort(this.sortedWorldRenderers, new EntitySorter(entitylivingbase));
                 }
             }
@@ -184,12 +196,12 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     /**
      * Goes through all the renderers setting new positions on them and those that have their position changed are
      * adding to be updated
+     *
      * @author _
      * @reason _
      */
     @Overwrite
-    public void markRenderersForNewPosition(int posX, int posY, int posZ)
-    {
+    public void markRenderersForNewPosition(int posX, int posY, int posZ) {
         posX -= 8;
         posY -= 8;
         posZ -= 8;
@@ -202,8 +214,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
         int renderBlocksWide = this.renderChunksWide * 16;
         int halfWide = renderBlocksWide / 2;
 
-        for (int chunkW = 0; chunkW < this.renderChunksWide; ++chunkW)
-        {
+        for (int chunkW = 0; chunkW < this.renderChunksWide; ++chunkW) {
             int blockW = chunkW * 16;
             int centerW = blockW + halfWide - posX;
 
@@ -241,8 +252,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
                     this.maxBlockZ = blockD;
                 }
 
-                for (int chunkT = 0; chunkT < this.renderChunksTall; ++chunkT)
-                {
+                for (int chunkT = 0; chunkT < this.renderChunksTall; ++chunkT) {
                     int blockT = chunkT * 16;
 
                     if (blockT < this.minBlockY) {

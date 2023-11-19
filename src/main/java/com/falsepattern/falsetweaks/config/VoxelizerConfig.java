@@ -135,13 +135,14 @@ public class VoxelizerConfig {
         for (String s : CLASS_EXCLUSION_LIST) {
             try {
                 if (Launch.classLoader.getClassBytes(s) != null) {
-                        val excluded = Class.forName(s);
-                        if (excluded.isAssignableFrom(clazz)) {
-                            knownClassExcludes.add(clazz);
-                            return true;
-                        }
+                    val excluded = Class.forName(s);
+                    if (excluded.isAssignableFrom(clazz)) {
+                        knownClassExcludes.add(clazz);
+                        return true;
+                    }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
         knownClassIncludes.add(clazz);
         return false;

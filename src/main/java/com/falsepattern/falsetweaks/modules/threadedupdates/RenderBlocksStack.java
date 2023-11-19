@@ -1,11 +1,14 @@
 package com.falsepattern.falsetweaks.modules.threadedupdates;
 
-/** A helper class to detect re-entrance of renderBlockByRenderType. */
+/**
+ * A helper class to detect re-entrance of renderBlockByRenderType.
+ */
 public class RenderBlocksStack {
 
     private int level;
 
-    /** Re-entrance should be impossible on the render threads, since only vanilla blocks are rendered there. So let's
+    /**
+     * Re-entrance should be impossible on the render threads, since only vanilla blocks are rendered there. So let's
      * just assume this is the case.
      */
     private boolean isMainThread() {
@@ -13,22 +16,30 @@ public class RenderBlocksStack {
     }
 
     public void push() {
-        if(!isMainThread()) return;
+        if (!isMainThread()) {
+            return;
+        }
         level++;
     }
 
     public void pop() {
-        if(!isMainThread()) return;
+        if (!isMainThread()) {
+            return;
+        }
         level--;
     }
 
     public void reset() {
-        if(!isMainThread()) return;
+        if (!isMainThread()) {
+            return;
+        }
         level = 0;
     }
 
     public int getLevel() {
-        if(!isMainThread()) return 0;
+        if (!isMainThread()) {
+            return 0;
+        }
         return level;
     }
 }

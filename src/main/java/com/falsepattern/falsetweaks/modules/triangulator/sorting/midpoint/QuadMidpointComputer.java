@@ -29,6 +29,7 @@ import org.joml.Vector3f;
 
 public class QuadMidpointComputer implements MidpointComputer {
     public static final QuadMidpointComputer INSTANCE = new QuadMidpointComputer();
+
     @Override
     public void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output) {
         val ax = Float.intBitsToFloat(vertexData[i]);

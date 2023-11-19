@@ -41,7 +41,8 @@ import net.minecraftforge.client.IItemRenderer;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
-    @Shadow private ItemStack itemToRender;
+    @Shadow
+    private ItemStack itemToRender;
 
     @Inject(method = "renderItemIn2D",
             at = @At("HEAD"),
@@ -64,9 +65,13 @@ public abstract class ItemRendererMixin {
             remap = false,
             require = 1)
     private void startManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
-        if (p_78443_2_ == null) return;
+        if (p_78443_2_ == null) {
+            return;
+        }
         val item = p_78443_2_.getItem();
-        if (item == null) return;
+        if (item == null) {
+            return;
+        }
         if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
             Data.setManagedMode(true);
         }
@@ -76,9 +81,13 @@ public abstract class ItemRendererMixin {
             at = @At("HEAD"),
             require = 1)
     private void startManagedMode2(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, CallbackInfo ci) {
-        if (p_78443_2_ == null) return;
+        if (p_78443_2_ == null) {
+            return;
+        }
         val item = p_78443_2_.getItem();
-        if (item == null) return;
+        if (item == null) {
+            return;
+        }
         if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
             Data.setManagedMode(true);
         }
@@ -88,9 +97,13 @@ public abstract class ItemRendererMixin {
             at = @At("HEAD"),
             require = 1)
     private void startManagedMode3(float p_78440_1_, CallbackInfo ci) {
-        if (itemToRender == null) return;
+        if (itemToRender == null) {
+            return;
+        }
         val item = itemToRender.getItem();
-        if (item == null) return;
+        if (item == null) {
+            return;
+        }
         if (!VoxelizerConfig.isClassExcluded(item.getClass())) {
             Data.setManagedMode(true);
         }

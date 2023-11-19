@@ -17,7 +17,8 @@ import net.minecraft.entity.EntityLivingBase;
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin implements IRendererUpdateResultHolder {
 
-    @Shadow protected abstract void postRenderBlocks(int p_147891_1_, EntityLivingBase p_147891_2_);
+    @Shadow
+    protected abstract void postRenderBlocks(int p_147891_1_, EntityLivingBase p_147891_2_);
 
     private ThreadedChunkUpdateHelper.UpdateTask arch$updateTask;
 
@@ -25,14 +26,15 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
             at = @At("HEAD"),
             require = 1)
     private void setLastWorldRendererSingleton(CallbackInfo ci) {
-        ThreadedChunkUpdateHelper.lastWorldRenderer = ((WorldRenderer)(Object)this);
+        ThreadedChunkUpdateHelper.lastWorldRenderer = ((WorldRenderer) (Object) this);
     }
 
     @Redirect(method = "updateRenderer",
-              at = @At(value="INVOKE", target = "Lnet/minecraft/client/renderer/WorldRenderer;postRenderBlocks(ILnet/minecraft/entity/EntityLivingBase;)V"),
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/renderer/WorldRenderer;postRenderBlocks(ILnet/minecraft/entity/EntityLivingBase;)V"),
               require = 1)
     private void loadTessellationResult(WorldRenderer instance, int pass, EntityLivingBase entity) {
-        if(!ft$getRendererUpdateTask().cancelled) {
+        if (!ft$getRendererUpdateTask().cancelled) {
             ((ICapturableTessellator) Tessellator.instance).arch$addTessellatorVertexState(
                     ft$getRendererUpdateTask().result[pass].renderedQuads);
         }
@@ -40,7 +42,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
     }
 
     @Inject(method = "updateRenderer",
-            at = @At(value="INVOKE",
+            at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/client/renderer/RenderBlocks;renderBlockByRenderType(Lnet/minecraft/block/Block;III)Z"),
             require = 1)
     private void resetStack(CallbackInfo ci) {
@@ -50,7 +52,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
 
     @Override
     public ThreadedChunkUpdateHelper.UpdateTask ft$getRendererUpdateTask() {
-        if(arch$updateTask == null) {
+        if (arch$updateTask == null) {
             arch$updateTask = new ThreadedChunkUpdateHelper.UpdateTask();
         }
         return arch$updateTask;
@@ -60,7 +62,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
             at = @At("RETURN"),
             require = 1)
     private void notifyDirty(CallbackInfo ci) {
-        ThreadedChunkUpdateHelper.instance.onWorldRendererDirty((WorldRenderer)(Object)this);
+        ThreadedChunkUpdateHelper.instance.onWorldRendererDirty((WorldRenderer) (Object) this);
     }
 
 }

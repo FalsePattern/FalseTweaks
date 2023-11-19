@@ -27,6 +27,7 @@ import net.minecraft.client.shader.TesselatorVertexState;
 
 public class BSPTessellatorVertexState extends TesselatorVertexState {
     public final ChunkBSPTree bspTree;
+
     public BSPTessellatorVertexState(int[] rawBuffer, int rawBufferIndex, int vertexCount, boolean hasTexture, boolean hasBrightness, boolean hasNormals, boolean hasColor, ChunkBSPTree bspTree) {
         super(rawBuffer, rawBufferIndex, vertexCount, hasTexture, hasBrightness, hasNormals, hasColor);
         this.bspTree = bspTree;

@@ -75,8 +75,9 @@ public abstract class TextureMapMixin {
             try {
                 val resource = manager.getResource(complete);
                 val layerMeta = (LayerMetadataSection) resource.getMetadata("voxelLayers");
-                if (VoxelizerConfig.VERBOSE_LOG)
+                if (VoxelizerConfig.VERBOSE_LOG) {
                     Share.log.info("__VOXELIZER__ " + name);
+                }
                 if (layerMeta != null) {
                     val thicknesses = layerMeta.thicknesses();
                     val layers = new Layer[thicknesses.length];
@@ -92,8 +93,9 @@ public abstract class TextureMapMixin {
                     }
                     tex.layers(layers);
                 } else {
-                    if (VoxelizerConfig.VERBOSE_LOG)
+                    if (VoxelizerConfig.VERBOSE_LOG) {
                         Share.log.info("__VOXELIZER__ NO LAYERS!");
+                    }
                     tex.layers(new Layer(iicon, BASE_THICKNESS));
                 }
             } catch (RuntimeException runtimeexception) {

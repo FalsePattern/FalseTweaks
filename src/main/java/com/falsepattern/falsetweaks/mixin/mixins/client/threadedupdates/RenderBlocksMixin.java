@@ -1,9 +1,9 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
+import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
 import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
-import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,12 +29,12 @@ public abstract class RenderBlocksMixin {
         boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
 
         ThreadedChunkUpdateHelper.UpdateTask task = mainThread
-                ? ((IRendererUpdateResultHolder)ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask()
-                : null;
+                                                    ? ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask()
+                                                    : null;
 
-        boolean offThreadBlock = ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType)
-                && !(task != null && task.cancelled)
-                && (!mainThread || ThreadedChunkUpdateHelper.renderBlocksStack.getLevel() == 1);
+        boolean offThreadBlock = ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType) &&
+                                 !(task != null && task.cancelled) &&
+                                 (!mainThread || ThreadedChunkUpdateHelper.renderBlocksStack.getLevel() == 1);
         if ((mainThread ? pass >= 0 : true) && (mainThread ? offThreadBlock : !offThreadBlock)) {
             // Cancel rendering block if it's delegated to a different thread.
             cir.setReturnValue(mainThread ? task.result[pass].renderedSomething : false);
@@ -42,17 +42,21 @@ public abstract class RenderBlocksMixin {
         }
     }
 
-    @Inject(method = "renderBlockByRenderType", at = @At("HEAD"))
+    @Inject(method = "renderBlockByRenderType",
+            at = @At("HEAD"))
     private void pushStack(CallbackInfoReturnable<Boolean> cir) {
         ThreadedChunkUpdateHelper.renderBlocksStack.push();
     }
 
-    @Inject(method = "renderBlockByRenderType", at = @At("RETURN"))
+    @Inject(method = "renderBlockByRenderType",
+            at = @At("RETURN"))
     private void popStack(CallbackInfoReturnable<Boolean> cir) {
         ThreadedChunkUpdateHelper.renderBlocksStack.pop();
     }
 
-    @Redirect(method = "*", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;"))
+    @Redirect(method = "*",
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;"))
     private Tessellator modifyTessellatorAccess() {
         return ThreadedChunkUpdates.getThreadTessellator();
     }

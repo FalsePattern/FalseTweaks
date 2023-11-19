@@ -35,6 +35,7 @@ public class TreeNode {
     public TIntList triangleRefs;
     public int frontRef;
     public int backRef;
+
     public TreeNode(Vector3f normal, Vector3f origin, TIntList triangleRefs, int frontRef, int backRef) {
         this.normal = new Vector3f(normal);
         this.origin = new Vector3f(origin);

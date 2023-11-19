@@ -34,8 +34,9 @@ public class VertexAPI {
     /**
      * Allocates extra usable space in vertex data.
      * Only usable during preInit, and only if the Triangulator module is enabled. Otherwise, it's a hard crash.
-     * @param count The amount of integers to allocate (1 count = 4 bytes).
-     * @param indices The indices of the allocated vertex slots. Size must be equal to count.
+     *
+     * @param count           The amount of integers to allocate (1 count = 4 bytes).
+     * @param indices         The indices of the allocated vertex slots. Size must be equal to count.
      * @param optiFineIndices The indices of the allocated vertex slots when OptiFine shaders are active. Size must be equal to count.
      */
     @StableAPI.Expose
@@ -45,8 +46,10 @@ public class VertexAPI {
 
     /**
      * Used for correcting any custom tessellator size/stride/offset logic.
-     * @param current The "vanilla" vertex size to be corrected
+     *
+     * @param current    The "vanilla" vertex size to be corrected
      * @param multiplier The amount of vertices to compute the size/stride/offset for
+     *
      * @return The computed value
      */
     @StableAPI.Expose

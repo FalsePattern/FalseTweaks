@@ -56,6 +56,7 @@ public abstract class SkyFix_RenderGlobalMixin {
     private void noDrawQuads1(Tessellator instance) {
 
     }
+
     @Redirect(method = "<init>",
               slice = @Slice(from = @At(value = "FIELD",
                                         target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;")),

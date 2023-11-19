@@ -31,6 +31,7 @@ public class VertexInfo {
     private static int optifineOffset = 18;
     private static int vanillaOffset = 8;
     private static int extraVertexInts = 0;
+
     public static synchronized void allocateExtraVertexSlots(int count, int[] indices, int[] optiFineIndices) {
         if (!ModuleConfig.TRIANGULATOR) {
             throw new IllegalStateException("Could not allocate vertex slots. Please enable the Triangulator module inside falsetweaks.cfg");

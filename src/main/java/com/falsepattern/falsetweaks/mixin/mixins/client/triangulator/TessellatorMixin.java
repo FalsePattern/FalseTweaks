@@ -40,7 +40,6 @@ import org.lwjgl.opengl.GL11;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -69,16 +68,26 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Shadow
     private int vertexCount;
 
-    @Shadow private boolean hasTexture;
-    @Shadow private boolean hasBrightness;
-    @Shadow private boolean hasColor;
-    @Shadow private boolean hasNormals;
-    @Shadow private double xOffset;
-    @Shadow private double yOffset;
-    @Shadow private double zOffset;
-    @Shadow @Final public static Tessellator instance;
+    @Shadow
+    private boolean hasTexture;
+    @Shadow
+    private boolean hasBrightness;
+    @Shadow
+    private boolean hasColor;
+    @Shadow
+    private boolean hasNormals;
+    @Shadow
+    private double xOffset;
+    @Shadow
+    private double yOffset;
+    @Shadow
+    private double zOffset;
+    @Shadow
+    @Final
+    public static Tessellator instance;
     @Shadow(aliases = {"rawBufferSize"})
-    public int field_78388_E; // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
+    public int field_78388_E;
+            // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -165,7 +174,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     @Override
     public void setVertexStateBSP(TesselatorVertexState tvs) {
         if (tvs instanceof BSPTessellatorVertexState) {
-            val bsp = (BSPTessellatorVertexState)tvs;
+            val bsp = (BSPTessellatorVertexState) tvs;
             bspTree = bsp.bspTree;
         } else {
             bspTree = null;

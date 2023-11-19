@@ -24,7 +24,6 @@
 package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
 
 import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.client.util.QuadComparator;
 
 public interface ITessellatorMixin {
     void alternativeTriangulation(boolean state);

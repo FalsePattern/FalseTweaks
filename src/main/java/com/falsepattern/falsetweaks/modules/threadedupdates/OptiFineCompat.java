@@ -37,8 +37,9 @@ public class OptiFineCompat {
     }
 
     public static void popEntity() {
-        if (!FMLClientHandler.instance().hasOptifine() || !Config.isShaders())
+        if (!FMLClientHandler.instance().hasOptifine() || !Config.isShaders()) {
             return;
+        }
         Shaders.popEntity();
     }
 }

@@ -169,7 +169,9 @@ public class ChunkBSPTree {
     }
 
     private void traverse(int node, Vector3f viewpoint, TIntList output) {
-        if (node < 0) return;
+        if (node < 0) {
+            return;
+        }
 
         val n = nodes.get(node);
         float factor = n.normal.dot(viewpoint.x - n.origin.x, viewpoint.y - n.origin.y, viewpoint.z - n.origin.z);

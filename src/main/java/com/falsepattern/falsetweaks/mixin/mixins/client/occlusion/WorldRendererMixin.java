@@ -19,25 +19,35 @@ import java.util.List;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin implements IWorldRenderer {
-    @Shadow public boolean isWaitingOnOcclusionQuery;
+    @Shadow
+    public boolean isWaitingOnOcclusionQuery;
 
-    @Shadow public World worldObj;
+    @Shadow
+    public World worldObj;
 
-    @Shadow public int posX;
+    @Shadow
+    public int posX;
 
-    @Shadow public int posZ;
+    @Shadow
+    public int posZ;
 
-    @Shadow public List tileEntityRenderers;
+    @Shadow
+    public List tileEntityRenderers;
 
-    @Shadow private List tileEntities;
+    @Shadow
+    private List tileEntities;
 
-    @Shadow public boolean needsUpdate;
+    @Shadow
+    public boolean needsUpdate;
 
-    @Shadow public boolean isInitialized;
+    @Shadow
+    public boolean isInitialized;
 
-    @Shadow private int bytesDrawn;
+    @Shadow
+    private int bytesDrawn;
 
-    @Shadow private TesselatorVertexState vertexState;
+    @Shadow
+    private TesselatorVertexState vertexState;
 
     private boolean ft$isInUpdateList;
     private boolean ft$isFrustumCheckPending;
@@ -66,7 +76,7 @@ public class WorldRendererMixin implements IWorldRenderer {
             require = 1,
             cancellable = true)
     private void bailOnEmptyChunk(EntityLivingBase view, CallbackInfo ci) {
-        if(worldObj.getChunkFromBlockCoords(posX, posZ) instanceof EmptyChunk) {
+        if (worldObj.getChunkFromBlockCoords(posX, posZ) instanceof EmptyChunk) {
             if (tileEntityRenderers.size() > 0) {
                 tileEntities.removeAll(tileEntityRenderers);
                 tileEntityRenderers.clear();

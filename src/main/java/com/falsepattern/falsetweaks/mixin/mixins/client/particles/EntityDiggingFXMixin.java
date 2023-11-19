@@ -38,7 +38,8 @@ import net.minecraft.world.World;
 
 @Mixin(EntityDiggingFX.class)
 public abstract class EntityDiggingFXMixin extends EntityFX {
-    @Shadow private Block field_145784_a;
+    @Shadow
+    private Block field_145784_a;
 
     protected EntityDiggingFXMixin(World p_i1218_1_, double p_i1218_2_, double p_i1218_4_, double p_i1218_6_) {
         super(p_i1218_1_, p_i1218_2_, p_i1218_4_, p_i1218_6_);
@@ -53,9 +54,9 @@ public abstract class EntityDiggingFXMixin extends EntityFX {
             return;
         }
         ci.cancel();
-        float u1 = ((float)this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;
+        float u1 = ((float) this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;
         float u2 = u1 + 0.015609375F;
-        float v1 = ((float)this.particleTextureIndexY + this.particleTextureJitterY / 4.0F) / 16.0F;
+        float v1 = ((float) this.particleTextureIndexY + this.particleTextureJitterY / 4.0F) / 16.0F;
         float v2 = v1 + 0.015609375F;
         float scale = 0.1F * this.particleScale;
         if (this.particleIcon != null) {
@@ -65,9 +66,9 @@ public abstract class EntityDiggingFXMixin extends EntityFX {
             v2 = this.particleIcon.getInterpolatedV((this.particleTextureJitterY + 1.0F) / 4.0F * 16.0F);
         }
 
-        float x = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTick - interpPosX);
-        float y = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTick - interpPosY);
-        float z = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTick - interpPosZ);
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTick - interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTick - interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTick - interpPosZ);
 
         ParticleUtil.drawCube(tess, this.particleRed, this.particleGreen, this.particleBlue, u1, u2, v1, v2, scale, x, y, z);
     }

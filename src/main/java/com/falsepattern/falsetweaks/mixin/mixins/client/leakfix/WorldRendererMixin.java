@@ -50,7 +50,8 @@ public abstract class WorldRendererMixin implements IWorldRendererMixin {
     public int posZClip;
     @Shadow
     private int glRenderList;
-    @Shadow private int bytesDrawn;
+    @Shadow
+    private int bytesDrawn;
     @Getter
     private boolean hasRenderList;
 

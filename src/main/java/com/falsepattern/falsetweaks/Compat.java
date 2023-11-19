@@ -23,9 +23,9 @@
 
 package com.falsepattern.falsetweaks;
 
+import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import stubpackage.Config;
@@ -133,7 +133,7 @@ public class Compat {
         }
 
         public static Tessellator threadTessellator() {
-            return  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
+            return org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
         }
     }
 
@@ -161,7 +161,8 @@ public class Compat {
             isOptiFinePresent = true;
             try {
                 isShadersModPresent = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
 
         public static boolean isShaders() {

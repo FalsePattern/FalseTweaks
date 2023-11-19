@@ -27,5 +27,6 @@ import org.joml.Vector3f;
 
 public interface NormalAreaComputer {
     float getArea(int[] vertexData, int i, int vertexSize);
+
     void getNormal(int[] vertexData, int i, int vertexSize, Vector3f output);
 }

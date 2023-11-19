@@ -7,7 +7,6 @@ import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMi
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -16,22 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.EntitySorter;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-@Mixin(value = RenderGlobal.class, priority = -2)
+@Mixin(value = RenderGlobal.class,
+       priority = -2)
 public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     /**
      * Queue a renderer to be updated.
@@ -66,7 +62,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
             at = @At("RETURN"),
             require = 1)
     private void initBetterLists(Minecraft p_i1249_1_, CallbackInfo ci) {
-        OcclusionHelpers.renderer = new OcclusionRenderer((RenderGlobal)(Object)this);
+        OcclusionHelpers.renderer = new OcclusionRenderer((RenderGlobal) (Object) this);
         OcclusionHelpers.renderer.initBetterLists();
     }
 
@@ -88,7 +84,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
         return new WorldRenderer(worldObj, tileEntities, x, y, z, glRenderListBase);
     }
 
-    @Redirect(method = { "loadRenderers", "markRenderersForNewPosition" },
+    @Redirect(method = {"loadRenderers", "markRenderersForNewPosition"},
               at = @At(value = "INVOKE",
                        target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
                        ordinal = 0),
@@ -118,7 +114,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
             at = @At("HEAD"),
             require = 1)
     private void setWorkerWorld(WorldClient world, CallbackInfo ci) {
-        OcclusionHelpers.worker.setWorld((RenderGlobal)(Object)this, world);
+        OcclusionHelpers.worker.setWorld((RenderGlobal) (Object) this, world);
     }
 
     @Inject(method = "loadRenderers",

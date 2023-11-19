@@ -13,7 +13,10 @@ import net.minecraft.client.renderer.Tessellator;
 @Mixin(value = Tessellator.class)
 public abstract class TessellatorMixin_Debug {
 
-    @Inject(method = {"setVertexState", "func_154352_a", "setColorRGBA_F", "setColorRGBA", "startDrawing", "addTranslation", "setTranslation", "addVertexWithUV", "setNormal", "setColorOpaque", "addVertex", "setColorOpaque_I", "reset", "setBrightness", "startDrawingQuads", "disableColor", "setColorRGBA_I", "setTextureUV", "setColorOpaque_F"},
+    @Inject(method = {"setVertexState", "func_154352_a", "setColorRGBA_F", "setColorRGBA", "startDrawing",
+                      "addTranslation", "setTranslation", "addVertexWithUV", "setNormal", "setColorOpaque", "addVertex",
+                      "setColorOpaque_I", "reset", "setBrightness", "startDrawingQuads", "disableColor",
+                      "setColorRGBA_I", "setTextureUV", "setColorOpaque_F"},
             at = @At("HEAD"),
             require = 1)
     private void verifyThreadIsCorrect(CallbackInfo ci) {
@@ -29,8 +32,9 @@ public abstract class TessellatorMixin_Debug {
 
     @Unique
     private void verifyThreadIsCorrect() {
-        if(((Object)this) == Tessellator.instance) {
-            if(ThreadedChunkUpdateHelper.MAIN_THREAD != null && Thread.currentThread() != ThreadedChunkUpdateHelper.MAIN_THREAD) {
+        if (((Object) this) == Tessellator.instance) {
+            if (ThreadedChunkUpdateHelper.MAIN_THREAD != null &&
+                Thread.currentThread() != ThreadedChunkUpdateHelper.MAIN_THREAD) {
                 throw new IllegalStateException("Tried to access main tessellator from non-main thread " + Thread.currentThread().getName());
             }
         }

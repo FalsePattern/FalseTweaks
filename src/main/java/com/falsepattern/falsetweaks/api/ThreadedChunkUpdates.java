@@ -33,7 +33,9 @@ public class ThreadedChunkUpdates {
         return ThreadedChunkUpdateHelper.instance != null;
     }
 
-    /** Returns the thread-local tessellator instance. Can only be called after init phase. */
+    /**
+     * Returns the thread-local tessellator instance. Can only be called after init phase.
+     */
     public static Tessellator getThreadTessellator() {
         return ThreadedChunkUpdateHelper.instance.getThreadTessellator();
     }

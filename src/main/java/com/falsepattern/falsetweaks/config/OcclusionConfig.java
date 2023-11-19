@@ -42,7 +42,8 @@ public class OcclusionConfig {
     @Config.Comment("The maximum amount of queued chunk updates per thread.\n" +
                     "Set this higher if you have a CPU with powerful cores.")
     @Config.DefaultInt(16)
-    @Config.RangeInt(min = 1, max = 256)
+    @Config.RangeInt(min = 1,
+                     max = 256)
     @Config.RequiresMcRestart
     public static int UPDATE_QUEUE_SIZE_PER_THREAD;
 
@@ -56,7 +57,8 @@ public class OcclusionConfig {
                     "This deadline is in FPS.\n" +
                     "0 to disable")
     @Config.DefaultInt(60)
-    @Config.RangeInt(min = 0, max = 1000)
+    @Config.RangeInt(min = 0,
+                     max = 1000)
     public static int DYNAMIC_CHUNK_UPDATES_DEADLINE;
 
 

@@ -18,14 +18,21 @@ import net.minecraft.world.chunk.Chunk;
 
 @Mixin(Chunk.class)
 public abstract class ChunkMixin implements ICulledChunk {
-    @Shadow public abstract Block getBlock(int p_150810_1_, int p_150810_2_, int p_150810_3_);
+    @Shadow
+    public abstract Block getBlock(int p_150810_1_, int p_150810_2_, int p_150810_3_);
 
-    @Shadow public World worldObj;
-    @Shadow @Final public int xPosition;
-    @Shadow @Final public int zPosition;
+    @Shadow
+    public World worldObj;
+    @Shadow
+    @Final
+    public int xPosition;
+    @Shadow
+    @Final
+    public int zPosition;
     private VisGraph[] visibility;
 
     private static ChunkThread worker = new ChunkThread();
+
     static {
         worker.start();
     }
@@ -42,9 +49,8 @@ public abstract class ChunkMixin implements ICulledChunk {
             }
         }
         OcclusionHelpers.updateArea(xPosition * 16 - 1, 0, zPosition * 16 - 1, xPosition * 16 + 16, 255, zPosition * 16 + 16);
-        return (Chunk)(Object)this;
+        return (Chunk) (Object) this;
     }
-
 
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;II)V",
@@ -64,8 +70,9 @@ public abstract class ChunkMixin implements ICulledChunk {
 
     boolean checkPosSolid(int x, int y, int z, Block block) {
 
-        if (y > 255 || y < 0)
+        if (y > 255 || y < 0) {
             return false;
+        }
         if (block == null) {
             block = getBlock(x, y, z);
         }
@@ -80,8 +87,8 @@ public abstract class ChunkMixin implements ICulledChunk {
             at = @At("RETURN"),
             require = 1)
     private void onSetBlock(int x, int y, int z, Block block, int meta, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValue() && this.worldObj.isRemote && checkPosSolid(x & 15, y, z & 15, block)) {
-            worker.modified.add((Chunk)(Object)this);
+        if (cir.getReturnValue() && this.worldObj.isRemote && checkPosSolid(x & 15, y, z & 15, block)) {
+            worker.modified.add((Chunk) (Object) this);
         }
     }
 
@@ -89,7 +96,7 @@ public abstract class ChunkMixin implements ICulledChunk {
             at = @At("RETURN"),
             require = 1)
     private void onFillChunk(byte[] p_76607_1_, int p_76607_2_, int p_76607_3_, boolean p_76607_4_, CallbackInfo ci) {
-        worker.loaded.add((Chunk)(Object)this);
+        worker.loaded.add((Chunk) (Object) this);
     }
 
 }

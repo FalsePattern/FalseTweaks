@@ -34,13 +34,15 @@ import net.minecraft.client.renderer.WorldRenderer;
 @Mixin(ShadersRender.class)
 public class ShadersRendererMixin {
     private static WorldRenderer[] ft$nullArray;
+
     @Redirect(method = "renderShadowMap",
               at = @At(value = "FIELD",
                        target = "Lnet/minecraft/client/renderer/RenderGlobal;worldRenderers:[Lnet/minecraft/client/renderer/WorldRenderer;"),
               require = 1)
     private static WorldRenderer[] disableShadowMapFrustrumToggling(RenderGlobal instance) {
-        if (ft$nullArray == null)
+        if (ft$nullArray == null) {
             return (ft$nullArray = new WorldRenderer[0]);
+        }
         return ft$nullArray;
     }
 }

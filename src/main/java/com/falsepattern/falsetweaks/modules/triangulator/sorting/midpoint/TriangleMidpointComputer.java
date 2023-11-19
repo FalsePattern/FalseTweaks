@@ -29,6 +29,7 @@ import org.joml.Vector3f;
 
 public class TriangleMidpointComputer implements MidpointComputer {
     public static final TriangleMidpointComputer INSTANCE = new TriangleMidpointComputer();
+
     @Override
     public void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output) {
         val ax = Float.intBitsToFloat(vertexData[i]);
