@@ -48,6 +48,12 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
             result.add(TranslucentBlockLayersConfig.class);
         }
+        if (ModuleConfig.OCCLUSION_TWEAKS) {
+            result.add(OcclusionConfig.class);
+            if (ModuleConfig.THREADED_CHUNK_UPDATES) {
+                result.add(ThreadingConfig.class);
+            }
+        }
         return result.toArray(new Class<?>[0]);
     }
 }

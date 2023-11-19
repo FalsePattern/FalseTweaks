@@ -22,34 +22,13 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
 @Config(modid = Tags.MODID,
-        category = "occlusion and threading")
+        category = "occlusion")
 public class OcclusionConfig {
-    @Config.Comment("The number of threads to use for chunk building.\n" +
-                    "The default is 1, which shouldn't be any laggier than vanilla but will reduce stutter.\n" +
-                    "If you have a lot of cores increasing this may be beneficial.\n" +
-                    "The value of 0 will set it to half of your total system threads (unaware of P/E cores on modern intel cpus!)")
-    @Config.DefaultInt(1)
-    @Config.RangeInt(min = 0)
-    @Config.RequiresMcRestart
-    public static int CHUNK_UPDATE_THREADS;
-
-    @Config.Comment("The maximum amount of queued chunk updates per thread.\n" +
-                    "Set this higher if you have a CPU with powerful cores.")
-    @Config.DefaultInt(16)
-    @Config.RangeInt(min = 1,
-                     max = 256)
-    @Config.RequiresMcRestart
-    public static int UPDATE_QUEUE_SIZE_PER_THREAD;
-
-    @Config.Comment("Changes the enableThreadedChunkUpdates option to never wait for chunk updates.\n" +
-                    "Improves framerate when blocks are placed or destroyed, at the cost of introducing visual delay.\n" +
-                    "This is analogous to 1.18's 'Chunk Builder' option, false meaning 'Fully Blocking', and true meaning 'Threaded'.")
-    @Config.DefaultBoolean(false)
-    public static boolean DISABLE_BLOCKING_CHUNK_UPDATES;
 
     @Config.Comment("Similar to OptiFine's \"Dynamic Updates\" feature, where chunks load faster when you don't move the player at all.\n" +
                     "This deadline is in FPS.\n" +
                     "0 to disable")
+    @Config.LangKey("config.falsetweaks.occlusion.deadline")
     @Config.DefaultInt(60)
     @Config.RangeInt(min = 0,
                      max = 1000)

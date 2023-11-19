@@ -133,6 +133,7 @@ public class ModuleConfig {
         VoxelizerConfig.init();
         TranslucentBlockLayersConfig.init();
         OcclusionConfig.init();
+        ThreadingConfig.init();
     }
 
     //This is here to make the static initializer run
