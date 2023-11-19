@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
@@ -76,7 +77,8 @@ public class Compat {
     }
 
     public static boolean enableTriangulation() {
-        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !neodymiumInstalled();
+        //Threaded chunk updates mess up the triangulator, so keep it off for now until the root cause is found.
+        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES && !neodymiumInstalled();
     }
 
     public static Tessellator tessellator() {

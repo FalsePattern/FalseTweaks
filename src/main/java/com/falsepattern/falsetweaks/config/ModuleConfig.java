@@ -125,7 +125,7 @@ public class ModuleConfig {
     public static boolean ADVANCED_PROFILER;
 
     @Config.Comment("Enables the 1.8-style occlusion culling originally developed by CoFHTweaks.\n" +
-                    "Not compatible with ArchaicFix's occlusion tweaks, or FastCraft.\n" +
+                    "Not compatible with ArchaicFix's occlusion tweaks, quad triangulation, or FastCraft.\n" +
                     "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
                     "FPS impact: Potentially huge gains, much faster chunk rendering")
     @Config.DefaultBoolean(true)

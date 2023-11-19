@@ -38,7 +38,7 @@ public class TriangulatorConfig {
                     "By sacrificing a bit of visual quality, you might get back a few extra FPS depending on your system.\n" +
                     "FPS impact: System-dependent. Intel iGPUs struggle when this is enabled.")
     @Config.LangKey("config.falsetweaks.triangulator.enable_quad_triangulation")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean ENABLE_QUAD_TRIANGULATION;
 
     @Config.Comment("Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.\n" +
