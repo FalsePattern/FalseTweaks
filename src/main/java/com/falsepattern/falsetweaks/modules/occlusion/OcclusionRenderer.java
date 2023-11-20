@@ -219,7 +219,7 @@ public class OcclusionRenderer {
             if (worldrenderer.distanceToEntitySquared(view) > 272f) {
                 updates++;
 
-                if (!worldrenderer.isWaitingOnOcclusionQuery || deadline != 0 || org.embeddedt.archaicfix.occlusion.OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
+                if(!worldrenderer.isWaitingOnOcclusionQuery || deadline != 0 || OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
                     long t = System.nanoTime();
                     if (t > deadline) {
                         spareTime = false;
