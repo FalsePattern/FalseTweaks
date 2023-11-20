@@ -32,11 +32,14 @@ import shadersmod.client.Shaders;
 import stubpackage.Config;
 import stubpackage.net.minecraft.client.renderer.EntityRenderer;
 
+import net.minecraft.client.gui.GuiOptionButton;
+import net.minecraft.client.gui.GuiOptionSlider;
 import net.minecraft.client.renderer.WorldRenderer;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class OcclusionCompat {
@@ -77,6 +80,14 @@ public class OcclusionCompat {
 
         public static boolean isShadowPass() {
             return Compat.optiFineHasShaders() && Shaders.isShadowPass;
+        }
+
+        public static boolean disableControl(List addToList, Object control) {
+            if (!(control instanceof GuiOptionButton))
+                return false;
+            val button = (GuiOptionButton) control;
+            button.enabled = false;
+            return addToList.add(button);
         }
     }
 

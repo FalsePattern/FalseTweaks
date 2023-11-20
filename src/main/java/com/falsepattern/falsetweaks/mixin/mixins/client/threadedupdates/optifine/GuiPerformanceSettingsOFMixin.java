@@ -15,47 +15,50 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
+package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.optifine;
 
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
-import lombok.SneakyThrows;
 import lombok.val;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.gui.GuiOptionButton;
 import net.minecraft.client.gui.GuiOptionSlider;
-import net.minecraft.client.gui.GuiVideoSettings;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 
 import java.util.List;
 
-@Mixin(GuiVideoSettings.class)
-public abstract class GuiVideoSettingsOptifineMixin {
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @SneakyThrows
-    @Redirect(method = "initGui",
+@Pseudo
+@Mixin(targets = "GuiPerformanceSettingsOF")
+public abstract class GuiPerformanceSettingsOFMixin  extends GuiScreen {
+    @Dynamic
+    @Redirect(method = {"initGui", "func_73866_w_"},
               at = @At(value = "INVOKE",
-                       target = "Ljava/util/List;add(Ljava/lang/Object;)Z"),
-              require = 2)
-    private boolean hackAdd(List instance, Object e) {
-        GameSettings.Options option = null;
+                     target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
+                     ordinal = 0),
+              require = 1)
+    private boolean removeIncompatibles(List instance, Object e) {
+
+        GameSettings.Options option;
         if (e instanceof GuiOptionSlider) {
             option = ((GuiOptionSlider)e).field_146133_q;
         } else if (e instanceof GuiOptionButton) {
             option = ((GuiOptionButton)e).returnEnumOptions();
-        }
-
-        if (option == null)
+        } else {
             return instance.add(e);
-
+        }
         switch (option.name()) {
-            case "CHUNK_LOADING":
-            case "ADVANCED_OPENGL":
+            case "FAST_RENDER":
+            case "CHUNK_UPDATES":
+            case "CHUNK_UPDATES_DYNAMIC":
                 return OcclusionCompat.OptiFineCompat.disableControl(instance, e);
         }
         return instance.add(e);
     }
+
 }

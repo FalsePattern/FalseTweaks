@@ -23,7 +23,6 @@ import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import stubpackage.Config;
-import sun.security.provider.SHA;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;

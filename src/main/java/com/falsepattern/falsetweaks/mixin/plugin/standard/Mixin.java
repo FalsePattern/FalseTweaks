@@ -157,6 +157,14 @@ public enum Mixin implements IMixin {
                                                       THREADING.and(require(TargetedMod.DRAGONAPI)),
                                                       "threadedupdates.dragonapi.WorldRenderer_DAPIMixin"),
 
+    //OptiFine
+    ThreadedUpdates_OptiFine_GameSettingsMixin(Side.CLIENT,
+                                               THREADING.and(REQUIRE_ANY_OPTIFINE),
+                                               "threadedupdates.optifine.GameSettingsMixin"),
+    ThreadedUpdates_OptiFine_GuiPerformanceSettingsOFMixin(Side.CLIENT,
+                                               THREADING.and(REQUIRE_ANY_OPTIFINE),
+                                               "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
+
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module
