@@ -196,13 +196,13 @@ public class OcclusionRenderer {
     }
 
     private boolean rebuildChunks(EntityLivingBase view, long deadline) {
-        int updateLimit = deadline == 0 ? 5 : Integer.MAX_VALUE;
+        int updateLimit = (deadline == 0) ? 5 : Integer.MAX_VALUE;
         int updates = 0;
 
         boolean spareTime = true;
         deferNewRenderUpdates = true;
         rendererUpdateOrderProvider.prepare(worldRenderersToUpdateList);
-        for (int c = 0; updates < updateLimit && rendererUpdateOrderProvider.hasNext(worldRenderersToUpdateList); ++c) {
+        while(updates < updateLimit && rendererUpdateOrderProvider.hasNext(worldRenderersToUpdateList)) {
             WorldRenderer worldrenderer = rendererUpdateOrderProvider.next(worldRenderersToUpdateList);
             
             ((IWorldRenderer)worldrenderer).ft$setInUpdateList(false);
