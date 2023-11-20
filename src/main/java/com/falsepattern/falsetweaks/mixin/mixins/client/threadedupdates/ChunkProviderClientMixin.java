@@ -29,7 +29,7 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.world.World;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * LongHashMap is NOT thread-safe when reading+writing at the same time, so we need to mutex it.
@@ -40,13 +40,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Mixin(ChunkProviderClient.class)
 public abstract class ChunkProviderClientMixin {
     @Unique
-    private ReentrantReadWriteLock FT$MUTEX;
+    private volatile AtomicLong ft$writeCount;
 
     @Inject(method = "<init>",
             at = @At("RETURN"),
             require = 1)
     private void initMutex(World p_i1184_1_, CallbackInfo ci) {
-        FT$MUTEX = new ReentrantReadWriteLock();
+        ft$writeCount = new AtomicLong();
     }
 
     @Redirect(method = "unloadChunk",
@@ -54,14 +54,10 @@ public abstract class ChunkProviderClientMixin {
                        target = "Lnet/minecraft/util/LongHashMap;remove(J)Ljava/lang/Object;"),
               require = 1)
     private Object threadSafeUnload(LongHashMap instance, long id) {
-        val writeLock = FT$MUTEX.writeLock();
-        while (!writeLock.tryLock())
-            Thread.yield();
-        try {
-            return instance.remove(id);
-        } finally {
-            writeLock.unlock();
-        }
+        ft$writeCount.incrementAndGet();
+        Object result = instance.remove(id);
+        ft$writeCount.incrementAndGet();
+        return result;
     }
 
     @Redirect(method = "loadChunk",
@@ -69,14 +65,9 @@ public abstract class ChunkProviderClientMixin {
                        target = "Lnet/minecraft/util/LongHashMap;add(JLjava/lang/Object;)V"),
               require = 1)
     private void threadSafeLoad(LongHashMap instance, long id, Object value) {
-        val writeLock = FT$MUTEX.writeLock();
-        while (!writeLock.tryLock())
-            Thread.yield();
-        try {
-            instance.add(id, value);
-        } finally {
-            writeLock.unlock();
-        }
+        ft$writeCount.incrementAndGet();
+        instance.add(id, value);
+        ft$writeCount.incrementAndGet();
     }
 
     @Redirect(method = "provideChunk",
@@ -84,13 +75,20 @@ public abstract class ChunkProviderClientMixin {
                        target = "Lnet/minecraft/util/LongHashMap;getValueByKey(J)Ljava/lang/Object;"),
               require = 1)
     private Object threadSafeGet(LongHashMap instance, long id) {
-        val readLock = FT$MUTEX.readLock();
-        while (!readLock.tryLock())
-            Thread.yield();
-        try {
-            return instance.getValueByKey(id);
-        } finally {
-            readLock.unlock();
-        }
+        Object result = null;
+        long expectedWriteCount;
+        boolean retry;
+        do {
+            retry = false;
+            do {
+                expectedWriteCount = ft$writeCount.get();
+            } while (expectedWriteCount % 2 != 0);
+            try {
+                result = instance.getValueByKey(id);
+            } catch (ArrayIndexOutOfBoundsException ignored) {
+                retry = true;
+            }
+        } while (retry || !ft$writeCount.compareAndSet(expectedWriteCount, expectedWriteCount));
+        return result;
     }
 }
