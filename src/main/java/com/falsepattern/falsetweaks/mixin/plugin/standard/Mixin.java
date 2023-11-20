@@ -140,6 +140,7 @@ public enum Mixin implements IMixin {
 
     //region Threaded Chunk Updates
 
+    ThreadedUpdates_ChunkProviderClientMixin(Side.CLIENT, THREADING, "threadedupdates.ChunkProviderClientMixin"),
     ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, THREADING, "threadedupdates.RenderBlocksMixin"),
     ThreadedUpdates_TessellatorMixin(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin"),
     ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin_Debug"),
