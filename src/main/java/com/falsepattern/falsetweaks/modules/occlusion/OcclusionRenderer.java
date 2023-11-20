@@ -196,15 +196,15 @@ public class OcclusionRenderer {
     }
 
     private boolean rebuildChunks(EntityLivingBase view, long deadline) {
-        int updateLimit = deadline == 0 ? 5 : Integer.MAX_VALUE;
+        int updateLimit = (deadline == 0) ? 5 : Integer.MAX_VALUE;
         int updates = 0;
-
         boolean spareTime = true;
+
         deferNewRenderUpdates = true;
         rendererUpdateOrderProvider.prepare(worldRenderersToUpdateList);
-        for (int c = 0; updates < updateLimit && rendererUpdateOrderProvider.hasNext(worldRenderersToUpdateList); ++c) {
+
+        while (updates < updateLimit && rendererUpdateOrderProvider.hasNext(worldRenderersToUpdateList)) {
             WorldRenderer worldrenderer = rendererUpdateOrderProvider.next(worldRenderersToUpdateList);
-            
             ((IWorldRenderer)worldrenderer).ft$setInUpdateList(false);
 
             if (!(worldrenderer.isInFrustum & worldrenderer.isVisible) && !OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
@@ -216,10 +216,10 @@ public class OcclusionRenderer {
             worldrenderer.isVisible &= !e;
             worldrenderer.isWaitingOnOcclusionQuery = worldrenderer.skipAllRenderPasses() || (mc.theWorld.getChunkFromBlockCoords(worldrenderer.posX, worldrenderer.posZ) instanceof EmptyChunk);
             // can't add fields, re-use
-
-            if(worldrenderer.distanceToEntitySquared(view) > 272f) {
+            if (worldrenderer.distanceToEntitySquared(view) > 272f) {
                 updates++;
-                if(!worldrenderer.isWaitingOnOcclusionQuery || deadline != 0 || OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
+
+                if (!worldrenderer.isWaitingOnOcclusionQuery || deadline != 0 || org.embeddedt.archaicfix.occlusion.OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
                     long t = System.nanoTime();
                     if (t > deadline) {
                         spareTime = false;
@@ -228,6 +228,7 @@ public class OcclusionRenderer {
                 }
             }
         }
+
         rendererUpdateOrderProvider.cleanup(worldRenderersToUpdateList);
         deferNewRenderUpdates = false;
         return spareTime;
