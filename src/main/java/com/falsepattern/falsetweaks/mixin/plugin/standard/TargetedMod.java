@@ -17,13 +17,17 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
+import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWith;
 
 @RequiredArgsConstructor
@@ -38,7 +42,11 @@ public enum TargetedMod implements ITargetedMod {
     REDSTONEPASTE("RedstonePaste", false, startsWith("redstonepaste")),
     APPARATUS("Apparatus", false, startsWith("apparatus")),
     RAILCRAFT("Railcraft", true, startsWith("railcraft")),
+    DRAGONAPI("DragonAPI", false, startsWith("dragonapi")),
     ;
+
+    public static Predicate<List<ITargetedMod>> REQUIRE_ANY_OPTIFINE = require(OPTIFINE_WITH_SHADERS).or(require(OPTIFINE_WITHOUT_SHADERS));
+    public static Predicate<List<ITargetedMod>> AVOID_ANY_OPTIFINE = avoid(OPTIFINE_WITH_SHADERS).and(avoid(OPTIFINE_WITHOUT_SHADERS));
 
     @Getter
     private final String modName;

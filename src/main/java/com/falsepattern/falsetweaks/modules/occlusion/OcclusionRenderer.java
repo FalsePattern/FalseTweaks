@@ -117,6 +117,7 @@ public class OcclusionRenderer {
 
                     if (!worldrenderer.needsUpdate || (worldrenderer.isVisible && !((IWorldRenderer)worldrenderer).ft$isInUpdateList())) {
                         worldrenderer.markDirty();
+                        OcclusionCompat.DragonAPICompat.ChangePacketRenderer$onChunkRerender(x1, y1, z1, x2, y2, z2, worldrenderer);
                         OcclusionHelpers.worker.dirty = true;
                     } else {
                         for(IRenderGlobalListener l : eventListeners) l.onDirtyRendererChanged(worldrenderer);
@@ -395,7 +396,7 @@ public class OcclusionRenderer {
         rg.theWorld.theProfiler.endSection();
 
         rg.theWorld.theProfiler.endStartSection("render");
-        if (Compat.OptiFineCompat.isOptiFineFogOff(this.mc.entityRenderer)) {
+        if (OcclusionCompat.OptiFineCompat.isOptiFineFogOff(this.mc.entityRenderer)) {
             GL11.glDisable(GL11.GL_FOG);
         }
         RenderHelper.disableStandardItemLighting();
@@ -407,7 +408,7 @@ public class OcclusionRenderer {
     }
 
     public int sortAndRender(int start, int end, int pass, double tick) {
-        boolean shadowPass = Compat.OptiFineCompat.isShadowPass();
+        boolean shadowPass = OcclusionCompat.OptiFineCompat.isShadowPass();
         val cam = CameraInfo.getInstance();
         double eX, eY, eZ;
         if (shadowPass) {

@@ -23,6 +23,8 @@
 
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import Reika.DragonAPI.Extras.ChangePacketRenderer;
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
@@ -30,13 +32,14 @@ import shadersmod.client.Shaders;
 import stubpackage.Config;
 import stubpackage.net.minecraft.client.renderer.EntityRenderer;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.client.renderer.WorldRenderer;
+import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
 
-public class Compat {
+public class OcclusionCompat {
     public static class FastCraftCompat {
         /**
          * This is here so that people won't cry about "waaaah this thing doesn't work with fastcraft waaaah" and then
@@ -67,14 +70,31 @@ public class Compat {
     }
 
     public static class OptiFineCompat {
-        private static final boolean HAS_OPTIFINE = FMLClientHandler.instance().hasOptifine();
 
         public static boolean isOptiFineFogOff(net.minecraft.client.renderer.EntityRenderer entityRenderer) {
-            return HAS_OPTIFINE && Config.isFogOff() && ((EntityRenderer)entityRenderer).fogStandard;
+            return Compat.optiFineInstalled() && Config.isFogOff() && ((EntityRenderer)entityRenderer).fogStandard;
         }
 
         public static boolean isShadowPass() {
-            return HAS_OPTIFINE && Shaders.isShadowPass;
+            return Compat.optiFineHasShaders() && Shaders.isShadowPass;
+        }
+    }
+
+    public static class DragonAPICompat {
+        private static final boolean DRAGONAPI_PRESENT = Loader.isModLoaded("DragonAPI");
+
+        public static void ChangePacketRenderer$onChunkRerender(int mx, int my, int mz, int px, int py, int pz, WorldRenderer r) {
+            if (!DRAGONAPI_PRESENT)
+                return;
+            try {
+                ChangePacketRenderer.onChunkRerender(mx, my, mz, px, py, pz, r);
+            } catch (Exception e) {
+                val warning = new StringBuilder();
+                for (int i = 0; i < 10; i++) {
+                    warning.append("THIS IS NOT A DRAGONAPI BUG! CONTACT FALSEPATTERN FIRST, THIS IS MOST LIKELY A FALSETWEAKS BUG!!!\n");
+                }
+                throw new RuntimeException(warning.toString(), e);
+            }
         }
     }
 }

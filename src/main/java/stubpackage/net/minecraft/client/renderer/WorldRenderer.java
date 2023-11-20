@@ -15,26 +15,18 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.threadedupdates;
+package stubpackage.net.minecraft.client.renderer;
 
-import com.falsepattern.falsetweaks.Compat;
-import shadersmod.client.Shaders;
-import stubpackage.Config;
+import net.minecraft.world.World;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import java.util.List;
 
-public class OptiFineCompat {
-    public static class ThreadSafeEntityData {
-        public static final ThreadLocal<ThreadSafeEntityData> TL = ThreadLocal.withInitial(ThreadSafeEntityData::new);
-
-        public final int[] entityData = new int[32];
-        public int entityDataIndex = 0;
-    }
-
-    public static void popEntity() {
-        if (!Compat.optiFineHasShaders() || !Config.isShaders()) {
-            return;
-        }
-        Shaders.popEntity();
+public class WorldRenderer extends net.minecraft.client.renderer.WorldRenderer {
+    /**
+     * OptiFine-added field
+     */
+    public boolean needsBoxUpdate;
+    public WorldRenderer(World p_i1240_1_, List p_i1240_2_, int p_i1240_3_, int p_i1240_4_, int p_i1240_5_, int p_i1240_6_) {
+        super(p_i1240_1_, p_i1240_2_, p_i1240_3_, p_i1240_4_, p_i1240_5_, p_i1240_6_);
     }
 }

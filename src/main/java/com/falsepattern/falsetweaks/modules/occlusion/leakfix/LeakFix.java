@@ -17,7 +17,9 @@
 
 package com.falsepattern.falsetweaks.modules.occlusion.leakfix;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import lombok.AccessLevel;
@@ -129,6 +131,12 @@ public final class LeakFix {
                                       hits, (int) ((100f / totalAllocs) * hits)));
             txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.alloc.miss",
                                       misses, (int) ((100f / totalAllocs) * misses)));
+        }
+        if (ModuleConfig.THREADED_CHUNK_UPDATES() && ThreadedChunkUpdateHelper.instance != null) {
+            txt.right.add(null);
+            txt.right.add(I18n.format("gui.falsetweaks.threading.debug.title"));
+            txt.right.add(I18n.format("gui.falsetweaks.threading.debug.count", ThreadedChunkUpdateHelper.instance.getThreadCount()));
+            txt.right.add(I18n.format("gui.falsetweaks.threading.debug.active", ThreadedChunkUpdateHelper.instance.getActiveThreads()));
         }
     }
 

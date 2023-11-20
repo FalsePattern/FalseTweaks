@@ -144,40 +144,6 @@ public abstract class WorldRendererMixin implements IWorldRenderer, IWorldRender
 
     }
 
-    @Redirect(method = "setPosition",
-              at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V"),
-              require = 1)
-    private void noNewList(int list, int mode) {
-
-    }
-
-    @Redirect(method = "setPosition",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/util/AxisAlignedBB;getBoundingBox(DDDDDD)Lnet/minecraft/util/AxisAlignedBB;"),
-              slice = @Slice(from = @At(value = "INVOKE",
-                                        target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V")),
-              require = 1)
-    private AxisAlignedBB noCreateAABB(double p_72330_0_, double p_72330_2_, double p_72330_4_, double p_72330_6_, double p_72330_8_, double p_72330_10_) {
-        return null;
-    }
-
-    @Redirect(method = "setPosition",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderAABB(Lnet/minecraft/util/AxisAlignedBB;)V"),
-              require = 1)
-    private void noAABB(AxisAlignedBB axisAlignedBB) {
-
-    }
-
-    @Redirect(method = "setPosition",
-              at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glEndList()V"),
-              require = 1)
-    private void noEndList() {
-
-    }
-
     @Getter
     private boolean hasRenderList;
 

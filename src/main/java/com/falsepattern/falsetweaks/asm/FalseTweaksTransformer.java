@@ -37,11 +37,6 @@ import java.util.List;
 public class FalseTweaksTransformer implements SmartTransformer {
     private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
 
-    static {
-        if (ModuleConfig.OCCLUSION_TWEAKS)
-            OptiFineTransformerHooks.disableOptiFinePatch("blo");
-    }
-
     public static RenderGlobalDeOptimizer OPTIFINE_DEOPTIMIZER = new RenderGlobalDeOptimizer();
     public static final List<IClassNodeTransformer> TRANSFORMERS = new ArrayList<>(Arrays.asList(OPTIFINE_DEOPTIMIZER));
 

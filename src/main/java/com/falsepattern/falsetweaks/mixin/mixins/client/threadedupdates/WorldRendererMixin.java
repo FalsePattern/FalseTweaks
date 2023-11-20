@@ -58,15 +58,6 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
         postRenderBlocks(pass, entity);
     }
 
-    @Inject(method = "updateRenderer",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/renderer/RenderBlocks;renderBlockByRenderType(Lnet/minecraft/block/Block;III)Z"),
-            require = 1)
-    private void resetStack(CallbackInfo ci) {
-        // Make sure the stack doesn't leak
-        ThreadedChunkUpdateHelper.renderBlocksStack.reset();
-    }
-
     @Override
     public ThreadedChunkUpdateHelper.UpdateTask ft$getRendererUpdateTask() {
         if (arch$updateTask == null) {

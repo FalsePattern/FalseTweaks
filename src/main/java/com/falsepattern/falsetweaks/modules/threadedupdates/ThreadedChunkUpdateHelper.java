@@ -24,6 +24,7 @@ import com.falsepattern.falsetweaks.modules.occlusion.IRenderGlobalListener;
 import com.falsepattern.falsetweaks.modules.occlusion.IRendererUpdateOrderProvider;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -52,6 +53,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
@@ -153,7 +155,14 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     private AtomicBoolean run = null;
     private Thread[] currentThreads = null;
+    @Getter
     private int threadCount = 0;
+
+    private AtomicInteger workingThreads = new AtomicInteger();
+
+    public int getActiveThreads() {
+        return workingThreads.get();
+    }
 
     private void spawnThreads() {
         int threads = ThreadingConfig.CHUNK_UPDATE_THREADS;
@@ -198,7 +207,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList) {
-        final int updateQueueSize = ThreadingConfig.CHUNK_UPDATE_THREADS * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
+        final int updateQueueSize = threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
         taskQueue.clear();
         for (int i = 0; i < updateQueueSize && i < toUpdateList.size(); i++) {
             WorldRenderer wr = toUpdateList.get(i);
@@ -253,6 +262,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 WorldRenderer wr = taskQueue.take();
                 UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
                 task.started = true;
+                workingThreads.incrementAndGet();
                 try {
                     doChunkUpdate(wr);
                 } catch (Exception e) {
@@ -261,6 +271,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                         r.clear();
                     }
                     ((ICapturableTessellator) threadTessellator.get()).discard();
+                } finally {
+                    workingThreads.decrementAndGet();
                 }
                 if (!task.important) {
                     finishedTasks.add(wr);

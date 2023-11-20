@@ -35,3 +35,6 @@ gui.falsetweaks.occlusion.debug.alloc.gc=Allocations since last GC cycle: %1d
 gui.falsetweaks.occlusion.debug.alloc.total=Total allocations: %1d
 gui.falsetweaks.occlusion.debug.alloc.hits=Total allocation cache hits: %1d (%2d%%)
 gui.falsetweaks.occlusion.debug.alloc.miss=Total allocation cache misses: %1d (%2d%%)
+gui.falsetweaks.threading.debug.title=[Threaded Chunk Rendering]
+gui.falsetweaks.threading.debug.count=Total render threads: %1d
+gui.falsetweaks.threading.debug.active=Busy render threads: %1d

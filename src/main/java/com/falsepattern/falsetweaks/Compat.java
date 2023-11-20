@@ -23,6 +23,7 @@ import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import stubpackage.Config;
+import sun.security.provider.SHA;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
@@ -36,25 +37,50 @@ import java.io.IOException;
 
 public class Compat {
     private static Boolean NEODYMIUM = null;
+    private static Boolean OPTIFINE = null;
+    private static Boolean SHADERS = null;
 
     public static boolean neodymiumInstalled() {
-        if (NEODYMIUM == null) {
-            try {
-                NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes(
-                        "makamys.neodymium.Neodymium") != null;
-            } catch (IOException e) {
-                e.printStackTrace();
-                NEODYMIUM = false;
-            }
-            if (NEODYMIUM) {
-                Share.log.warn("Neodymium detected! Incompatible modules will be disabled.");
-                Share.log.warn("Incompatible modules:");
-                Share.log.warn(
-                        "Leak Fix (Change from Auto for Enable to bypass the safety check and enable it anyways)");
-                Share.log.warn("Quad Triangulation");
-            }
+        if (NEODYMIUM != null) {
+            return NEODYMIUM;
+        }
+        try {
+            NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes(
+                    "makamys.neodymium.Neodymium") != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            NEODYMIUM = false;
         }
         return NEODYMIUM;
+    }
+
+    public static boolean optiFineInstalled() {
+        if (OPTIFINE != null) {
+            return OPTIFINE;
+        }
+        try {
+            OPTIFINE = Launch.classLoader.getClassBytes("Config") != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            OPTIFINE = false;
+        }
+        return OPTIFINE;
+    }
+
+    public static boolean optiFineHasShaders() {
+        if (!optiFineInstalled()) {
+            return false;
+        }
+        if (SHADERS != null) {
+            return SHADERS;
+        }
+        try {
+            SHADERS = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            SHADERS = false;
+        }
+        return SHADERS;
     }
 
     public static void applyCompatibilityTweaks() {
@@ -64,9 +90,6 @@ public class Compat {
         }
         if (Loader.isModLoaded("apparatus")) {
             ApparatusCompat.init();
-        }
-        if (FMLClientHandler.instance().hasOptifine()) {
-            OptiFineCompat.init();
         }
     }
 
@@ -86,10 +109,7 @@ public class Compat {
     }
 
     public static boolean isShaders() {
-        if (OptiFineCompat.isShadersModPresent()) {
-            return OptiFineCompat.isShaders();
-        }
-        return false;
+        return optiFineHasShaders() && Config.isShaders();
     }
 
     public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
@@ -142,25 +162,6 @@ public class Compat {
 
         public static Tessellator threadTessellator() {
             return ThreadedChunkUpdates.getThreadTessellator();
-        }
-    }
-
-    private static class OptiFineCompat {
-        @Getter
-        private static boolean isShadersModPresent = false;
-        @Getter
-        private static boolean isOptiFinePresent = false;
-
-        private static void init() {
-            isOptiFinePresent = true;
-            try {
-                isShadersModPresent = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
-            } catch (IOException ignored) {
-            }
-        }
-
-        public static boolean isShaders() {
-            return Config.isShaders();
         }
     }
 }

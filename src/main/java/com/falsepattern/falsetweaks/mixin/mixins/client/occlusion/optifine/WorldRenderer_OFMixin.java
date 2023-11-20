@@ -1,0 +1,52 @@
+/*
+ * This file is part of FalseTweaks.
+ *
+ * FalseTweaks is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FalseTweaks is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
+
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Dynamic;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.util.AxisAlignedBB;
+
+@Mixin(WorldRenderer.class)
+public abstract class WorldRenderer_OFMixin {
+
+    @Dynamic
+    @Redirect(method = "setPosition",
+              at = @At(value = "FIELD",
+                       opcode = Opcodes.PUTFIELD,
+                       target = "Lnet/minecraft/client/renderer/WorldRenderer;needsBoxUpdate:Z"),
+              require = 1)
+    private void noAABB(WorldRenderer instance, boolean value) {
+        ((stubpackage.net.minecraft.client.renderer.WorldRenderer)instance).needsBoxUpdate = false;
+    }
+
+    /**
+     * @author FalsePattern
+     * @reason Unused
+     */
+    @Dynamic
+    @Overwrite(remap = false)
+    protected void updateFinished() {
+
+    }
+}

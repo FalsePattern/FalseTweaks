@@ -118,6 +118,10 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
 
+    public static boolean THREADED_CHUNK_UPDATES() {
+        return OCCLUSION_TWEAKS && THREADED_CHUNK_UPDATES;
+    }
+
     @Config.Comment("Improves the performance of the minecraft sky mesh.\n" +
                     "Also fixes the weird white lines that some OptiFine shaderpacks get with huge render distances.\n" +
                     "FPS impact: Negligible gain")

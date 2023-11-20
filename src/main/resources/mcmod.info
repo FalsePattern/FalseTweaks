@@ -13,7 +13,6 @@
     "dependencies": [
       "falsepatternlib"
     ],
-    "useDependencyInformation": true,
     "credits": "celeron55, CoFH Team, embeddedt, makamys, papuja, Ven"
   }
 ]

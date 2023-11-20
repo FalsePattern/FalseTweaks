@@ -19,13 +19,10 @@ package com.falsepattern.falsetweaks.asm;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.modules.occlusion.Compat;
-import com.falsepattern.lib.util.FileUtil;
-import lombok.val;
+import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
-import java.nio.file.Files;
 import java.util.Map;
 
 @IFMLLoadingPlugin.TransformerExclusions(Tags.GROUPNAME + ".asm")
@@ -34,7 +31,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         ModuleConfig.init();
 
         if (ModuleConfig.OCCLUSION_TWEAKS) {
-            Compat.FastCraftCompat.executeFastCraftCompatibilityHacks();
+            OcclusionCompat.FastCraftCompat.executeFastCraftCompatibilityHacks();
         }
     }
 

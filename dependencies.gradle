@@ -27,6 +27,9 @@ dependencies {
 
     compileOnly(deobfMaven("https://mvn.falsepattern.com/stripped", "reikakalseki:chromaticraft:v33a"))
 
+    //V33b
+    compileOnly(deobfCurse("dragonapi-235591:4722480"))
+
     compileOnly(deobf("https://github.com/embeddedt/ArchaicFix/releases/download/0.6.2/archaicfix-0.6.2.jar"))
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
