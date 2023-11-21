@@ -19,8 +19,10 @@ package com.falsepattern.falsetweaks.proxy;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.asm.FalseTweaksTransformer;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
@@ -32,11 +34,15 @@ import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSeria
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraftforge.client.ClientCommandHandler;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
@@ -59,6 +65,7 @@ public class ClientProxy extends CommonProxy {
             LeakFix.registerBus();
             OcclusionHelpers.init();
         }
+        FMLCommonHandler.instance().bus().register(this);
     }
 
     @Override
@@ -86,5 +93,21 @@ public class ClientProxy extends CommonProxy {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
         }
         Compat.applyCompatibilityTweaks();
+
+        // FastCraft compat
+        if (ModuleConfig.OCCLUSION_TWEAKS && GameSettings.Options.RENDER_DISTANCE.getValueMax() != OcclusionConfig.RENDER_DISTANCE) {
+            GameSettings.Options.RENDER_DISTANCE.setValueMax(OcclusionConfig.RENDER_DISTANCE);
+        }
+    }
+
+    @SubscribeEvent
+    public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent e) {
+        if (!e.modID.equals(Tags.MODID))
+            return;
+
+        // Ingame editable occlusion tweaks
+        if (ModuleConfig.OCCLUSION_TWEAKS) {
+            GameSettings.Options.RENDER_DISTANCE.setValueMax(OcclusionConfig.RENDER_DISTANCE);
+        }
     }
 }
