@@ -30,9 +30,8 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         ModuleConfig.init();
 
-        if (ModuleConfig.OCCLUSION_TWEAKS) {
-            OcclusionCompat.FastCraftCompat.executeFastCraftCompatibilityHacks();
-        }
+        if (ModuleConfig.OCCLUSION_TWEAKS)
+            OcclusionCompat.executeConfigCompatibilityHacks();
     }
 
     @Override
@@ -52,6 +51,9 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        //Doing this here because this runs after coremod init, but before minecraft classes start loading and mixins start colliding and crashing.
+        if (ModuleConfig.OCCLUSION_TWEAKS)
+            OcclusionCompat.ArchaicFixCompat.crashIfUnsupportedConfigsAreActive();
 
     }
 

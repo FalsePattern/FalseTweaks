@@ -28,13 +28,14 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
+import org.embeddedt.archaicfix.config.ArchaicConfig;
 import shadersmod.client.Shaders;
 import stubpackage.Config;
 import stubpackage.net.minecraft.client.renderer.EntityRenderer;
 
 import net.minecraft.client.gui.GuiOptionButton;
-import net.minecraft.client.gui.GuiOptionSlider;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
@@ -43,6 +44,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OcclusionCompat {
+
+    public static void executeConfigCompatibilityHacks() {
+        FastCraftCompat.executeFastCraftCompatibilityHacks();
+        ArchaicFixCompat.executeArchaicFixCompatibilityHacks();
+    }
+
     public static class FastCraftCompat {
         /**
          * This is here so that people won't cry about "waaaah this thing doesn't work with fastcraft waaaah" and then
@@ -61,7 +68,8 @@ public class OcclusionCompat {
             try {
                 val fileText = Files.readAllLines(targetPath);
                 val result = fileText.stream().map(line -> {
-                    if (line.contains("asyncCulling") || line.contains("enableCullingTweaks"))
+                    if (line.contains("asyncCulling") ||
+                        line.contains("enableCullingTweaks"))
                         return line.replace("true", "false");
                     return line;
                 }).collect(Collectors.toList());
@@ -69,6 +77,74 @@ public class OcclusionCompat {
             } catch (IOException e) {
                 Share.log.fatal("Failed to apply FastCraft occlusion tweak compatibility patches!", e);
             }
+        }
+    }
+
+    public static class ArchaicFixCompat {
+        /**
+         * See {@link FastCraftCompat#executeFastCraftCompatibilityHacks()}
+         */
+        public static void executeArchaicFixCompatibilityHacks() {
+            val targetPath = FileUtil.getMinecraftHomePath().resolve("config").resolve("archaicfix.cfg");
+            if (!Files.exists(targetPath))
+                return;
+            try {
+                val fileText = Files.readAllLines(targetPath);
+                val result = fileText.stream().map(line -> {
+                    if (line.contains("raiseMaxRenderDistance") ||
+                        line.contains("enableOcclusionTweaks") ||
+                        line.contains("enableThreadedChunkUpdates"))
+                        return line.replaceAll("[tT][rR][uU][eE]", "false");
+                    return line;
+                }).collect(Collectors.toList());
+                Files.write(targetPath, result);
+            } catch (IOException e) {
+                Share.log.fatal("Failed to apply ArchaicFix occlusion tweak compatibility patches!", e);
+            }
+        }
+
+        /**
+         * People keep repeating almost the exact same bug reports, so i'll just crash here with a descriptive crash report.
+         */
+        public static void crashIfUnsupportedConfigsAreActive() {
+            try {
+                if (Launch.classLoader.getClassBytes("org.embeddedt.archaicfix.config.ArchaicConfig") == null)
+                    return;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            boolean crash = false;
+            val sb = new StringBuilder("\n");
+            //try/catch with ignore so that field name changes don't cause uncontrollable crashes.
+            try {
+                if (ArchaicConfig.raiseMaxRenderDistance) {
+                    crash = true;
+                    sb.append(alarm("raiseMaxRenderDistance"));
+                }
+            } catch (Throwable ignored) {}
+            try {
+                if (ArchaicConfig.enableOcclusionTweaks) {
+                    crash = true;
+                    sb.append(alarm("enableOcclusionTweaks"));
+                }
+            } catch (Throwable ignored) {}
+            try {
+                if (ArchaicConfig.enableThreadedChunkUpdates) {
+                    crash = true;
+                    sb.append(alarm("enableThreadedChunkUpdates"));
+                }
+            } catch (Throwable ignored) {}
+            if (crash) {
+                val exception = new IllegalStateException(sb.toString());
+                exception.setStackTrace(new StackTraceElement[0]);
+                throw exception;
+            }
+
+        }
+
+        private static String alarm(String configProperty) {
+            return "ArchaicFix's " + configProperty + " config is not compatible with FalseTweaks' occlusion culling. Please set it to false in archaicfix.cfg.\n";
         }
     }
 
