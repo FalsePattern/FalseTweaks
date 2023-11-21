@@ -25,18 +25,18 @@ import com.falsepattern.lib.config.ConfigurationManager;
         category = "threading")
 public class ThreadingConfig {
     @Config.Comment("The number of threads to use for chunk building.\n" +
-                    "The default is 1, which shouldn't be any laggier than vanilla but will reduce stutter.\n" +
+                    "The default is 0, which is half of your system threads.\n" +
                     "If you have a lot of cores increasing this may be beneficial.\n" +
                     "The value of 0 will set it to half of your total system threads (unaware of P/E cores on modern intel cpus!)")
     @Config.LangKey("config.falsetweaks.threading.threads")
-    @Config.DefaultInt(1)
+    @Config.DefaultInt(0)
     @Config.RangeInt(min = 0)
     public static int CHUNK_UPDATE_THREADS;
 
     @Config.Comment("The maximum amount of queued chunk updates per thread.\n" +
                     "Set this higher if you have a CPU with powerful cores.")
     @Config.LangKey("config.falsetweaks.threading.queuesize")
-    @Config.DefaultInt(16)
+    @Config.DefaultInt(32)
     @Config.RangeInt(min = 1,
                      max = 256)
     public static int UPDATE_QUEUE_SIZE_PER_THREAD;
