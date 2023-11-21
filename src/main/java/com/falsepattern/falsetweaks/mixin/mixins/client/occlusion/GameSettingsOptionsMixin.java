@@ -17,6 +17,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -34,6 +35,6 @@ public abstract class GameSettingsOptionsMixin {
                                          ordinal = 0),
                     require = 1)
     private static float expandRenderDistance(float constant) {
-        return 32.0f;
+        return OcclusionConfig.RENDER_DISTANCE;
     }
 }

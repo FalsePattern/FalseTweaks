@@ -44,6 +44,13 @@ public class OcclusionConfig {
     @Config.DefaultInt(4096)
     public static int CACHE_SIZE_TARGET;
 
+    @Config.Comment("Changes the maximum render distance.\n" +
+                    "NOTE: things might get extremely laggy above 32 without serverside performance mods!\n")
+    @Config.RangeInt(min = 16, max = 64)
+    @Config.LangKey("config.falsetweaks.occlusion.render_distance")
+    @Config.DefaultInt(32)
+    public static int RENDER_DISTANCE;
+
 
     static {
         ConfigurationManager.selfInit();

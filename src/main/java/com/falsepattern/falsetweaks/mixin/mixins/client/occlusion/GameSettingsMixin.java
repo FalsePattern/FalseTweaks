@@ -17,6 +17,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,10 +35,10 @@ public abstract class GameSettingsMixin {
                                               args = "stringValue=options.txt")),
                     constant = {@Constant(floatValue = 16.0F,
                                           ordinal = 0),
-                                @Constant(floatValue = 32.0F, //optifine
+                                @Constant(floatValue = 32.0F, //optifine, fastcraft (patched)
                                           ordinal = 0)},
                     require = 1)
     private static float expandRenderDistance(float constant) {
-        return 32f;
+        return OcclusionConfig.RENDER_DISTANCE;
     }
 }

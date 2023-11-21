@@ -17,6 +17,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.common.occlusion;
 
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -35,6 +36,6 @@ public abstract class PlayerManagerMixin {
                     require = 0,
                     expect = 0)
     private int expandViewDistance(int constant) {
-        return 32;
+        return OcclusionConfig.RENDER_DISTANCE;
     }
 }

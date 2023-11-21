@@ -71,6 +71,8 @@ public class OcclusionCompat {
                     if (line.contains("asyncCulling") ||
                         line.contains("enableCullingTweaks"))
                         return line.replace("true", "false");
+                    if (line.contains("maxViewDistance"))
+                        return line.replaceAll("\\d+", "32");
                     return line;
                 }).collect(Collectors.toList());
                 Files.write(targetPath, result);
