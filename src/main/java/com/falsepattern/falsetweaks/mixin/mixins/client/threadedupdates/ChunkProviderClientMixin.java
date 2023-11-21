@@ -55,9 +55,11 @@ public abstract class ChunkProviderClientMixin {
               require = 1)
     private Object threadSafeUnload(LongHashMap instance, long id) {
         ft$writeCount.incrementAndGet();
-        Object result = instance.remove(id);
-        ft$writeCount.incrementAndGet();
-        return result;
+        try {
+            return instance.remove(id);
+        } finally {
+            ft$writeCount.incrementAndGet();
+        }
     }
 
     @Redirect(method = "loadChunk",
@@ -66,8 +68,11 @@ public abstract class ChunkProviderClientMixin {
               require = 1)
     private void threadSafeLoad(LongHashMap instance, long id, Object value) {
         ft$writeCount.incrementAndGet();
-        instance.add(id, value);
-        ft$writeCount.incrementAndGet();
+        try {
+            instance.add(id, value);
+        } finally {
+            ft$writeCount.incrementAndGet();
+        }
     }
 
     @Redirect(method = "provideChunk",
