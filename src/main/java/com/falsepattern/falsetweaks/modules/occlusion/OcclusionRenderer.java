@@ -411,7 +411,9 @@ public class OcclusionRenderer {
         boolean shadowPass = OcclusionCompat.OptiFineCompat.isShadowPass();
         val cam = CameraInfo.getInstance();
         double eX, eY, eZ;
+        boolean noOcclusion;
         if (shadowPass) {
+            noOcclusion = true;
             val entitylivingbase = this.mc.renderViewEntity;
             eX = entitylivingbase.lastTickPosX + (entitylivingbase.posX - entitylivingbase.lastTickPosX) * tick;
             eY = entitylivingbase.lastTickPosY + (entitylivingbase.posY - entitylivingbase.lastTickPosY) * tick;
@@ -420,6 +422,7 @@ public class OcclusionRenderer {
             eX = cam.getEyeX();
             eY = cam.getEyeY();
             eZ = cam.getEyeZ();
+            noOcclusion = cam.getEyeY() > 256;
         }
 
         RenderList[] allRenderLists = rg.allRenderLists;
@@ -427,7 +430,7 @@ public class OcclusionRenderer {
             allRenderLists[i].resetList();
         }
 
-        if (shadowPass)
+        if (noOcclusion)
             end = rg.worldRenderers.length;
 
         int loopStart = start;
@@ -475,13 +478,13 @@ public class OcclusionRenderer {
 
         mc.theWorld.theProfiler.startSection("setup_lists");
         int glListsRendered = 0, allRenderListsLength = 0;
-        WorldRenderer[] sortedWorldRenderers = shadowPass ? rg.worldRenderers : rg.sortedWorldRenderers;
+        WorldRenderer[] sortedWorldRenderers = noOcclusion ? rg.worldRenderers : rg.sortedWorldRenderers;
 
         for (int i = loopStart; i != loopEnd; i += dir) {
             WorldRenderer rend = sortedWorldRenderers[i];
 
             boolean isVisible = false, isInFrustum = false;
-            if (shadowPass) {
+            if (noOcclusion) {
                 isVisible = rend.isVisible;
                 isInFrustum = rend.isInFrustum;
                 rend.isVisible = true;
@@ -510,7 +513,7 @@ public class OcclusionRenderer {
                 allRenderLists[renderListIndex].addGLRenderList(rend.getGLCallListForPass(pass));
                 ++glListsRendered;
             }
-            if (shadowPass) {
+            if (noOcclusion) {
                 rend.isVisible = isVisible;
                 rend.isInFrustum = isInFrustum;
             }
