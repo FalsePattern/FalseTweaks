@@ -32,15 +32,36 @@ import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 public enum Mixin implements IMixin {
     // @formatter:off
     //region Startup Optimizations Module
-    //region Minecraft->client
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModDiscovererMixin"),
-    //endregion Minecraft->client
+
+    //Only activate these on java 8 to avoid potential lwjgl3ify collisions
+    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.DirectoryDiscovererMixin"),
+    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.JarDiscovererMixin"),
+    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.ModContainerFactoryMixin"),
+    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.ModDiscovererMixin"),
+
     //endregion Startup Optimizations Module
     // @formatter:on
     ;
+
+    private static class Detections {
+        private static int getVersion() {
+            String version = System.getProperty("java.version");
+            if(version.startsWith("1.")) {
+                version = version.substring(2, 3);
+            } else {
+                int dot = version.indexOf(".");
+                if(dot != -1) { version = version.substring(0, dot); }
+            }
+            try {
+                return Integer.parseInt(version);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        private static final int JAVA_VERSION = getVersion();
+        private static final Predicate<List<ITargetedMod>> JAVA8 = condition(() -> JAVA_VERSION == 8);
+    }
 
     @Getter
     private final Side side;
