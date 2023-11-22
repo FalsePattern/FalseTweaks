@@ -102,6 +102,12 @@ public enum Mixin implements IMixin {
     Occlusion_GameSettingsOptionsMixin(Side.CLIENT,
                                        OCCLUSION.and(AVOID_ANY_OPTIFINE),
                                        "occlusion.GameSettingsOptionsMixin"),
+    Occlusion_ClippingHelperMixin(Side.CLIENT,
+                                       OCCLUSION,
+                                       "occlusion.ClippingHelperMixin"),
+    Occlusion_ClippingHelperImplMixin(Side.CLIENT,
+                                       OCCLUSION,
+                                       "occlusion.ClippingHelperImplMixin"),
 
     //OptiFine
     Occlusion_Optifine_RenderGlobalMixin(Side.CLIENT,

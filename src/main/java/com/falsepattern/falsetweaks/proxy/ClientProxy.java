@@ -43,9 +43,11 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
+    public static boolean clippingHelperShouldInit = true;
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
@@ -74,6 +76,12 @@ public class ClientProxy extends CommonProxy {
             ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper();
             ThreadedChunkUpdateHelper.instance.init();
         }
+    }
+
+
+    @SubscribeEvent
+    public void onTick(TickEvent.RenderTickEvent e) {
+        clippingHelperShouldInit = true;
     }
 
     @Override
