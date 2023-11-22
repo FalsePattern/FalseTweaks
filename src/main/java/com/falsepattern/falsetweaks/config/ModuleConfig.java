@@ -110,7 +110,7 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean OCCLUSION_TWEAKS;
 
-    @Config.Comment("Enables multi-threaded chunk updating. It only works if enableOcclusionTweaks is turned on.\n" +
+    @Config.Comment("Enables multi-threaded chunk updating. It only works if OCCLUSION_TWEAKS is turned on.\n" +
                     "Not compatible with quad triangulation (automatically disables it if you turn this on)\n" +
                     "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
                     "FPS impact: Depends on your CPU, but should be pretty good on modern CPUs")
