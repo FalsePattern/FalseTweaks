@@ -2,9 +2,9 @@
   "required": true,
   "minVersion": "0.7.11",
   "package": "com.falsepattern.falsetweaks.mixin.mixins",
-  "plugin": "com.falsepattern.falsetweaks.mixin.plugin.preinit.MixinPlugin",
+  "plugin": "com.falsepattern.falsetweaks.mixin.plugin.init.MixinPlugin",
   "refmap": "mixins.falsetweaks.refmap.json",
-  "target": "@env(PREINIT)",
+  "target": "@env(INIT)",
   "compatibilityLevel": "JAVA_8"
 }
 

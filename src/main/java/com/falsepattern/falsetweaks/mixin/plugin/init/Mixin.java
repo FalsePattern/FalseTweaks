@@ -15,7 +15,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin.preinit;
+package com.falsepattern.falsetweaks.mixin.plugin.init;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.mixin.IMixin;

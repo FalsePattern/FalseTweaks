@@ -15,7 +15,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.plugin.preinit;
+package com.falsepattern.falsetweaks.mixin.plugin.init;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.mixin.IMixin;
@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MixinPlugin implements IMixinPlugin {
     @Getter
-    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME + " PreInit");
+    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME + " Init");
 
     @Override
     public ITargetedMod[] getTargetedModEnumValues() {
