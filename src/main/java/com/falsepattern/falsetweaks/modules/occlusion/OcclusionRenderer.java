@@ -321,7 +321,7 @@ public class OcclusionRenderer {
         val xSize = rg.renderChunksWide;
         val ySize = rg.renderChunksTall;
         val zSize = rg.renderChunksDeep;
-        if (Math.abs(deltaX) > 2 || Math.abs(deltaZ) > 2 || !populated
+        if (Math.abs(deltaX) >= 4 || Math.abs(deltaZ) >= 4 || !populated
             || lastPosChunkX != prevX || lastPosChunkZ != prevZ
             || xSize != sizeX || ySize != sizeY || zSize != sizeZ) {
             rg.markRenderersForNewPosition(camX, camY, camZ);
@@ -330,12 +330,20 @@ public class OcclusionRenderer {
             OcclusionHelpers.worker.run(true);
         } else {
             if (deltaX != 0) {
-                repositionDeltaX(rg, deltaX);
-                OcclusionHelpers.renderer.updateRendererNeighborsXPartial(deltaX);
+                int dRaw = deltaX < 0 ? -1 : 1;
+                int dAbs = Math.abs(deltaX);
+                for (int i = 0; i < dAbs; i++) {
+                    repositionDeltaX(rg, dRaw);
+                    OcclusionHelpers.renderer.updateRendererNeighborsXPartial(dRaw);
+                }
             }
             if (deltaZ != 0) {
-                repositionDeltaZ(rg, deltaZ);
-                OcclusionHelpers.renderer.updateRendererNeighborsZPartial(deltaZ);
+                int dRaw = deltaZ < 0 ? -1 : 1;
+                int dAbs = Math.abs(deltaZ);
+                for (int i = 0; i < dAbs; i++) {
+                    repositionDeltaZ(rg, dRaw);
+                    OcclusionHelpers.renderer.updateRendererNeighborsZPartial(dRaw);
+                }
             }
             OcclusionHelpers.worker.run(true);
         }
