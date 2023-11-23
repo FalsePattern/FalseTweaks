@@ -1,5 +1,7 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import lombok.val;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -162,6 +164,12 @@ public class OcclusionWorker {
             isInFrustum(ci, frustum); // make sure frustum status gets updated for the starting renderer
             ci.init(StepDirection.NONE, (byte) 0);
             queue.add(ci);
+            for (val neighbor: ci.neighbors) {
+                if (neighbor == null)
+                    continue;
+                neighbor.init(StepDirection.NONE, (byte) 0);
+                queue.add(neighbor);
+            }
         } else {
             int level = viewY > 5 ? 250 : 5;
             center = extendedRender.getRenderer(viewX, level, viewZ);
