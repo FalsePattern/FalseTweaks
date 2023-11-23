@@ -179,7 +179,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
             at = @At("TAIL"),
             require = 1)
     private void runWorker(int p_72722_1_, int p_72722_2_, int p_72722_3_, CallbackInfo ci) {
-        OcclusionHelpers.renderer.runWorker(p_72722_1_, p_72722_2_, p_72722_3_);
+        OcclusionHelpers.renderer.runWorkerFull();
     }
 
     /**

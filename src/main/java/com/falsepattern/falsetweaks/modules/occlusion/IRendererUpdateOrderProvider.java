@@ -9,7 +9,7 @@ import java.util.List;
 public interface IRendererUpdateOrderProvider {
     
     /** Prepare providing a batch of renderers. */
-    void prepare(List<WorldRenderer> worldRenderersToUpdateList);
+    void prepare(List<WorldRenderer> worldRenderersToUpdateList, int updateLimit);
     
     boolean hasNext(List<WorldRenderer> worldRenderersToUpdateList);
     

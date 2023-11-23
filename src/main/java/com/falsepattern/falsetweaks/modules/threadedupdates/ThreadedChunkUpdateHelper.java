@@ -22,7 +22,9 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.IRenderGlobalListener;
 import com.falsepattern.falsetweaks.modules.occlusion.IRendererUpdateOrderProvider;
+import com.falsepattern.falsetweaks.modules.occlusion.IWorldRenderer;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
+import com.falsepattern.falsetweaks.modules.occlusion.OcclusionWorker;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -94,8 +96,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         private WorldRenderer nextRenderer;
 
         @Override
-        public void prepare(List<WorldRenderer> worldRenderersToUpdateList) {
-            preRendererUpdates(worldRenderersToUpdateList);
+        public void prepare(List<WorldRenderer> worldRenderersToUpdateList, int updateLimit) {
+            preRendererUpdates(worldRenderersToUpdateList, updateLimit);
         }
 
         @Override
@@ -155,14 +157,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     private AtomicBoolean run = null;
     private Thread[] currentThreads = null;
-    @Getter
     private int threadCount = 0;
-
-    private AtomicInteger workingThreads = new AtomicInteger();
-
-    public int getActiveThreads() {
-        return workingThreads.get();
-    }
 
     private void spawnThreads() {
         int threads = ThreadingConfig.CHUNK_UPDATE_THREADS;
@@ -201,16 +196,25 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         spawnThreads();
     }
 
-    private void preRendererUpdates(List<WorldRenderer> toUpdateList) {
-        updateWorkQueue(toUpdateList);
+    private void preRendererUpdates(List<WorldRenderer> toUpdateList, int updateLimit) {
+        updateWorkQueue(toUpdateList, updateLimit);
         removeCancelledResults();
     }
 
-    private void updateWorkQueue(List<WorldRenderer> toUpdateList) {
-        final int updateQueueSize = threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
+    private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
+        final int updateQueueSize = Math.min(updateLimit, threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD);
         taskQueue.clear();
-        for (int i = 0; i < updateQueueSize && i < toUpdateList.size(); i++) {
+        main:
+        for (int i = 0, updated = 0; updated < updateQueueSize && i < toUpdateList.size(); i++) {
             WorldRenderer wr = toUpdateList.get(i);
+            val ci = ((IWorldRenderer)wr).ft$getCullInfo();
+            if (ci.visGraph == null || ci.visGraph == OcclusionWorker.DUMMY)
+                continue;
+            for (val neighbor: ci.neighbors) {
+                if (neighbor == null || neighbor.visGraph == null || neighbor.visGraph == OcclusionWorker.DUMMY)
+                    continue main;
+            }
+            updated++;
             UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
 
             if (wr.distanceToEntitySquared(Minecraft.getMinecraft().renderViewEntity) < 16 * 16) {
@@ -262,7 +266,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 WorldRenderer wr = taskQueue.take();
                 UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
                 task.started = true;
-                workingThreads.incrementAndGet();
                 try {
                     doChunkUpdate(wr);
                 } catch (Exception e) {
@@ -271,8 +274,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                         r.clear();
                     }
                     ((ICapturableTessellator) threadTessellator.get()).discard();
-                } finally {
-                    workingThreads.decrementAndGet();
                 }
                 if (!task.important) {
                     finishedTasks.add(wr);

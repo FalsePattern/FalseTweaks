@@ -3,6 +3,7 @@ package com.falsepattern.falsetweaks.modules.occlusion;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
 import lombok.val;
+import lombok.var;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -50,6 +51,25 @@ public class OcclusionRenderer {
 
     /* Make sure other threads can see changes to this */
     private volatile boolean deferNewRenderUpdates;
+
+
+    private boolean populated = false;
+    private int lastPosChunkX;
+    private int lastPosChunkY;
+    private int lastPosChunkZ;
+    private int sizeX;
+    private int sizeY;
+    private int sizeZ;
+    /**
+     * Order:
+     * [X][Z][Y]
+     */
+    private WorldRenderer[][][] spatialRendererStore;
+
+    private List<WorldRenderer> visgraphDummyRecheckBackBuffer = new ArrayList<>();
+    private List<WorldRenderer> visgraphDummyRecheckFrontBuffer = new ArrayList<>();
+    private int visgraphPointer = 0;
+    private long lastCheck = 0;
     
     public OcclusionRenderer(RenderGlobal renderGlobal) {
         this.rg = renderGlobal;
@@ -201,7 +221,7 @@ public class OcclusionRenderer {
 
         boolean spareTime = true;
         deferNewRenderUpdates = true;
-        rendererUpdateOrderProvider.prepare(worldRenderersToUpdateList);
+        rendererUpdateOrderProvider.prepare(worldRenderersToUpdateList, updateLimit);
         while(updates < updateLimit && rendererUpdateOrderProvider.hasNext(worldRenderersToUpdateList)) {
             WorldRenderer worldrenderer = rendererUpdateOrderProvider.next(worldRenderersToUpdateList);
             
@@ -286,34 +306,252 @@ public class OcclusionRenderer {
         }
     }
 
+    private void repositionSmart(RenderGlobal rg, CameraInfo cam) {
+        val prevX = rg.prevChunkSortX;
+        val prevY = rg.prevChunkSortY;
+        val prevZ = rg.prevChunkSortZ;
+        val camX = MathHelper.floor_double(cam.getX());
+        val camY = MathHelper.floor_double(cam.getY());
+        val camZ = MathHelper.floor_double(cam.getZ());
+        val currX = cam.getChunkCoordX();
+        val currY = cam.getChunkCoordY();
+        val currZ = cam.getChunkCoordZ();
+        val deltaX = currX - prevX;
+        val deltaZ = currZ - prevZ;
+        val xSize = rg.renderChunksWide;
+        val ySize = rg.renderChunksTall;
+        val zSize = rg.renderChunksDeep;
+        if (Math.abs(deltaX) > 2 || Math.abs(deltaZ) > 2 || !populated
+            || lastPosChunkX != prevX || lastPosChunkZ != prevZ
+            || xSize != sizeX || ySize != sizeY || zSize != sizeZ) {
+            rg.markRenderersForNewPosition(camX, camY, camZ);
+            rebuidSpatialRenderStore(rg, xSize, ySize, zSize, camX, camZ);
+            OcclusionHelpers.renderer.updateRendererNeighborsFull();
+            OcclusionHelpers.worker.run(true);
+        } else {
+            if (deltaX != 0) {
+                repositionDeltaX(rg, deltaX);
+                OcclusionHelpers.renderer.updateRendererNeighborsXPartial(deltaX);
+            }
+            if (deltaZ != 0) {
+                repositionDeltaZ(rg, deltaZ);
+                OcclusionHelpers.renderer.updateRendererNeighborsZPartial(deltaZ);
+            }
+            OcclusionHelpers.worker.run(true);
+        }
+
+        lastPosChunkX = rg.prevChunkSortX = currX;
+        lastPosChunkY = rg.prevChunkSortY = currY;
+        lastPosChunkZ = rg.prevChunkSortZ = currZ;
+    }
+
+    private void repositionDeltaX(RenderGlobal rg, int deltaX) {
+        rotate(spatialRendererStore, deltaX);
+        WorldRenderer[][] edgeColumn;
+        WorldRenderer[][] prevEdgeColumn;
+        int deltaPos;
+        if (deltaX > 0) {
+            edgeColumn = spatialRendererStore[sizeX - 1];
+            prevEdgeColumn = spatialRendererStore[sizeX - 2];
+            deltaPos = 16;
+        } else {
+            edgeColumn = spatialRendererStore[0];
+            prevEdgeColumn = spatialRendererStore[1];
+            deltaPos = -16;
+        }
+        for (int z = 0; z < sizeZ; z++) {
+            val edgeChunk = edgeColumn[z];
+            val prevEdgeChunk = prevEdgeColumn[z];
+            updateRelativeChunk(edgeChunk, prevEdgeChunk, deltaPos, 0);
+        }
+        rg.minBlockX += deltaPos;
+        rg.maxBlockX += deltaPos;
+    }
+
+    private void repositionDeltaZ(RenderGlobal rg, int deltaZ) {
+        int deltaPos = deltaZ * 16;
+        for (int x = 0; x < sizeX; x++) {
+            val columnX = spatialRendererStore[x];
+            rotate(columnX, deltaZ);
+            WorldRenderer[] edgeChunk;
+            WorldRenderer[] prevEdgeChunk;
+            if (deltaZ > 0) {
+                edgeChunk = columnX[sizeZ - 1];
+                prevEdgeChunk = columnX[sizeZ - 2];
+            } else {
+                edgeChunk = columnX[0];
+                prevEdgeChunk = columnX[1];
+            }
+            updateRelativeChunk(edgeChunk, prevEdgeChunk, 0, deltaPos);
+        }
+        rg.minBlockZ += deltaPos;
+        rg.maxBlockZ += deltaPos;
+    }
+
+    private void updateRelativeChunk(WorldRenderer[] edgeChunk, WorldRenderer[] prevEdgeChunk, int deltaX, int deltaZ) {
+        for (int y = 0; y < sizeY; y++) {
+            val edgeSubChunk = edgeChunk[y];
+            val prevEdgeSubChunk = prevEdgeChunk[y];
+            OcclusionHelpers.renderer.setPositionAndMarkInvisible(edgeSubChunk, prevEdgeSubChunk.posX + deltaX, prevEdgeSubChunk.posY, prevEdgeSubChunk.posZ + deltaZ);
+        }
+    }
+
+    private static <T> void rotate(T[] array, int delta) {
+        if (delta < -1 || delta > 1)
+            throw new IllegalArgumentException("Can only rotate array by single steps!");
+
+        int grab;
+        int drop;
+        int start;
+        int end;
+        if (delta > 0) {
+            grab = 0;
+            drop = array.length - 1;
+            start = 1;
+            end = array.length;
+        } else {
+            grab = array.length - 1;
+            drop = 0;
+            start = array.length - 2;
+            end = -1;
+        }
+        val toShift = array[grab];
+        for (int i = start; i != end; i += delta) {
+            array[i - delta] = array[i];
+        }
+        array[drop] = toShift;
+    }
+
+    private void rebuidSpatialRenderStore(RenderGlobal rg, int xSize, int ySize, int zSize, int camX, int camZ) {
+        spatialRendererStore = new WorldRenderer[xSize][zSize][ySize];
+        val baseX = camX - (xSize + 1) * 8;
+        val baseZ = camZ - (zSize + 1) * 8;
+        for (int i = 0; i < rg.worldRenderers.length; i++) {
+            val wr = rg.worldRenderers[i];
+            var wrcX = (wr.posX - baseX) >> 4;
+            var wrcY = wr.posY >> 4;
+            var wrcZ = (wr.posZ - baseZ) >> 4;
+
+            if (spatialRendererStore[wrcX]
+                        [wrcZ]
+                        [wrcY] != null) {
+                System.err.println("WUT @" + wrcX + "," + wrcY + "," + wrcZ);
+            }
+            spatialRendererStore[wrcX][wrcZ][wrcY] = wr;
+
+        }
+        populated = true;
+        sizeX = xSize;
+        sizeY = ySize;
+        sizeZ = zSize;
+    }
+
     public void resetOcclusionWorker() {
-        updateRendererNeighbors();
+        populated = false;
+        updateRendererNeighborsFull();
         if(OcclusionHelpers.worker != null) {
             OcclusionHelpers.worker.dirty = true;
         }
     }
-    
-    public void updateRendererNeighbors() {
+
+    private void updateRendererNeighborsXPartial(int deltaX) {
+        WorldRenderer[][] oldNeighborColumn;
+        WorldRenderer[][] column;
+        WorldRenderer[][] newNeighborColumn;
+        EnumFacing towardsOldNeighbor;
+        EnumFacing towardsNewNeighbor;
+        if (deltaX > 0) {
+            oldNeighborColumn = spatialRendererStore[0];
+            column = spatialRendererStore[sizeX - 1];
+            newNeighborColumn = spatialRendererStore[sizeX - 2];
+            towardsOldNeighbor = EnumFacing.WEST;
+            towardsNewNeighbor = EnumFacing.EAST;
+        } else {
+            oldNeighborColumn = spatialRendererStore[sizeX - 1];
+            column = spatialRendererStore[0];
+            newNeighborColumn = spatialRendererStore[1];
+            towardsOldNeighbor = EnumFacing.EAST;
+            towardsNewNeighbor = EnumFacing.WEST;
+        }
+        for (int z = 0; z < sizeZ; z++) {
+            updateNeighborsShift(oldNeighborColumn[z], column[z], newNeighborColumn[z], towardsOldNeighbor, towardsNewNeighbor);
+        }
+    }
+
+    private void updateRendererNeighborsZPartial(int deltaZ) {
+        for (int x = 0; x < sizeX; x++) {
+            val xColumn = spatialRendererStore[x];
+            WorldRenderer[] oldNeighborChunk;
+            WorldRenderer[] chunk;
+            WorldRenderer[] newNeighborChunk;
+            EnumFacing towardsOldNeighbor;
+            EnumFacing towardsNewNeighbor;
+            if (deltaZ > 0) {
+                oldNeighborChunk = xColumn[0];
+                chunk = xColumn[sizeZ - 1];
+                newNeighborChunk = xColumn[sizeZ - 2];
+                towardsOldNeighbor = EnumFacing.SOUTH;
+                towardsNewNeighbor = EnumFacing.NORTH;
+            } else {
+                oldNeighborChunk = xColumn[sizeZ - 1];
+                chunk = xColumn[0];
+                newNeighborChunk = xColumn[1];
+                towardsOldNeighbor = EnumFacing.NORTH;
+                towardsNewNeighbor = EnumFacing.SOUTH;
+            }
+            updateNeighborsShift(oldNeighborChunk, chunk, newNeighborChunk, towardsOldNeighbor, towardsNewNeighbor);
+        }
+    }
+
+    private void updateNeighborsShift(WorldRenderer[] oldNeighbor, WorldRenderer[] chunk, WorldRenderer[] newNeighbor, EnumFacing towardsOldNeighbor, EnumFacing towardsNewNeighbor) {
+        for (int y = 0; y < sizeY; y++) {
+            val oldNeighborCI = ((IWorldRenderer)oldNeighbor[y]).ft$getCullInfo();
+            val newNeighborCI = ((IWorldRenderer)newNeighbor[y]).ft$getCullInfo();
+            WorldRenderer rend = chunk[y];
+            OcclusionWorker.CullInfo ci = ((IWorldRenderer) rend).ft$getCullInfo();
+            updateVisGraph(rend, ci);
+            if (ci.visGraph == OcclusionWorker.DUMMY)
+                visgraphDummyRecheckBackBuffer.add(rend);
+            ci.setNeighbor(towardsOldNeighbor, null);
+            ci.setNeighbor(towardsNewNeighbor, newNeighborCI);
+            oldNeighborCI.setNeighbor(towardsNewNeighbor, null);
+            newNeighborCI.setNeighbor(towardsOldNeighbor, ci);
+        }
+    }
+
+    private void updateRendererNeighborsFull() {
+        visgraphDummyRecheckBackBuffer.clear();
+        visgraphDummyRecheckFrontBuffer.clear();
         if(rg.worldRenderers == null) return;
         for(int i = 0; i < rg.worldRenderers.length; i++) {
             WorldRenderer rend = rg.worldRenderers[i];
             OcclusionWorker.CullInfo ci = ((IWorldRenderer) rend).ft$getCullInfo();
             ci.wrIdx = i;
-            Chunk o = rend.worldObj.getChunkFromBlockCoords(rend.posX, rend.posZ);
-            VisGraph oSides = isChunkEmpty(o) ? OcclusionWorker.DUMMY : ((ICulledChunk)o).getVisibility()[rend.posY >> 4];
-            ci.visGraph = oSides;
-            ci.vis = oSides.getVisibilityArray();
-            for(EnumFacing dir : OcclusionHelpers.FACING_VALUES) {
-                WorldRenderer neighbor = getRenderer(
-                        rend.posX + dir.getFrontOffsetX() * 16,
-                        rend.posY + dir.getFrontOffsetY() * 16,
-                        rend.posZ + dir.getFrontOffsetZ() * 16
-                );
-                ci.setNeighbor(dir, neighbor == null ? null : ((IWorldRenderer)neighbor).ft$getCullInfo());
-            }
+            updateVisGraph(rend, ci);
+            if (ci.visGraph == OcclusionWorker.DUMMY)
+                visgraphDummyRecheckBackBuffer.add(rend);
+            updateNeighborsForRendererInefficient(rend, ci);
         }
     }
-    
+
+    private void updateVisGraph(WorldRenderer rend, OcclusionWorker.CullInfo ci) {
+        Chunk o = rend.worldObj.getChunkFromBlockCoords(rend.posX, rend.posZ);
+        VisGraph oSides = isChunkEmpty(o) ? OcclusionWorker.DUMMY : ((ICulledChunk)o).getVisibility()[rend.posY >> 4];
+        ci.visGraph = oSides;
+        ci.vis = oSides.getVisibilityArray();
+    }
+
+    private void updateNeighborsForRendererInefficient(WorldRenderer rend, OcclusionWorker.CullInfo ci) {
+        for(EnumFacing dir : OcclusionHelpers.FACING_VALUES) {
+            WorldRenderer neighbor = getRenderer(
+                    rend.posX + dir.getFrontOffsetX() * 16,
+                    rend.posY + dir.getFrontOffsetY() * 16,
+                    rend.posZ + dir.getFrontOffsetZ() * 16
+                                                );
+            ci.setNeighbor(dir, neighbor == null ? null : ((IWorldRenderer)neighbor).ft$getCullInfo());
+        }
+    }
+
     public void pushWorkerRenderer(WorldRenderer wr) {
         if(!(mc.theWorld.getChunkFromBlockCoords(wr.posX, wr.posZ) instanceof EmptyChunk))
             addRendererToUpdateQueue(wr);
@@ -335,12 +573,41 @@ public class OcclusionRenderer {
         }
     }
 
-    public void runWorker(int p_72722_1_, int p_72722_2_, int p_72722_3_) {
-        updateRendererNeighbors();
+    public void runWorkerFull() {
+        updateRendererNeighborsFull();
         OcclusionHelpers.worker.run(true);
     }
 
+    private void queryMissingVisgraphs() {
+        if (visgraphPointer >= visgraphDummyRecheckFrontBuffer.size()) {
+            long newCheck = System.nanoTime();
+            long delta = newCheck - lastCheck;
+            if (delta < 100_000_000)
+                return;
+            lastCheck = newCheck;
+            val tmp = visgraphDummyRecheckBackBuffer;
+            visgraphDummyRecheckFrontBuffer.clear();
+            visgraphDummyRecheckBackBuffer = visgraphDummyRecheckFrontBuffer ;
+            visgraphDummyRecheckFrontBuffer = tmp;
+            visgraphPointer = 0;
+        }
+        int visgraphEnd = Math.min(visgraphPointer + 1000, visgraphDummyRecheckFrontBuffer.size());
+        for (; visgraphPointer < visgraphEnd; visgraphPointer++) {
+            val wr = visgraphDummyRecheckFrontBuffer.get(visgraphPointer);
+            val ci = ((IWorldRenderer)wr).ft$getCullInfo();
+            if (ci.visGraph == OcclusionWorker.DUMMY) {
+                updateVisGraph(wr, ci);
+                if (ci.visGraph == OcclusionWorker.DUMMY)
+                    visgraphDummyRecheckBackBuffer.add(wr);
+            }
+        }
+        if (visgraphPointer >= visgraphDummyRecheckFrontBuffer.size()) {
+            visgraphDummyRecheckFrontBuffer.clear();
+        }
+    }
+
     public int sortAndRender(EntityLivingBase view, int pass, double tick) {
+        queryMissingVisgraphs();
         CameraInfo cam = CameraInfo.getInstance();
         cam.update(view, tick);
 
@@ -368,10 +635,7 @@ public class OcclusionRenderer {
 
         rg.theWorld.theProfiler.startSection("reposition_chunks");
         if (rg.prevChunkSortX != cam.getChunkCoordX() || rg.prevChunkSortY != cam.getChunkCoordY() || rg.prevChunkSortZ != cam.getChunkCoordZ()) {
-            rg.prevChunkSortX = cam.getChunkCoordX();
-            rg.prevChunkSortY = cam.getChunkCoordY();
-            rg.prevChunkSortZ = cam.getChunkCoordZ();
-            rg.markRenderersForNewPosition(MathHelper.floor_double(cam.getX()), MathHelper.floor_double(cam.getY()), MathHelper.floor_double(cam.getZ()));
+            repositionSmart(rg, cam);
             OcclusionHelpers.worker.dirty = true;
         }
         rg.theWorld.theProfiler.endSection();

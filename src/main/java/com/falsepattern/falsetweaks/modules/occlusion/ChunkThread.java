@@ -28,7 +28,7 @@ public class ChunkThread extends Thread {
                     work = true;
                 }
                 if ((i & 3) == 0) {
-                    yield();
+                    Thread.yield();
                 }
             }
             for (i = 0; modified.size() > 0; ++i) {
@@ -44,7 +44,7 @@ public class ChunkThread extends Thread {
                     }
                 }
                 if ((i & 7) == 0) {
-                    yield();
+                    Thread.yield();
                 }
             }
             OcclusionHelpers.worker.dirty = work;

@@ -37,7 +37,7 @@ public abstract class SkyFix_RenderGlobalMixin {
                                          ordinal = 0),
                     require = 1)
     private int modifySkySize(int constant) {
-        return 512;
+        return 2048;
     }
 
     @Redirect(method = "<init>",
@@ -69,7 +69,7 @@ public abstract class SkyFix_RenderGlobalMixin {
                        target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V",
                        ordinal = 0),
               require = 1)
-    private void bigDraw(int list, int mode) {
+    private void bigDraw1Start(int list, int mode) {
         GL11.glNewList(list, mode);
         Tessellator.instance.startDrawingQuads();
     }
@@ -81,7 +81,7 @@ public abstract class SkyFix_RenderGlobalMixin {
                        target = "Lorg/lwjgl/opengl/GL11;glEndList()V",
                        ordinal = 0),
               require = 1)
-    private void emptyList() {
+    private void bigDraw1End() {
         Tessellator.instance.draw();
         GL11.glEndList();
     }
