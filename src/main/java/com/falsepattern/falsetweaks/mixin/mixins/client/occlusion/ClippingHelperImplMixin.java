@@ -1,5 +1,6 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
+import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.proxy.ClientProxy;
 import lombok.val;
 import org.lwjgl.opengl.GL11;
@@ -24,9 +25,11 @@ public abstract class ClippingHelperImplMixin extends ClippingHelper {
                        target = "Lnet/minecraft/client/renderer/culling/ClippingHelperImpl;init()V"),
               require = 1)
     private static void initOncePerFrame(ClippingHelperImpl instance) {
-        if (!ClientProxy.clippingHelperShouldInit)
-            return;
-        ClientProxy.clippingHelperShouldInit = false;
+        if (OcclusionConfig.AGGRESSIVE_CLIPPING_HELPER_OPTIMIZATIONS) {
+            if (!ClientProxy.clippingHelperShouldInit)
+                return;
+            ClientProxy.clippingHelperShouldInit = false;
+        }
         instance.init();
     }
 }

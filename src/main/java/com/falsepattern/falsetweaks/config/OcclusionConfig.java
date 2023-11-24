@@ -51,6 +51,15 @@ public class OcclusionConfig {
     @Config.DefaultInt(32)
     public static int RENDER_DISTANCE;
 
+    @Config.Comment("Makes sure that the clipping helper is only initialized once per frame.\n" +
+                    "Saves a bunch of opengl data retrieval calls and some matrix math, but might lead of weird/broken\n" +
+                    "culling behaviour, so this is disabled by default.\n" +
+                    "DO NOT REPORT BUGS IF YOU TURNED THIS ON!")
+    @Config.LangKey("config.falsetweaks.occlusion.aggressive_clipping_helper")
+    @Config.DefaultBoolean(false)
+    public static boolean AGGRESSIVE_CLIPPING_HELPER_OPTIMIZATIONS;
+
+
 
     static {
         ConfigurationManager.selfInit();
