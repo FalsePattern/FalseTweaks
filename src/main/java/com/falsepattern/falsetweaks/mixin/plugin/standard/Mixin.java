@@ -113,9 +113,6 @@ public enum Mixin implements IMixin {
     Occlusion_Optifine_RenderGlobalMixin(Side.CLIENT,
                                          OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
                                          "occlusion.optifine.RenderGlobalMixin"),
-    Occlusion_Optifine_ShadersRendererMixin(Side.CLIENT,
-                                            OCCLUSION.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
-                                            "occlusion.optifine.ShadersRendererMixin"),
     Occlusion_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT,
                                                    OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
                                                    "occlusion.optifine.GameSettingsOptifineMixin"),
@@ -128,6 +125,15 @@ public enum Mixin implements IMixin {
     Occlusion_Optifine_WorldRenderer_OFMixin(Side.CLIENT,
                                              OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
                                              "occlusion.optifine.WorldRenderer_OFMixin"),
+
+    //OptiFine with shaders
+    Occlusion_Optifine_Shaders_ShadersRendererMixin(Side.CLIENT,
+                                                    OCCLUSION.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                                    "occlusion.optifine.shaders.ShadersRendererMixin"),
+    Occlusion_Optifine_Shaders_FrustrumMixin(Side.CLIENT,
+                                             OCCLUSION.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                             "occlusion.optifine.shaders.FrustrumMixin"),
+
 
     //FastCraft
     Occlusion_FastCraft_GLAllocationMixin(Side.CLIENT,

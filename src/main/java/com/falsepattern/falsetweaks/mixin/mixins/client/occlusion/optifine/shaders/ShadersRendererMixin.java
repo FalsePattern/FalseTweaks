@@ -15,7 +15,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine;
+package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifine.shaders;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 
 @Mixin(ShadersRender.class)
-public class ShadersRendererMixin {
+public abstract class ShadersRendererMixin {
     private static WorldRenderer[] ft$nullArray;
 
     @Redirect(method = "renderShadowMap",
