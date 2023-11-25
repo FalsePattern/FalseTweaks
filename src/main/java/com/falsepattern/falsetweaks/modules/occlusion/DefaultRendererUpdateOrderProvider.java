@@ -4,6 +4,7 @@ import gnu.trove.list.array.TIntArrayList;
 import lombok.val;
 
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 
@@ -46,8 +47,17 @@ public class DefaultRendererUpdateOrderProvider implements IRendererUpdateOrderP
             val ci = ((IWorldRenderer)wr).ft$getCullInfo();
             if (ci.visGraph == OcclusionWorker.DUMMY)
                 continue;
-            for (val neighbor: ci.neighbors) {
-                if (neighbor == null || neighbor.visGraph == OcclusionWorker.DUMMY)
+            for (val facing: OcclusionHelpers.FACING_VALUES) {
+                val neighbor = ci.neighbors[facing.ordinal()];
+                if (neighbor == null) {
+                    if ((facing == EnumFacing.DOWN && wr.posY == 0) ||
+                        (facing == EnumFacing.UP && wr.posY == 240)) {
+                        continue;
+                    } else {
+                        continue main;
+                    }
+                }
+                if (neighbor.visGraph == OcclusionWorker.DUMMY)
                     continue main;
             }
             indices.add(index);

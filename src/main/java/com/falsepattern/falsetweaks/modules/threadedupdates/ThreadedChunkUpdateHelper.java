@@ -39,6 +39,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.shader.TesselatorVertexState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.ChunkCache;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
@@ -210,8 +211,17 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             val ci = ((IWorldRenderer)wr).ft$getCullInfo();
             if (ci.visGraph == null || ci.visGraph == OcclusionWorker.DUMMY)
                 continue;
-            for (val neighbor: ci.neighbors) {
-                if (neighbor == null || neighbor.visGraph == null || neighbor.visGraph == OcclusionWorker.DUMMY)
+            for (val facing: OcclusionHelpers.FACING_VALUES) {
+                val neighbor = ci.neighbors[facing.ordinal()];
+                if (neighbor == null) {
+                    if ((facing == EnumFacing.DOWN && wr.posY == 0) ||
+                        (facing == EnumFacing.UP && wr.posY == 240)) {
+                        continue;
+                    } else {
+                        continue main;
+                    }
+                }
+                if (neighbor.visGraph == OcclusionWorker.DUMMY)
                     continue main;
             }
             updated++;
