@@ -32,10 +32,10 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         ModuleConfig.init();
 
         if (ModuleConfig.OCCLUSION_TWEAKS)
-            OcclusionCompat.executeConfigCompatibilityHacks();
+            OcclusionCompat.executeConfigFixes();
 
         if (ModuleConfig.TEXTURE_OPTIMIZATIONS)
-            AnimFixCompat.executeConfigCompatibilityHacks();
+            AnimFixCompat.executeConfigFixes();
     }
 
     @Override

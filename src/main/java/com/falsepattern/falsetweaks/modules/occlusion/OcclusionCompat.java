@@ -26,7 +26,7 @@ package com.falsepattern.falsetweaks.modules.occlusion;
 import Reika.DragonAPI.Extras.ChangePacketRenderer;
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.lib.util.FileUtil;
+import com.falsepattern.falsetweaks.util.ConfigFixUtil;
 import lombok.val;
 import org.embeddedt.archaicfix.config.ArchaicConfig;
 import shadersmod.client.Shaders;
@@ -39,15 +39,13 @@ import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OcclusionCompat {
 
-    public static void executeConfigCompatibilityHacks() {
-        FastCraftCompat.executeFastCraftCompatibilityHacks();
-        ArchaicFixCompat.executeArchaicFixCompatibilityHacks();
+    public static void executeConfigFixes() {
+        FastCraftCompat.executeFastCraftConfigFixes();
+        ArchaicFixCompat.executeArchaicFixConfigFixes();
     }
 
     public static class FastCraftCompat {
@@ -61,48 +59,30 @@ public class OcclusionCompat {
          * <p>
          * "apex predator of grug is complexity"
          */
-        public static void executeFastCraftCompatibilityHacks() {
-            val targetPath = FileUtil.getMinecraftHomePath().resolve("config").resolve("fastcraft.ini");
-            if (!Files.exists(targetPath))
-                return;
-            try {
-                val fileText = Files.readAllLines(targetPath);
-                val result = fileText.stream().map(line -> {
-                    if (line.contains("asyncCulling") ||
-                        line.contains("enableCullingTweaks"))
-                        return line.replace("true", "false");
-                    if (line.contains("maxViewDistance"))
-                        return line.replaceAll("\\d+", "32");
-                    return line;
-                }).collect(Collectors.toList());
-                Files.write(targetPath, result);
-            } catch (IOException e) {
-                Share.log.fatal("Failed to apply FastCraft occlusion tweak compatibility patches!", e);
-            }
+        public static void executeFastCraftConfigFixes() {
+            ConfigFixUtil.fixConfig("fastcraft.ini", (line) -> {
+                if (line.contains("asyncCulling") ||
+                    line.contains("enableCullingTweaks"))
+                    return line.replace("true", "false");
+                if (line.contains("maxViewDistance"))
+                    return line.replaceAll("\\d+", "32");
+                return line;
+            }, e -> Share.log.fatal("Failed to apply FastCraft occlusion tweak compatibility patches!", e));
         }
     }
 
     public static class ArchaicFixCompat {
         /**
-         * See {@link FastCraftCompat#executeFastCraftCompatibilityHacks()}
+         * See {@link FastCraftCompat#executeFastCraftConfigFixes()}
          */
-        public static void executeArchaicFixCompatibilityHacks() {
-            val targetPath = FileUtil.getMinecraftHomePath().resolve("config").resolve("archaicfix.cfg");
-            if (!Files.exists(targetPath))
-                return;
-            try {
-                val fileText = Files.readAllLines(targetPath);
-                val result = fileText.stream().map(line -> {
-                    if (line.contains("raiseMaxRenderDistance") ||
-                        line.contains("enableOcclusionTweaks") ||
-                        line.contains("enableThreadedChunkUpdates"))
-                        return line.replaceAll("[tT][rR][uU][eE]", "false");
-                    return line;
-                }).collect(Collectors.toList());
-                Files.write(targetPath, result);
-            } catch (IOException e) {
-                Share.log.fatal("Failed to apply ArchaicFix occlusion tweak compatibility patches!", e);
-            }
+        public static void executeArchaicFixConfigFixes() {
+            ConfigFixUtil.fixConfig("archaicfix.cfg", line -> {
+                if (line.contains("raiseMaxRenderDistance") ||
+                    line.contains("enableOcclusionTweaks") ||
+                    line.contains("enableThreadedChunkUpdates"))
+                    return line.replaceAll("[tT][rR][uU][eE]", "false");
+                return line;
+            }, e -> Share.log.fatal("Failed to apply ArchaicFix occlusion tweak compatibility patches!", e));
         }
 
         /**
