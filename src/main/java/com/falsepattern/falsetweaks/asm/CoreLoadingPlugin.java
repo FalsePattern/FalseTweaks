@@ -19,6 +19,7 @@ package com.falsepattern.falsetweaks.asm;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.modules.animfix.AnimFixCompat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -32,6 +33,9 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
         if (ModuleConfig.OCCLUSION_TWEAKS)
             OcclusionCompat.executeConfigCompatibilityHacks();
+
+        if (ModuleConfig.TEXTURE_OPTIMIZATIONS)
+            AnimFixCompat.executeConfigCompatibilityHacks();
     }
 
     @Override
