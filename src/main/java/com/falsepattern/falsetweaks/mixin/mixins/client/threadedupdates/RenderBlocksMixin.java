@@ -50,7 +50,7 @@ public abstract class RenderBlocksMixin {
         if (mainThread) {
             val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
-            if (task != null && !task.cancelled && renderableOffThread) {
+            if (task != null && !task.cancelled && renderableOffThread && pass >= 0) {
                 cir.setReturnValue(task.result[pass].renderedSomething);
             }
         } else {
