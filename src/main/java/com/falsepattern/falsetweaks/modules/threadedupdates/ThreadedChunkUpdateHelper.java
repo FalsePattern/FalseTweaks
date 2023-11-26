@@ -107,8 +107,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
             if (!urgentTaskQueue.isEmpty()) {
                 nextRenderer = urgentTaskQueue.poll();
-                UpdateTask task = ((IRendererUpdateResultHolder) nextRenderer).ft$getRendererUpdateTask();
-                task.cancelled = true;
                 return true;
             }
 
@@ -227,11 +225,14 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             updated++;
             UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
 
-            if (wr.distanceToEntitySquared(Minecraft.getMinecraft().renderViewEntity) < 16 * 16) {
+            boolean urgent = wr.distanceToEntitySquared(Minecraft.getMinecraft().renderViewEntity) < 16 * 16;
+
+            if (urgent) {
+                task.important = true;
                 if (!ThreadingConfig.DISABLE_BLOCKING_CHUNK_UPDATES) {
+                    task.cancelled = true;
                     urgentTaskQueue.add(wr);
-                } else {
-                    task.important = true;
+                    continue;
                 }
             }
 

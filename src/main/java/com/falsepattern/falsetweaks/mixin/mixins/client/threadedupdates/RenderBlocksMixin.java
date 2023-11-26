@@ -21,6 +21,7 @@ import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
 import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,16 +46,20 @@ public abstract class RenderBlocksMixin {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
 
-        ThreadedChunkUpdateHelper.UpdateTask task = mainThread
-                                                    ? ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask()
-                                                    : null;
+        boolean renderableOffThread = ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType);
+        if (mainThread) {
+            val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
-        boolean offThreadBlock = ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType) &&
-                                 !(task != null && task.cancelled) &&
-                                 (!mainThread || ThreadedChunkUpdateHelper.renderBlocksStack.getLevel() == 1);
-        if ((mainThread ? pass >= 0 : true) && (mainThread ? offThreadBlock : !offThreadBlock)) {
-            // Cancel rendering block if it's delegated to a different thread.
-            cir.setReturnValue(mainThread ? task.result[pass].renderedSomething : false);
+            if (task != null && !task.cancelled && renderableOffThread) {
+                cir.setReturnValue(task.result[pass].renderedSomething);
+            }
+        } else {
+            if (!renderableOffThread) {
+                cir.setReturnValue(false);
+            }
+        }
+
+        if (cir.isCancelled()) {
             OptiFineCompat.popEntity();
         }
     }
