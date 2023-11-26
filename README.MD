@@ -57,6 +57,7 @@ myItem_2.png
 | Crash with "IllegalArgumentException: Comparison method violates its general contract!"        | Under the `00_modules` category in the config,<br>set `B:TE_TRANSPARENCY_FIX` to `false`.                                                             |
 | Flickering blocks when using optifine shaders and PBR resource packs                           | Under the `00_modules` category in the config,<br>set `B:TEXTURE_OPTIMIZATIONS` to `false`.                                                           |
 | Crash with ArchaicFix                                                                          | Disable the occlusion culling feature in ArchaicFix if you enable the one in FalseTweaks. (The FalseTweaks one is compatible with FastCraft/OptiFine) |
+| Buggy/invisible world with LWJGL3ify                                                           | Under the `00_modules` category in the config,<br>set `B:TEXTURE_OPTIMIZATIONS` to `false`.                                                           |
 
 Any bug reports concerning the known problems listed in this table will be closed without response. Read before you open issues.
 
