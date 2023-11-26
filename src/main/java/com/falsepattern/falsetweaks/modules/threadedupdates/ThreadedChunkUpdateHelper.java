@@ -335,8 +335,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                                     tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
                                 }
 
-                                int k3 = block.getRenderBlockPass();
-
                                 if (!block.canRenderInPass(pass)) {
                                     continue;
                                 }
