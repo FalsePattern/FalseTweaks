@@ -140,7 +140,10 @@ public class OcclusionRenderer {
                         OcclusionCompat.DragonAPICompat.ChangePacketRenderer$onChunkRerender(x1, y1, z1, x2, y2, z2, worldrenderer);
                         OcclusionHelpers.worker.dirty = true;
                     } else {
-                        for(IRenderGlobalListener l : eventListeners) l.onDirtyRendererChanged(worldrenderer);
+                        int size = eventListeners.size();
+                        for(int m = -1; ++m < size;) {
+                            eventListeners.get(m).onDirtyRendererChanged(worldrenderer);
+                        }
                     }
                 }
             }
