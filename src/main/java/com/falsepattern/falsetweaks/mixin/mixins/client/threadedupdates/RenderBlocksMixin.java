@@ -24,9 +24,7 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateH
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -39,20 +37,12 @@ import net.minecraftforge.client.ForgeHooksClient;
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
 
-    private int returnBoolCancel;
-    /**
-     * @author FalsePattern
-     * @reason CallbackInfoReturnable from a regular injection is really expensive and allocation spammy,
-     * so we sidestep it by shuffling data through a field
-     */
-    @Redirect(method = "renderBlockByRenderType",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/block/Block;getRenderType()I",
-                       ordinal = 0),
-              require = 1)
-    private int cancelRenderDelegatedToDifferentThread1(Block block) {
-        returnBoolCancel = 0;
-        int renderType = block.getRenderType();
+    @Inject(method = "renderBlockByRenderType",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/block/Block;setBlockBoundsBasedOnState(Lnet/minecraft/world/IBlockAccess;III)V"),
+            cancellable = true,
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void cancelRenderDelegatedToDifferentThread(Block block, int x, int y, int z, CallbackInfoReturnable<Boolean> cir, int renderType) {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
 
@@ -61,23 +51,15 @@ public abstract class RenderBlocksMixin {
             val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
             if (task != null && !task.cancelled && renderableOffThread && pass >= 0) {
-                returnBoolCancel = task.result[pass].renderedSomething ? 1 : 0;
-                return -1;
+                cir.setReturnValue(task.result[pass].renderedSomething);
             }
         } else if (!renderableOffThread) {
-            return -1;
+            cir.setReturnValue(false);
         }
-        return renderType;
-    }
 
-    //Minecraft Dev plugin for intellij incorrectly assumes this to the "0" in the switch
-    //In reality, this replaces the "return false;" statement in the -1 case
-    @ModifyConstant(method = "renderBlockByRenderType",
-                    constant = @Constant(intValue = 0,
-                                         ordinal = 0),
-                    require = 1)
-    private int fakeReturn(int value) {
-        return returnBoolCancel;
+        if (cir.isCancelled()) {
+            OptiFineCompat.popEntity();
+        }
     }
 
     @Inject(method = "renderBlockByRenderType",
