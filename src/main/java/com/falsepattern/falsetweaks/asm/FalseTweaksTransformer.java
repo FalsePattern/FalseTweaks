@@ -19,6 +19,7 @@ package com.falsepattern.falsetweaks.asm;
 
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalDeOptimizer;
+import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_RenderBlocksASM;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.asm.SmartTransformer;
@@ -39,6 +40,12 @@ public class FalseTweaksTransformer implements SmartTransformer {
 
     public static RenderGlobalDeOptimizer OPTIFINE_DEOPTIMIZER = new RenderGlobalDeOptimizer();
     public static final List<IClassNodeTransformer> TRANSFORMERS = new ArrayList<>(Arrays.asList(OPTIFINE_DEOPTIMIZER));
+
+    static {
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            TRANSFORMERS.add(new Threading_RenderBlocksASM());
+        }
+    }
 
     private final List<IClassNodeTransformer> transformers = TRANSFORMERS;
 }

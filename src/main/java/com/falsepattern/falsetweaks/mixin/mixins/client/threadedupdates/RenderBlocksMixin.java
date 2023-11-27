@@ -19,15 +19,14 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
 import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
-import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -36,13 +35,12 @@ import net.minecraftforge.client.ForgeHooksClient;
 
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
-
-    @Inject(method = "renderBlockByRenderType",
-            at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/block/Block;setBlockBoundsBasedOnState(Lnet/minecraft/world/IBlockAccess;III)V"),
-            cancellable = true,
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void cancelRenderDelegatedToDifferentThread(Block block, int x, int y, int z, CallbackInfoReturnable<Boolean> cir, int renderType) {
+    /**
+     * Called by ASM
+     */
+    @SuppressWarnings("unused")
+    @Unique
+    private int ft$cancelRenderDelegatedToDifferentThread(Block block, int renderType) {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
 
@@ -51,15 +49,13 @@ public abstract class RenderBlocksMixin {
             val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
             if (task != null && !task.cancelled && renderableOffThread && pass >= 0) {
-                cir.setReturnValue(task.result[pass].renderedSomething);
+                return task.result[pass].renderedSomething ? 2 : 1;
             }
         } else if (!renderableOffThread) {
-            cir.setReturnValue(false);
+            return 1;
         }
 
-        if (cir.isCancelled()) {
-            OptiFineCompat.popEntity();
-        }
+        return 0;
     }
 
     @Inject(method = "renderBlockByRenderType",

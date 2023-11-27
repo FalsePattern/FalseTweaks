@@ -177,6 +177,55 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Shadow
     public abstract boolean hasOverrideBlockTexture();
 
+    private IFaceRenderer fr$renderFaceYNeg;
+    private IFaceRenderer fr$renderFaceYPos;
+    private IFaceRenderer fr$renderFaceZNeg;
+    private IFaceRenderer fr$renderFaceZPos;
+    private IFaceRenderer fr$renderFaceXNeg;
+    private IFaceRenderer fr$renderFaceXPos;
+
+    @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
+            at = @At("RETURN"),
+            require = 2)
+    private void setupCallbacks(CallbackInfo ci) {
+        fr$renderFaceYNeg = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceYNeg(block, x, y, z, icon);
+            }
+        };
+        fr$renderFaceYPos = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceYPos(block, x, y, z, icon);
+            }
+        };
+        fr$renderFaceZNeg = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceZNeg(block, x, y, z, icon);
+            }
+        };
+        fr$renderFaceZPos = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceZPos(block, x, y, z, icon);
+            }
+        };
+        fr$renderFaceXNeg = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceXNeg(block, x, y, z, icon);
+            }
+        };
+        fr$renderFaceXPos = new IFaceRenderer() {
+            @Override
+            public void render(Block block, int x, int y, int z, IIcon icon) {
+                renderFaceXPos(block, x, y, z, icon);
+            }
+        };
+    }
+
     @Shadow
     public abstract void renderFaceYNeg(Block p_147768_1_, double p_147768_2_, double p_147768_4_, double p_147768_6_, IIcon p_147768_8_);
 
@@ -531,12 +580,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
         state.set(block, x, y, z, r, g, b, useColor, light);
         boolean drewSomething;
-        drewSomething = renderFace(this::renderFaceYNeg, Facing.YNEG);
-        drewSomething |= renderFace(this::renderFaceYPos, Facing.YPOS);
-        drewSomething |= renderFace(this::renderFaceZNeg, Facing.ZNEG);
-        drewSomething |= renderFace(this::renderFaceZPos, Facing.ZPOS);
-        drewSomething |= renderFace(this::renderFaceXNeg, Facing.XNEG);
-        drewSomething |= renderFace(this::renderFaceXPos, Facing.XPOS);
+        drewSomething = renderFace(fr$renderFaceYNeg, Facing.YNEG);
+        drewSomething |= renderFace(fr$renderFaceYPos, Facing.YPOS);
+        drewSomething |= renderFace(fr$renderFaceZNeg, Facing.ZNEG);
+        drewSomething |= renderFace(fr$renderFaceZPos, Facing.ZPOS);
+        drewSomething |= renderFace(fr$renderFaceXNeg, Facing.XNEG);
+        drewSomething |= renderFace(fr$renderFaceXPos, Facing.XPOS);
 
         this.enableAO = false;
         if (drewSomething && enableMultiRenderReuse) {

@@ -19,6 +19,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,12 +30,13 @@ import net.minecraft.client.shader.TesselatorVertexState;
 
 @Mixin(Tessellator.class)
 public abstract class TessellatorBSPSortingMixin implements ITessellatorMixin {
-    @Inject(method = "getVertexState",
-            at = @At(value = "HEAD"),
-            cancellable = true,
-            require = 1)
-    private void bspSort(float p_147564_1_, float p_147564_2_, float p_147564_3_, CallbackInfoReturnable<TesselatorVertexState> cir) {
-        cir.setReturnValue(getVertexStateBSP(p_147564_1_, p_147564_2_, p_147564_3_));
+    /**
+     * @author FalsePattern
+     * @reason BSP sorting, way less allocs than inject/cancel
+     */
+    @Overwrite
+    public TesselatorVertexState getVertexState(float p_147564_1_, float p_147564_2_, float p_147564_3_) {
+        return getVertexStateBSP(p_147564_1_, p_147564_2_, p_147564_3_);
     }
 
     @Inject(method = "setVertexState",
