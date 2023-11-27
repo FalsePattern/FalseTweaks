@@ -2,7 +2,7 @@
 
 FalsePattern's flagship tweaking, patching, and optimization mod.
 
-Nightly (most likely broken) builds available [here](https://nightly.link/FalsePattern/FalseTweaks/workflows/build-nightly/main/nightly.zip)
+Nightly (most likely broken) builds available [here](https://nightly.link/FalsePattern/FalseTweaks/workflows/build-nightly/master/nightly.zip)
 
 ## NOTICE
 This mod completely replaces Triangulator and AnimFix. Make sure you delete these two mods before installing FalseTweaks.
