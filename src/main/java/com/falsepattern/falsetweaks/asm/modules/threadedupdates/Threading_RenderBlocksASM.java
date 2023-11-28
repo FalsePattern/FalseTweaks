@@ -61,6 +61,7 @@ public class Threading_RenderBlocksASM implements IClassNodeTransformer {
         list.add(new InsnNode(Opcodes.ISUB));
         list.add(new InsnNode(Opcodes.IRETURN));
         list.add(lbl);
+        list.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"I"}));
         list.add(new InsnNode(Opcodes.POP));
     }
 }

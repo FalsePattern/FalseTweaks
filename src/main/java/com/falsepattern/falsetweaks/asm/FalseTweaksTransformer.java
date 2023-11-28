@@ -21,16 +21,21 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalDeOptimizer;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_RenderBlocksASM;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.lib.asm.ASMUtil;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.asm.SmartTransformer;
 import com.falsepattern.lib.optifine.OptiFineTransformerHooks;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -45,6 +50,40 @@ public class FalseTweaksTransformer implements SmartTransformer {
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
             TRANSFORMERS.add(new Threading_RenderBlocksASM());
         }
+    }
+
+    @Override
+    public byte[] transform(String name, String transformedName, byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        val transformers = new ArrayList<IClassNodeTransformer>();
+        val cn = ASMUtil.parseClass(bytes, 0);
+        for (val transformer : transformers()) {
+            if (transformer.shouldTransform(cn, transformedName, CoreLoadingPlugin.isObfuscated())) {
+                transformers.add(transformer);
+            }
+        }
+        if (transformers.isEmpty()) {
+            return bytes;
+        }
+        transformers.sort(Comparator.comparingInt(IClassNodeTransformer::internalSortingOrder));
+        val log = logger();
+        for (val transformer : transformers) {
+            log.debug("Patching {} with {}...", transformedName, transformer.getName());
+            try {
+                transformer.transform(cn, transformedName, CoreLoadingPlugin.isObfuscated());
+            } catch (RuntimeException | Error t) {
+                log.error("Error transforming {} with {}: {}", transformedName, transformer.getName(), t.getMessage());
+                throw t;
+            } catch (Throwable t) {
+                log.error("Error transforming {} with {}: {}", transformedName, transformer.getName(), t.getMessage());
+                throw new RuntimeException(t);
+            }
+        }
+        val result = ASMUtil.serializeClass(cn, 0);
+        log.debug("Patched {} successfully.", transformedName);
+        return result;
     }
 
     private final List<IClassNodeTransformer> transformers = TRANSFORMERS;

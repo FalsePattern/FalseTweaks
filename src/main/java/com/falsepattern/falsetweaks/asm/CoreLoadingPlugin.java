@@ -21,6 +21,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.animfix.AnimFixCompat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
+import lombok.Getter;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
@@ -28,6 +29,9 @@ import java.util.Map;
 
 @IFMLLoadingPlugin.TransformerExclusions(Tags.GROUPNAME + ".asm")
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
+    @Getter
+    private static boolean obfuscated;
+
     static {
         ModuleConfig.init();
 
@@ -55,6 +59,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
         //Doing this here because this runs after coremod init, but before minecraft classes start loading and mixins start colliding and crashing.
         if (ModuleConfig.OCCLUSION_TWEAKS)
             OcclusionCompat.ArchaicFixCompat.crashIfUnsupportedConfigsAreActive();
