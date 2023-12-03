@@ -66,6 +66,9 @@ public abstract class TextureMapMixin {
             val tex = (ITextureAtlasSpriteMixin) iicon;
             val loc = new ResourceLocation(name);
             val complete = completeResourceLocation(loc, 0);
+            if (iicon.hasCustomLoader(manager, complete)) {
+                continue;
+            }
             try {
                 val resource = manager.getResource(complete);
                 val layerMeta = (LayerMetadataSection) resource.getMetadata("voxelLayers");
