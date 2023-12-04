@@ -31,9 +31,11 @@ import lombok.val;
 import org.embeddedt.archaicfix.config.ArchaicConfig;
 import shadersmod.client.Shaders;
 import stubpackage.Config;
+import stubpackage.DynamicLights;
 import stubpackage.net.minecraft.client.renderer.EntityRenderer;
 
 import net.minecraft.client.gui.GuiOptionButton;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Loader;
@@ -146,6 +148,14 @@ public class OcclusionCompat {
             val button = (GuiOptionButton) control;
             button.enabled = false;
             return addToList.add(button);
+        }
+
+        public static void updateDynamicLights(RenderGlobal rg) {
+            if (!Compat.optiFineHasDynamicLights())
+                return;
+            if (!Config.isDynamicLights())
+                return;
+            DynamicLights.update(rg);
         }
     }
 

@@ -362,7 +362,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     private ChunkCache getChunkCacheSnapshot(WorldRenderer wr) {
         // TODO This is not thread-safe! Actually make a snapshot here.
         byte pad = 1;
-        ChunkCache chunkcache = new ChunkCache(wr.worldObj, wr.posX - pad, wr.posY - pad, wr.posZ - pad,
+        ChunkCache chunkcache = OptiFineCompat.createChunkCache(wr.worldObj, wr.posX - pad, wr.posY - pad, wr.posZ - pad,
                 wr.posX + 16 + pad, wr.posY + 16 + pad, wr.posZ + 16 + pad, pad);
         return chunkcache;
     }

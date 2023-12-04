@@ -618,6 +618,7 @@ public class OcclusionRenderer {
     }
 
     public int sortAndRender(EntityLivingBase view, int pass, double tick) {
+        OcclusionCompat.OptiFineCompat.updateDynamicLights(rg);
         queryMissingVisgraphs();
         CameraInfo cam = CameraInfo.getInstance();
         cam.update(view, tick);

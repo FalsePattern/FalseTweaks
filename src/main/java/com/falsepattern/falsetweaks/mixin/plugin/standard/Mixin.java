@@ -33,7 +33,10 @@ import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonCon
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.TRIANGULATOR;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.VOXELIZER;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_ANY_OPTIFINE;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_SHADERS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_ANY_OPTIFINE;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_SHADERS;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
@@ -68,10 +71,10 @@ public enum Mixin implements IMixin {
                                   TRIANGULATOR.and(AVOID_ANY_OPTIFINE),
                                   "triangulator.optifine.TessellatorVanillaMixin"),
     Tri_OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT,
-                                               TRIANGULATOR.and(avoid(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                               TRIANGULATOR.and(AVOID_OPTIFINE_WITH_SHADERS),
                                                "triangulator.optifine.TessellatorVanillaOrOldOptifineMixin"),
     Tri_OFTessellatorOptiFineMixin(Side.CLIENT,
-                                   TRIANGULATOR.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                   TRIANGULATOR.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                    "triangulator.optifine.TessellatorOptiFineMixin"),
 
     //ChromatiCraft
@@ -128,10 +131,10 @@ public enum Mixin implements IMixin {
 
     //OptiFine with shaders
     Occlusion_Optifine_Shaders_ShadersRendererMixin(Side.CLIENT,
-                                                    OCCLUSION.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                                    OCCLUSION.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                                     "occlusion.optifine.shaders.ShadersRendererMixin"),
     Occlusion_Optifine_Shaders_FrustrumMixin(Side.CLIENT,
-                                             OCCLUSION.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                             OCCLUSION.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                              "occlusion.optifine.shaders.FrustrumMixin"),
 
 
@@ -158,7 +161,7 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin_Debug"),
     ThreadedUpdates_WorldRendererMixin(Side.CLIENT, THREADING, "threadedupdates.WorldRendererMixin"),
     ThreadedUpdates_Optifine_ShadersMixin(Side.CLIENT,
-                                          THREADING.and(require(TargetedMod.OPTIFINE_WITH_SHADERS)),
+                                          THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                           "threadedupdates.optifine.ShadersMixin"),
 
     //DragonAPI
@@ -176,7 +179,8 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_OptiFine_GuiPerformanceSettingsOFMixin(Side.CLIENT,
                                                THREADING.and(REQUIRE_ANY_OPTIFINE),
                                                "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
-
+    ThreadedUpdates_OptiFine_WorldClientMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS),
+                                                   "threadedupdates.optifine.WorldClientMixin"),
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module

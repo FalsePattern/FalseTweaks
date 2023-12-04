@@ -34,4 +34,8 @@ public class Config {
     public static boolean isFogOff() {
         return false;
     }
+
+    public static boolean isDynamicLights() {
+        return false;
+    }
 }

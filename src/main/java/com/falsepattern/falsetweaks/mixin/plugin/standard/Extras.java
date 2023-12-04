@@ -24,4 +24,5 @@ import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.contains;
 class Extras {
     static final Predicate<String> OPTIFINE_SHADERSMOD_VERSIONS =
             contains("d7").or(contains("d8")).or(contains("e3")).or(contains("e7"));
+    static final Predicate<String> OPTIFINE_DYNAMIC_LIGHTS_VERSIONS = contains("d6");
 }

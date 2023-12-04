@@ -19,9 +19,14 @@ package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.Compat;
 import shadersmod.client.Shaders;
+import stubpackage.ChunkCacheOF;
 import stubpackage.Config;
 
-import cpw.mods.fml.client.FMLClientHandler;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.World;
+
+import java.io.IOException;
 
 public class OptiFineCompat {
     public static class ThreadSafeEntityData {
@@ -36,5 +41,33 @@ public class OptiFineCompat {
             return;
         }
         Shaders.popEntity();
+    }
+
+    private static Boolean HAS_CHUNKCACHE = null;
+
+    public static ChunkCache createChunkCache(World world, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, int subIn) {
+        if (HAS_CHUNKCACHE == null) {
+            if (Compat.optiFineInstalled()) {
+                try {
+                    HAS_CHUNKCACHE = Launch.classLoader.getClassBytes("ChunkCacheOF") != null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    HAS_CHUNKCACHE = false;
+                }
+            } else {
+                HAS_CHUNKCACHE = false;
+            }
+        }
+        if (HAS_CHUNKCACHE) {
+            return WrappedOF.createOFChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        } else {
+            return new ChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        }
+    }
+
+    private static class WrappedOF {
+        private static ChunkCache createOFChunkCache(World world, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, int subIn) {
+            return new ChunkCacheOF(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        }
     }
 }

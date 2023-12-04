@@ -37,6 +37,7 @@ import java.io.IOException;
 public class Compat {
     private static Boolean NEODYMIUM = null;
     private static Boolean OPTIFINE = null;
+    private static Boolean DYNLIGHTS = null;
     private static Boolean SHADERS = null;
 
     public static boolean neodymiumInstalled() {
@@ -64,6 +65,22 @@ public class Compat {
             OPTIFINE = false;
         }
         return OPTIFINE;
+    }
+
+    public static boolean optiFineHasDynamicLights() {
+        if (!optiFineInstalled()) {
+            return false;
+        }
+        if (DYNLIGHTS != null) {
+            return DYNLIGHTS;
+        }
+        try {
+            DYNLIGHTS = Launch.classLoader.getClassBytes("DynamicLights") != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            DYNLIGHTS = false;
+        }
+        return DYNLIGHTS;
     }
 
     public static boolean optiFineHasShaders() {
