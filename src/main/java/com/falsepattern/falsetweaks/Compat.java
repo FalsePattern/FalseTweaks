@@ -159,7 +159,11 @@ public class Compat {
         private static boolean isThreadedChunkUpdatingEnabled;
 
         private static void init() {
-            isThreadedChunkUpdatingEnabled =  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
+            try {
+                isThreadedChunkUpdatingEnabled =  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
+            } catch (Throwable ignored) {
+                isThreadedChunkUpdatingEnabled = false;
+            }
         }
 
         public static Tessellator threadTessellator() {
