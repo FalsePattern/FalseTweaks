@@ -22,6 +22,7 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
+import makamys.neodymium.Neodymium;
 import stubpackage.Config;
 
 import net.minecraft.block.Block;
@@ -52,6 +53,10 @@ public class Compat {
             NEODYMIUM = false;
         }
         return NEODYMIUM;
+    }
+
+    public static boolean neodymiumActive() {
+        return neodymiumInstalled() && Neodymium.isActive();
     }
 
     public static boolean optiFineInstalled() {
@@ -111,7 +116,7 @@ public class Compat {
 
     public static boolean enableTriangulation() {
         //Threaded chunk updates mess up the triangulator, so keep it off for now until the root cause is found.
-        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES && !neodymiumInstalled();
+        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES && !neodymiumActive();
     }
 
     public static Tessellator tessellator() {
@@ -182,6 +187,12 @@ public class Compat {
 
         public static Tessellator threadTessellator() {
             return ThreadedChunkUpdates.getThreadTessellator();
+        }
+    }
+
+    private static class NeodymiumCompat {
+        public static boolean isActive() {
+            return Neodymium.isActive();
         }
     }
 }

@@ -17,6 +17,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.modules.occlusion.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.occlusion.leakfix.interfaces.IWorldRendererMixin;
 import com.falsepattern.falsetweaks.modules.occlusion.IWorldRenderer;
@@ -189,6 +190,7 @@ public abstract class WorldRendererMixin implements IWorldRenderer, IWorldRender
             at = @At("HEAD"),
             require = 1)
     private void prepareRenderList(int p_147890_1_, CallbackInfo ci) {
-        genList();
+        if (!Compat.neodymiumActive())
+            genList();
     }
 }

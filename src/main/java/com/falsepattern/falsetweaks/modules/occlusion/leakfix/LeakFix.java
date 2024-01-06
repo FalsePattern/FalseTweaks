@@ -17,6 +17,7 @@
 
 package com.falsepattern.falsetweaks.modules.occlusion.leakfix;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
@@ -117,6 +118,10 @@ public final class LeakFix {
         val txt = (RenderGameOverlayEvent.Text) e;
         txt.right.add(null);
         txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.title"));
+        if (Compat.neodymiumActive()) {
+            txt.right.add(I18n.format("gui.falsetweaks.occlusion.debug.ndbypass"));
+            return;
+        }
         int active = LeakFix.getActiveBufferCount();
         int cached = LeakFix.getCachedBufferCount();
         int total = active + cached;
