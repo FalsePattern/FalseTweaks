@@ -1,5 +1,6 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
 import lombok.val;
@@ -161,15 +162,33 @@ public class OcclusionRenderer {
     }
 
     public String getDebugInfoRenders() {
-        StringBuilder r = new StringBuilder(3 + 4 + 1 + 4 + 1 + 6 + 5 + 4 + 5 + 4 + 5 + 4 + 5 + 4 + 5 + 3 + 5 + 3 + 5 + 4);
-        r.append("C: ").append(rg.renderersBeingRendered).append('/').append(rg.renderersLoaded).append('/').append(rg.worldRenderers.length);
-        r.append(". F: ").append(rg.renderersBeingClipped);
-        r.append(", O: ").append(rg.renderersBeingOccluded);
-        r.append(", E: ").append(rg.renderersSkippingRenderPass);
-        r.append(", I: ").append(rg.dummyRenderInt);
-        r.append("; U: ").append(renderersNeedUpdate);
-        r.append(", N: ").append(rg.worldRenderersToUpdate.size());
-        return r.toString();
+        if (Compat.neodymiumActive()) {
+            StringBuilder r = new StringBuilder(
+                    3 + 6 + 1 + 6 +
+                    5 + 6
+                    );
+            r.append("C: ").append(rg.renderersLoaded).append('/').append(rg.worldRenderers.length);
+            r.append(", N: ").append(rg.worldRenderersToUpdate.size());
+            return r.toString();
+        } else {
+            StringBuilder r = new StringBuilder(
+                    3 + 6 + 1 + 6 + 1 + 6
+                    + 5 + 6
+                    + 5 + 6
+                    + 5 + 6
+                    + 5 + 6
+                    + 5 + 6
+                    + 5 + 6
+            );
+            r.append("C: ").append(rg.renderersBeingRendered).append('/').append(rg.renderersLoaded).append('/').append(rg.worldRenderers.length);
+            r.append(". F: ").append(rg.renderersBeingClipped);
+            r.append(", O: ").append(rg.renderersBeingOccluded);
+            r.append(", E: ").append(rg.renderersSkippingRenderPass);
+            r.append(", I: ").append(rg.dummyRenderInt);
+            r.append("; U: ").append(renderersNeedUpdate);
+            r.append(", N: ").append(rg.worldRenderersToUpdate.size());
+            return r.toString();
+        }
     }
 
     public void initBetterLists() {
