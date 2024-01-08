@@ -17,7 +17,10 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
+import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
+import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -94,6 +97,7 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
         }
         if (field_78388_E > rawBuffer.length) {
             rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
+            OptiFineCompat.resizeNativeBuffers((Tessellator)(Object)this);
         }
 
         System.arraycopy(state.getRawBuffer(), 0, rawBuffer, rawBufferIndex, state.getRawBufferIndex());

@@ -181,6 +181,9 @@ public enum Mixin implements IMixin {
                                                "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
     ThreadedUpdates_OptiFine_WorldClientMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS),
                                                    "threadedupdates.optifine.WorldClientMixin"),
+    ThreadedUpdates_OptiFine_TessellatorMixin(Side.CLIENT,
+                                              THREADING.and(REQUIRE_ANY_OPTIFINE),
+                                              "threadedupdates.optifine.TessellatorMixin"),
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module

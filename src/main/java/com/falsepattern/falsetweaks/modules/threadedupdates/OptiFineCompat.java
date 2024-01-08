@@ -22,6 +22,7 @@ import shadersmod.client.Shaders;
 import stubpackage.ChunkCacheOF;
 import stubpackage.Config;
 
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
@@ -29,6 +30,12 @@ import net.minecraft.world.World;
 import java.io.IOException;
 
 public class OptiFineCompat {
+    public static void resizeNativeBuffers(Tessellator tessellator) {
+        if (Compat.optiFineInstalled()) {
+            ((ITessellatorOptiFineCompat)tessellator).ft$resizeNativeBuffers();
+        }
+    }
+
     public static class ThreadSafeEntityData {
         public static final ThreadLocal<ThreadSafeEntityData> TL = ThreadLocal.withInitial(ThreadSafeEntityData::new);
 
