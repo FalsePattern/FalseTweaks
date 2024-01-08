@@ -74,6 +74,10 @@ public abstract class ChunkMixin implements ICulledChunk {
             at = @At("RETURN"),
             require = 1)
     private void onInit(World p_i1995_1_, int p_i1995_2_, int p_i1995_3_, CallbackInfo ci) {
+        initVisArray();
+    }
+
+    private void initVisArray() {
         visibility = new VisGraph[16];
         for (int i = 0; i < 16; ++i) {
             visibility[i] = new VisGraph();
