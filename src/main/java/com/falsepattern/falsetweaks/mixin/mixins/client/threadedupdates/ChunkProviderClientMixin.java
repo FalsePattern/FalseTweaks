@@ -29,6 +29,9 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -41,12 +44,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class ChunkProviderClientMixin {
     @Unique
     private volatile AtomicLong ft$writeCount;
+    @Unique
+    private volatile ThreadLocal<Boolean> ft$isClientThread;
 
     @Inject(method = "<init>",
             at = @At("RETURN"),
             require = 1)
     private void initMutex(World p_i1184_1_, CallbackInfo ci) {
         ft$writeCount = new AtomicLong();
+        ft$isClientThread = ThreadLocal.withInitial(() -> Thread.currentThread().getName().equals("Client thread"));
     }
 
     @Redirect(method = "unloadChunk",
@@ -80,6 +86,11 @@ public abstract class ChunkProviderClientMixin {
                        target = "Lnet/minecraft/util/LongHashMap;getValueByKey(J)Ljava/lang/Object;"),
               require = 1)
     private Object threadSafeGet(LongHashMap instance, long id) {
+        if (ft$isClientThread.get())
+            return instance.getValueByKey(id);
+        try {
+            return instance.getValueByKey(id);
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
         Object result = null;
         long expectedWriteCount;
         boolean retry;
