@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,6 +38,14 @@ import java.util.Set;
         category = "voxelizer")
 @Config.RequiresMcRestart
 public class VoxelizerConfig {
+    @Config.Ignore
+    private static final Set<String> knownExcludes = new HashSet<>();
+    @Config.Ignore
+    private static final Set<String> knownIncludes = new HashSet<>();
+    @Config.Ignore
+    private static final Set<Class<?>> knownClassExcludes = new HashSet<>();
+    @Config.Ignore
+    private static final Set<Class<?>> knownClassIncludes = new HashSet<>();
     @Config.Comment("You can use this property to fix any incorrectly detected overlays.\n" +
                     "Syntax: texture_name=layer, where layer is the multiplier.\n" +
                     "The default behaviour is that if the texture name ends with _overlay, its layer is set to 1,\n" +
@@ -92,11 +106,6 @@ public class VoxelizerConfig {
         ConfigurationManager.selfInit();
     }
 
-    @Config.Ignore
-    private static final Set<String> knownExcludes = new HashSet<>();
-    @Config.Ignore
-    private static final Set<String> knownIncludes = new HashSet<>();
-
     public static boolean isExcluded(String textureName) {
         if (knownExcludes.contains(textureName)) {
             return true;
@@ -113,11 +122,6 @@ public class VoxelizerConfig {
         knownIncludes.add(textureName);
         return false;
     }
-
-    @Config.Ignore
-    private static final Set<Class<?>> knownClassExcludes = new HashSet<>();
-    @Config.Ignore
-    private static final Set<Class<?>> knownClassIncludes = new HashSet<>();
 
     public static boolean isClassExcluded(Class<?> clazz) {
         if (knownClassExcludes.contains(clazz)) {

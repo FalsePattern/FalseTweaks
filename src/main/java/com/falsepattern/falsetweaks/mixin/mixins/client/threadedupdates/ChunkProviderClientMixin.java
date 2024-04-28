@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
-import lombok.val;
+import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,10 +35,7 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
+import lombok.val;
 
 /**
  * LongHashMap is NOT thread-safe when reading+writing at the same time, so we need to mutex it.
@@ -43,41 +46,43 @@ import java.util.concurrent.atomic.AtomicLong;
 @Mixin(ChunkProviderClient.class)
 public abstract class ChunkProviderClientMixin {
     @Unique
-    private volatile AtomicLong ft$writeCount;
+    private volatile long ft$writeCount;
     @Unique
-    private volatile ThreadLocal<Boolean> ft$isClientThread;
+    private Thread ft$clientThread;
 
     @Inject(method = "<init>",
             at = @At("RETURN"),
             require = 1)
     private void initMutex(World p_i1184_1_, CallbackInfo ci) {
-        ft$writeCount = new AtomicLong();
-        ft$isClientThread = ThreadLocal.withInitial(() -> Thread.currentThread().getName().equals("Client thread"));
+        ft$writeCount = 0L;
+        ft$clientThread = Thread.currentThread();
     }
 
+    @SuppressWarnings("NonAtomicOperationOnVolatileField")
     @Redirect(method = "unloadChunk",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/util/LongHashMap;remove(J)Ljava/lang/Object;"),
               require = 1)
     private Object threadSafeUnload(LongHashMap instance, long id) {
-        ft$writeCount.incrementAndGet();
+        ft$writeCount++;
         try {
             return instance.remove(id);
         } finally {
-            ft$writeCount.incrementAndGet();
+            ft$writeCount++;
         }
     }
 
+    @SuppressWarnings("NonAtomicOperationOnVolatileField")
     @Redirect(method = "loadChunk",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/util/LongHashMap;add(JLjava/lang/Object;)V"),
               require = 1)
     private void threadSafeLoad(LongHashMap instance, long id, Object value) {
-        ft$writeCount.incrementAndGet();
+        ft$writeCount++;
         try {
             instance.add(id, value);
         } finally {
-            ft$writeCount.incrementAndGet();
+            ft$writeCount++;
         }
     }
 
@@ -86,25 +91,24 @@ public abstract class ChunkProviderClientMixin {
                        target = "Lnet/minecraft/util/LongHashMap;getValueByKey(J)Ljava/lang/Object;"),
               require = 1)
     private Object threadSafeGet(LongHashMap instance, long id) {
-        if (ft$isClientThread.get())
+        val t = Thread.currentThread();
+        if (ft$clientThread == t || FTWorker.isThread(t)) {
             return instance.getValueByKey(id);
-        try {
-            return instance.getValueByKey(id);
-        } catch (ArrayIndexOutOfBoundsException ignored) {}
+        }
         Object result = null;
         long expectedWriteCount;
         boolean retry;
         do {
             retry = false;
             do {
-                expectedWriteCount = ft$writeCount.get();
-            } while (expectedWriteCount % 2 != 0);
+                expectedWriteCount = ft$writeCount;
+            } while (ft$writeCount % 2 != 0);
             try {
                 result = instance.getValueByKey(id);
             } catch (ArrayIndexOutOfBoundsException ignored) {
                 retry = true;
             }
-        } while (retry || !ft$writeCount.compareAndSet(expectedWriteCount, expectedWriteCount));
+        } while (retry || ft$writeCount != expectedWriteCount);
         return result;
     }
 }

@@ -1,9 +1,30 @@
+/*
+ * This file is part of FalseTweaks.
+ *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * FalseTweaks is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FalseTweaks is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
 import com.falsepattern.lib.asm.ASMUtil;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import lombok.val;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FrameNode;
@@ -39,21 +60,28 @@ public class Threading_RenderBlocksASM implements IClassNodeTransformer {
         boolean found = false;
         while (list.hasNext()) {
             val insn = list.next();
-            if (!(insn instanceof VarInsnNode))
+            if (!(insn instanceof VarInsnNode)) {
                 continue;
+            }
             val varInsn = (VarInsnNode) insn;
-            if (varInsn.getOpcode() != Opcodes.ISTORE || varInsn.var != 5)
+            if (varInsn.getOpcode() != Opcodes.ISTORE || varInsn.var != 5) {
                 continue;
+            }
             found = true;
             break;
         }
-        if (!found)
+        if (!found) {
             throw new IllegalStateException("Could not find injection point!");
+        }
 
         list.add(new VarInsnNode(Opcodes.ALOAD, 0));
         list.add(new VarInsnNode(Opcodes.ALOAD, 1));
         list.add(new VarInsnNode(Opcodes.ILOAD, 5));
-        list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/client/renderer/RenderBlocks", "ft$cancelRenderDelegatedToDifferentThread", "(Lnet/minecraft/block/Block;I)I", false));
+        list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
+                                    "net/minecraft/client/renderer/RenderBlocks",
+                                    "ft$cancelRenderDelegatedToDifferentThread",
+                                    "(Lnet/minecraft/block/Block;I)I",
+                                    false));
         val lbl = new LabelNode();
         list.add(new InsnNode(Opcodes.DUP));
         list.add(new JumpInsnNode(Opcodes.IFEQ, lbl));

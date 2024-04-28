@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,16 +34,15 @@ import lombok.Getter;
 import org.joml.Vector3f;
 
 public class PolygonHolder {
+    public final int vertexStride;
+    private final int polygonSize;
+    private final int vertexSize;
+    private final MidpointComputer midpointComputer;
+    private final NormalAreaComputer areaComputer;
     @Getter
     private int[] vertexData;
     @Getter
     private int polygonCount = 0;
-
-    private final int polygonSize;
-    private final int vertexSize;
-    public final int vertexStride;
-    private final MidpointComputer midpointComputer;
-    private final NormalAreaComputer areaComputer;
 
     public PolygonHolder(boolean triangleMode, boolean shaderMode) {
         this.polygonSize = triangleMode ? 3 : 4;
@@ -60,8 +65,8 @@ public class PolygonHolder {
         midpointComputer.getMidpoint(vertexData, polygon * vertexStride, vertexSize, output);
     }
 
-    public float area(int polygon) {
-        return areaComputer.getArea(vertexData, polygon * vertexStride, vertexSize);
+    public float area(int polygon, Vector3f scratchBuffer) {
+        return areaComputer.getArea(vertexData, polygon * vertexStride, vertexSize, scratchBuffer);
     }
 
     public void normal(int polygon, Vector3f output) {

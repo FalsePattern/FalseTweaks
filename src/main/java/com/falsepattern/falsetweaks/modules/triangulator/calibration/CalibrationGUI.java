@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -86,10 +92,8 @@ public class CalibrationGUI extends GuiScreen {
             y += 10;
         }
         labelList.add(descriptionLabel);
-        val toggle =
-                new GuiButton(ID_TOGGLE, centerX - 110, y, 100, 20, I18n.format("gui.triangulator.calibration.toggle"));
-        val apply =
-                new GuiButton(ID_APPLY, centerX + 10, y, 100, 20, I18n.format("gui.triangulator.calibration.apply"));
+        val toggle = new GuiButton(ID_TOGGLE, centerX - 110, y, 100, 20, I18n.format("gui.triangulator.calibration.toggle"));
+        val apply = new GuiButton(ID_APPLY, centerX + 10, y, 100, 20, I18n.format("gui.triangulator.calibration.apply"));
         buttonList.add(toggle);
         buttonList.add(apply);
     }
@@ -104,8 +108,7 @@ public class CalibrationGUI extends GuiScreen {
                 Calibration.setCalibration(flip);
                 val mc = Minecraft.getMinecraft();
                 mc.displayGuiScreen(null);
-                FormattedText.parse(EnumChatFormatting.GREEN + I18n.format("chat.triangulator.calibrated.message"))
-                             .addChatMessage(mc.thePlayer);
+                FormattedText.parse(EnumChatFormatting.GREEN + I18n.format("chat.triangulator.calibrated.message")).addChatMessage(mc.thePlayer);
                 break;
         }
     }

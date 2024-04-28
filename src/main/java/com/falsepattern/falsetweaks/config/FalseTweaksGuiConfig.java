@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,7 +39,7 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
 
     private static Class<?>[] fetchConfigClasses() {
         val result = new ArrayList<Class<?>>();
-        if (ModuleConfig.TRIANGULATOR) {
+        if (ModuleConfig.TRIANGULATOR()) {
             result.add(TriangulatorConfig.class);
         }
         if (ModuleConfig.ITEM_RENDER_LISTS) {
@@ -48,11 +54,9 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
             result.add(TranslucentBlockLayersConfig.class);
         }
-        if (ModuleConfig.OCCLUSION_TWEAKS) {
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
             result.add(OcclusionConfig.class);
-            if (ModuleConfig.THREADED_CHUNK_UPDATES) {
-                result.add(ThreadingConfig.class);
-            }
+            result.add(ThreadingConfig.class);
         }
         return result.toArray(new Class<?>[0]);
     }

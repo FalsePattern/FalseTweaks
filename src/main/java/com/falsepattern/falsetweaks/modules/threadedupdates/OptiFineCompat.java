@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,17 +36,13 @@ import net.minecraft.world.World;
 import java.io.IOException;
 
 public class OptiFineCompat {
+    public static boolean scheduledReload = false;
+    private static Boolean HAS_CHUNKCACHE = null;
+
     public static void resizeNativeBuffers(Tessellator tessellator) {
         if (Compat.optiFineInstalled()) {
-            ((ITessellatorOptiFineCompat)tessellator).ft$resizeNativeBuffers();
+            ((ITessellatorOptiFineCompat) tessellator).ft$resizeNativeBuffers();
         }
-    }
-
-    public static class ThreadSafeEntityData {
-        public static final ThreadLocal<ThreadSafeEntityData> TL = ThreadLocal.withInitial(ThreadSafeEntityData::new);
-
-        public final int[] entityData = new int[32];
-        public int entityDataIndex = 0;
     }
 
     public static void popEntity() {
@@ -49,8 +51,6 @@ public class OptiFineCompat {
         }
         Shaders.popEntity();
     }
-
-    private static Boolean HAS_CHUNKCACHE = null;
 
     public static ChunkCache createChunkCache(World world, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, int subIn) {
         if (HAS_CHUNKCACHE == null) {
@@ -70,6 +70,13 @@ public class OptiFineCompat {
         } else {
             return new ChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
         }
+    }
+
+    public static class ThreadSafeEntityData {
+        public static final ThreadLocal<ThreadSafeEntityData> TL = ThreadLocal.withInitial(ThreadSafeEntityData::new);
+
+        public final int[] entityData = new int[32];
+        public int entityDataIndex = 0;
     }
 
     private static class WrappedOF {

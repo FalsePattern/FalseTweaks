@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,8 +34,8 @@ public class ModuleConfig {
     @Config.Comment("Optimizes the way forge scans the classpath during launch.\n" +
                     "Not compatible with some badly-written mods.\n" +
                     "FPS impact: None, but makes startup a bit faster")
-    @Config.DefaultBoolean(true)
-    public static boolean STARTUP_OPTIMIZATIONS;
+    @Config.DefaultBoolean(false)
+    public static boolean STARTUP_OPTIMIZATIONS_V2;
 
     @Config.Comment("Enable/Disable texture optimizations. This includes:\n" +
                     "- Multithreaded animated textures\n" +
@@ -45,14 +51,15 @@ public class ModuleConfig {
     public static boolean VOXELIZER;
 
     @Config.Comment("Enables the Triangulator module. This also includes the ambient occlusion and smooth lighting fix," +
-                    "along with the block crack fix.\n" +
+                    "along with the block crack fix. Also provides the VertexAPI used by the BSP sorter and the threading system.\n" +
                     "If you want to use those fixes without having triangulated meshes, set the ENABLE_QUAD_TRIANGULATION\n" +
                     "property to false in the triangulator category.\n" +
-                    "FPS impact: Small performance decrease, but smooth lighting will look way better.")
+                    "FPS impact: Tiny performance decrease, but smooth lighting will look way better.")
     @Config.DefaultBoolean(true)
     public static boolean TRIANGULATOR;
 
     @Config.Comment("Enable an optimized, BSP-tree based vertex sorting algorithm for transparent blocks.\n" +
+                    "Force-enables TRIANGULATOR.\n" +
                     "FPS impact: A little bit less stuttering when moving around with a lot of stained glass-like blocks around")
     @Config.DefaultBoolean(true)
     public static boolean BSP_SORTING;
@@ -64,6 +71,10 @@ public class ModuleConfig {
                     "FPS impact: Decent improvement with lots of items on ground")
     @Config.DefaultBoolean(true)
     public static boolean ITEM_RENDER_LISTS;
+
+    @Config.Comment("Disables the Realms button on the main menu.")
+    @Config.DefaultBoolean(true)
+    public static boolean NO_REALMS_ON_MENU;
 
     @Config.Comment("Beacons also have an optimization using renderlists. If you spot any issues related to beacons,\n" +
                     "you can toggle said optimization here.\n" +
@@ -102,26 +113,18 @@ public class ModuleConfig {
     @Config.DefaultBoolean(true)
     public static boolean ADVANCED_PROFILER;
 
-    @Config.Comment("Enables the 1.8-style occlusion culling originally developed by CoFHTweaks.\n" +
-                    "Not compatible with ArchaicFix's occlusion tweaks.\n" +
-                    "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
-                    "FPS impact: Potentially huge gains, much faster chunk rendering")
-    @Config.DefaultBoolean(true)
-    @Config.RequiresMcRestart
-    public static boolean OCCLUSION_TWEAKS;
-
-    @Config.Comment("Enables multi-threaded chunk updating. It only works if OCCLUSION_TWEAKS is turned on.\n" +
+    @Config.Comment("Enables multi-threaded chunk updating.\n" +
                     "Not compatible with quad triangulation (automatically disables it if you turn this on)\n" +
+                    "Force-enables BSP_SORTING.\n" +
                     "COMPATIBLE WITH OPTIFINE AND SHADERS\n" +
-                    "FPS impact: Depends on your CPU, but should be pretty good on modern CPUs")
-    @Config.DefaultBoolean(true)
+                    "FPS impact: Significant FPS and world rendering speed gains. Even higher with Neodymium installed.")
+    @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
 
-    public static boolean THREADED_CHUNK_UPDATES() {
-        return OCCLUSION_TWEAKS && THREADED_CHUNK_UPDATES;
-    }
-
+    @Config.Comment("Gets rid of that obnoxious burst of minecart sounds when joining a world.")
+    @Config.DefaultBoolean(true)
+    public static boolean MINECART_EAR_BLAST_FIX;
     @Config.Comment("Improves the performance of the minecraft sky mesh.\n" +
                     "Also fixes the weird white lines that some OptiFine shaderpacks get with huge render distances.\n" +
                     "FPS impact: Negligible gain")
@@ -129,6 +132,11 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean SKY_MESH_OPTIMIZATION;
 
+    @Config.Comment("Fixes an occasional crash that happens when joining worlds due to a null-safety issue in biome code.\n" +
+                    "FPS impact: Zero")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean GETBIOME_CRASH_FIX;
 
     static {
         ConfigurationManager.selfInit();
@@ -139,6 +147,18 @@ public class ModuleConfig {
         TranslucentBlockLayersConfig.init();
         OcclusionConfig.init();
         ThreadingConfig.init();
+    }
+
+    public static boolean TRIANGULATOR() {
+        return TRIANGULATOR || BSP_SORTING();
+    }
+
+    public static boolean THREADED_CHUNK_UPDATES() {
+        return THREADED_CHUNK_UPDATES;
+    }
+
+    public static boolean BSP_SORTING() {
+        return BSP_SORTING || THREADED_CHUNK_UPDATES();
     }
 
     //This is here to make the static initializer run

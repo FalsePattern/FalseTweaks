@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -46,8 +52,7 @@ public class RenderGlobalDeOptimizer implements IClassNodeTransformer {
 
     @Override
     public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return "net.minecraft.client.renderer.RenderGlobal".equals(transformedName) &&
-               FMLClientHandler.instance().hasOptifine();
+        return "net.minecraft.client.renderer.RenderGlobal".equals(transformedName) && FMLClientHandler.instance().hasOptifine();
     }
 
     @Override
@@ -61,8 +66,7 @@ public class RenderGlobalDeOptimizer implements IClassNodeTransformer {
                 val insn = insnList.next();
                 if (insn instanceof FieldInsnNode) {
                     val field = (FieldInsnNode) insn;
-                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_NAME.equals(field.name) &&
-                        BAD_FIELD_DESC.equals(field.desc)) {
+                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_NAME.equals(field.name) && BAD_FIELD_DESC.equals(field.desc)) {
                         field.name = TARGET_FIELD_NAME;
                         field.desc = TARGET_FIELD_DESC;
                     }

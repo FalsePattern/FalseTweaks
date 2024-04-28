@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,10 +29,9 @@ import org.joml.Vector3f;
 
 public class TriangleAreaComputer implements NormalAreaComputer {
     public static final TriangleAreaComputer INSTANCE = new TriangleAreaComputer();
-    private final Vector3f buf = new Vector3f();
 
     @Override
-    public float getArea(int[] vertexData, int i, int vertexSize) {
+    public float getArea(int[] vertexData, int i, int vertexSize, Vector3f buf) {
         getNormalUnscaled(vertexData, i, vertexSize, buf);
         return SharedMath.unscaledNormalToArea(buf);
     }

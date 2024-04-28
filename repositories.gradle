@@ -22,4 +22,11 @@ repositories {
             includeGroup "optifine"
         }
     }
+    maven {
+        name = "FalsePattern GTMEGA Maven"
+        url = "https://mvn.falsepattern.com/gtmega_releases/"
+        content {
+            includeGroup "codechicken"
+        }
+    }
 }

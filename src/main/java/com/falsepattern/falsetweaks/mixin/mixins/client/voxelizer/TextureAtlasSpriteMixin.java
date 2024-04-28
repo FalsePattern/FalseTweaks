@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,6 +23,8 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.voxelizer;
 
+import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.falsepattern.falsetweaks.modules.voxelizer.Data;
 import com.falsepattern.falsetweaks.modules.voxelizer.Layer;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
@@ -85,6 +93,9 @@ public abstract class TextureAtlasSpriteMixin implements ITextureAtlasSpriteMixi
             at = @At("HEAD"),
             require = 1)
     private void trackLastUsedSprite(CallbackInfoReturnable<Float> cir) {
+        if (ThreadedChunkUpdates.isEnabled() && !ThreadedChunkUpdateHelper.isMainThread()) {
+            return;
+        }
         Data.setLastUsedSprite((TextureAtlasSprite) (Object) this);
     }
 

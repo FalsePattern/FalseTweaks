@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -76,8 +82,7 @@ public class VoxelMesh {
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
             val layers = texture.layers();
-            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy,
-                                 layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
+            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
             texture.setVoxelMesh(mesh);
         }
         return mesh;

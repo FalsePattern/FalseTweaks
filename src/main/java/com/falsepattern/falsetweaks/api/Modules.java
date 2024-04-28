@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,16 +21,6 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
- * This file is part of FalseTweaks.
- *
- * FalseTweaks is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * FalseTweaks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.falsepattern.falsetweaks.api;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -36,7 +32,7 @@ import java.util.Optional;
 public final class Modules {
     @StableAPI.Expose
     public static boolean startupOptimizationsActive() {
-        return ModuleConfig.STARTUP_OPTIMIZATIONS;
+        return ModuleConfig.STARTUP_OPTIMIZATIONS_V2;
     }
 
     @StableAPI.Expose
@@ -51,7 +47,7 @@ public final class Modules {
 
     @StableAPI.Expose
     public static boolean triangulatorActive() {
-        return ModuleConfig.TRIANGULATOR;
+        return ModuleConfig.TRIANGULATOR();
     }
 
     @StableAPI.Expose
@@ -75,14 +71,24 @@ public final class Modules {
     }
 
     @StableAPI.Expose
+    public static boolean threadingActive() {
+        return ModuleConfig.THREADED_CHUNK_UPDATES();
+    }
+
+    @StableAPI.Expose
+    public static boolean bspSortingActive() {
+        return ModuleConfig.BSP_SORTING();
+    }
+
+    @StableAPI.Expose
     @Deprecated
     public static Optional<Boolean> leakFixActive() {
-        return Optional.of(ModuleConfig.OCCLUSION_TWEAKS);
+        return Optional.of(ModuleConfig.THREADED_CHUNK_UPDATES());
     }
 
     @StableAPI.Expose
     @Deprecated
     public static boolean leakFixMixinsInjected() {
-        return ModuleConfig.OCCLUSION_TWEAKS;
+        return ModuleConfig.THREADED_CHUNK_UPDATES();
     }
 }

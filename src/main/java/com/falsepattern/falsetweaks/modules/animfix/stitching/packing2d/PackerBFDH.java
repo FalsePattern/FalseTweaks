@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,8 +48,7 @@ public class PackerBFDH<T extends Rect2D> extends Packer<T> {
                 if (!level.canFit(r)) {
                     continue;
                 }
-                if (levelWithSmallestResidual != null &&
-                    levelWithSmallestResidual.availableWidth() > level.availableWidth()) {
+                if (levelWithSmallestResidual != null && levelWithSmallestResidual.availableWidth() > level.availableWidth()) {
                     levelWithSmallestResidual = level;
                 } else if (levelWithSmallestResidual == null) {
                     levelWithSmallestResidual = level;

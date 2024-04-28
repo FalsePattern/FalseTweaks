@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,10 +23,12 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionWorker;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -41,6 +49,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 
+import java.nio.IntBuffer;
 import java.util.Comparator;
 import java.util.List;
 
@@ -111,14 +120,6 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
         return false;
     }
 
-    @Redirect(method = "<init>",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/renderer/OpenGlCapsChecker;checkARBOcclusion()Z"),
-              require = 1)
-    private boolean neverEnableOcclusion() {
-        return false;
-    }
-
     @Inject(method = "updateRenderers",
             at = @At("HEAD"),
             require = 1,
@@ -167,6 +168,23 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
         OcclusionHelpers.renderer.markRendererInvisible(instance);
     }
 
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "INVOKE",
+                       target = "Ljava/nio/IntBuffer;get(I)I"),
+              require = 1)
+    private int padOcclusionQueryForShaders(IntBuffer instance, int i) {
+        return Compat.optiFineHasShaders() ? i * 2 : i;
+    }
+
+    @Redirect(method = "loadRenderers",
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderGlobal;occlusionEnabled:Z",
+                       opcode = Opcodes.GETFIELD),
+              require = 1)
+    private boolean noOcclusionInLoad(RenderGlobal instance) {
+        return false;
+    }
+
     @Redirect(method = "markRenderersForNewPosition",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/renderer/WorldRenderer;setPosition(III)V"),
@@ -207,6 +225,16 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
     @Overwrite
     public void clipRenderersByFrustum(ICamera p_72729_1_, float p_72729_2_) {
         OcclusionHelpers.renderer.clipRenderersByFrustum(p_72729_1_, p_72729_2_);
+    }
+
+    @Redirect(method = "<init>",
+              at = @At(value = "FIELD",
+                       target = "Lnet/minecraft/client/renderer/RenderGlobal;occlusionEnabled:Z",
+                       opcode = Opcodes.GETFIELD,
+                       ordinal = 0),
+              require = 1)
+    private boolean noBuiltinQueries(RenderGlobal instance) {
+        return false;
     }
 
     @Redirect(method = "<init>",

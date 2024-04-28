@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,9 +27,9 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.animfix.AnimFixCompat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
-import lombok.Getter;
-
+import com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadContainer;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import lombok.Getter;
 
 import java.util.Map;
 
@@ -35,11 +41,14 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         ModuleConfig.init();
 
-        if (ModuleConfig.OCCLUSION_TWEAKS)
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
             OcclusionCompat.executeConfigFixes();
+            MainThreadContainer.setMainThread();
+        }
 
-        if (ModuleConfig.TEXTURE_OPTIMIZATIONS)
+        if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
             AnimFixCompat.executeConfigFixes();
+        }
     }
 
     @Override
@@ -61,8 +70,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     public void injectData(Map<String, Object> data) {
         obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
         //Doing this here because this runs after coremod init, but before minecraft classes start loading and mixins start colliding and crashing.
-        if (ModuleConfig.OCCLUSION_TWEAKS)
-            OcclusionCompat.ArchaicFixCompat.crashIfUnsupportedConfigsAreActive();
 
     }
 

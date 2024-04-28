@@ -1,73 +1,168 @@
+/*
+ * This file is part of FalseTweaks.
+ *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * FalseTweaks is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FalseTweaks is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.falsepattern.falsetweaks.modules.occlusion;
 
+import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
+import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.culling.Frustrum;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
-
-import static com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers.DEBUG_PRINT_QUEUE_ITERATIONS;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OcclusionWorker {
+    private final Minecraft mc = Minecraft.getMinecraft();
+    private final WRComparator sortComp = new WRComparator(false);
+    public volatile boolean dirty = false;
+    private WorldClient theWorld;
+    private FutureTask<WorldRenderer[]> sortingTask;
+    private int sortCount;
+    private long lastUpdateTime = 0;
+    private boolean markedRendererChanged;
+
+    @AllArgsConstructor
+    private static class WorkResults {
+        public final WorldRenderer[] sortResults;
+        public boolean changed;
+        public final int count;
+        public List<WorldRenderer> toPush;
+    }
+    private volatile WorkResults sortResults;
+    private volatile EntityLivingBase sortView;
+
+    private static final int SORT_WAIT = 0;
+    private static final int SORT_SIGNALED = 1;
+    private static final int SORT_WORKING = 2;
+    private static final int SORT_DONE = 3;
+    private final AtomicInteger sortState = new AtomicInteger();
+    private final PreSortWorker preSortWorker = new PreSortWorker();
+    private class PreSortWorker implements ThreadedTask {
+        @Override
+        public boolean alive() {
+            return true;
+        }
+
+        @Override
+        public boolean lazy() {
+            return true;
+        }
+
+        @Override
+        public boolean doWork() {
+            if (!sortState.compareAndSet(SORT_SIGNALED, SORT_WORKING))
+                return false;
+
+            val view = sortView;
+            if (view == null)
+                return false;
+            val render = getRender();
+            if (render == null)
+                return false;
+
+            val swr = render.sortedWorldRenderers;
+            if (swr == null)
+                return false;
+
+            val rwr = render.worldRenderers;
+            if (rwr == null)
+                return false;
+
+            boolean sortedWorldRenderersChanged = false;
+
+            val newSortedWorldRenderers = new WorldRenderer[swr.length];
+
+            int count = 0;
+
+            val toPush = new ArrayList<WorldRenderer>();
+
+            for (int i = 0; i < rwr.length; ++i) {
+                WorldRenderer wr = rwr[i];
+                if (wr == null) {
+                    continue;
+                }
+                val ci = ((WorldRendererOcclusion) wr).ft$getCullInfo();
+                if (ci == null) {
+                    continue;
+                }
+                ci.isFrustumCheckPending = true;
+                count = markRendererThreaded(wr, ci, view, newSortedWorldRenderers, count, toPush);
+                sortedWorldRenderersChanged |= markedRendererChanged;
+            }
+            Arrays.fill(newSortedWorldRenderers, count, newSortedWorldRenderers.length, null);
+
+            sortResults = new WorkResults(newSortedWorldRenderers, sortedWorldRenderersChanged, count, toPush);
+
+            sortState.set(SORT_DONE);
+            return true;
+        }
+    }
 
     public OcclusionWorker() {
-
-        /*for (int i = 0; i < fStack.length; ++i) {
-            fStack[i] = new Frustrum();
-        }//*/
+        FTWorker.addTask(preSortWorker);
     }
 
     public void setWorld(RenderGlobal rg, WorldClient world) {
         theWorld = world;
+        reset();
     }
 
-    public static final VisGraph DUMMY = new VisGraph();
-
-    static {
-        DUMMY.computeVisibility();
+    public void reset() {
+        if (sortState.get() == SORT_WAIT) {
+            sortResults = null;
+            sortView = null;
+        } else {
+            while (!sortState.compareAndSet(SORT_DONE, SORT_WAIT)) {
+                Thread.yield();
+            }
+            sortResults = null;
+            sortView = null;
+        }
+        dirty = true;
     }
-
-    public volatile boolean dirty = false;
-    public int dirtyFrustumRenderers;
-    private int frame = 0;
-    private final List<CullInfo> queue = new ArrayList<>();
-    @SuppressWarnings("unused")
-    private Frustrum fStack = new Frustrum();
-    private WorldClient theWorld;
-
-    /**
-     * We cache the values of WorldRenderer#isInFrustum here to avoid the overhead of accessing the field.
-     */
-    private boolean[] isWRInFrustum;
-
-    private boolean allVis = false;
-
-    private final Minecraft mc = Minecraft.getMinecraft();
 
     private RenderGlobal getRender() {
         return getExtendedRender().getRenderGlobal();
     }
-    
+
     private OcclusionRenderer getExtendedRender() {
         return OcclusionHelpers.renderer;
     }
-    
-    public void run(boolean immediate) {
-        frame++;
-        queue.clear();
-        int queueIterations = 0;
 
+    public void run(boolean immediate) {
         if (getRender() == null) {
             return;
         }
@@ -76,358 +171,127 @@ public class OcclusionWorker {
             return;
         }
 
-        allVis = mc.playerController.currentGameType.getID() == 3;
+        sortView = view;
 
-        long t0 = DEBUG_PRINT_QUEUE_ITERATIONS ? System.nanoTime() : 0;
+        theWorld.theProfiler.startSection("mark");
 
-        Frustrum frustum = getFrustum();
+        if (sortState.compareAndSet(SORT_WAIT, SORT_SIGNALED)) {
+            theWorld.theProfiler.endSection();
+            return;
+        }
 
-        theWorld.theProfiler.startSection("prep");
+        val results = sortResults;
 
-        prepareRenderers();
+        if (results == null) {
+            theWorld.theProfiler.endSection();
+            return;
+        }
+        boolean workFinishedThisFrame = sortState.compareAndSet(SORT_DONE, SORT_WAIT);
 
-        seedQueue(frustum);
+        val sortedWorldRenderersChanged = results.changed;
+        val count = results.count;
+        val newSortedWorldRenderers = results.sortResults;
+        if (results.toPush != null) {
+            val er = getExtendedRender();
+            for (val push: results.toPush) {
+                er.pushWorkerRenderer(push);
+            }
+            results.toPush = null;
+        }
 
-        long t1 = DEBUG_PRINT_QUEUE_ITERATIONS ? System.nanoTime() : 0;
+        sortState.set(SORT_SIGNALED);
 
-        theWorld.theProfiler.endStartSection("process_queue");
-        for (int i = 0; i < queue.size(); i++) {
-            queueIterations++;
-            CullInfo ci = queue.get(i);
+        theWorld.theProfiler.endStartSection("sort");
 
-            for (StepDirection stepPos : CullInfo.ALLOWED_STEPS[ci.facings & 0b111111]) {
-                if (canStep(ci, stepPos)) {
-                    maybeEnqueueNeighbor(ci, stepPos, queue, frustum);
+        RenderGlobal render = getRender();
+
+        if (!sortedWorldRenderersChanged && sortingTask != null && sortingTask.isDone()) {
+            if (sortingTask.isCancelled()) {
+                sortingTask = null;
+            } else {
+                WorldRenderer[] sortingOutput = null;
+                try {
+                    sortingOutput = sortingTask.get();
+                } catch (InterruptedException | ExecutionException ignored) {
                 }
+                val sortCount = this.sortCount;
+                if (sortingOutput != null && sortCount == count) {
+                    int copied = 0;
+                    for (int i = 0; i < sortCount; i++) {
+                        val rend = sortingOutput[i];
+                        if (rend.isInitialized && !((WorldRendererOcclusion) rend).ft$skipRenderPass()) {
+                            render.sortedWorldRenderers[copied++] = rend;
+                        }
+                    }
+                    render.renderersLoaded = copied;
+                }
+                sortingTask = null;
             }
         }
-        theWorld.theProfiler.endStartSection("cleanup");
 
-        long t2 = DEBUG_PRINT_QUEUE_ITERATIONS ? System.nanoTime() : 0;
-
-        for (CullInfo ci : queue) {
-            markRenderer(ci, view);
-        }
-
-        if (DEBUG_PRINT_QUEUE_ITERATIONS) {
-            if (queueIterations != 0) {
-                System.out.println("queue iterations: " + queueIterations);
+        val camX = (float) render.prevRenderSortX;
+        val camY = (float) render.prevRenderSortY;
+        val camZ = (float) render.prevRenderSortZ;
+        boolean moved = sortComp.posX != camX || sortComp.posY != camY || sortComp.posZ != camZ;
+        long currentTime = System.currentTimeMillis();
+        if (sortedWorldRenderersChanged || moved || (currentTime - lastUpdateTime) > 100) {
+            results.changed = false;
+            lastUpdateTime = currentTime;
+            val sorter = new InterruptableSorter<>(sortComp);
+            sortComp.posX = camX;
+            sortComp.posY = camY;
+            sortComp.posZ = camZ;
+            if (sortingTask != null) {
+                sortingTask.cancel(true);
             }
-            long t3 = System.nanoTime();
-            System.out.println(((t1 - t0) / 1000000.0) + " ms prepare + " + (t2 - t1) / 1000000.0 + " ms queue + " + (t3 - t2) / 1000000.0 + " ms mark");
+            sortCount = count;
+            int finalCount = count;
+            sortingTask = new FutureTask<>(() -> {
+                try {
+                    sorter.interruptableSort(newSortedWorldRenderers, 0, finalCount - 1);
+                    return newSortedWorldRenderers;
+                } catch (Throwable ignored) {
+                }
+                return null;
+            });
+            FTWorker.doSubmit(sortingTask);
         }
 
         dirty = false;
-        queue.clear();
         theWorld.theProfiler.endSection();
     }
 
-    private void prepareRenderers() {
-        RenderGlobal render = getRender();
-        if (isWRInFrustum == null || isWRInFrustum.length != render.worldRenderers.length) {
-            isWRInFrustum = new boolean[render.worldRenderers.length];
-        }
+    private int markRendererThreaded(WorldRenderer rend, CullInfo info, EntityLivingBase view, WorldRenderer[] sortedWorldRenderers, int renderersLoaded, List<WorldRenderer> toPush) {
+        val newID = renderersLoaded++;
+        markedRendererChanged = info.prevSortIndex != newID;
+        info.prevSortIndex = newID;
 
-        for (int i = 0; i < render.worldRenderers.length; ++i) {
-            WorldRenderer wr = render.worldRenderers[i];
-            wr.isVisible = false;
-            isWRInFrustum[i] = wr.isInFrustum;
-        }
-        render.renderersLoaded = 0;
-    }
-
-    private Frustrum getFrustum() {
-        EntityLivingBase view = mc.renderViewEntity;
-
-        Frustrum frustum = new Frustrum();
-        // TODO: interpolate using partial tick time
-        frustum.setPosition(view.posX, view.posY, view.posZ);
-        return frustum;
-    }
-
-    private void seedQueue(Frustrum frustum) {
-        CameraInfo cam = CameraInfo.getInstance();
-
-        int viewX = MathHelper.floor_double(cam.getX());
-        int viewY = MathHelper.floor_double(cam.getY());
-        int viewZ = MathHelper.floor_double(cam.getZ());
-
-        theWorld.theProfiler.endStartSection("gather_chunks");
-
-        OcclusionRenderer extendedRender = getExtendedRender();
-
-        theWorld.theProfiler.endStartSection("seed_queue");
-
-        WorldRenderer center = extendedRender.getRenderer(viewX, viewY, viewZ);
-        if (center != null) {
-            CullInfo ci = ((IWorldRenderer) center).ft$getCullInfo();
-            isInFrustum(ci, frustum); // make sure frustum status gets updated for the starting renderer
-            ci.init(StepDirection.NONE, (byte) 0);
-            queue.add(ci);
-            for (val neighbor: ci.neighbors) {
-                if (neighbor == null)
-                    continue;
-                neighbor.init(StepDirection.NONE, (byte) 0);
-                queue.add(neighbor);
-            }
-        } else {
-            int level = viewY > 5 ? 250 : 5;
-            center = extendedRender.getRenderer(viewX, level, viewZ);
-            if (center != null) {
-                StepDirection pos = viewY < 5 ? StepDirection.UP : StepDirection.DOWN;
-                {
-                    CullInfo ci = ((IWorldRenderer) center).ft$getCullInfo();
-                    ci.init(StepDirection.NONE, (byte) 0);
-                    queue.add(ci);
-                }
-                boolean allNull = false;
-                theWorld.theProfiler.startSection("gather_world");
-                for (int size = 1; !allNull; ++size) {
-                    allNull = true;
-                    for (int i = 0, j = size; i < size; ) {
-                        for (int k = 0; k < 4; ++k) {
-                            int xm = (k & 1) == 0 ? -1 : 1;
-                            int zm = (k & 2) == 0 ? -1 : 1;
-                            center = extendedRender.getRenderer(viewX + i * 16 * xm, level, viewZ + j * 16 * zm);
-                            if (center != null) {
-                                CullInfo ci = ((IWorldRenderer) center).ft$getCullInfo();
-                                if (isInFrustum(ci, frustum)) {
-                                    allNull = false;
-                                    ci.init(StepDirection.NONE, (byte) 0);
-                                    queue.add(ci);
-                                }
-                            }
-                        }
-                        ++i;
-                        --j;
-                    }
-                }
-                theWorld.theProfiler.endSection();
-            }
-        }
-    }
-
-    private boolean canStep(CullInfo info, StepDirection stepPos) {
-        return allVis || SetVisibility.isVisible(info.vis[0], info.dir.getOpposite().facing, stepPos.facing);
-    }
-
-    private void maybeEnqueueNeighbor(CullInfo info, StepDirection stepPos, Collection<CullInfo> queue, Frustrum frustum) {
-        CullInfo neighbor = info.getNeighbor(stepPos.facing);
-
-        if (neighbor == null || !neighbor.setLastCullUpdateFrame(frame) || !isInFrustum(neighbor, frustum))
-            return;
-
-        neighbor.init(stepPos, info.facings);
-
-        queue.add(neighbor);
-    }
-
-    private void markRenderer(CullInfo info, EntityLivingBase view) {
-        RenderGlobal render = getRender();
-        WorldRenderer rend = render.worldRenderers[info.wrIdx];
-        if (!rend.isVisible) {
-            rend.isVisible = true;
-            if (!rend.isWaitingOnOcclusionQuery) {
-                // only add it to the list of sorted renderers if it's not skipping all passes (re-used field)
-                render.sortedWorldRenderers[render.renderersLoaded++] = rend;
-            }
-        }
-        if (rend.needsUpdate || !rend.isInitialized || info.visGraph.isRenderDirty()) {
+        sortedWorldRenderers[newID] = rend;
+        if (rend.needsUpdate || !rend.isInitialized) {
             rend.needsUpdate = true;
-            if (!rend.isInitialized || (rend.needsUpdate && rend.distanceToEntitySquared(view) <= 1128.0F)) {
-                getExtendedRender().pushWorkerRenderer(rend);
-            }
-        }
-    }
-
-    private boolean isInFrustum(CullInfo ci, Frustrum frustum) {
-        if (isWRInFrustum[ci.wrIdx]) {
-            ci.isFrustumCheckPending = true;
-        } else {
-            WorldRenderer wr = Minecraft.getMinecraft().renderGlobal.worldRenderers[ci.wrIdx];
-            wr.updateInFrustum(frustum);
-            isWRInFrustum[ci.wrIdx] = wr.isInFrustum;
-        }
-        return isWRInFrustum[ci.wrIdx];
-    }
-
-    public enum StepDirection {
-        // EnumFacing.EAST and EnumFacing.WEST is flipped in MCP
-        DOWN(EnumFacing.DOWN, 0, -1, 0),
-        UP(EnumFacing.UP, 0, 16, 0),
-        WEST(EnumFacing.EAST /* WEST */, -1, 0, 0),
-        EAST(EnumFacing.WEST /* EAST */, 16, 0, 0),
-        NORTH(EnumFacing.NORTH, 0, 0, -1),
-        SOUTH(EnumFacing.SOUTH, 0, 0, 16),
-        NONE(null, 0, 0, 0),
-        NONE_opp(null, 0, 0, 0);
-
-        public static final StepDirection[] DIRECTIONS = values();
-        public static final StepDirection[][] DIRECTIONS_BIAS = new StepDirection[6][6];
-        public static final StepDirection[] FROM_FACING = new StepDirection[6];
-        public static final List<StepDirection> SIDES = Arrays.asList(DIRECTIONS).subList(1, 6);
-        static {
-            for (int i = 0; i < 6; ++i) {
-                StepDirection pos = DIRECTIONS[i];
-                FROM_FACING[pos.facing.ordinal()] = pos;
-                StepDirection[] bias = DIRECTIONS_BIAS[i];
-                int j = 0, xor = pos.ordinal() & 1;
-                switch (pos) {
-                    case DOWN:
-                    case UP:
-                        bias[j++] = pos;
-                        bias[j++] = DIRECTIONS[NORTH.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[SOUTH.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[EAST.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[WEST.ordinal() ^ xor];
-                        bias[j++] = pos.getOpposite();
-                        break;
-                    case WEST:
-                    case EAST:
-                        bias[j++] = pos;
-                        bias[j++] = DIRECTIONS[NORTH.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[SOUTH.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[UP.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[DOWN.ordinal() ^ xor];
-                        bias[j++] = pos.getOpposite();
-                        break;
-                    case NORTH:
-                    case SOUTH:
-                        bias[j++] = pos;
-                        bias[j++] = DIRECTIONS[EAST.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[WEST.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[UP.ordinal() ^ xor];
-                        bias[j++] = DIRECTIONS[DOWN.ordinal() ^ xor];
-                        bias[j++] = pos.getOpposite();
-                        break;
-                    case NONE:
-                    case NONE_opp:
-                        break;
+            if (!rend.isInitialized || rend.distanceToEntitySquared(view) <= 1128.0F) {
+                val wro = ((WorldRendererOcclusion)rend);
+                if (!wro.ft$isInUpdateList()) {
+                    toPush.add(rend);
+                } else {
+                    wro.ft$currentPriority(getExtendedRender().determinePriority(rend));
                 }
             }
         }
-
-        public final int x, y, z;
-        public final EnumFacing facing;
-
-        StepDirection(EnumFacing face, int x, int y, int z) {
-
-            this.facing = face;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            _x = x > 0 ? 1 : x;
-            _y = y > 0 ? 1 : y;
-            _z = z > 0 ? 1 : z;
-        }
-
-        public StepDirection getOpposite() {
-
-            return DIRECTIONS[ordinal() ^ 1];
-        }
-
-        private final int _x, _y, _z;
+        return renderersLoaded;
     }
 
     public static class CullInfo {
-
-        public static final StepDirection[][] ALLOWED_STEPS;
-
-        static {
-            ALLOWED_STEPS = generateAllowedSteps();
-        }
-
-        private static StepDirection[][] generateAllowedSteps() {
-            StepDirection[][] allowedSteps = new StepDirection[(int) Math.pow(2, 6) + 1][];
-
-            for (int xStep = -1; xStep <= 1; xStep++) {
-                for (int yStep = -1; yStep <= 1; yStep++) {
-                    for (int zStep = -1; zStep <= 1; zStep++) {
-                        byte mask = 0;
-
-                        //                    SNEWUD
-                        mask |= new byte[]{0b000100,
-                                0b000000,
-                                0b001000
-                        }[xStep + 1];
-
-                        //                    SNEWUD
-                        mask |= new byte[]{0b000001,
-                                0b000000,
-                                0b000010
-                        }[yStep + 1];
-
-                        //                    SNEWUD
-                        mask |= new byte[]{0b010000,
-                                0b000000,
-                                0b100000
-                        }[zStep + 1];
-
-                        byte finalMask = mask;
-                        allowedSteps[mask] =
-                                Stream.of(StepDirection.DOWN, StepDirection.UP, StepDirection.NORTH, StepDirection.SOUTH, StepDirection.WEST, StepDirection.EAST)
-                                        .filter(p -> (1 << (p.getOpposite().ordinal()) & finalMask) == 0)
-                                        .toArray(StepDirection[]::new);
-                    }
-                }
-            }
-            return allowedSteps;
-        }
-
         /**
          * The index of the world renderer in RenderGlobal#worldRenderers. Not stored as a reference because I
          * found that having it slows things down significantly.
          */
         public int wrIdx;
-        public CullInfo[] neighbors;
-        /**
-         * A direct reference to the visibility graph's visibility mask, used to avoid the significant overhead of
-         * accessing VisGraph's fields.
-         */
-        public long[] vis;
-        public VisGraph visGraph;
-        /**
-         * The direction we stepped in to reach this subchunk.
-         */
-        public StepDirection dir;
+        public int prevSortIndex = -1;
         /**
          * All the directions we have stepped in to reach this subchunk.
          */
-        public byte facings;
-        public int lastCullUpdateFrame;
-        public boolean isFrustumCheckPending;
-
-        public CullInfo() {
-            this.neighbors = new CullInfo[OcclusionHelpers.FACING_VALUES.length];
-            this.visGraph = DUMMY;
-            this.vis = visGraph.getVisibilityArray();
-        }
-
-        public CullInfo init(StepDirection dir, byte facings) {
-            this.dir = dir;
-
-            this.facings = facings;
-            this.facings |= (1 << dir.ordinal());
-
-            return this;
-        }
-
-        public CullInfo getNeighbor(EnumFacing dir) {
-            return neighbors[dir.ordinal()];
-        }
-
-        public void setNeighbor(EnumFacing dir, CullInfo neighbor) {
-            neighbors[dir.ordinal()] = neighbor;
-        }
-
-        /**
-         * Sets the number of the last frame when this renderer was visited by the occlusion culling algorithm.
-         * Returns true if the value was changed as a result.
-         */
-        public boolean setLastCullUpdateFrame(int lastCullUpdateFrame) {
-            if (this.lastCullUpdateFrame == lastCullUpdateFrame) return false;
-            this.lastCullUpdateFrame = lastCullUpdateFrame;
-            return true;
-        }
+        public volatile boolean isFrustumCheckPending;
+        public volatile boolean isFrustumStateUpdated;
     }
 }

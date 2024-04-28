@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,6 +27,9 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import shadersmod.client.BlockAliases;
 import shadersmod.client.Shaders;
 
@@ -30,6 +39,12 @@ import net.minecraft.client.renderer.RenderBlocks;
 @Mixin(value = Shaders.class,
        remap = false)
 public abstract class ShadersMixin {
+    @Inject(method = "uninit",
+            at = @At("HEAD"),
+            require = 1)
+    private static void scheduleDeinit(CallbackInfo ci) {
+        OptiFineCompat.scheduledReload = true;
+    }
 
     /**
      * @author FalsePattern

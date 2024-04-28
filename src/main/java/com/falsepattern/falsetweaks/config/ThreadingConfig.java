@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.config;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
@@ -25,31 +32,125 @@ import com.falsepattern.lib.config.ConfigurationManager;
         category = "threading")
 public class ThreadingConfig {
     @Config.Comment("The number of threads to use for chunk building.\n" +
-                    "The default is 0, which is half of your system threads.\n" +
-                    "If you have a lot of cores increasing this may be beneficial.\n" +
-                    "The value of 0 will set it to half of your total system threads (unaware of P/E cores on modern intel cpus!)")
+                    "0   - For very low-end CPUs. Makes chunk building run on a throttled thread to avoid freezing your pc\n" +
+                    "1   - Recommended\n" +
+                    "2-8 - For higher-end systems, with diminishing results")
     @Config.LangKey("config.falsetweaks.threading.threads")
-    @Config.DefaultInt(0)
-    @Config.RangeInt(min = 0)
+    @Config.DefaultInt(1)
+    @Config.RangeInt(min = 0, max = 8)
     public static int CHUNK_UPDATE_THREADS;
 
-    @Config.Comment("The maximum amount of queued chunk updates per thread.\n" +
-                    "Set this higher if you have a CPU with powerful cores.")
-    @Config.LangKey("config.falsetweaks.threading.queuesize")
-    @Config.DefaultInt(32)
-    @Config.RangeInt(min = 1,
-                     max = 256)
-    public static int UPDATE_QUEUE_SIZE_PER_THREAD;
+    @Config.Comment("Disable this to use a slower, but more accurate thread safety check in the tessellator.")
+    @Config.LangKey("config.falsetweaks.threading.fast_safety")
+    @Config.DefaultBoolean(true)
+    public static boolean FAST_SAFETY_CHECKS;
 
-    @Config.Comment("Changes the enableThreadedChunkUpdates option to never wait for chunk updates.\n" +
-                    "Improves framerate when blocks are placed or destroyed, at the cost of introducing visual delay.\n" +
-                    "This is analogous to 1.18's 'Chunk Builder' option, false meaning 'Fully Blocking', and true meaning 'Threaded'.")
-    @Config.LangKey("config.falsetweaks.threading.noblock")
+    @Config.Comment("EXPERIMENTAL AND UNSUPPORTED FEATURE!\n" +
+                    "DO NOT REPORT CRASHES IF YOU TURN THIS ON!\n\n" +
+                    "This enabled deep integration with Neodymium.\n" +
+                    "Needs a game restart to change.\n" +
+                    "Only effective if Neodymium is installed.\n" +
+                    "FPS Impact: Unknown")
+    @Config.LangKey("config.falsetweaks.threading.neodymium")
     @Config.DefaultBoolean(false)
-    public static boolean DISABLE_BLOCKING_CHUNK_UPDATES;
+    @Config.RequiresMcRestart
+    public static boolean UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS;
+
+    @Config.Comment("Enables some extra debug info for error stacktraces.\n" +
+                    "EXPENSIVE! Only turn this on for debugging purposes!\n" +
+                    "FPS Impact: significant slowdown")
+    @Config.LangKey("config.falsetweaks.threading.debug")
+    @Config.DefaultBoolean(false)
+    public static boolean EXTRA_DEBUG_INFO;
+    @Config.Comment("Classes added here will be automatically patched to use the threaded Tessellator." +
+                    "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)\n" +
+                    "This patch covers most edge cases, however some implementations will still require manual patches.")
+    @Config.LangKey("config.falsetweaks.threading.tessellatorUseReplacementTargets")
+    @Config.DefaultStringList({"appeng.client.render.*",
+                               "binnie.extratrees.block.DoorBlockRenderer",
+                               "biomesoplenty.client.render.blocks.*",
+                               "buildcraft.core.render.RenderingMarkers",
+                               "buildcraft.silicon.render.RenderLaserTable",
+                               "buildcraft.transport.render.PipeRendererWorld",
+                               "codechicken.lib.render.CCRenderState",
+                               "com.carpentersblocks.renderer.*",
+                               "com.enderio.core.client.render.*",
+                               "com.jaquadro.minecraft.storagedrawers.util.*",
+                               "com.rwtema.extrautils.block.render.*",
+                               "com.thecodewarrior.catwalks.render.*",
+                               "crazypants.enderio.machine.OverlayRenderer",
+                               "extracells.part.PartECBase",
+                               "extracells.render.block.RendererHardMEDrive$",
+                               "forestry.apiculture.render.RenderCandleBlock",
+                               "forestry.core.render.RenderOverlayBlock",
+                               "gcewing.architecture.BaseWorldRenderTarget",
+                               "gregtech.api.objects.GT_RenderedTexture",
+                               "gregtech.api.util.LightingHelper",
+                               "gregtech.common.render.GT_Renderer_Block",
+                               "ic2.core.block.RenderBlockCrop",
+                               "lumien.randomthings.Client.Renderer.RenderWirelessLever",
+                               "mods.natura.client.LeverRender",
+                               "mods.railcraft.client.render.RenderFakeBlock",
+                               "net.malisis.core.renderer.MalisisRenderer",
+                               "net.minecraftforge.fluids.RenderBlockFluid",
+                               "openmods.renderer.FixedRenderBlocks",
+                               "tb.client.render.block.ThaumicRelocatorRenderer",
+                               "team.chisel.ctmlib.*",
+                               "thaumcraft.client.renderers.block.*",
+                               "thaumic.tinkerer.client.render.block.kami.RenderWarpGate",
+                               "thaumicenergistics.client.render.RenderBlockProviderBase",
+                               "thaumicenergistics.common.parts.ThEPartBase",
+                               "tuhljin.automagy.renderers.RenderBlockGlowOverlay",
+                               "twilightforest.client.renderer.blocks.RenderBlockTFCastleMagic",
+                               "vswe.stevescarts.Renders.RendererUpgrade",
+                               "vswe.stevesfactory.blocks.RenderCamouflage"})
+    @Config.ListMaxLength(Integer.MAX_VALUE)
+    @Config.StringMaxLength(65535)
+    @Config.RequiresMcRestart
+    public static String[] TESSELLATOR_USE_REPLACEMENT_TARGETS;
+
+    @Config.Comment("ISimpleBlockRenderingHandler classes added here will be treated as thread-safe.\n" +
+                    "In many cases, these classes should also be included in TESSELLATOR_USE_REPLACEMENT_TARGETS.\n" +
+                    "Syntax: classname:constructor\n" +
+                    "Examples:\n" +
+                    "Implicitly thread-safe (stateless):                                                 com.example.ExampleRenderer:safe\n" +
+                    "Default constructor (aka: new ExampleRenderer()):                                   com.example.ExampleRenderer:default!\n" +
+                    "Custom constructor supplied by a utility mod (creates a new instance every call):   com.example.ExampleRenderer:com.mymod.ThreadTools!createExampleRenderer\n" +
+                    "Custom threadlocal managed by a utility mod (returns the same instance per thread): com.example.ExampleRenderer:com.mymod.ThreadTools?threadExampleRenderer\n" +
+                    "All of these MUST be zero argument methods!")
+    @Config.LangKey("config.falsetweaks.threading.threadSafeISBRH")
+    @Config.DefaultStringList({
+            "net.minecraftforge.fluids.RenderBlockFluid:safe",
+            "com.falsepattern.rple.api.client.render.LampRenderer:safe"
+    })
+    @Config.ListMaxLength(Integer.MAX_VALUE)
+    @Config.StringMaxLength(65535)
+    @Config.RequiresMcRestart
+    public static String[] THREAD_SAFE_ISBRHS;
+
+    @Config.Comment("Disables the logging of block rendering handler registrations.")
+    @Config.LangKey("config.falsetweaks.threading.handlerSuppress")
+    @Config.DefaultBoolean(true)
+    public static boolean SUPPRESS_HANDLER_REGISTRATION_LOGGING;
+
+    @Config.Ignore
+    private static Boolean AGGRESSIVE_NEODYMIUM_THREADING;
 
     static {
         ConfigurationManager.selfInit();
+    }
+
+    public static boolean AGGRESSIVE_NEODYMIUM_THREADING() {
+        if (AGGRESSIVE_NEODYMIUM_THREADING == null) {
+            if (!ModuleConfig.THREADED_CHUNK_UPDATES()) {
+                AGGRESSIVE_NEODYMIUM_THREADING = false;
+            } else if (!Compat.neodymiumInstalled()) {
+                AGGRESSIVE_NEODYMIUM_THREADING = false;
+            } else {
+                AGGRESSIVE_NEODYMIUM_THREADING = UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS;
+            }
+        }
+        return AGGRESSIVE_NEODYMIUM_THREADING;
     }
 
     //This is here to make the static initializer run

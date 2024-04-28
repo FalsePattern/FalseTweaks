@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,7 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.optifine;
 
-import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.Tessellator;
 
 @Mixin(Tessellator.class)
-public abstract class TessellatorVanillaOrOldOptifineMixin implements ITessellatorMixin {
+public abstract class TessellatorVanillaOrOldOptifineMixin implements ITriangulatorTessellator {
     @Inject(method = "addVertex",
             at = @At(value = "RETURN"),
             require = 1)

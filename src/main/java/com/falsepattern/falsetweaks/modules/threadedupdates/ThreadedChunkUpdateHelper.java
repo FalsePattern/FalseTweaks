@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,100 +25,92 @@ package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
-import com.falsepattern.falsetweaks.modules.occlusion.IRenderGlobalListener;
-import com.falsepattern.falsetweaks.modules.occlusion.IRendererUpdateOrderProvider;
-import com.falsepattern.falsetweaks.modules.occlusion.IWorldRenderer;
-import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
-import com.falsepattern.falsetweaks.modules.occlusion.OcclusionWorker;
+import com.falsepattern.falsetweaks.modules.debug.Debug;
+import com.falsepattern.falsetweaks.modules.occlusion.*;
+import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
+import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
+import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.google.common.base.Preconditions;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.val;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.shader.TesselatorVertexState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.ChunkCache;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.shader.TesselatorVertexState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.World;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
+import static com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer.*;
+import static com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadContainer.MAIN_THREAD;
 
 public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
-
+    public static final boolean AGGRESSIVE_NEODYMIUM_THREADING = ThreadingConfig.AGGRESSIVE_NEODYMIUM_THREADING();
+    public static final RenderBlocksStack renderBlocksStack = new RenderBlocksStack();
+    private static final boolean DEBUG_THREADED_UPDATE_FINE_LOG = Boolean.parseBoolean(System.getProperty(Tags.MODID + ".debug.enableThreadedUpdateFineLog"));
+    private static final int BIT_NextPass = 0b1;
+    private static final int BIT_RenderedSomething = 0b10;
+    private static final int BIT_StartedTessellator = 0b100;
     public static ThreadedChunkUpdateHelper instance;
-
-    public static Thread MAIN_THREAD;
-
-    private static final boolean DEBUG_THREADED_UPDATE_FINE_LOG =
-            Boolean.parseBoolean(System.getProperty(Tags.MODID + ".debug.enableThreadedUpdateFineLog"));
-
     /**
      * Used within the scope of WorldRenderer#updateRenderer (on the main thread).
      */
     public static WorldRenderer lastWorldRenderer;
-
-    public static final RenderBlocksStack renderBlocksStack = new RenderBlocksStack();
-
-    /**
-     * Tasks not yet started
-     */
-    public BlockingQueue<WorldRenderer> taskQueue = new LinkedBlockingDeque<>();
+    private final AtomicReference<PendingTaskUpdate> taskQueueUnsorted = new AtomicReference<>();
     /**
      * Finished tasks ready for consumption
      */
     public BlockingDeque<WorldRenderer> finishedTasks = new LinkedBlockingDeque<>();
 
-    /**
-     * Tasks that should be completed immediately on the main thread
-     */
-    public Queue<WorldRenderer> urgentTaskQueue = new ArrayDeque<>();
-
     public ThreadLocal<Tessellator> threadTessellator = ThreadLocal.withInitial(Tessellator::new);
 
     IRendererUpdateOrderProvider rendererUpdateOrderProvider = new IRendererUpdateOrderProvider() {
         /** The renderers updated during the batch */
-        private List<WorldRenderer> updatedRenderers = new ArrayList<>();
+        private List<WorldRenderer> worldRenderersToUpdateListInternal = new ArrayList<>();
+        private List<WorldRenderer> updatedRenderersMain = new ArrayList<>();
+        private Set<WorldRenderer> updatedRenderersSetMain = new HashSet<>();
+        private List<WorldRenderer> updatedRenderersCleanup = new ArrayList<>();
+        private Set<WorldRenderer> updatedRenderersSetCleanup = new HashSet<>();
 
         private WorldRenderer nextRenderer;
 
         @Override
         public void prepare(List<WorldRenderer> worldRenderersToUpdateList, int updateLimit) {
-            preRendererUpdates(worldRenderersToUpdateList, updateLimit);
+            worldRenderersToUpdateListInternal.addAll(worldRenderersToUpdateList);
+            worldRenderersToUpdateList.clear();
+            preRendererUpdates(worldRenderersToUpdateListInternal, updateLimit);
         }
 
         @Override
-        public boolean hasNext(List<WorldRenderer> worldRenderersToUpdateList) {
+        public boolean hasNext() {
             WorldRenderer wr;
-
-            if (!urgentTaskQueue.isEmpty()) {
-                nextRenderer = urgentTaskQueue.poll();
-                return true;
-            }
 
             while ((wr = finishedTasks.poll()) != null) {
                 UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-                if (task.cancelled || !wr.needsUpdate) {
+                if (task.cancelled || (!wr.needsUpdate && !((WorldRendererOcclusion) wr).ft$needsSort())) {
+                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                        NeodymiumCompat.safeDiscardTask(task);
+                    }
                     task.clear();
                 } else {
                     nextRenderer = wr;
@@ -123,76 +121,226 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
 
         @Override
-        public WorldRenderer next(List<WorldRenderer> worldRenderersToUpdateList) {
+        public WorldRenderer next() {
             Preconditions.checkNotNull(nextRenderer);
             WorldRenderer wr = nextRenderer;
             nextRenderer = null;
-            updatedRenderers.add(wr);
+            updatedRenderersMain.add(wr);
+            updatedRenderersSetMain.add(wr);
 
-            debugLog("Consuming renderer " + worldRendererToString(wr) + " " + worldRendererUpdateTaskToString(wr));
+            debugLog(() -> "Consuming renderer " + worldRendererToString(wr) + " " + worldRendererUpdateTaskToString(wr));
 
             return wr;
         }
 
         @Override
-        public void cleanup(List<WorldRenderer> worldRenderersToUpdateList) {
-            for (WorldRenderer wr : updatedRenderers) {
-                worldRenderersToUpdateList.remove(wr);
-                ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask().clear();
-            }
-            updatedRenderers.clear();
-            urgentTaskQueue.clear();
+        public Future<List<WorldRenderer>> cleanup() {
+            val updatedRenderers = updatedRenderersMain;
+            updatedRenderersMain = updatedRenderersCleanup;
+            updatedRenderersCleanup = updatedRenderers;
+            val updatedRenderersSet = updatedRenderersSetMain;
+            updatedRenderersSetMain = updatedRenderersSetCleanup;
+            updatedRenderersSetCleanup = updatedRenderersSet;
+            val worldRenderersToUpdateList = worldRenderersToUpdateListInternal;
+
             nextRenderer = null;
+            return FTWorker.submit(() -> {
+                for (int i = 0, updatedRenderersSize = updatedRenderers.size(); i < updatedRenderersSize; ++i) {
+                    WorldRenderer wr = updatedRenderers.get(i);
+                    val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                        NeodymiumCompat.safeDiscardTask(task);
+                    }
+                    task.clear();
+                }
+                updatedRenderers.clear();
+                for (int i = 0, size = worldRenderersToUpdateList.size(); i < size; ++i) {
+                    val wr = worldRenderersToUpdateList.get(i);
+                    if (!updatedRenderersSet.contains(wr)) {
+                        updatedRenderers.add(wr);
+                    }
+                }
+                worldRenderersToUpdateList.clear();
+                worldRenderersToUpdateList.addAll(updatedRenderers);
+                updatedRenderers.clear();
+                updatedRenderersSet.clear();
+                return worldRenderersToUpdateList;
+            });
         }
     };
+    /**
+     * Tasks not yet started
+     */
+    private final CircularTaskQueue taskQueue = new CircularTaskQueue();
+    private final int framesSinceLastSubmit = 0;
+    private AtomicBoolean run = null;
+    private PoolWorker currentPoolWorker = null;
+    private WorkerThread[] currentThreads = null;
+    private int threadCount = 0;
+    private WorkSorterThread workSorter;
+
+    private static boolean hasFlag(int flags, int bit) {
+        return (flags & bit) != 0;
+    }
+
+    private static int doChunkUpdateForRenderPass(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, RenderBlocks renderblocks) {
+        int flags = 0;
+
+        BlockLoop:
+        for (int y = wr.posY; y < wr.posY + 16; ++y) {
+            for (int z = wr.posZ; z < wr.posZ + 16; ++z) {
+                for (int x = wr.posX; x < wr.posX + 16; ++x) {
+                    if (task.cancelled) {
+                        debugLog(() -> "Realized renderer " + worldRendererToString(wr) + " is dirty, aborting update");
+                        break BlockLoop;
+                    }
+                    flags = doChunkUpdateForRenderPassBlock(wr, task, chunkcache, tess, pass, renderblocks, x, y, z, flags);
+                }
+            }
+        }
+
+        return flags;
+    }
+
+    private static int doChunkUpdateForRenderPassBlock(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, RenderBlocks renderblocks, int x, int y, int z, int flags) {
+        Block block = chunkcache.getBlock(x, y, z);
+
+        if (block.getMaterial() != Material.air) {
+
+            if (AGGRESSIVE_NEODYMIUM_THREADING && pass == 0 && block.hasTileEntity(chunkcache.getBlockMetadata(x, y, z))) {
+                val tileEntity = chunkcache.getTileEntity(x, y, z);
+                if (TileEntityRendererDispatcher.instance.hasSpecialRenderer(tileEntity)) {
+                    task.TESRs.add(tileEntity);
+                }
+            }
+
+            if (block.getRenderBlockPass() > pass) {
+                flags |= BIT_NextPass;
+            }
+
+            if (!block.canRenderInPass(pass)) {
+                return flags;
+            }
+            if (!hasFlag(flags, BIT_StartedTessellator)) {
+                if (ModuleConfig.TRIANGULATOR()) {
+                    ToggleableTessellatorManager.preRenderBlocks(pass);
+                }
+                flags |= BIT_StartedTessellator;
+                if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                    NeodymiumCompat.beginRenderPass(task, wr, pass);
+                }
+                tess.startDrawingQuads();
+                tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
+            }
+
+            flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
+
+            if (block.getRenderType() == 0 && x == playerX && y == playerY && z == playerZ) {
+                renderblocks.setRenderFromInside(true);
+                renderblocks.setRenderAllFaces(true);
+                renderblocks.renderBlockByRenderType(block, x, y, z);
+                renderblocks.setRenderFromInside(false);
+                renderblocks.setRenderAllFaces(false);
+            }
+        }
+        return flags;
+    }
+
+    public static boolean canBlockBeRenderedOffThread(Block block, int pass, int renderType) {
+        return renderType < 42 && renderType != 22; // vanilla block
+    }
+
+    public static boolean isMainThread() {
+        if (MAIN_THREAD == null)
+            throw new AssertionError("Main thread not setup, mad.");
+        return Thread.currentThread() == MAIN_THREAD;
+    }
+
+    private static String worldRendererToString(WorldRenderer wr) {
+        return wr + "(" + wr.posX + ", " + wr.posY + ", " + wr.posZ + ")";
+    }
+
+    private static String worldRendererUpdateTaskToString(WorldRenderer wr) {
+        UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+        return task.result[0].renderedSomething + "";
+        // TODO + " (" + (task.result[0].renderedQuads == null ? "null" : task.result[0].renderedQuads.getVertexCount()) + ")/" + task.result[1].renderedSomething + " (" + (task.result[1].renderedQuads == null ? "null" : task.result[1].renderedQuads.getVertexCount()) + ")";
+    }
+
+    private static void debugLog(Supplier<String> msg) {
+        if (DEBUG_THREADED_UPDATE_FINE_LOG) {
+            Share.log.trace(msg.get());
+        }
+    }
 
     public void init() {
         OcclusionHelpers.renderer.ft$setRendererUpdateOrderProvider(rendererUpdateOrderProvider);
         OcclusionHelpers.renderer.ft$addRenderGlobalListener(this);
-        MAIN_THREAD = Thread.currentThread();
         FMLCommonHandler.instance().bus().register(this);
-        spawnThreads();
     }
 
-    private AtomicBoolean run = null;
-    private Thread[] currentThreads = null;
-    private int threadCount = 0;
-
-    private void spawnThreads() {
+    public void spawnThreads(RenderGlobal rg) {
+        if (rg.theWorld == null)
+            return;
         int threads = ThreadingConfig.CHUNK_UPDATE_THREADS;
 
-        if (threads == 0)
-            threads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+        threads = Math.max(0, Math.min(threads, 8));
 
-        if (threadCount == threads) {
-            return;
-        }
-        if (run != null)
+        if (run != null) {
             run.set(false);
-        if (currentThreads != null)
-            for (val thread: currentThreads)
-                thread.interrupt();
+        }
+
+        try {
+            if (currentPoolWorker != null) {
+                FTWorker.removeTask(currentPoolWorker);
+                currentPoolWorker = null;
+            }
+            if (currentThreads != null) {
+                for (val thread : currentThreads) {
+                    thread.interrupt();
+                }
+            }
+            if (workSorter != null) {
+                FTWorker.removeTask(workSorter);
+                workSorter = null;
+            }
+            if (currentThreads != null) {
+                for (val thread: currentThreads)
+                    thread.join();
+                currentThreads = null;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Share.log.info("Creating " + threads + " chunk builder" + (threads > 1 ? "s" : ""));
-        String nameBase = "Chunk Update Worker Thread #";
+        String nameBase = "Chunk Update Worker #";
         if (Loader.isModLoaded("lumina")) {
             nameBase = "$LUMI_NO_RELIGHT" + nameBase;
         }
+        taskQueue.setCapacity(rg.worldRenderers.length);
         run = new AtomicBoolean(true);
-        currentThreads = new Thread[threads];
-        threadCount = threads;
-        for (int i = 0; i < threads; i++) {
-            val t = new Thread(() -> this.runThread(run), nameBase + i);
-            currentThreads[i] = t;
-            t.setDaemon(true);
-            t.start();
+        workSorter = new WorkSorterThread();
+        FTWorker.addTask(workSorter);
+        if (threads > 0) {
+            currentThreads = new WorkerThread[threads];
+            threadCount = threads;
+            for (int i = 0; i < threads; i++) {
+                val t = new WorkerThread(nameBase + i);
+                currentThreads[i] = t;
+                t.setDaemon(true);
+                t.start();
+            }
+        } else {
+            currentPoolWorker = new PoolWorker();
+            FTWorker.addTask(currentPoolWorker);
         }
     }
 
     @SubscribeEvent
     public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent e) {
-        if (!e.modID.equals(Tags.MODID))
+        if (!e.modID.equals(Tags.MODID)) {
             return;
-        spawnThreads();
+        }
+        Minecraft.getMinecraft().renderGlobal.loadRenderers();
     }
 
     private void preRendererUpdates(List<WorldRenderer> toUpdateList, int updateLimit) {
@@ -201,48 +349,9 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
-        final int updateQueueSize = Math.min(updateLimit, threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD);
-        taskQueue.clear();
-        main:
-        for (int i = 0, updated = 0; updated < updateQueueSize && i < toUpdateList.size(); i++) {
-            WorldRenderer wr = toUpdateList.get(i);
-            val ci = ((IWorldRenderer)wr).ft$getCullInfo();
-            if (ci.visGraph == null || ci.visGraph == OcclusionWorker.DUMMY)
-                continue;
-            for (val facing: OcclusionHelpers.FACING_VALUES) {
-                val neighbor = ci.neighbors[facing.ordinal()];
-                if (neighbor == null) {
-                    if ((facing == EnumFacing.DOWN && wr.posY == 0) ||
-                        (facing == EnumFacing.UP && wr.posY == 240)) {
-                        continue;
-                    } else {
-                        continue main;
-                    }
-                }
-                if (neighbor.visGraph == OcclusionWorker.DUMMY)
-                    continue main;
-            }
-            updated++;
-            UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+        final int updateQueueSize = updateLimit;//threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
 
-            boolean urgent = wr.distanceToEntitySquared(Minecraft.getMinecraft().renderViewEntity) < 16 * 16;
-
-            if (urgent) {
-                task.important = true;
-                if (!ThreadingConfig.DISABLE_BLOCKING_CHUNK_UPDATES) {
-                    task.cancelled = true;
-                    urgentTaskQueue.add(wr);
-                    continue;
-                }
-            }
-
-            if (task.isEmpty()) {
-                // No update in progress; add to task queue
-                debugLog("Adding " + worldRendererToString(wr) + " to task queue");
-                task.chunkCache = getChunkCacheSnapshot(wr);
-                taskQueue.add(wr);
-            }
-        }
+        taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateQueueSize));
     }
 
     private void removeCancelledResults() {
@@ -251,6 +360,9 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
             if (task.cancelled) {
                 // Discard results and allow re-schedule on worker thread.
+                if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                    NeodymiumCompat.safeDiscardTask(task);
+                }
                 task.clear();
                 it.remove();
             }
@@ -265,34 +377,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     public void onWorldRendererDirty(WorldRenderer wr) {
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
         if (!task.isEmpty()) {
-            debugLog("Renderer " + worldRendererToString(wr) + " is dirty, cancelling task");
+            debugLog(() -> "Renderer " + worldRendererToString(wr) + " is dirty, cancelling task");
             task.cancelled = true;
-        }
-    }
-
-    @SneakyThrows
-    private void runThread(AtomicBoolean run) {
-        while (run.get()) {
-            try {
-                WorldRenderer wr = taskQueue.take();
-                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-                task.started = true;
-                try {
-                    doChunkUpdate(wr);
-                } catch (Exception e) {
-                    Share.log.error("Failed to update chunk " + worldRendererToString(wr), e);
-                    for (UpdateTask.Result r : task.result) {
-                        r.clear();
-                    }
-                    ((ICapturableTessellator) threadTessellator.get()).discard();
-                }
-                if (!task.important) {
-                    finishedTasks.add(wr);
-                } else {
-                    finishedTasks.addFirst(wr);
-                }
-            } catch (InterruptedException ignored) {
-            }
         }
     }
 
@@ -302,68 +388,102 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      * produced by the worker thread to fill them in.
      */
     public void doChunkUpdate(WorldRenderer wr) {
-        debugLog("Starting update of renderer " + worldRendererToString(wr));
+        debugLog(() -> "Starting update of renderer " + worldRendererToString(wr));
 
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+        if (AGGRESSIVE_NEODYMIUM_THREADING) {
+            NeodymiumCompat.beginThreadedPass(wr, false);
+        }
 
         ChunkCache chunkcache = task.chunkCache;
 
         Tessellator tess = threadTessellator.get();
 
+        val wro = ((WorldRendererOcclusion) wr);
+
+        boolean pass1Only = !wr.needsUpdate && wro.ft$needsSort();
+        if (pass1Only && wr.vertexState != null) {
+            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                NeodymiumCompat.beginRenderPass(task, wr, 1);
+            }
+            tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
+            tess.setVertexState(wr.vertexState);
+            wr.vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
+            if (task.cancelled) {
+                ((ICapturableTessellator)tess).discard();
+                if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                    NeodymiumCompat.cancelTask(tess, wr);
+                }
+                return;
+            }
+            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                tess.setVertexState(wr.vertexState);
+                NeodymiumCompat.beginCapturing(tess, wr, task, 1);
+            }
+            return;
+        }
+        wr.needsUpdate = true;
+        wro.ft$needsSort(false);
+
         if (chunkcache != null && !chunkcache.extendedLevelsInChunkCache()) {
             RenderBlocks renderblocks = new RenderBlocks(chunkcache);
 
             for (int pass = 0; pass < 2; pass++) {
-                boolean renderedSomething = false;
-                boolean startedTessellator = false;
-
-                BlockLoop:
-                for (int y = wr.posY; y < wr.posY + 16; ++y) {
-                    for (int z = wr.posZ; z < wr.posZ + 16; ++z) {
-                        for (int x = wr.posX; x < wr.posX + 16; ++x) {
-                            if (task.cancelled) {
-                                debugLog("Realized renderer " + worldRendererToString(wr) + " is dirty, aborting update");
-                                break BlockLoop;
-                            }
-
-                            Block block = chunkcache.getBlock(x, y, z);
-
-                            if (block.getMaterial() != Material.air) {
-                                if (!startedTessellator) {
-                                    startedTessellator = true;
-                                    tess.startDrawingQuads();
-                                    tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
-                                }
-
-                                if (!block.canRenderInPass(pass)) {
-                                    continue;
-                                }
-
-                                renderedSomething |= renderblocks.renderBlockByRenderType(block, x, y, z);
-                            }
-                        }
+                ((ICapturableTessellator) tess).discard();
+                ThreadedClientHooks.threadRenderPass.set(pass);
+                int flags = doChunkUpdateForRenderPass(wr, task, chunkcache, tess, pass, renderblocks);
+                if (task.cancelled) {
+                    ((ICapturableTessellator) tess).discard();
+                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                        NeodymiumCompat.cancelTask(tess, wr);
                     }
+                    break;
                 }
+
+                boolean nextPass = hasFlag(flags, BIT_NextPass);
+                boolean renderedSomething = hasFlag(flags, BIT_RenderedSomething);
+                boolean startedTessellator = hasFlag(flags, BIT_StartedTessellator);
 
                 if (startedTessellator) {
-                    task.result[pass].renderedQuads = ((ICapturableTessellator) tess).arch$getUnsortedVertexState();
-                    ((ICapturableTessellator) tess).discard();
+                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                        if (pass == 1) {
+                            //Sort vertices
+                            val verts = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
+                            if (verts != null) {
+                                wr.vertexState = verts;
+                                tess.setVertexState(verts);
+                            }
+                        }
+                        NeodymiumCompat.beginCapturing(tess, wr, task, pass);
+                    } else {
+                        TesselatorVertexState vertexState;
+                        if (pass == 1) {
+                            //Sort vertices
+                            vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
+                        } else {
+                            vertexState = ((ICapturableTessellator) tess).arch$getUnsortedVertexState();
+                        }
+                        task.result[pass].renderedQuads(vertexState);
+                        ((ICapturableTessellator) tess).discard();
+                    }
+                    if (ModuleConfig.TRIANGULATOR()) {
+                        ToggleableTessellatorManager.postRenderBlocks(pass);
+                    }
                 }
                 task.result[pass].renderedSomething = renderedSomething;
+                task.result[pass].startedTessellator = startedTessellator;
+                task.result[pass].nextPass = nextPass;
             }
+            ThreadedClientHooks.threadRenderPass.set(-1);
         }
-        debugLog("Result of updating " + worldRendererToString(wr) + ": " + worldRendererUpdateTaskToString(wr));
-    }
-
-    public static boolean canBlockBeRenderedOffThread(Block block, int pass, int renderType) {
-        return renderType < 42 && renderType != 22; // vanilla block
+        debugLog(() -> "Result of updating " + worldRendererToString(wr) + ": " + worldRendererUpdateTaskToString(wr));
     }
 
     private ChunkCache getChunkCacheSnapshot(WorldRenderer wr) {
         // TODO This is not thread-safe! Actually make a snapshot here.
         byte pad = 1;
-        ChunkCache chunkcache = OptiFineCompat.createChunkCache(wr.worldObj, wr.posX - pad, wr.posY - pad, wr.posZ - pad,
-                wr.posX + 16 + pad, wr.posY + 16 + pad, wr.posZ + 16 + pad, pad);
+        ChunkCache chunkcache =
+                OptiFineCompat.createChunkCache(wr.worldObj, wr.posX - pad, wr.posY - pad, wr.posZ - pad, wr.posX + 16 + pad, wr.posY + 16 + pad, wr.posZ + 16 + pad, pad);
         return chunkcache;
     }
 
@@ -372,33 +492,24 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     public Tessellator getThreadTessellator() {
-        if (Thread.currentThread() == MAIN_THREAD) {
+        if (isMainThread()) {
             return Tessellator.instance;
         } else {
             return threadTessellator.get();
         }
     }
 
-    private static String worldRendererToString(WorldRenderer wr) {
-        return wr + "(" + wr.posX + ", " + wr.posY + ", " + wr.posZ + ")";
-    }
-
-    private static String worldRendererUpdateTaskToString(WorldRenderer wr) {
-        UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-        return task.result[0].renderedSomething + " (" + (task.result[0].renderedQuads == null ? "null" : task.result[0].renderedQuads.getVertexCount()) + ")/" + task.result[1].renderedSomething + " (" + (task.result[1].renderedQuads == null ? "null" : task.result[1].renderedQuads.getVertexCount()) + ")";
-    }
-
-    private static void debugLog(String msg) {
-        if (DEBUG_THREADED_UPDATE_FINE_LOG) {
-            Share.log.trace(msg);
-        }
+    @RequiredArgsConstructor
+    private static class PendingTaskUpdate {
+        public final List<WorldRenderer> tasks;
+        public final int updateLimit;
     }
 
     public static class UpdateTask {
         public boolean started;
         public boolean cancelled;
-        public boolean important;
         public Result[] result = new Result[]{new Result(), new Result()};
+        public List<TileEntity> TESRs = new ArrayList<>();
 
         public ChunkCache chunkCache;
 
@@ -413,16 +524,178 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 r.clear();
             }
             cancelled = false;
-            important = false;
+            TESRs.clear();
         }
 
         public static class Result {
+            public boolean nextPass;
+            public boolean startedTessellator;
             public boolean renderedSomething;
-            public TesselatorVertexState renderedQuads;
+            public Object resultData;
+            public Throwable written;
 
             public void clear() {
                 renderedSomething = false;
-                renderedQuads = null;
+                nextPass = false;
+                startedTessellator = false;
+                if (AGGRESSIVE_NEODYMIUM_THREADING && ThreadingConfig.EXTRA_DEBUG_INFO && resultData != null) {
+                    new Throwable(written).printStackTrace();
+                    written = null;
+                }
+                resultData = null;
+            }
+
+            public TesselatorVertexState renderedQuads() {
+                return (TesselatorVertexState) resultData;
+            }
+
+            public void renderedQuads(TesselatorVertexState quads) {
+                resultData = quads;
+            }
+        }
+    }
+
+    private class WorkSorterThread implements ThreadedTask {
+        private final AtomicBoolean myRun = run;
+        private final WRComparator comp = new WRComparator(true);
+        private final InterruptableSorter<WorldRenderer> sorter = new InterruptableSorter<>(comp);
+
+        @Override
+        public boolean alive() {
+            return myRun.get();
+        }
+
+        @Override
+        public boolean lazy() {
+            return false;
+        }
+
+        @Override
+        public boolean doWork() {
+            if (Debug.ENABLED && !Debug.chunkRebaking) {
+                return false;
+            }
+            if (!myRun.get())
+                return false;
+            val pending = taskQueueUnsorted.getAndSet(null);
+            if (pending == null) {
+                return false;
+            }
+            val view = Minecraft.getMinecraft().renderViewEntity;
+            if (view == null) {
+                return false;
+            }
+            comp.posX = (float) view.posX;
+            comp.posY = (float) view.posY;
+            comp.posZ = (float) view.posZ;
+            val tasks = pending.tasks;
+            try {
+                sorter.interruptableSort(tasks);
+            } catch (InterruptedException ignored) {
+            }
+
+            taskQueue.clear();
+            for (int i = 0, updated = 0; updated < pending.updateLimit && i < tasks.size(); i++) {
+                WorldRenderer wr = tasks.get(i);
+                updated++;
+                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+
+                if (task.isEmpty()) {
+                    // No update in progress; add to task queue
+                    debugLog(() -> "Adding " + worldRendererToString(wr) + " to task queue");
+                    try {
+                        task.chunkCache = getChunkCacheSnapshot(wr);
+                    } catch (Exception ignored) {
+                        updated--;
+                        continue;
+                    }
+
+                    taskQueue.add(wr);
+                }
+            }
+            return true;
+        }
+    }
+
+    public static <T> T kChunkCache(World world, int x1, int y1, int z1, int x2, int y2, int z2, int extent, Operation<T> original) {
+        return AGGRESSIVE_NEODYMIUM_THREADING ? original.call(world, x1, y1, z1, x2 + 16, y2 + 16, z2 + 16, extent) : original.call(world, x1, y1, z1, x2, y2, z2, extent);
+    }
+
+
+    private void runTask(WorldRenderer wr) {
+        UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+        task.started = true;
+        try {
+            doChunkUpdate(wr);
+        } catch (Exception e) {
+            ThreadedClientHooks.threadRenderPass.set(-1);
+            Share.log.debug("Failed to update chunk " + worldRendererToString(wr), e);
+            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                NeodymiumCompat.safeDiscardTask(task);
+            }
+            task.clear();
+        }
+        ((ICapturableTessellator) threadTessellator.get()).discard();
+        finishedTasks.add(wr);
+    }
+
+    private class PoolWorker implements ThreadedTask {
+        private final AtomicBoolean myRun = run;
+
+        @Override
+        public boolean alive() {
+            return myRun.get();
+        }
+
+        @Override
+        public boolean lazy() {
+            return false;
+        }
+
+        @Override
+        public boolean doWork() {
+            if (!myRun.get())
+                return false;
+
+            if (Debug.ENABLED && !Debug.chunkRebaking) {
+                return false;
+            }
+            WorldRenderer wr = taskQueue.tryTake();
+            if (wr == null) {
+                return false;
+            }
+            runTask(wr);
+            return true;
+        }
+    }
+
+    private class WorkerThread extends Thread {
+        public WorkerThread(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            val myRun = run;
+            while (myRun.get()) {
+                if (Debug.ENABLED && !Debug.chunkRebaking) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    continue;
+                }
+                WorldRenderer wr = taskQueue.tryTake();
+                if (wr == null) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ignored) {
+
+                    }
+                    continue;
+                }
+                runTask(wr);
             }
         }
     }

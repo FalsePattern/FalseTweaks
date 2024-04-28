@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,14 +23,15 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
-import com.falsepattern.falsetweaks.Compat;
-import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
+import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
@@ -36,36 +43,29 @@ import java.util.Arrays;
 @Mixin(Tessellator.class)
 public abstract class TessellatorMixin implements ICapturableTessellator {
 
+    // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
+    @Shadow(aliases = {"rawBufferSize"})
+    public int field_78388_E;
     @Shadow
     private int[] rawBuffer;
-
     @Shadow
     private int rawBufferIndex;
-
     @Shadow
     private int vertexCount;
+    @Shadow
+    private boolean isDrawing;
+    @Shadow
+    private boolean hasTexture;
+    @Shadow
+    private boolean hasBrightness;
+    @Shadow
+    private boolean hasColor;
+    @Shadow
+    private boolean hasNormals;
+    private Throwable lastStart;
 
     @Shadow
     protected abstract void reset();
-
-    @Shadow
-    private boolean isDrawing;
-
-    @Shadow(aliases = {"rawBufferSize"})
-    public int field_78388_E;
-            // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
-
-    @Shadow
-    private boolean hasTexture;
-
-    @Shadow
-    private boolean hasBrightness;
-
-    @Shadow
-    private boolean hasColor;
-
-    @Shadow
-    private boolean hasNormals;
 
     @Override
     public TesselatorVertexState arch$getUnsortedVertexState() {
@@ -97,7 +97,7 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
         }
         if (field_78388_E > rawBuffer.length) {
             rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
-            OptiFineCompat.resizeNativeBuffers((Tessellator)(Object)this);
+            OptiFineCompat.resizeNativeBuffers((Tessellator) (Object) this);
         }
 
         System.arraycopy(state.getRawBuffer(), 0, rawBuffer, rawBufferIndex, state.getRawBufferIndex());
@@ -124,5 +124,19 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
             return buffer.clear();
         }
         return buffer;
+    }
+
+    @Inject(method = "startDrawingQuads",
+            at = @At("HEAD"),
+            require = 1)
+    private void startedAt(CallbackInfo ci) {
+        if (!ThreadingConfig.EXTRA_DEBUG_INFO) {
+            return;
+        }
+
+        if (isDrawing) {
+            throw new IllegalStateException("Already tesselating!", lastStart);
+        }
+        lastStart = new Throwable();
     }
 }

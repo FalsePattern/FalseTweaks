@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +36,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.world.IBlockAccess;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
@@ -46,8 +51,7 @@ public class Compat {
             return NEODYMIUM;
         }
         try {
-            NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes(
-                    "makamys.neodymium.Neodymium") != null;
+            NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
         } catch (IOException e) {
             e.printStackTrace();
             NEODYMIUM = false;
@@ -106,9 +110,6 @@ public class Compat {
 
     public static void applyCompatibilityTweaks() {
         ThreadingCompat.init();
-        if (Loader.isModLoaded("archaicfix")) {
-            ArchaicFixCompat.init();
-        }
         if (Loader.isModLoaded("apparatus")) {
             ApparatusCompat.init();
         }
@@ -116,15 +117,12 @@ public class Compat {
 
     public static boolean enableTriangulation() {
         //Threaded chunk updates mess up the triangulator, so keep it off for now until the root cause is found.
-        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES && !neodymiumActive();
+        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES() && !neodymiumActive();
     }
 
     public static Tessellator tessellator() {
         if (ThreadingCompat.isThreadedChunkUpdatingEnabled()) {
             return ThreadedChunkUpdates.getThreadTessellator();
-        }
-        if (ArchaicFixCompat.isThreadedChunkUpdatingEnabled()) {
-            return ArchaicFixCompat.threadTessellator();
         }
         return Tessellator.instance;
     }
@@ -155,24 +153,6 @@ public class Compat {
             }
 
             return ((IParaBlock) block).paraTile(blockAccess, x, y, z).getAmbientOcclusionLightValue();
-        }
-    }
-
-    private static class ArchaicFixCompat {
-
-        @Getter
-        private static boolean isThreadedChunkUpdatingEnabled;
-
-        private static void init() {
-            try {
-                isThreadedChunkUpdatingEnabled =  org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.isEnabled();
-            } catch (Throwable ignored) {
-                isThreadedChunkUpdatingEnabled = false;
-            }
-        }
-
-        public static Tessellator threadTessellator() {
-            return org.embeddedt.archaicfix.threadedupdates.api.ThreadedChunkUpdates.getThreadTessellator();
         }
     }
 

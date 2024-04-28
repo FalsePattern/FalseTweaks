@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -83,9 +89,7 @@ public abstract class TextureMapMixin {
                         Share.log.info("__VOXELIZER__ Layer count: " + thicknesses.length);
                     }
                     for (int i = 0; i < thicknesses.length; i++) {
-                        layers[thicknesses.length - 1 - i] =
-                                new Layer((TextureAtlasSprite) registerIcon(name + "_" + i),
-                                          thicknesses[i] * BASE_THICKNESS);
+                        layers[thicknesses.length - 1 - i] = new Layer((TextureAtlasSprite) registerIcon(name + "_" + i), thicknesses[i] * BASE_THICKNESS);
                         registerIcon(name + "_" + i);
                     }
                     tex.layers(layers);
@@ -96,8 +100,7 @@ public abstract class TextureMapMixin {
                     tex.layers(new Layer(iicon, BASE_THICKNESS));
                 }
             } catch (RuntimeException runtimeexception) {
-                cpw.mods.fml.client.FMLClientHandler.instance()
-                                                    .trackBrokenTexture(complete, runtimeexception.getMessage());
+                cpw.mods.fml.client.FMLClientHandler.instance().trackBrokenTexture(complete, runtimeexception.getMessage());
             } catch (IOException ioexception1) {
                 cpw.mods.fml.client.FMLClientHandler.instance().trackMissingTexture(complete);
             }

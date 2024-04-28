@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,19 +23,14 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
-import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
-import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.BSPTessellatorVertexState;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.ChunkBSPTree;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.val;
-import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -41,47 +42,29 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.shader.TesselatorVertexState;
 
 import java.util.Arrays;
 
 @Mixin(Tessellator.class)
 @Accessors(fluent = true,
            chain = false)
-public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableTessellator {
+public abstract class TessellatorMixin implements ITriangulatorTessellator, ToggleableTessellator {
+    @Shadow
+    @Final
+    public static Tessellator instance;
+    // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
+    @Shadow(aliases = {"rawBufferSize"})
+    public int field_78388_E;
     @Shadow
     private int drawMode;
-
     @Shadow
     private int[] rawBuffer;
     @Shadow
     private int rawBufferIndex;
     @Shadow
     private int vertexCount;
-
-    @Shadow
-    private boolean hasTexture;
-    @Shadow
-    private boolean hasBrightness;
-    @Shadow
-    private boolean hasColor;
-    @Shadow
-    private boolean hasNormals;
-    @Shadow
-    private double xOffset;
-    @Shadow
-    private double yOffset;
-    @Shadow
-    private double zOffset;
-    @Shadow
-    @Final
-    public static Tessellator instance;
-    @Shadow(aliases = {"rawBufferSize"})
-    public int field_78388_E;
-            // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
     private boolean hackedQuadRendering = false;
     @Getter
     private boolean drawingTris = false;
@@ -100,19 +83,11 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             at = @At(value = "HEAD"),
             require = 1)
     private void resetState(CallbackInfo ci) {
-        bspTree = null;
         drawingTris = false;
         hackedQuadRendering = false;
         quadTriangulationTemporarilySuspended = false;
         alternativeTriangulation = false;
         quadVerticesPutIntoBuffer = 0;
-    }
-
-    @Inject(method = "draw",
-            at = @At(value = "HEAD"),
-            require = 1)
-    private void drawKillBSP(CallbackInfoReturnable<Integer> cir) {
-        bspTree = null;
     }
 
     @Redirect(method = "startDrawing",
@@ -133,48 +108,6 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
         drawMode = value;
     }
 
-    private ChunkBSPTree bspTree;
-
-    @Override
-    public TesselatorVertexState getVertexStateBSP(float viewX, float viewY, float viewZ) {
-        if (this.rawBufferIndex <= 0) {
-            this.bspTree = null;
-            return null;
-        }
-        int[] srcBuf;
-        ChunkBSPTree bspTree;
-        if (this.bspTree == null) {
-            val originalSnapshot = new int[this.rawBufferIndex];
-            System.arraycopy(rawBuffer, 0, originalSnapshot, 0, originalSnapshot.length);
-            bspTree = new ChunkBSPTree(drawingTris, Compat.isShaders());
-            bspTree.buildTree(originalSnapshot);
-            srcBuf = originalSnapshot;
-        } else {
-            bspTree = this.bspTree;
-            srcBuf = bspTree.polygonHolder.getVertexData();
-            this.bspTree = null;
-        }
-        bspTree.traverse(new Vector3f((float) (viewX + xOffset), (float) (viewY + yOffset), (float) (viewZ + zOffset)));
-        val stride = bspTree.polygonHolder.vertexStride;
-        int[] stateSnapshot = new int[this.rawBufferIndex];
-        for (int j = 0, n = bspTree.polygonList.size(); j < n; j++) {
-            val i = bspTree.polygonList.get(j);
-            System.arraycopy(srcBuf, i * stride, stateSnapshot, j * stride, stride);
-        }
-        System.arraycopy(stateSnapshot, 0, rawBuffer, 0, stateSnapshot.length);
-        return new BSPTessellatorVertexState(stateSnapshot, this.rawBufferIndex, this.vertexCount, this.hasTexture, this.hasBrightness, this.hasNormals, this.hasColor, bspTree);
-    }
-
-    @Override
-    public void setVertexStateBSP(TesselatorVertexState tvs) {
-        if (tvs instanceof BSPTessellatorVertexState) {
-            val bsp = (BSPTessellatorVertexState) tvs;
-            bspTree = bsp.bspTree;
-        } else {
-            bspTree = null;
-        }
-    }
-
     @Override
     public boolean hackedQuadRendering() {
         return hackedQuadRendering;
@@ -189,8 +122,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
     public void suspendQuadTriangulation() {
         quadTriangulationTemporarilySuspended = true;
         if (quadVerticesPutIntoBuffer != 0) {
-            Share.log.error(new RuntimeException(
-                    "Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
+            Share.log.error(new RuntimeException("Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
             quadVerticesPutIntoBuffer = 0;
         }
     }
@@ -229,16 +161,13 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
-                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex,
-                                 2 * vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize),
-                                 vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex, 2 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize), vertexSize);
                 alternativeTriangulation = false;
             } else {
                 //Target vertex layout: ABC DAC
                 System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize,
-                                 vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize, vertexSize);
             }
             vertexCount += 2;
             rawBufferIndex += 2 * vertexSize;
@@ -254,8 +183,7 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
                 int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
                 ensureRawBufferHasExtraSpaceFor(vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize,
-                                 3 * vertexSize);
+                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize, 3 * vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - vertexSize, vertexSize);
                 quadVerticesPutIntoBuffer = 0;
                 alternativeTriangulation = false;
@@ -329,7 +257,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 32),
-                    require = 5, // OptiFine
+                    require = 5,
+                    // OptiFine
                     allow = 6)   // Vanilla
     private int extendDrawStride(int constant) {
         return VertexInfo.recomputeVertexInfo(constant >>> 2, 4);
@@ -337,7 +266,8 @@ public abstract class TessellatorMixin implements ITessellatorMixin, ToggleableT
 
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 8),
-                    require = 0, // OptiFine
+                    require = 0,
+                    // OptiFine
                     allow = 2)   // Vanilla
     private int extendDrawOffset(int constant) {
         return VertexInfo.recomputeVertexInfo(constant, 1);

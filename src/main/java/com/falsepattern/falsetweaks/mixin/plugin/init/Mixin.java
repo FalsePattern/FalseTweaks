@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,24 +39,37 @@ public enum Mixin implements IMixin {
     // @formatter:off
     //region Startup Optimizations Module
 
-    //Only activate these on java 8 to avoid potential lwjgl3ify collisions
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS).and(Detections.JAVA8), "startup.ModDiscovererMixin"),
+    ASMDataTableMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ASMDataTableMixin"),
+
+    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.DirectoryDiscovererMixin"),
+    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.JarDiscovererMixin"),
+    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ModContainerFactoryMixin"),
+    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ModDiscovererMixin"),
 
     //endregion Startup Optimizations Module
     // @formatter:on
     ;
 
+    @Getter
+    private final Side side;
+    @Getter
+    private final Predicate<List<ITargetedMod>> filter;
+    @Getter
+    private final String mixin;
+
     private static class Detections {
+        private static final int JAVA_VERSION = getVersion();
+        private static final Predicate<List<ITargetedMod>> JAVA8 = condition(() -> JAVA_VERSION == 8);
+
         private static int getVersion() {
             String version = System.getProperty("java.version");
-            if(version.startsWith("1.")) {
+            if (version.startsWith("1.")) {
                 version = version.substring(2, 3);
             } else {
                 int dot = version.indexOf(".");
-                if(dot != -1) { version = version.substring(0, dot); }
+                if (dot != -1) {
+                    version = version.substring(0, dot);
+                }
             }
             try {
                 return Integer.parseInt(version);
@@ -59,15 +78,6 @@ public enum Mixin implements IMixin {
                 return -1;
             }
         }
-        private static final int JAVA_VERSION = getVersion();
-        private static final Predicate<List<ITargetedMod>> JAVA8 = condition(() -> JAVA_VERSION == 8);
     }
-
-    @Getter
-    private final Side side;
-    @Getter
-    private final Predicate<List<ITargetedMod>> filter;
-    @Getter
-    private final String mixin;
 }
 

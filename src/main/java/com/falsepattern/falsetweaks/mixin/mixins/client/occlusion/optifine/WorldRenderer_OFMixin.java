@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +31,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.util.AxisAlignedBB;
 
 @Mixin(WorldRenderer.class)
 public abstract class WorldRenderer_OFMixin {
@@ -37,7 +42,7 @@ public abstract class WorldRenderer_OFMixin {
                        target = "Lnet/minecraft/client/renderer/WorldRenderer;needsBoxUpdate:Z"),
               require = 1)
     private void noAABB(WorldRenderer instance, boolean value) {
-        ((stubpackage.net.minecraft.client.renderer.WorldRenderer)instance).needsBoxUpdate = false;
+        ((stubpackage.net.minecraft.client.renderer.WorldRenderer) instance).needsBoxUpdate = false;
     }
 
     /**

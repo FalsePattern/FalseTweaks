@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +25,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
+import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,19 +41,13 @@ public abstract class WorldRendererMixin {
             at = @At("HEAD"),
             require = 1)
     private void noTriOnPass1Pre(int pass, CallbackInfo ci) {
-        val tess = (ToggleableTessellator) Compat.tessellator();
-        tess.pass(pass);
-        if (pass != 0) {
-            tess.disableTriangulatorLocal();
-        }
+        ToggleableTessellatorManager.preRenderBlocks(pass);
     }
 
     @Inject(method = "postRenderBlocks",
             at = @At(value = "RETURN"),
             require = 1)
     private void noTriOnPass1Post(int pass, EntityLivingBase p_147891_2_, CallbackInfo ci) {
-        if (pass != 0) {
-            ((ToggleableTessellator) Compat.tessellator()).enableTriangulatorLocal();
-        }
+        ToggleableTessellatorManager.postRenderBlocks(pass);
     }
 }

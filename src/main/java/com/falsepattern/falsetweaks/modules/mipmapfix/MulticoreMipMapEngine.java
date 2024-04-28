@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,19 +43,17 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MulticoreMipMapEngine {
     private static final ThreadLocal<MulticoreMipMapEngine> engine = new ThreadLocal<>();
-    private final ExecutorService service =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
-                val thread = new Thread(r);
-                thread.setName("FalseTweaks mipmap thread");
-                return thread;
-            });
+    private final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
+        val thread = new Thread(r);
+        thread.setName("MipMap");
+        return thread;
+    });
     private final ConcurrentLinkedDeque<String> completedTextures = new ConcurrentLinkedDeque<>();
     private final ConcurrentLinkedDeque<ReportedException> exceptions = new ConcurrentLinkedDeque<>();
     private final ProgressManager.ProgressBar progressBar;
 
     private static IllegalStateException fatalError() {
-        return new IllegalStateException(
-                "Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
+        return new IllegalStateException("Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
     }
 
     public static void initWorkers(ProgressManager.ProgressBar bar) {
@@ -85,8 +89,7 @@ public class MulticoreMipMapEngine {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
                 crashreportcategory.addCrashSectionCallable("Sprite name", sprite::getIconName);
-                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " +
-                                                                                 sprite.getIconHeight());
+                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " + sprite.getIconHeight());
                 crashreportcategory.addCrashSectionCallable("Sprite frames", () -> sprite.getFrameCount() + " frames");
                 crashreportcategory.addCrashSection("Mipmap levels", mipMapLevels);
                 exceptions.add(new ReportedException(crashreport));
@@ -104,13 +107,13 @@ public class MulticoreMipMapEngine {
             } catch (InterruptedException e) {
                 Share.log.trace(e);
             }
-            while (completedTextures.size() > 0) {
+            while (!completedTextures.isEmpty()) {
                 String name = completedTextures.poll();
                 if (name != null) {
                     progressBar.step(name);
                 }
             }
-            while (exceptions.size() > 0) {
+            while (!exceptions.isEmpty()) {
                 val ex = exceptions.poll();
                 if (firstException == null) {
                     firstException = ex;

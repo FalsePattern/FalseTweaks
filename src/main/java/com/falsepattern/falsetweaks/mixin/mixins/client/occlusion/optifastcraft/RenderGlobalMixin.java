@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,6 +23,10 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifastcraft;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadSafeSettings;
+import lombok.val;
+import lombok.var;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +39,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -81,10 +92,8 @@ public abstract class RenderGlobalMixin {
 
     @Shadow
     public List tileEntities;
-
-    @Shadow
-    public abstract void onStaticEntitiesChanged();
-
+    @SuppressWarnings("MissingUnique")
+    public List field_72767_j;
     @Shadow
     private boolean occlusionEnabled;
 
@@ -97,10 +106,11 @@ public abstract class RenderGlobalMixin {
     @Shadow
     private int glRenderListBase;
 
-    @SuppressWarnings("MissingUnique")
-    public List field_72767_j;
+    @Shadow
+    public abstract void onStaticEntitiesChanged();
 
-    @Shadow public abstract void markRenderersForNewPosition(int p_72722_1_, int p_72722_2_, int p_72722_3_);
+    @Shadow
+    public abstract void markRenderersForNewPosition(int p_72722_1_, int p_72722_2_, int p_72722_3_);
 
     /**
      * @author FalsePattern
@@ -109,8 +119,8 @@ public abstract class RenderGlobalMixin {
     @Overwrite
     public void loadRenderers() {
         if (this.theWorld != null) {
-            Blocks.leaves.setGraphicsLevel(this.mc.gameSettings.fancyGraphics);
-            Blocks.leaves2.setGraphicsLevel(this.mc.gameSettings.fancyGraphics);
+            ft$updateLeafFancyGraphics();
+
             this.renderDistanceChunks = this.mc.gameSettings.renderDistanceChunks;
             int i;
 
@@ -147,7 +157,8 @@ public abstract class RenderGlobalMixin {
             for (l = 0; l < this.renderChunksWide; ++l) {
                 for (int i1 = 0; i1 < this.renderChunksTall; ++i1) {
                     for (int j1 = 0; j1 < this.renderChunksDeep; ++j1) {
-                        this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] = new WorldRenderer(this.theWorld, this.tileEntities, l * 16, i1 * 16, j1 * 16, this.glRenderListBase + j);
+                        this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] =
+                                new WorldRenderer(this.theWorld, this.tileEntities, l * 16, i1 * 16, j1 * 16, this.glRenderListBase + j);
 
                         if (this.occlusionEnabled) {
                             this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].glOcclusionQuery = this.glOcclusionQueryBase.get(k);
@@ -158,7 +169,8 @@ public abstract class RenderGlobalMixin {
                         this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].isInFrustum = true;
                         this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].chunkIndex = k++;
                         this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].markDirty();
-                        this.sortedWorldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] = this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l];
+                        this.sortedWorldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] =
+                                this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l];
                         this.field_72767_j.add(this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l]);
                         j += 3;
                     }
@@ -169,8 +181,7 @@ public abstract class RenderGlobalMixin {
                 EntityLivingBase entitylivingbase = this.mc.renderViewEntity;
 
                 if (entitylivingbase != null) {
-                    this.markRenderersForNewPosition(MathHelper.floor_double(entitylivingbase.posX),
-                                                     MathHelper.floor_double(entitylivingbase.posY),
+                    this.markRenderersForNewPosition(MathHelper.floor_double(entitylivingbase.posX), MathHelper.floor_double(entitylivingbase.posY),
                                                      MathHelper.floor_double(entitylivingbase.posZ));
                     Arrays.sort(this.sortedWorldRenderers, new EntitySorter(entitylivingbase));
                 }
@@ -178,5 +189,19 @@ public abstract class RenderGlobalMixin {
 
             this.renderEntitiesStartupCounter = 2;
         }
+    }
+
+    @Unique
+    private void ft$updateLeafFancyGraphics() {
+        val gameSettings = mc.gameSettings;
+        var fancyGraphics = false;
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            fancyGraphics = ((ThreadSafeSettings) gameSettings).ft$fancyGraphics();
+        } else {
+            // This field does not exist if threaded chunk updates are used.
+            fancyGraphics = mc.gameSettings.fancyGraphics;
+        }
+        Blocks.leaves.setGraphicsLevel(fancyGraphics);
+        Blocks.leaves2.setGraphicsLevel(fancyGraphics);
     }
 }

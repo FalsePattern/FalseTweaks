@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -83,47 +89,20 @@ public class ProfilingNode {
         return childrenMap.get(node).findChild(path, index + 1);
     }
 
-    public void toJson(JsonWriter json, boolean compact, boolean named) throws IOException {
+    public void toJson(JsonWriter json) throws IOException {
         if (parent != null) {
-            if (!compact || children.size() > 0 || named) {
-                json.beginObject();
-                if (named) {
-                    json.name("name").value(name);
-                }
-                json.name("nanos").value(totalTime);
-                if (children.size() > 0) {
-                    json.name("children");
-                    if (compact) {
-                        json.beginObject();
-                    } else {
-                        json.beginArray();
-                    }
-                }
-            } else {
-                json.value(totalTime);
-            }
+            json.beginObject();
+            json.name("name").value(name);
+            json.name("timeNs").value(totalTime);
+            json.name("children");
+            json.beginArray();
         }
-        if (compact) {
-            for (val child : childrenMap.entrySet()) {
-                json.name(child.getKey());
-                child.getValue().toJson(json, true, parent == null);
-            }
-        } else {
-            for (val child : childrenMap.values()) {
-                child.toJson(json, true, parent == null);
-            }
+        for (val child : childrenMap.values()) {
+            child.toJson(json);
         }
         if (parent != null) {
-            if (!compact || children.size() > 0 || named) {
-                if (children.size() > 0) {
-                    if (compact) {
-                        json.endObject();
-                    } else {
-                        json.endArray();
-                    }
-                }
-                json.endObject();
-            }
+            json.endArray();
+            json.endObject();
         }
     }
 }

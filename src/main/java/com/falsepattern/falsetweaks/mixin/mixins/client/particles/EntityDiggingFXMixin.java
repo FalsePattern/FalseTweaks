@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +27,9 @@ import com.falsepattern.falsetweaks.modules.particles.ParticleUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.Block;
@@ -37,6 +45,13 @@ public abstract class EntityDiggingFXMixin extends EntityFX {
 
     protected EntityDiggingFXMixin(World p_i1218_1_, double p_i1218_2_, double p_i1218_4_, double p_i1218_6_) {
         super(p_i1218_1_, p_i1218_2_, p_i1218_4_, p_i1218_6_);
+    }
+
+    @ModifyConstant(method = "<init>(Lnet/minecraft/world/World;DDDDDDLnet/minecraft/block/Block;II)V",
+                    constant = @Constant(floatValue = 0.6f),
+                    require = 1)
+    private float fixColor(float constant) {
+        return 0.8f;
     }
 
     @Inject(method = "renderParticle",

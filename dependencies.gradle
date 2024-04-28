@@ -32,11 +32,25 @@ dependencies {
 
     compileOnly(deobf("https://github.com/embeddedt/ArchaicFix/releases/download/0.6.2/archaicfix-0.6.2.jar"))
 
-    compileOnly(deobf("https://github.com/makamys/Neodymium/releases/download/0.1.9/neodymium-1.7.10-0.1.9+nomixin.jar"))
+    compileOnly("makamys:neodymium-1.7.10:f008edb")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
         transitive = false
     }
 
     compileOnly(deobfCurse("railcraft-51195:2458987"))
+
+    // Nuclear Control 2 2.4.5a
+    compileOnly(deobfCurse("nuclear-control-2-236813:3802063"))
+    // OpenComputers MC1.7.10-1.8.3+089dd28
+    compileOnly(deobfCurse("opencomputers-223008:4630534"))
+    // Computronics 1.7.10-1.6.6
+    compileOnly(deobf("https://files.vexatos.com/Computronics/Computronics-1.7.10-1.6.6.jar"))
+    // ExtraCells 1.7.10-2.5.0-14
+    compileOnly(deobf("https://downloads.gtnewhorizons.com/Mods_for_Twitch/ExtraCells-1.7.10-2.5.0-14.jar"))
+    // Automagy 0.28.2
+    compileOnly(deobfCurse("automagy-222153:2285272"))
+
+    // CodeChickenLib
+    compileOnly("codechicken:codechickenlib-mc1.7.10:1.2.0-mega:dev")
 }

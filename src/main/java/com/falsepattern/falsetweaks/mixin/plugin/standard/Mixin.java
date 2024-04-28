@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,6 +25,7 @@ package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.falsepattern.falsetweaks.modules.debug.Debug;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
@@ -27,13 +34,15 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_SAFETY_CHECKS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.BSP;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.OCCLUSION;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.THREADING;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.TRIANGULATOR;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.VOXELIZER;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_ANY_OPTIFINE;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_SHADERS;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.NEODYMIUM;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.OPTIFINE_WITH_SHADERS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_ANY_OPTIFINE;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_SHADERS;
@@ -56,15 +65,6 @@ public enum Mixin implements IMixin {
     Tri_RenderingRegistryMixin(Side.CLIENT, TRIANGULATOR, "triangulator.RenderingRegistryMixin"),
     Tri_TessellatorMixin(Side.CLIENT, TRIANGULATOR, "triangulator.TessellatorMixin"),
     Tri_WorldRendererMixin(Side.CLIENT, TRIANGULATOR, "triangulator.WorldRendererMixin"),
-
-    Tri_BSPSortMixin(Side.CLIENT,
-                     BSP.and(avoid(TargetedMod.FOAMFIX)),
-                     "triangulator.TessellatorBSPSortingMixin"),
-
-    //FoamFix
-    Tri_BSPSortFoamFixMixin(Side.CLIENT,
-                            BSP.and(require(TargetedMod.FOAMFIX)),
-                            "triangulator.foamfix.TessellatorBSPSortingMixin"),
 
     //OptiFine
     Tri_OFTessellatorVanillaMixin(Side.CLIENT,
@@ -92,77 +92,88 @@ public enum Mixin implements IMixin {
     //region Occlusion Tweaks Module
 
     //For 32chunk render distance without optifine
-    Occlusion_PlayerManagerMixin(Side.COMMON, OCCLUSION, "occlusion.PlayerManagerMixin"),
+    Occlusion_PlayerManagerMixin(Side.COMMON, THREADING, "occlusion.PlayerManagerMixin"),
 
-    Occlusion_ChunkMixin(Side.CLIENT, OCCLUSION, "occlusion.ChunkMixin"),
-    Occlusion_EntityRendererMixin(Side.CLIENT, OCCLUSION, "occlusion.EntityRendererMixin"),
-    Occlusion_GuiVideoSettingsMixin(Side.CLIENT, OCCLUSION, "occlusion.GuiVideoSettingsMixin"),
-    Occlusion_RenderGlobalMixin(Side.CLIENT, OCCLUSION, "occlusion.RenderGlobalMixin"),
-    Occlusion_WorldRendererMixin(Side.CLIENT, OCCLUSION, "occlusion.WorldRendererMixin"),
+    Occlusion_EntityRendererMixin(Side.CLIENT, THREADING, "occlusion.EntityRendererMixin"),
+    Occlusion_GuiVideoSettingsMixin(Side.CLIENT, THREADING, "occlusion.GuiVideoSettingsMixin"),
+    Occlusion_RenderGlobalMixin(Side.CLIENT, THREADING, "occlusion.RenderGlobalMixin"),
+    Occlusion_WorldRendererMixin(Side.CLIENT, THREADING, "occlusion.WorldRendererMixin"),
+    Occlusion_MinecraftMixin(Side.CLIENT, THREADING, "occlusion.MinecraftMixin"),
     Occlusion_GameSettingsMixin(Side.CLIENT,
-                                OCCLUSION.and(AVOID_ANY_OPTIFINE),
+                                THREADING.and(AVOID_ANY_OPTIFINE),
                                 "occlusion.GameSettingsMixin"),
     Occlusion_GameSettingsOptionsMixin(Side.CLIENT,
-                                       OCCLUSION.and(AVOID_ANY_OPTIFINE),
+                                       THREADING.and(AVOID_ANY_OPTIFINE),
                                        "occlusion.GameSettingsOptionsMixin"),
     Occlusion_ClippingHelperMixin(Side.CLIENT,
-                                       OCCLUSION,
+                                  THREADING,
                                        "occlusion.ClippingHelperMixin"),
     Occlusion_ClippingHelperImplMixin(Side.CLIENT,
-                                       OCCLUSION,
+                                      THREADING,
                                        "occlusion.ClippingHelperImplMixin"),
+
+    //Neodymium
+    Occlusion_Neodymium_NeoRendererMixin(Side.CLIENT,
+                                         THREADING.and(require(NEODYMIUM)),
+                                         "occlusion.neodymium.NeoRendererMixin"),
 
     //OptiFine
     Occlusion_Optifine_RenderGlobalMixin(Side.CLIENT,
-                                         OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
+                                         THREADING.and(REQUIRE_ANY_OPTIFINE),
                                          "occlusion.optifine.RenderGlobalMixin"),
     Occlusion_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT,
-                                                   OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
+                                                   THREADING.and(REQUIRE_ANY_OPTIFINE),
                                                    "occlusion.optifine.GameSettingsOptifineMixin"),
     Occlusion_Optifine_OFGuiVideoSettingsOptifineMixin(Side.CLIENT,
-                                                       OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
+                                                       THREADING.and(REQUIRE_ANY_OPTIFINE),
                                                        "occlusion.optifine.GuiVideoSettingsOptifineMixin"),
     Occlusion_Optifine_WorldRenderer_VanillaMixin(Side.CLIENT,
-                                                  OCCLUSION.and(AVOID_ANY_OPTIFINE),
+                                                  THREADING.and(AVOID_ANY_OPTIFINE),
                                                   "occlusion.optifine.WorldRenderer_VanillaMixin"),
     Occlusion_Optifine_WorldRenderer_OFMixin(Side.CLIENT,
-                                             OCCLUSION.and(REQUIRE_ANY_OPTIFINE),
+                                             THREADING.and(REQUIRE_ANY_OPTIFINE),
                                              "occlusion.optifine.WorldRenderer_OFMixin"),
 
     //OptiFine with shaders
     Occlusion_Optifine_Shaders_ShadersRendererMixin(Side.CLIENT,
-                                                    OCCLUSION.and(REQUIRE_OPTIFINE_WITH_SHADERS),
+                                                    THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                                     "occlusion.optifine.shaders.ShadersRendererMixin"),
     Occlusion_Optifine_Shaders_FrustrumMixin(Side.CLIENT,
-                                             OCCLUSION.and(REQUIRE_OPTIFINE_WITH_SHADERS),
+                                             THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                              "occlusion.optifine.shaders.FrustrumMixin"),
 
 
     //FastCraft
     Occlusion_FastCraft_GLAllocationMixin(Side.CLIENT,
-                                          OCCLUSION.and(require(TargetedMod.FASTCRAFT)),
+                                          THREADING.and(require(TargetedMod.FASTCRAFT)),
                                           "occlusion.fastcraft.GLAllocationMixin"),
     Occlusion_FastCraft_EntityRendererMixin(Side.CLIENT,
-                                            OCCLUSION.and(require(TargetedMod.FASTCRAFT)).and(AVOID_ANY_OPTIFINE),
+                                            THREADING.and(require(TargetedMod.FASTCRAFT)).and(AVOID_ANY_OPTIFINE),
                                             "occlusion.fastcraft.EntityRendererMixin"),
 
     //Both of them
     Occlusion_OptiFastCraft_RenderGlobalMixin(Side.CLIENT,
-                                              OCCLUSION.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)),
+                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)),
                                               "occlusion.optifastcraft.RenderGlobalMixin"),
 
     //endregion Occlusion Tweaks Module
 
     //region Threaded Chunk Updates
 
+    ThreadedUpdates_BlockMixin(Side.CLIENT, THREADING, "threadedupdates.BlockMixin"),
+    ThreadedUpdates_GameSettings(Side.CLIENT, THREADING, "threadedupdates.GameSettingsMixin"),
     ThreadedUpdates_ChunkProviderClientMixin(Side.CLIENT, THREADING, "threadedupdates.ChunkProviderClientMixin"),
+    ThreadedUpdates_ForgeHooksClientMixin(Side.CLIENT, THREADING, "threadedupdates.ForgeHooksClientMixin"),
     ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, THREADING, "threadedupdates.RenderBlocksMixin"),
+    ThreadedUpdates_RenderGlobalMixin(Side.CLIENT, THREADING, "threadedupdates.RenderGlobalMixin"),
     ThreadedUpdates_TessellatorMixin(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin"),
-    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin_Debug"),
+    ThreadedUpdates_TessellatorMixin_DebugFast(Side.CLIENT, THREADING.and(condition(() -> FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_DebugFast"),
+    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING.and(condition(() -> !FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_Debug"),
+    ThreadedUpdates_WorldRenderer_NonOptiFineMixin(Side.CLIENT, THREADING.and(AVOID_ANY_OPTIFINE), "threadedupdates.WorldRenderer_NonOptiFineMixin"),
     ThreadedUpdates_WorldRendererMixin(Side.CLIENT, THREADING, "threadedupdates.WorldRendererMixin"),
-    ThreadedUpdates_Optifine_ShadersMixin(Side.CLIENT,
-                                          THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                          "threadedupdates.optifine.ShadersMixin"),
+
+    //Neodymium
+    ThreadedUpdates_Neodymium_WorldRendererMixin(Side.CLIENT, THREADING.and(require(TargetedMod.NEODYMIUM)), "threadedupdates.neodymium.WorldRendererMixin"),
 
     //DragonAPI
     ThreadedUpdates_DragonAPI_WorldRenderer_VanillaMixin(Side.CLIENT,
@@ -177,13 +188,51 @@ public enum Mixin implements IMixin {
                                                THREADING.and(REQUIRE_ANY_OPTIFINE),
                                                "threadedupdates.optifine.GameSettingsMixin"),
     ThreadedUpdates_OptiFine_GuiPerformanceSettingsOFMixin(Side.CLIENT,
-                                               THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                               "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
-    ThreadedUpdates_OptiFine_WorldClientMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS),
-                                                   "threadedupdates.optifine.WorldClientMixin"),
+                                                           THREADING.and(REQUIRE_ANY_OPTIFINE),
+                                                           "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
+    ThreadedUpdates_OptiFine_MinecraftMixin(Side.CLIENT,
+                                            THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
+                                            "threadedupdates.optifine.MinecraftMixin"),
+    ThreadedUpdates_Optifine_ShadersMixin(Side.CLIENT,
+                                          THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
+                                          "threadedupdates.optifine.ShadersMixin"),
     ThreadedUpdates_OptiFine_TessellatorMixin(Side.CLIENT,
                                               THREADING.and(REQUIRE_ANY_OPTIFINE),
                                               "threadedupdates.optifine.TessellatorMixin"),
+    ThreadedUpdates_OptiFine_WorldClientMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS),
+                                              "threadedupdates.optifine.WorldClientMixin"),
+    ThreadedUpdates_OptiFine_WorldRendererMixin(Side.CLIENT,
+                                                THREADING.and(REQUIRE_ANY_OPTIFINE),
+                                                "threadedupdates.optifine.WorldRendererMixin"),
+
+    // Nuclear Control 2
+    ThreadedUpdates_Nuclear_Control_MainBlockRendererMixin(Side.CLIENT,
+                                                           THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
+                                                           "threadedupdates.nuclearcontrol.MainBlockRendererMixin"),
+    ThreadedUpdates_Nuclear_Control_TileEntityInfoPanelRendererMixin(Side.CLIENT,
+                                                                     THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
+                                                                     "threadedupdates.nuclearcontrol.TileEntityInfoPanelRendererMixin"),
+    ThreadedUpdates_Nuclear_Control_TileEntityAdvancedInfoPanelMixin(Side.CLIENT,
+                                                                     THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
+                                                                     "threadedupdates.nuclearcontrol.TileEntityAdvancedInfoPanelMixin"),
+
+    // OpenComputers
+    ThreadedUpdates_Open_Computers_TileEntityAdvancedInfoPanelMixin(Side.CLIENT,
+                                                                    THREADING.and(require(TargetedMod.OPEN_COMPUTERS)),
+                                                                    "threadedupdates.opencomputers.RenderStateMixin"),
+    // Computronics
+    ThreadedUpdates_Computronics_LampRenderMixin(Side.CLIENT,
+                                                 THREADING.and(require(TargetedMod.COMPUTRONICS)),
+                                                 "threadedupdates.computronics.LampRenderMixin"),
+    // Extra Cells 2
+    ThreadedUpdates_Extra_Cells_RendererHardMEDriveMixin(Side.CLIENT,
+                                                         THREADING.and(require(TargetedMod.EXTRA_CELLS)),
+                                                         "threadedupdates.extracells.RendererHardMEDriveMixin"),
+    // Automagy
+    ThreadedUpdates_Automagy_RenderBlockGlowOverlayMixin(Side.CLIENT,
+                                                         THREADING.and(require(TargetedMod.AUTOMAGY)),
+                                                         "threadedupdates.automagy.RenderBlockGlowOverlayMixin"),
+
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module
@@ -234,8 +283,26 @@ public enum Mixin implements IMixin {
     Profiler_ProfilerMixin(Side.CLIENT, condition(() -> ModuleConfig.ADVANCED_PROFILER), "profiler.ProfilerMixin"),
     //endregion Profiler Module
 
+    //region BSP Sorting Module
+    BSP_TessellatorMixin(Side.CLIENT,
+                         BSP,
+                         "bsp.TessellatorMixin"),
+
+    BSP_TessellatorBSPSortingMixin(Side.CLIENT,
+                                   BSP.and(avoid(TargetedMod.FOAMFIX)),
+                                   "bsp.TessellatorBSPSortingMixin"),
+
+    //FoamFix
+    BSP_foamfix_TessellatorBSPSortingMixin(Side.CLIENT,
+                                           BSP.and(require(TargetedMod.FOAMFIX)),
+                                           "bsp.foamfix.TessellatorBSPSortingMixin"),
+
+    //endregion
+
     //region Misc Modules
     ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),
+
+    MinecartEarBlast_WorldclientMixin(Side.CLIENT, condition(() -> ModuleConfig.MINECART_EAR_BLAST_FIX), "misc.MinecartEarBlast_WorldClientMixin"),
 
     BeaconFix_TileEntityBeaconRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconRendererMixin"),
     BeaconFix_TileEntityBeaconMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconMixin"),
@@ -245,6 +312,9 @@ public enum Mixin implements IMixin {
     TranslucentBlockLayers_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX), "misc.TranslucentBlockLayers_RenderGlobalMixin"),
 
     SkyFix_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.SKY_MESH_OPTIMIZATION), "misc.SkyFix_RenderGlobalMixin"),
+
+    RealmShutUp_GuiMainMenuMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_GuiMainMenuMixin"),
+    RealmShutUp_RealmsBridgeMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_RealmsBridgeMixin"),
     //endregion Misc Modules
 
     //region Particles
@@ -252,16 +322,14 @@ public enum Mixin implements IMixin {
     Particles_EntityDiggingFXMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "particles.EntityDiggingFXMixin"),
     Particles_EffectRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "particles.EffectRendererMixin"),
     //endregion Particles
+
+    //region Debug
+    Debug_Occlusion_Neodymium_NeoRendererMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS).and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.NeoRendererMixin"),
+    Debug_Occlusion_Neodymium_GPUMemoryManagerMixin(Side.CLIENT, THREADING.and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.GPUMemoryManagerMixin"),
+    //endregion Debug
+
     ;
     // @formatter:on
-
-    public static class CommonConfigs {
-        public static final Predicate<List<ITargetedMod>> TRIANGULATOR = condition(() -> ModuleConfig.TRIANGULATOR);
-        public static final Predicate<List<ITargetedMod>> OCCLUSION = condition(() -> ModuleConfig.OCCLUSION_TWEAKS);
-        public static final Predicate<List<ITargetedMod>> THREADING = condition(ModuleConfig::THREADED_CHUNK_UPDATES);
-        public static final Predicate<List<ITargetedMod>> BSP = condition(() -> ModuleConfig.TRIANGULATOR && ModuleConfig.BSP_SORTING);
-        public static final Predicate<List<ITargetedMod>> VOXELIZER = condition(() -> ModuleConfig.VOXELIZER);
-    }
 
     @Getter
     private final Side side;
@@ -269,5 +337,12 @@ public enum Mixin implements IMixin {
     private final Predicate<List<ITargetedMod>> filter;
     @Getter
     private final String mixin;
+
+    public static class CommonConfigs {
+        public static final Predicate<List<ITargetedMod>> TRIANGULATOR = condition(ModuleConfig::TRIANGULATOR);
+        public static final Predicate<List<ITargetedMod>> THREADING = condition(ModuleConfig::THREADED_CHUNK_UPDATES);
+        public static final Predicate<List<ITargetedMod>> BSP = condition(ModuleConfig::BSP_SORTING);
+        public static final Predicate<List<ITargetedMod>> VOXELIZER = condition(() -> ModuleConfig.VOXELIZER);
+    }
 }
 

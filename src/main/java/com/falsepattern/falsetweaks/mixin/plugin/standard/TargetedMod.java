@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
-import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +38,8 @@ import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.startsWit
 
 @RequiredArgsConstructor
 public enum TargetedMod implements ITargetedMod {
-    ARCHAICFIX("ArchaicFix", false, startsWith("archaicfix")),
     FOAMFIX("FoamFix", false, startsWith("foamfix")),
-    OPTIFINE_WITHOUT_SHADERS("OptiFine without shaders", false,
-                             startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.or(OPTIFINE_DYNAMIC_LIGHTS_VERSIONS).negate())),
+    OPTIFINE_WITHOUT_SHADERS("OptiFine without shaders", false, startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS.or(OPTIFINE_DYNAMIC_LIGHTS_VERSIONS).negate())),
     OPTIFINE_WITH_SHADERS("OptiFine with shaders", false, startsWith("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
     OPTIFINE_WITH_DYNAMIC_LIGHTS("OptiFine with dynamic lights", false, startsWith("optifine").and(OPTIFINE_DYNAMIC_LIGHTS_VERSIONS)),
     FASTCRAFT("FastCraft", false, startsWith("fastcraft")),
@@ -45,6 +48,12 @@ public enum TargetedMod implements ITargetedMod {
     APPARATUS("Apparatus", false, startsWith("apparatus")),
     RAILCRAFT("Railcraft", true, startsWith("railcraft")),
     DRAGONAPI("DragonAPI", false, startsWith("dragonapi")),
+    NEODYMIUM("Neodymium", false, startsWith("neodymium-")),
+    NUCLEAR_CONTROL("Nuclear Control 2", false, startsWith("IC2NuclearControl-")),
+    OPEN_COMPUTERS("OpenComputers", false, startsWith("OpenComputers-")),
+    COMPUTRONICS("Computronics", false, startsWith("Computronics-")),
+    EXTRA_CELLS("Extra Cells 2", false, startsWith("ExtraCells-")),
+    AUTOMAGY("Automagy", false, startsWith("Automagy-")),
     ;
 
     public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITHOUT_SHADERS = require(OPTIFINE_WITHOUT_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));

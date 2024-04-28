@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,10 +30,9 @@ import org.joml.Vector3f;
 
 public class QuadAreaComputer implements NormalAreaComputer {
     public static final QuadAreaComputer INSTANCE = new QuadAreaComputer();
-    private final Vector3f buf = new Vector3f();
 
     @Override
-    public float getArea(int[] vertexData, int i, int vertexSize) {
+    public float getArea(int[] vertexData, int i, int vertexSize, Vector3f buf) {
         val ax = Float.intBitsToFloat(vertexData[i]);
         val ay = Float.intBitsToFloat(vertexData[i + 1]);
         val az = Float.intBitsToFloat(vertexData[i + 2]);
@@ -61,8 +66,7 @@ public class QuadAreaComputer implements NormalAreaComputer {
         var cy = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 1]);
         var cz = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 2]);
 
-        if ((ax == bx && ay == by && az == bz)
-            || (bx == cx && by == cy && bz == cz)) {
+        if ((ax == bx && ay == by && az == bz) || (bx == cx && by == cy && bz == cz)) {
             bx = cx;
             by = cy;
             bz = cz;

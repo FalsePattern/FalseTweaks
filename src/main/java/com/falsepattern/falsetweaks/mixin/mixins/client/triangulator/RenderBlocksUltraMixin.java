@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,9 +29,8 @@ import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
-import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITessellatorMixin;
+import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
-import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.IFaceRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.RenderState;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -176,55 +181,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     @Shadow
     public abstract boolean hasOverrideBlockTexture();
-
-    private IFaceRenderer fr$renderFaceYNeg;
-    private IFaceRenderer fr$renderFaceYPos;
-    private IFaceRenderer fr$renderFaceZNeg;
-    private IFaceRenderer fr$renderFaceZPos;
-    private IFaceRenderer fr$renderFaceXNeg;
-    private IFaceRenderer fr$renderFaceXPos;
-
-    @Inject(method = {"<init>()V", "<init>(Lnet/minecraft/world/IBlockAccess;)V"},
-            at = @At("RETURN"),
-            require = 2)
-    private void setupCallbacks(CallbackInfo ci) {
-        fr$renderFaceYNeg = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceYNeg(block, x, y, z, icon);
-            }
-        };
-        fr$renderFaceYPos = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceYPos(block, x, y, z, icon);
-            }
-        };
-        fr$renderFaceZNeg = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceZNeg(block, x, y, z, icon);
-            }
-        };
-        fr$renderFaceZPos = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceZPos(block, x, y, z, icon);
-            }
-        };
-        fr$renderFaceXNeg = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceXNeg(block, x, y, z, icon);
-            }
-        };
-        fr$renderFaceXPos = new IFaceRenderer() {
-            @Override
-            public void render(Block block, int x, int y, int z, IIcon icon) {
-                renderFaceXPos(block, x, y, z, icon);
-            }
-        };
-    }
 
     @Shadow
     public abstract void renderFaceYNeg(Block p_147768_1_, double p_147768_2_, double p_147768_4_, double p_147768_6_, IIcon p_147768_8_);
@@ -402,11 +358,10 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private boolean shouldSideBeRenderedQuick(Block block, int x, int y, int z, Facing facing) {
-        return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(),
-                                          facing.face.ordinal());
+        return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
     }
 
-    private boolean renderFace(IFaceRenderer renderer, Facing facing) {
+    private boolean renderFace(Facing facing) {
         Block block = state.block;
         int x = state.x;
         int y = state.y;
@@ -543,7 +498,26 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         this.colorGreenTopRight *= aoTopRight;
         this.colorBlueTopRight *= aoTopRight;
         IIcon icon = getBlockIcon(block, blockAccess, x, y, z, facing.face.ordinal());
-        renderer.render(block, x, y, z, getBlockIcon(block, blockAccess, x, y, z, facing.face.ordinal()));
+        switch (facing) {
+            case YNEG:
+                renderFaceYNeg(block, x, y, z, icon);
+                break;
+            case YPOS:
+                renderFaceYPos(block, x, y, z, icon);
+                break;
+            case ZNEG:
+                renderFaceZNeg(block, x, y, z, icon);
+                break;
+            case ZPOS:
+                renderFaceZPos(block, x, y, z, icon);
+                break;
+            case XNEG:
+                renderFaceXNeg(block, x, y, z, icon);
+                break;
+            case XPOS:
+                renderFaceXPos(block, x, y, z, icon);
+                break;
+        }
         if (facing.face != Facing.Direction.FACE_YNEG && facing.face != Facing.Direction.FACE_YPOS) {
             if (fancyGrass && icon.getIconName().equals("grass_side") && !this.hasOverrideBlockTexture()) {
                 float r = state.r;
@@ -561,7 +535,27 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                 this.colorBlueBottomLeft *= b;
                 this.colorBlueBottomRight *= b;
                 this.colorBlueTopRight *= b;
-                renderer.render(block, x, y, z, BlockGrass.getIconSideOverlay());
+                val sideIcon = BlockGrass.getIconSideOverlay();
+                switch (facing) {
+                    case YNEG:
+                        renderFaceYNeg(block, x, y, z, sideIcon);
+                        break;
+                    case YPOS:
+                        renderFaceYPos(block, x, y, z, sideIcon);
+                        break;
+                    case ZNEG:
+                        renderFaceZNeg(block, x, y, z, sideIcon);
+                        break;
+                    case ZPOS:
+                        renderFaceZPos(block, x, y, z, sideIcon);
+                        break;
+                    case XNEG:
+                        renderFaceXNeg(block, x, y, z, sideIcon);
+                        break;
+                    case XPOS:
+                        renderFaceXPos(block, x, y, z, sideIcon);
+                        break;
+                }
             }
         }
 
@@ -580,12 +574,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
         state.set(block, x, y, z, r, g, b, useColor, light);
         boolean drewSomething;
-        drewSomething = renderFace(fr$renderFaceYNeg, Facing.YNEG);
-        drewSomething |= renderFace(fr$renderFaceYPos, Facing.YPOS);
-        drewSomething |= renderFace(fr$renderFaceZNeg, Facing.ZNEG);
-        drewSomething |= renderFace(fr$renderFaceZPos, Facing.ZPOS);
-        drewSomething |= renderFace(fr$renderFaceXNeg, Facing.XNEG);
-        drewSomething |= renderFace(fr$renderFaceXPos, Facing.XPOS);
+        drewSomething = renderFace(Facing.YNEG);
+        drewSomething |= renderFace(Facing.YPOS);
+        drewSomething |= renderFace(Facing.ZNEG);
+        drewSomething |= renderFace(Facing.ZPOS);
+        drewSomething |= renderFace(Facing.XNEG);
+        drewSomething |= renderFace(Facing.XPOS);
 
         this.enableAO = false;
         if (drewSomething && enableMultiRenderReuse) {
@@ -603,9 +597,9 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private void reuse(Facing.Direction dir) {
         if (reusePreviousStates) {
-            ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
+            ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
         } else {
-            states[dir.ordinal()] = ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation();
+            states[dir.ordinal()] = ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation();
         }
     }
 
@@ -617,8 +611,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() &&
-            CalibrationConfig.FLIP_DIAGONALS) {
+        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() && CalibrationConfig.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
             avgBottomLeft = tmp;
@@ -632,14 +625,14 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             val mainDiagonalAvg = avg(avgTopLeft, avgBottomRight);
             val altDiagonalAvg = avg(avgBottomLeft, avgTopRight);
             if (Math.abs(mainDiagonalAvg - altDiagonalAvg) > 0.01 && mainDiagonalAvg < altDiagonalAvg) {
-                ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(true);
+                ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(true);
                 return;
             }
         } else if (altDiagonalDiff < mainDiagonalDiff) {
-            ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(true);
+            ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(true);
             return;
         }
-        ((ITessellatorMixin) Compat.tessellator()).alternativeTriangulation(false);
+        ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(false);
     }
 
     @Inject(method = {"renderFaceXNeg"},
@@ -771,8 +764,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             return;
         }
 
-        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 || renderMaxX != 1 || renderMaxY != 1 ||
-            renderMaxZ != 1) {
+        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 || renderMaxX != 1 || renderMaxY != 1 || renderMaxZ != 1) {
             return;
         }
         val EPSILON = TriangulatorConfig.BLOCK_CRACK_FIX_EPSILON;
@@ -794,12 +786,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
     }
 
-    @Inject(method = {"renderFaceXNeg",
-                      "renderFaceXPos",
-                      "renderFaceYNeg",
-                      "renderFaceYPos",
-                      "renderFaceZNeg",
-                      "renderFaceZPos"},
+    @Inject(method = {"renderFaceXNeg", "renderFaceXPos", "renderFaceYNeg", "renderFaceYPos", "renderFaceZNeg", "renderFaceZPos"},
             at = @At(value = "RETURN"),
             require = 6)
     private void postBounds(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {

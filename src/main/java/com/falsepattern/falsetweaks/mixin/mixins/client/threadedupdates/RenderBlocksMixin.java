@@ -1,6 +1,12 @@
 /*
  * This file is part of FalseTweaks.
  *
+ * Copyright (C) 2022-2024 FalsePattern
+ * All Rights Reserved
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,6 +39,8 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraftforge.client.ForgeHooksClient;
 
+import static com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper.AGGRESSIVE_NEODYMIUM_THREADING;
+
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
     /**
@@ -42,15 +50,19 @@ public abstract class RenderBlocksMixin {
     @Unique
     private int ft$cancelRenderDelegatedToDifferentThread(Block block, int renderType) {
         int pass = ForgeHooksClient.getWorldRenderPass();
-        boolean mainThread = Thread.currentThread() == ThreadedChunkUpdateHelper.MAIN_THREAD;
+        boolean mainThread = ThreadedChunkUpdateHelper.isMainThread();
 
-        boolean renderableOffThread = ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType);
+        boolean renderableOffThread = AGGRESSIVE_NEODYMIUM_THREADING || ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType);
         if (mainThread) {
+            if (ThreadedChunkUpdateHelper.lastWorldRenderer == null) {
+                return 0;
+            }
             val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
             if (task != null && !task.cancelled && renderableOffThread && pass >= 0) {
                 return task.result[pass].renderedSomething ? 2 : 1;
             }
+            return 1;
         } else if (!renderableOffThread) {
             return 1;
         }
