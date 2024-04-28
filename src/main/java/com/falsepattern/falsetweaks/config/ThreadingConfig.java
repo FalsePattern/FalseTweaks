@@ -129,9 +129,9 @@ public class ThreadingConfig {
     public static String[] THREAD_SAFE_ISBRHS;
 
     @Config.Comment("Disables the logging of block rendering handler registrations.")
-    @Config.LangKey("config.falsetweaks.threading.handlerSuppress")
+    @Config.LangKey("config.falsetweaks.threading.logISBRHErrors")
     @Config.DefaultBoolean(true)
-    public static boolean SUPPRESS_HANDLER_REGISTRATION_LOGGING;
+    public static boolean LOG_ISBRH_ERRORS;
 
     @Config.Ignore
     private static Boolean AGGRESSIVE_NEODYMIUM_THREADING;

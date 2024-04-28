@@ -50,6 +50,7 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -106,6 +107,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init(FMLInitializationEvent e) {
+        super.init(e);
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
             ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper();
             ThreadedChunkUpdateHelper.instance.init();
@@ -141,6 +143,12 @@ public class ClientProxy extends CommonProxy {
         if (Debug.ENABLED) {
             Debug.init();
         }
+    }
+
+    @Override
+    public void loadComplete(FMLLoadCompleteEvent e) {
+        super.loadComplete(e);
+        ThreadSafeBlockRendererMap.logBrokenISBRHs();
     }
 
     @SubscribeEvent

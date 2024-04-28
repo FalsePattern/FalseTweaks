@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.proxy;
 
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
@@ -42,6 +43,10 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
+
+    }
+
+    public void loadComplete(FMLLoadCompleteEvent e) {
 
     }
 }
