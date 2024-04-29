@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO ASM Logging
 public class Threading_BlockMinMaxRedirector implements ICancellableClassNodeTransformer {
     /**
      * All classes in net.minecraft.block.* are the block subclasses save for these.

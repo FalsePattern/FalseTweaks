@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO ASM Logging
 public class Threading_TessellatorUseReplacement implements IClassNodeTransformer {
     private static final String TARGET_DESC_NOTCH = "Lbmh;";
     private static final String TARGET_DESC_SRG = "Lnet/minecraft/client/renderer/Tessellator;";
@@ -74,8 +75,6 @@ public class Threading_TessellatorUseReplacement implements IClassNodeTransforme
 
     @Override
     public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
-        System.out.println("Transforming: " + cn.name);
-
         val methods = cn.methods;
         for (val classMethod : methods) {
             val insnList = classMethod.instructions.iterator();
@@ -91,7 +90,6 @@ public class Threading_TessellatorUseReplacement implements IClassNodeTransforme
                     if (opcode == Opcodes.GETFIELD || opcode == Opcodes.GETSTATIC) {
                         insnList.add(new InsnNode(Opcodes.POP));
                         insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, REPLACEMENT_OWNER, REPLACEMENT_NAME, REPLACEMENT_DESC, false));
-                        System.out.println("did transforming work");
                     }
                 }
             }

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO ASM Logging
 public class Threading_BlockMinMax implements IClassNodeTransformer {
     public static final String classInternal = "net/minecraft/block/Block";
     public static final String packageInternal = classInternal.substring(0, classInternal.lastIndexOf('/') + 1);

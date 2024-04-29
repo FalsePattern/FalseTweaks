@@ -32,6 +32,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 
 import static com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threading_GameSettings.GAME_SETTINGS_CLASS;
 
+// TODO ASM Logging
 @NoArgsConstructor
 public final class Threading_GameSettingsRedirector implements ICancellableClassNodeTransformer {
     @Override
@@ -80,8 +81,6 @@ public final class Threading_GameSettingsRedirector implements ICancellableClass
                                                            opcode == Opcodes.GETFIELD ? "()Z" : "(Z)V",
                                                            false);
                 insnList.set(replacementMethod);
-
-                System.out.println("added redirect to: " + transformedName);
 
                 didWork = true;
             }

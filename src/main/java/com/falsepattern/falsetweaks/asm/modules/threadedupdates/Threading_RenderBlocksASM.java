@@ -34,6 +34,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+// TODO ASM Logging
 public class Threading_RenderBlocksASM implements IClassNodeTransformer {
     @Override
     public String getName() {

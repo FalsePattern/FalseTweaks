@@ -35,6 +35,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 
+// TODO Logging
 @NoArgsConstructor
 public final class Threading_GameSettings implements IClassNodeTransformer {
     static final UniversalClass GAME_SETTINGS_CLASS;

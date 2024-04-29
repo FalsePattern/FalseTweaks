@@ -22,7 +22,6 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
-import com.falsepattern.falsetweaks.api.threading.ThreadSafeBlockRenderer;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import lombok.val;
@@ -45,6 +44,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+// TODO ASM Logging
 public class Threading_ThreadSafeBlockRendererInjector implements IClassNodeTransformer {
     private static final Set<String> CLASS_NAMES = new HashSet<>();
     private static final Set<String> INTERNAL_NAMES = new HashSet<>();

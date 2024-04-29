@@ -24,50 +24,33 @@ package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.api.threading.ThreadSafeBlockRenderer;
 import com.google.common.base.Strings;
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.Loader;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.Loader;
-
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.falsepattern.falsetweaks.config.ThreadingConfig.LOG_ISBRH_ERRORS;
 
 public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRenderingHandler> {
-    @Data
-    private static class ISBRHErrorMessage {
-        public final int id;
-        public final String className;
-        public final Kind kind;
-        public final Throwable stacktrace;
+    private static final Map<String, List<ISBRHErrorMessage>> ERROR_MESSAGES = new HashMap<>();
+    private static final AtomicInteger TOTAL_ERRORS = new AtomicInteger();
 
-        public enum Kind {
-            Null,
-            NonThreadSafe
-        }
-    }
-
-    private static final Map<String, List<ISBRHErrorMessage>> errorMessages = new HashMap<>();
     private static boolean bypass = false;
+
     private final Map<Integer, ISimpleBlockRenderingHandler> wrappedMap = new HashMap<>();
+
     @Override
     public ISimpleBlockRenderingHandler put(Integer key, ISimpleBlockRenderingHandler value) {
         log:
         if (LOG_ISBRH_ERRORS) {
-            synchronized (errorMessages) {
+            synchronized (ERROR_MESSAGES) {
                 if (value instanceof ThreadSafeBlockRenderer) {
                     break log;
                 }
@@ -78,9 +61,10 @@ public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRend
                     val activeModContainer = Loader.instance().activeModContainer();
                     activeModID = activeModContainer == null ? "UNKNOWN" : activeModContainer.getModId();
                 }
-                errorMessages.computeIfAbsent(activeModID, i -> new ArrayList<>())
-                             .add(new ISBRHErrorMessage(key, value == null ? "null" : value.getClass().getName(),
-                                                        value == null ? ISBRHErrorMessage.Kind.Null : ISBRHErrorMessage.Kind.NonThreadSafe, new Throwable()));
+                ERROR_MESSAGES.computeIfAbsent(activeModID, i -> new ArrayList<>())
+                              .add(new ISBRHErrorMessage(key, value == null ? "null" : value.getClass().getName(),
+                                                         value == null ? ISBRHErrorMessage.Kind.Null : ISBRHErrorMessage.Kind.NonThreadSafe, new Throwable()));
+                TOTAL_ERRORS.getAndIncrement();
             }
         }
         return wrappedMap.put(key, value);
@@ -93,7 +77,7 @@ public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRend
 
     @Override
     public void putAll(Map<? extends Integer, ? extends ISimpleBlockRenderingHandler> m) {
-        for (val entry: m.entrySet()) {
+        for (val entry : m.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
     }
@@ -149,8 +133,6 @@ public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRend
         return threadSafeWrap(wrappedMap.get(key));
     }
 
-
-
     @SneakyThrows
     public static void inject() {
         val blockRenderers = RenderingRegistry.class.getDeclaredField("blockRenderers");
@@ -164,32 +146,59 @@ public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRend
         blockRenderers.set(rr, newRenderers);
     }
 
-
     public static void logBrokenISBRHs() {
-        if (errorMessages.isEmpty() || !LOG_ISBRH_ERRORS) {
+        if (!LOG_ISBRH_ERRORS)
+            return;
+
+        val logger = LogManager.getLogger("FT|THREAD SAFETY");
+        if (ERROR_MESSAGES.isEmpty()) {
+            logger.info("No ISBRH errors found.");
             return;
         }
-        Logger logger = LogManager.getLogger("THREAD SAFETY");
+
+        val totalSources = ERROR_MESSAGES.size();
+        val totalErrors = TOTAL_ERRORS.get();
+
         logger.error(Strings.repeat("+=", 25));
-        logger.error("The following ISBRH errors were found.");
-        for (val error : errorMessages.entrySet()) {
+        logger.error("Found: {} unsafe ISBRH{} from: {} source{}",
+                     totalErrors,
+                     totalErrors != 1 ? "s" : "",
+                     totalSources,
+                     totalSources != 1 ? "s" : "");
+
+        for (val error : ERROR_MESSAGES.entrySet()) {
             val mod = error.getKey();
             val messages = error.getValue();
+            val messageCount = messages.size();
+
             logger.error(Strings.repeat("=", 50));
-            logger.error("  MOD {} has {} unsafe ISBRH{}", mod, messages.size(), messages.size() != 1 ? "s" : "");
+            logger.error("  MOD: {} has: {} unsafe ISBRH{}", mod, messageCount, messageCount != 1 ? "s" : "");
             for (val message : messages) {
                 switch (message.kind) {
                     case Null:
                         logger.error("    ID {} is null!", message.id);
                         break;
                     case NonThreadSafe:
-                        logger.error("    ID {} is not thread safe! Renderer class: {}", message.id, message.className);
+                        logger.error("    ID {} is not thread safe! ISBRH Class: {}", message.id, message.className);
                 }
-                logger.trace(message.stacktrace);
+                logger.trace("", message.stacktrace);
             }
             logger.error(Strings.repeat("=", 50));
         }
-        logger.error("Open the log file to view detailed stacktraces!");
+        logger.error("Open the log file to view detailed stacktraces.");
         logger.error(Strings.repeat("+=", 25));
+    }
+
+    @Data
+    private static class ISBRHErrorMessage {
+        public final int id;
+        public final String className;
+        public final Kind kind;
+        public final Throwable stacktrace;
+
+        public enum Kind {
+            Null,
+            NonThreadSafe
+        }
     }
 }
