@@ -76,7 +76,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      * Used within the scope of WorldRenderer#updateRenderer (on the main thread).
      */
     public static WorldRenderer lastWorldRenderer;
-    private final AtomicReference<PendingTaskUpdate> taskQueueUnsorted = new AtomicReference<>();
     /**
      * Finished tasks ready for consumption
      */
@@ -171,13 +170,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     /**
      * Tasks not yet started
      */
-    private final CircularTaskQueue taskQueue = new CircularTaskQueue();
-    private final int framesSinceLastSubmit = 0;
+    private AtomicReference<PendingTaskUpdate> taskQueueUnsorted = null;
     private AtomicBoolean run = null;
     private PoolWorker currentPoolWorker = null;
     private WorkerThread[] currentThreads = null;
-    private int threadCount = 0;
-    private WorkSorterThread workSorter;
+    private WorkSorterThread workSorter = null;
 
     private static boolean hasFlag(int flags, int bit) {
         return (flags & bit) != 0;
@@ -288,49 +285,43 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         if (run != null) {
             run.set(false);
         }
-
-        try {
-            if (currentPoolWorker != null) {
-                FTWorker.removeTask(currentPoolWorker);
-                currentPoolWorker = null;
+        if (currentPoolWorker != null) {
+            FTWorker.removeTask(currentPoolWorker);
+            currentPoolWorker = null;
+        }
+        if (currentThreads != null) {
+            for (val thread : currentThreads) {
+                thread.interrupt();
             }
-            if (currentThreads != null) {
-                for (val thread : currentThreads) {
-                    thread.interrupt();
-                }
-            }
-            if (workSorter != null) {
-                FTWorker.removeTask(workSorter);
-                workSorter = null;
-            }
-            if (currentThreads != null) {
-                for (val thread: currentThreads)
-                    thread.join();
-                currentThreads = null;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            currentThreads = null;
+        }
+        if (workSorter != null) {
+            FTWorker.removeTask(workSorter);
+            workSorter = null;
+        }
+        if (taskQueueUnsorted != null) {
+            taskQueueUnsorted.set(null);
         }
         Share.log.info("Creating " + threads + " chunk builder" + (threads > 1 ? "s" : ""));
         String nameBase = "Chunk Update Worker #";
         if (Loader.isModLoaded("lumina")) {
             nameBase = "$LUMI_NO_RELIGHT" + nameBase;
         }
-        taskQueue.setCapacity(rg.worldRenderers.length);
+        CircularTaskQueue taskQueue = new CircularTaskQueue(rg.worldRenderers.length);
+        taskQueueUnsorted = new AtomicReference<>(null);
         run = new AtomicBoolean(true);
-        workSorter = new WorkSorterThread();
+        workSorter = new WorkSorterThread(run, taskQueueUnsorted, taskQueue);
         FTWorker.addTask(workSorter);
         if (threads > 0) {
             currentThreads = new WorkerThread[threads];
-            threadCount = threads;
             for (int i = 0; i < threads; i++) {
-                val t = new WorkerThread(nameBase + i);
+                val t = new WorkerThread(nameBase + i, run, taskQueue);
                 currentThreads[i] = t;
                 t.setDaemon(true);
                 t.start();
             }
         } else {
-            currentPoolWorker = new PoolWorker();
+            currentPoolWorker = new PoolWorker(run, taskQueue);
             FTWorker.addTask(currentPoolWorker);
         }
     }
@@ -344,14 +335,15 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void preRendererUpdates(List<WorldRenderer> toUpdateList, int updateLimit) {
+        if (taskQueueUnsorted == null)
+            return;
         updateWorkQueue(toUpdateList, updateLimit);
         removeCancelledResults();
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
-        final int updateQueueSize = updateLimit;//threadCount * ThreadingConfig.UPDATE_QUEUE_SIZE_PER_THREAD;
 
-        taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateQueueSize));
+        taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateLimit));
     }
 
     private void removeCancelledResults() {
@@ -556,9 +548,17 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private class WorkSorterThread implements ThreadedTask {
-        private final AtomicBoolean myRun = run;
+        private final AtomicBoolean myRun;
         private final WRComparator comp = new WRComparator(true);
         private final InterruptableSorter<WorldRenderer> sorter = new InterruptableSorter<>(comp);
+        private final AtomicReference<PendingTaskUpdate> taskQueueUnsorted;
+        private final CircularTaskQueue taskQueue;
+
+        public WorkSorterThread(AtomicBoolean run, AtomicReference<PendingTaskUpdate> taskQueueUnsorted, CircularTaskQueue taskQueue) {
+            myRun = run;
+            this.taskQueueUnsorted = taskQueueUnsorted;
+            this.taskQueue = taskQueue;
+        }
 
         @Override
         public boolean alive() {
@@ -640,7 +640,13 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private class PoolWorker implements ThreadedTask {
-        private final AtomicBoolean myRun = run;
+        private final AtomicBoolean myRun;
+        private final CircularTaskQueue taskQueue;
+
+        public PoolWorker(AtomicBoolean run, CircularTaskQueue taskQueue) {
+            myRun = run;
+            this.taskQueue = taskQueue;
+        }
 
         @Override
         public boolean alive() {
@@ -670,19 +676,23 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private class WorkerThread extends Thread {
-        public WorkerThread(String name) {
+        private final AtomicBoolean myRun;
+        private final CircularTaskQueue taskQueue;
+        public WorkerThread(String name, AtomicBoolean run, CircularTaskQueue taskQueue) {
             super(name);
+            this.myRun = run;
+            this.taskQueue = taskQueue;
         }
 
         @Override
         public void run() {
-            val myRun = run;
             while (myRun.get()) {
                 if (Debug.ENABLED && !Debug.chunkRebaking) {
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        if (!myRun.get())
+                            return;
                     }
                     continue;
                 }
@@ -691,7 +701,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException ignored) {
-
+                        if (!myRun.get())
+                            return;
                     }
                     continue;
                 }

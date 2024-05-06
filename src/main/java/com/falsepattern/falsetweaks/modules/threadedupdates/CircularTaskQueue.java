@@ -30,10 +30,11 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CircularTaskQueue {
-    private WorldRenderer[] renderers;
+    private final WorldRenderer[] renderers;
     private final AtomicInteger head = new AtomicInteger();
     private final AtomicInteger tail = new AtomicInteger();
-    public void setCapacity(int capacity) {
+
+    public CircularTaskQueue(int capacity) {
         head.set(0);
         tail.set(0);
         renderers = new WorldRenderer[capacity];
