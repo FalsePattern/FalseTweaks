@@ -363,7 +363,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     @Override
     public void onDirtyRendererChanged(WorldRenderer wr) {
-        onWorldRendererDirty(wr);
+        UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+        if (!task.isEmpty()) {
+            //Do not discard useful work; just re-bake after rendering.
+            ((WorldRendererOcclusion)wr).ft$needsRebake(true);
+        }
     }
 
     public void onWorldRendererDirty(WorldRenderer wr) {

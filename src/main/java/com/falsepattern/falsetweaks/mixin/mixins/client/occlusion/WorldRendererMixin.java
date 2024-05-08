@@ -93,6 +93,18 @@ public abstract class WorldRendererMixin implements WorldRendererOcclusion {
     private boolean hasRenderList;
     @Unique
     private volatile boolean ft$needsSort;
+    @Unique
+    private volatile boolean ft$needsRebake;
+
+    @Override
+    public boolean ft$needsRebake() {
+        return ft$needsRebake;
+    }
+
+    @Override
+    public void ft$needsRebake(boolean value) {
+        ft$needsRebake = value;
+    }
 
     @Override
     public boolean ft$skipRenderPass() {

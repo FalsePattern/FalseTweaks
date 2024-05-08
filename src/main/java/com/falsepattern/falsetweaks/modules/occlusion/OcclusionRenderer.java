@@ -472,6 +472,10 @@ public class OcclusionRenderer {
                     updates++;
                 }
             }
+            if (wro.ft$needsRebake()) {
+                worldrenderer.markDirty();
+                wro.ft$needsRebake(false);
+            }
             //                if(!worldrenderer.isWaitingOnOcclusionQuery || deadline != 0 || OcclusionHelpers.DEBUG_LAZY_CHUNK_UPDATES) {
             //                    long t = System.nanoTime();
             //                    if (t > deadline) {

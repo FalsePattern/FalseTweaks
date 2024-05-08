@@ -64,6 +64,10 @@ public interface WorldRendererOcclusion {
 
     boolean ft$isVisibleShadows();
 
+    boolean ft$needsRebake();
+
+    void ft$needsRebake(boolean value);
+
     void ft$isVisibleShadows(boolean value);
 
     void ft$bumpFrustumCheckCanaryRender();
