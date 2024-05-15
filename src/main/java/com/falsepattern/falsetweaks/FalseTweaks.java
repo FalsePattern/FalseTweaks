@@ -24,7 +24,9 @@
 package com.falsepattern.falsetweaks;
 
 import com.falsepattern.falsetweaks.proxy.CommonProxy;
+import lombok.val;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
@@ -54,9 +56,23 @@ public class FalseTweaks {
         proxy.construct(e);
     }
 
+    private static Error idiot(String modname) {
+        val loudWarning = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            loudWarning.append("REMOVE ").append(modname).append(" FROM YOUR MODS DIRECTORY, IT HAS BEEN MERGED INTO FALSETWEAKS\n");
+        }
+        return new Error(loudWarning.toString());
+    }
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         proxy.preInit(e);
+        if (Loader.isModLoaded("animfix")) {
+            throw idiot("animfix");
+        }
+        if (Loader.isModLoaded("triangulator")) {
+            throw idiot("triangulator");
+        }
     }
 
     @Mod.EventHandler
