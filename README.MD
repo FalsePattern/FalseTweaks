@@ -65,4 +65,4 @@ Any bug reports concerning the known problems listed in this table will be close
 
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
-- [GasStation](https://github.com/FalsePattern/GasStation)
+- [UniMixins](https://github.com/LegacyModdingMC/UniMixins)
