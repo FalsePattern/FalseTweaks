@@ -32,7 +32,7 @@ dependencies {
 
     compileOnly(deobf("https://github.com/embeddedt/ArchaicFix/releases/download/0.6.2/archaicfix-0.6.2.jar"))
 
-    compileOnly("makamys:neodymium-1.7.10:f008edb")
+    compileOnly("makamys:neodymium-1.7.10:cf17eb5")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
         transitive = false
