@@ -93,10 +93,13 @@ public abstract class StitcherMixin {
             currentHeight = masterStitcher.height;
             stitchSlots.clear();
             stitchSlots.addAll(masterStitcher.getSlots());
-            ((ITextureMapMixin) AnimationUpdateBatcherRegistry.currentAtlas).initializeBatcher(batchingStitcher.x,
-                                                                                               batchingStitcher.y,
-                                                                                               batchingStitcher.width,
-                                                                                               batchingStitcher.height);
+            //Can be null if other mods try to be smart with their own texture atlas classes by using the vanilla stitcher
+            if (AnimationUpdateBatcherRegistry.currentAtlas != null) {
+                ((ITextureMapMixin) AnimationUpdateBatcherRegistry.currentAtlas).initializeBatcher(batchingStitcher.x,
+                                                                                                   batchingStitcher.y,
+                                                                                                   batchingStitcher.width,
+                                                                                                   batchingStitcher.height);
+            }
         } catch (TooBigException ignored) {
             throw new StitcherException(null, "Unable to fit all textures into atlas. Maybe try a lower resolution resourcepack?");
         } finally {
