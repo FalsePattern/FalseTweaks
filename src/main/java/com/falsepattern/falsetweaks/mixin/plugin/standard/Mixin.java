@@ -324,6 +324,7 @@ public enum Mixin implements IMixin {
     //endregion Particles
 
     //region Debug
+    Debug_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> Debug.ENABLED), "debug.TileEntityRendererDispatcherMixin"),
     Debug_Occlusion_Neodymium_NeoRendererMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS).and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.NeoRendererMixin"),
     Debug_Occlusion_Neodymium_GPUMemoryManagerMixin(Side.CLIENT, THREADING.and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.GPUMemoryManagerMixin"),
     //endregion Debug
