@@ -73,7 +73,7 @@ public class OptiFineCompat {
     }
 
     public static class ThreadSafeEntityData {
-        public static final ThreadLocal<ThreadSafeEntityData> TL = ThreadLocal.withInitial(ThreadSafeEntityData::new);
+        public static final FastThreadLocal.FixedValue<ThreadSafeEntityData> TL = new FastThreadLocal.FixedValue<>(ThreadSafeEntityData::new);
 
         public final int[] entityData = new int[32];
         public int entityDataIndex = 0;
