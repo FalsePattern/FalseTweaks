@@ -133,6 +133,11 @@ public class ThreadingConfig {
     @Config.DefaultBoolean(true)
     public static boolean LOG_ISBRH_ERRORS;
 
+    @Config.Comment("Speeds up the threading of block bounds, try turning this off if you get compatibility issues.")
+    @Config.LangKey("config.falsetweaks.threading.fastThreadedBlockBounds")
+    @Config.DefaultBoolean(true)
+    public static boolean FAST_THREADED_BLOCK_BOUNDS;
+
     @Config.Ignore
     private static Boolean AGGRESSIVE_NEODYMIUM_THREADING;
 

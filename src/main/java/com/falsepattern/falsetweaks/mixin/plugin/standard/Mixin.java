@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_SAFETY_CHECKS;
+import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_THREADED_BLOCK_BOUNDS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.BSP;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.THREADING;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.TRIANGULATOR;
@@ -159,8 +160,6 @@ public enum Mixin implements IMixin {
     //endregion Occlusion Tweaks Module
 
     //region Threaded Chunk Updates
-
-    ThreadedUpdates_BlockMixin(Side.CLIENT, THREADING, "threadedupdates.BlockMixin"),
     ThreadedUpdates_GameSettings(Side.CLIENT, THREADING, "threadedupdates.GameSettingsMixin"),
     ThreadedUpdates_ChunkProviderClientMixin(Side.CLIENT, THREADING, "threadedupdates.ChunkProviderClientMixin"),
     ThreadedUpdates_ForgeHooksClientMixin(Side.CLIENT, THREADING, "threadedupdates.ForgeHooksClientMixin"),
@@ -171,6 +170,10 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING.and(condition(() -> !FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_Debug"),
     ThreadedUpdates_WorldRenderer_NonOptiFineMixin(Side.CLIENT, THREADING.and(AVOID_ANY_OPTIFINE), "threadedupdates.WorldRenderer_NonOptiFineMixin"),
     ThreadedUpdates_WorldRendererMixin(Side.CLIENT, THREADING, "threadedupdates.WorldRendererMixin"),
+
+    ThreadedUpdates_BlockBounds_BlockMixin_Root(Side.CLIENT, THREADING, "threadedupdates.blockbounds.BlockMixin_Root"),
+    ThreadedUpdates_BlockBounds_BlockMixin_Impl(Side.CLIENT, THREADING, "threadedupdates.blockbounds.BlockMixin_Impl"),
+    ThreadedUpdates_BlockBounds_BlockMixin_FastImpl(Side.CLIENT, THREADING.and(condition(() -> FAST_THREADED_BLOCK_BOUNDS)), "threadedupdates.blockbounds.BlockMixin_FastImpl"),
 
     //Neodymium
     ThreadedUpdates_Neodymium_WorldRendererMixin(Side.CLIENT, THREADING.and(require(TargetedMod.NEODYMIUM)), "threadedupdates.neodymium.WorldRendererMixin"),

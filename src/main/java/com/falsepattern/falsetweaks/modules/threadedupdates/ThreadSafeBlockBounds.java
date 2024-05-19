@@ -23,6 +23,7 @@
 package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_BlockMinMaxRedirector;
+import net.minecraft.util.AxisAlignedBB;
 
 /**
  * These methods are injected as redirects using ASM.
@@ -31,27 +32,35 @@ import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_
  */
 @SuppressWarnings("unused")
 public interface ThreadSafeBlockBounds {
+    boolean ft$boundsModified();
+
+    void ft$bounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
+
     void ft$minX(double minX);
-
-    void ft$maxX(double maxX);
-
-    void ft$minY(double minY);
-
-    void ft$maxY(double maxY);
-
-    void ft$minZ(double minZ);
-
-    void ft$maxZ(double maxZ);
 
     double ft$minX();
 
+    void ft$maxX(double maxX);
+
     double ft$maxX();
+
+    void ft$minY(double minY);
 
     double ft$minY();
 
+    void ft$maxY(double maxY);
+
     double ft$maxY();
+
+    void ft$minZ(double minZ);
 
     double ft$minZ();
 
+    void ft$maxZ(double maxZ);
+
     double ft$maxZ();
+
+    AxisAlignedBB ft$writeableBounds();
+
+    AxisAlignedBB ft$readableBounds();
 }
