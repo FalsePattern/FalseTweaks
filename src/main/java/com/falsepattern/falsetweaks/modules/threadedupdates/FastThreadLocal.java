@@ -41,11 +41,10 @@ public abstract class FastThreadLocal<S> {
 
     protected final ThreadLocal<S> threadLocal;
     protected final Object[] turboLookup = new Object[MAX_LIVE_TURBO_THREADS];
-    protected S mainThreadValue;
+    protected S mainThreadValue = null;
 
-    protected FastThreadLocal(ThreadLocal<S> threadLocal, S mainThreadValue) {
+    protected FastThreadLocal(ThreadLocal<S> threadLocal) {
         this.threadLocal = threadLocal;
-        this.mainThreadValue = mainThreadValue;
         liveThreadLocals.add(new WeakReference<>(this));
     }
 
@@ -56,14 +55,18 @@ public abstract class FastThreadLocal<S> {
     public static final class FixedValue<S> extends FastThreadLocal<S> {
         private final Supplier<S> initializer;
         public FixedValue(Supplier<S> initializer) {
-            super(ThreadLocal.withInitial(initializer), initializer.get());
+            super(ThreadLocal.withInitial(initializer));
             this.initializer = initializer;
         }
 
         public S get() {
             val t = Thread.currentThread();
-            if (isMainThread(t))
+            if (isMainThread(t)) {
+                if (mainThreadValue == null) {
+                    mainThreadValue = initializer.get();
+                }
                 return mainThreadValue;
+            }
             else if (t instanceof TurboThread) {
                 val tt = (TurboThread) t;
                 S value = (S) turboLookup[tt.setIndex];
@@ -79,7 +82,7 @@ public abstract class FastThreadLocal<S> {
 
     public static final class DynamicValue<S> extends FastThreadLocal<S> {
         public DynamicValue() {
-            super(new ThreadLocal<>(), null);
+            super(new ThreadLocal<>());
         }
 
         public void set(S value) {
