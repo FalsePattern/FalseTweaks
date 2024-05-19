@@ -197,23 +197,21 @@ public abstract class BlockMixin_FastImpl implements ThreadSafeBlockBounds {
     @Unique
     private boolean ft$areSideBoundsOffset(int side) {
         val bounds = ft$readableBounds();
-        check:
-        {
-            if (side == MIN_X_SIDE && bounds.minX > 0D)
-                break check;
-            if (side == MAX_X_SIDE && bounds.maxX < 1D)
-                break check;
-            if (side == MIN_Y_SIDE && bounds.minY > 0D)
-                break check;
-            if (side == MAX_Y_SIDE && bounds.maxY < 1D)
-                break check;
-            if (side == MIN_Z_SIDE && bounds.minZ > 0D)
-                break check;
-            if (side == MAX_Z_SIDE && bounds.maxZ < 1D)
-                break check;
-            return false;
+        switch (side) {
+            case MIN_X_SIDE:
+                return bounds.minX > 0D;
+            case MAX_X_SIDE:
+                return bounds.maxX < 1D;
+            case MIN_Y_SIDE:
+                return bounds.minY > 0D;
+            case MAX_Y_SIDE:
+                return bounds.maxY < 1D;
+            case MIN_Z_SIDE:
+                return bounds.minZ > 0D;
+            case MAX_Z_SIDE:
+                return bounds.maxZ < 1D;
         }
-        return true;
+        return false;
     }
 
     @Unique
