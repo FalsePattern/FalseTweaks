@@ -66,7 +66,7 @@ public abstract class BlockMixin_FastImpl implements ThreadSafeBlockBounds {
     public boolean shouldSideBeRendered(IBlockAccess world, int offsetPosX, int offsetPosY, int offsetPosZ, int side) {
         if (ft$boundsModified() && ft$areSideBoundsOffset(side))
             return true;
-        val block = world.getBlock(offsetPosX, offsetPosY, offsetPosX);
+        val block = world.getBlock(offsetPosX, offsetPosY, offsetPosZ);
         return !block.isOpaqueCube();
     }
 
