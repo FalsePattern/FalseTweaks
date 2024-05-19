@@ -32,6 +32,7 @@ import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threadi
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threading_GameSettingsRedirector;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
+import com.falsepattern.falsetweaks.modules.threadedupdates.FastThreadLocal;
 import com.falsepattern.lib.asm.ASMUtil;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.asm.SmartTransformer;
@@ -70,6 +71,10 @@ public class FalseTweaksTransformer implements SmartTransformer {
 
     private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
     private final List<IClassNodeTransformer> transformers = TRANSFORMERS;
+
+    public FalseTweaksTransformer() {
+        FastThreadLocal.setMainThread(Thread.currentThread());
+    }
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] bytes) {

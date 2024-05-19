@@ -81,7 +81,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      */
     public BlockingDeque<WorldRenderer> finishedTasks = new LinkedBlockingDeque<>();
 
-    public ThreadLocal<Tessellator> threadTessellator = ThreadLocal.withInitial(Tessellator::new);
+    public FastThreadLocal.FixedValue<Tessellator> threadTessellator = new FastThreadLocal.FixedValue<>(Tessellator::new);
 
     IRendererUpdateOrderProvider rendererUpdateOrderProvider = new IRendererUpdateOrderProvider() {
         /** The renderers updated during the batch */
@@ -679,7 +679,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
     }
 
-    private class WorkerThread extends Thread {
+    private class WorkerThread extends FastThreadLocal.TurboThread {
         private final AtomicBoolean myRun;
         private final CircularTaskQueue taskQueue;
         public WorkerThread(String name, AtomicBoolean run, CircularTaskQueue taskQueue) {
@@ -690,27 +690,32 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
         @Override
         public void run() {
-            while (myRun.get()) {
-                if (Debug.ENABLED && !Debug.chunkRebaking) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        if (!myRun.get())
-                            return;
+            super.onStartup();
+            try {
+                while (myRun.get()) {
+                    if (Debug.ENABLED && !Debug.chunkRebaking) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            if (!myRun.get())
+                                return;
+                        }
+                        continue;
                     }
-                    continue;
-                }
-                WorldRenderer wr = taskQueue.tryTake();
-                if (wr == null) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ignored) {
-                        if (!myRun.get())
-                            return;
+                    WorldRenderer wr = taskQueue.tryTake();
+                    if (wr == null) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException ignored) {
+                            if (!myRun.get())
+                                return;
+                        }
+                        continue;
                     }
-                    continue;
+                    runTask(wr);
                 }
-                runTask(wr);
+            } finally {
+                super.onShutdown();
             }
         }
     }

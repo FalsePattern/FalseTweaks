@@ -19,6 +19,7 @@
  */
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
+import com.falsepattern.falsetweaks.modules.threadedupdates.FastThreadLocal;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadSafeSettings;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import lombok.var;
@@ -39,7 +40,7 @@ public abstract class GameSettingsMixin implements ThreadSafeSettings {
     @Unique
     private volatile boolean ft$safeFancyGraphics;
     @Unique
-    private volatile ThreadLocal<Boolean> ft$threadedFancyGraphics = new ThreadLocal<>();
+    private volatile FastThreadLocal.DynamicValue<Boolean> ft$threadedFancyGraphics = new FastThreadLocal.DynamicValue<>();
 
     @Inject(method = "<init>*",
             at = @At("RETURN"),
@@ -55,7 +56,7 @@ public abstract class GameSettingsMixin implements ThreadSafeSettings {
 
         synchronized (ft$updateLock) {
             ft$initialFancyGraphics = ft$safeFancyGraphics;
-            ft$threadedFancyGraphics = new ThreadLocal<>();
+            ft$threadedFancyGraphics = new FastThreadLocal.DynamicValue<>();
         }
     }
 
