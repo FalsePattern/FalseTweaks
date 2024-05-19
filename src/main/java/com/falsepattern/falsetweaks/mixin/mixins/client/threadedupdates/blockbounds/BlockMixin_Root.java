@@ -40,8 +40,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class BlockMixin_Root implements ThreadSafeBlockBounds {
     private final FastThreadLocal.DynamicValue<AxisAlignedBB> ft$threadBounds = new FastThreadLocal.DynamicValue<>();
 
-    private volatile AxisAlignedBB ft$initialBounds;
-    private volatile boolean ft$boundsModified;
+    private AxisAlignedBB ft$initialBounds;
+    private boolean ft$boundsModified;
 
     @Redirect(method = "<init>",
               at = @At(value = "INVOKE",
