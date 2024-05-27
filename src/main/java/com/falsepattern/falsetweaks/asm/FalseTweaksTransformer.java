@@ -33,94 +33,39 @@ import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threadi
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.FastThreadLocal;
-import com.falsepattern.lib.asm.ASMUtil;
-import com.falsepattern.lib.asm.IClassNodeTransformer;
-import com.falsepattern.lib.asm.SmartTransformer;
+import com.falsepattern.lib.turboasm.MergeableTurboTransformer;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Getter
 @Accessors(fluent = true)
-public class FalseTweaksTransformer implements SmartTransformer {
-    public static RenderGlobalDeOptimizer OPTIFINE_DEOPTIMIZER = new RenderGlobalDeOptimizer();
-    public static final List<IClassNodeTransformer> TRANSFORMERS = new ArrayList<>(Collections.singletonList(OPTIFINE_DEOPTIMIZER));
-
-    static {
+public class FalseTweaksTransformer extends MergeableTurboTransformer {
+    private static List<TurboClassTransformer> transformers() {
+        val transformers = new ArrayList<TurboClassTransformer>();
+        transformers.add(new RenderGlobalDeOptimizer());
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            TRANSFORMERS.add(new Threading_RenderBlocksASM());
+            transformers.add(new Threading_RenderBlocksASM());
             if (ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS.length > 0) {
-                TRANSFORMERS.add(new Threading_TessellatorUseReplacement());
+                transformers.add(new Threading_TessellatorUseReplacement());
             }
             if (ThreadingConfig.THREAD_SAFE_ISBRHS.length > 0) {
-                TRANSFORMERS.add(new Threading_ThreadSafeBlockRendererInjector());
+                transformers.add(new Threading_ThreadSafeBlockRendererInjector());
             }
-            TRANSFORMERS.add(new Threading_BlockMinMax());
-            TRANSFORMERS.add(new Threading_BlockMinMaxRedirector());
-            TRANSFORMERS.add(new Threading_GameSettings());
-            TRANSFORMERS.add(new Threading_GameSettingsRedirector());
+            transformers.add(new Threading_BlockMinMax());
+            transformers.add(new Threading_BlockMinMaxRedirector());
+            transformers.add(new Threading_GameSettings());
+            transformers.add(new Threading_GameSettingsRedirector());
         }
+        return transformers;
     }
-
-    private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
-    private final List<IClassNodeTransformer> transformers = TRANSFORMERS;
 
     public FalseTweaksTransformer() {
+        super(transformers());
         FastThreadLocal.setMainThread(Thread.currentThread());
-    }
-
-    @Override
-    public byte[] transform(String name, String transformedName, byte[] bytes) {
-        if (bytes == null) {
-            return null;
-        }
-        val transformers = new ArrayList<IClassNodeTransformer>();
-        val cn = ASMUtil.parseClass(bytes, 0);
-        for (val transformer : transformers()) {
-            if (transformer.shouldTransform(cn, transformedName, CoreLoadingPlugin.isObfuscated())) {
-                transformers.add(transformer);
-            }
-        }
-        if (transformers.isEmpty()) {
-            return bytes;
-        }
-        transformers.sort(Comparator.comparingInt(IClassNodeTransformer::internalSortingOrder));
-        val log = logger();
-        boolean changed = false;
-        for (val transformer : transformers) {
-            try {
-                boolean applied;
-                if (transformer instanceof ICancellableClassNodeTransformer) {
-                    applied = ((ICancellableClassNodeTransformer) transformer).transformCancellable(cn, transformedName, CoreLoadingPlugin.isObfuscated());
-                } else {
-                    transformer.transform(cn, transformedName, CoreLoadingPlugin.isObfuscated());
-                    applied = true;
-                }
-                if (applied) {
-                    changed = true;
-                    log.debug("Patched {} with {}...", transformedName, transformer.getName());
-                }
-            } catch (RuntimeException | Error t) {
-                log.error("Error transforming {} with {}: {}", transformedName, transformer.getName(), t.getMessage());
-                throw t;
-            } catch (Throwable t) {
-                log.error("Error transforming {} with {}: {}", transformedName, transformer.getName(), t.getMessage());
-                throw new RuntimeException(t);
-            }
-        }
-        if (changed) {
-            val result = ASMUtil.serializeClass(cn, 0);
-            log.debug("Patched {} successfully.", transformedName);
-            return result;
-        } else {
-            return bytes;
-        }
     }
 }

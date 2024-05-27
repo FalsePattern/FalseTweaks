@@ -22,13 +22,15 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates.block;
 
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.mapping.MappingManager;
 import com.falsepattern.lib.mapping.types.MappingType;
 import com.falsepattern.lib.mapping.types.NameType;
 import com.falsepattern.lib.mapping.types.UniversalField;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
-import org.objectweb.asm.tree.ClassNode;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.FieldNode;
 
 import java.util.ArrayList;
@@ -36,11 +38,11 @@ import java.util.Arrays;
 import java.util.List;
 
 // TODO ASM Logging
-public class Threading_BlockMinMax implements IClassNodeTransformer {
+public class Threading_BlockMinMax implements TurboClassTransformer {
     public static final String classInternal = "net/minecraft/block/Block";
     public static final String packageInternal = classInternal.substring(0, classInternal.lastIndexOf('/') + 1);
     public static final List<UniversalField> fieldsToRemove = new ArrayList<>();
-    private static final String className = classInternal.replace('/', '.');
+    private static final String targetName = classInternal.replace('/', '.');
 
     static {
         try {
@@ -54,18 +56,35 @@ public class Threading_BlockMinMax implements IClassNodeTransformer {
     }
 
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_BlockMinMax";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return className.equals(transformedName);
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        return targetName.equals(className);
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
-        cn.fields.removeIf(Threading_BlockMinMax::shouldRemoveField);
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+        val iter = cn.fields.iterator();
+        boolean changed = false;
+        while (iter.hasNext()) {
+            val field = iter.next();
+            if (shouldRemoveField(field)) {
+                iter.remove();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     static boolean shouldRemoveField(FieldNode fieldNode) {

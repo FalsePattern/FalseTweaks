@@ -22,11 +22,13 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 // TODO ASM Logging
-public class Threading_TessellatorUseReplacement implements IClassNodeTransformer {
+public class Threading_TessellatorUseReplacement implements TurboClassTransformer {
     private static final String TARGET_DESC_NOTCH = "Lbmh;";
     private static final String TARGET_DESC_SRG = "Lnet/minecraft/client/renderer/Tessellator;";
 
@@ -58,23 +60,32 @@ public class Threading_TessellatorUseReplacement implements IClassNodeTransforme
     }
 
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_TessellatorUseReplacement";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        if (CLASS_NAMES.contains(transformedName))
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        if (CLASS_NAMES.contains(className))
             return true;
         for (val prefix: PREFIXES) {
-            if (transformedName.startsWith(prefix))
+            if (className.startsWith(prefix))
                 return true;
         }
         return false;
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+        boolean modified = false;
         val methods = cn.methods;
         for (val classMethod : methods) {
             val insnList = classMethod.instructions.iterator();
@@ -90,9 +101,11 @@ public class Threading_TessellatorUseReplacement implements IClassNodeTransforme
                     if (opcode == Opcodes.GETFIELD || opcode == Opcodes.GETSTATIC) {
                         insnList.add(new InsnNode(Opcodes.POP));
                         insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, REPLACEMENT_OWNER, REPLACEMENT_NAME, REPLACEMENT_DESC, false));
+                        modified = true;
                     }
                 }
             }
         }
+        return modified;
     }
 }

@@ -22,11 +22,13 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings;
 
-import com.falsepattern.falsetweaks.asm.ICancellableClassNodeTransformer;
+import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
@@ -34,19 +36,29 @@ import static com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.
 
 // TODO ASM Logging
 @NoArgsConstructor
-public final class Threading_GameSettingsRedirector implements ICancellableClassNodeTransformer {
+public final class Threading_GameSettingsRedirector implements TurboClassTransformer {
+
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_GameSettingsRedirector";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         return true;
     }
 
     @Override
-    public boolean transformCancellable(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+
         boolean didWork = false;
         for (val mn : cn.methods) {
             val insnList = mn.instructions.iterator();

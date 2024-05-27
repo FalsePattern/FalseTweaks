@@ -86,10 +86,6 @@ public class ClientProxy extends CommonProxy {
                 return sb.toString();
             }
         });
-        if (!FMLClientHandler.instance().hasOptifine()) {
-            //Load perf
-            FalseTweaksTransformer.TRANSFORMERS.remove(FalseTweaksTransformer.OPTIFINE_DEOPTIMIZER);
-        }
         Share.LEAKFIX_CLASS_INITIALIZED = true;
         if (ModuleConfig.TRIANGULATOR()) {
             Calibration.registerBus();

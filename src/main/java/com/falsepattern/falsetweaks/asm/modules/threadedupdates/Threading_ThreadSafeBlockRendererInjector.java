@@ -22,13 +22,15 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
@@ -45,7 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO ASM Logging
-public class Threading_ThreadSafeBlockRendererInjector implements IClassNodeTransformer {
+public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTransformer {
     private static final Set<String> CLASS_NAMES = new HashSet<>();
     private static final Set<String> INTERNAL_NAMES = new HashSet<>();
     private static final Map<String, Handle> INITIALIZERS = new HashMap<>();
@@ -81,36 +83,31 @@ public class Threading_ThreadSafeBlockRendererInjector implements IClassNodeTran
             }
         }
     }
+
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_ThreadSafeBlockRendererInjector";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return CLASS_NAMES.contains(transformedName);
-    }
-
-    private void injectInstanceCreation(MethodNode method, String internalName) {
-        val insnList = method.instructions.iterator();
-        insnList.add(new InvokeDynamicInsnNode("get", "()Ljava/util/function/Supplier;",
-                                               LAMBDA_META_FACTORY,
-                                               Type.getType("()Ljava/lang/Object;"),
-                                               INITIALIZERS.get(internalName),
-                                               Type.getType("()L" + internalName + ";")));
-        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ThreadLocal", "withInitial", "(Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;", false));
-        insnList.add(new FieldInsnNode(Opcodes.PUTSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
-        if (method.maxStack == 0) {
-            method.maxStack = 1;
-        }
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        return CLASS_NAMES.contains(className);
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
         if (cn.interfaces.contains(TSBR_InternalName))
-            return; // Already implemented, skip
+            return false; // Already implemented, skip
 
-        val internalName = transformedName.replace('.', '/');
+        val internalName = className.replace('.', '/');
         cn.interfaces.add(TSBR_InternalName);
         if (INITIALIZERS.containsKey(internalName)) {
             cn.innerClasses.add(new InnerClassNode("java/lang/invoke/MethodHandles$Lookup", "java/lang/invoke/MethodHandles", "Lookup", Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL));
@@ -146,5 +143,21 @@ public class Threading_ThreadSafeBlockRendererInjector implements IClassNodeTran
         insnList.add(new InsnNode(Opcodes.ARETURN));
         getter.maxStack = 1;
         getter.maxLocals = 1;
+        return true;
+    }
+
+
+    private void injectInstanceCreation(MethodNode method, String internalName) {
+        val insnList = method.instructions.iterator();
+        insnList.add(new InvokeDynamicInsnNode("get", "()Ljava/util/function/Supplier;",
+                                               LAMBDA_META_FACTORY,
+                                               Type.getType("()Ljava/lang/Object;"),
+                                               INITIALIZERS.get(internalName),
+                                               Type.getType("()L" + internalName + ";")));
+        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ThreadLocal", "withInitial", "(Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;", false));
+        insnList.add(new FieldInsnNode(Opcodes.PUTSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
+        if (method.maxStack == 0) {
+            method.maxStack = 1;
+        }
     }
 }

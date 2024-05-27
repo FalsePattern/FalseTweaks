@@ -22,11 +22,13 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates.block;
 
-import com.falsepattern.falsetweaks.asm.ICancellableClassNodeTransformer;
+import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
 import lombok.var;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -38,7 +40,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 // TODO ASM Logging
-public class Threading_BlockMinMaxRedirector implements ICancellableClassNodeTransformer {
+public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
     /**
      * All classes in net.minecraft.block.* are the block subclasses save for these.
      */
@@ -72,17 +74,26 @@ public class Threading_BlockMinMaxRedirector implements ICancellableClassNodeTra
     }
 
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_BlockMinMaxRedirector";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         return true;
     }
 
     @Override
-    public boolean transformCancellable(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+
         // Track subclasses of Block
         if (!isVanillaBlockSubclass(cn.name) && isBlockSubclass(cn.superName))
             moddedBlockSubclasses.add(cn.name);

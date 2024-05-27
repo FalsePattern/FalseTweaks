@@ -49,6 +49,6 @@ dependencies {
     // Automagy 0.28.2
     compileOnly(deobfCurse("automagy-222153:2285272"))
 
-    // CodeChickenLib
     compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
+    compileOnly("org.jetbrains:annotations:24.1.0")
 }

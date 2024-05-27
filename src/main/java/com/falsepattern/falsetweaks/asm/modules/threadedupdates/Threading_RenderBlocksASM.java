@@ -22,9 +22,12 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.asm.ASMUtil;
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FrameNode;
@@ -35,21 +38,33 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 // TODO ASM Logging
-public class Threading_RenderBlocksASM implements IClassNodeTransformer {
+public class Threading_RenderBlocksASM implements TurboClassTransformer {
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_RenderBlocksASM";
     }
 
+
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return "net.minecraft.client.renderer.RenderBlocks".equals(transformedName);
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        return "net.minecraft.client.renderer.RenderBlocks".equals(className);
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+
         transformRenderBlockByRenderType(cn);
+        return true;
     }
+
 
     /**
      * CallbackInfoReturnable spam avoidance, we need to cancel but this method is called so frequently that the memory

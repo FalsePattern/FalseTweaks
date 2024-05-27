@@ -23,21 +23,23 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings;
 
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.mapping.MappingManager;
 import com.falsepattern.lib.mapping.types.MappingType;
 import com.falsepattern.lib.mapping.types.NameType;
 import com.falsepattern.lib.mapping.types.UniversalClass;
 import com.falsepattern.lib.mapping.types.UniversalField;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import org.objectweb.asm.tree.ClassNode;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 
 // TODO Logging
 @NoArgsConstructor
-public final class Threading_GameSettings implements IClassNodeTransformer {
+public final class Threading_GameSettings implements TurboClassTransformer {
     static final UniversalClass GAME_SETTINGS_CLASS;
     static final UniversalField FANCY_GRAPHICS_FIELD;
 
@@ -52,19 +54,37 @@ public final class Threading_GameSettings implements IClassNodeTransformer {
         }
     }
 
+
     @Override
-    public String getName() {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public String name() {
         return "Threading_GameSettings";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return GAME_SETTINGS_CLASS.regularName.srg.equals(transformedName);
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        return GAME_SETTINGS_CLASS.regularName.srg.equals(className);
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
-        cn.fields.removeIf(Threading_GameSettings::shouldRemoveField);
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+        val iter = cn.fields.iterator();
+        boolean changed = false;
+        while (iter.hasNext()) {
+            val field = iter.next();
+            if (shouldRemoveField(field)) {
+                iter.remove();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     static boolean isTargetOwner(FieldInsnNode fieldInst) {
