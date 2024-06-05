@@ -16,8 +16,8 @@ dependencies {
 
     annotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    compileOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.0.0:api")
-    runtimeOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.0.0:dev")
+    compileOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.2.4:api")
+    runtimeOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.2.4:dev")
 
     compileOnly(deobfMaven("https://mvn.falsepattern.com/stripped", "optifine:shadersmod-stripped:1.7.10-hd_u7"))
 
@@ -50,5 +50,5 @@ dependencies {
     compileOnly(deobfCurse("automagy-222153:2285272"))
 
     // CodeChickenLib
-    compileOnly("codechicken:codechickenlib-mc1.7.10:1.2.0-mega:dev")
+    compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
 }
