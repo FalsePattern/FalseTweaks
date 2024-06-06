@@ -28,10 +28,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public abstract class FastThreadLocal<S> {
     private static final List<WeakReference<FastThreadLocal<?>>> liveThreadLocals = new ArrayList<>();
+    private static final ReentrantLock lock = new ReentrantLock();
     private static final int MAX_LIVE_TURBO_THREADS = 128;
     private static Thread MAIN_THREAD = null;
 
@@ -147,7 +149,8 @@ public abstract class FastThreadLocal<S> {
 
         protected void onStartup() {
             int i;
-            synchronized (theSet) {
+            lock.lock();
+            try {
                 for (i = 0; i < MAX_LIVE_TURBO_THREADS; i++) {
                     if (!theSet.get(i)) {
                         theSet.set(i);
@@ -157,13 +160,16 @@ public abstract class FastThreadLocal<S> {
                     }
                 }
                 throw new IllegalStateException();
+            } finally {
+                lock.unlock();
             }
         }
 
         protected void onShutdown() {
             if (!started)
                 return;
-            synchronized (theSet) {
+            lock.lock();
+            try {
                 val iter = liveThreadLocals.iterator();
                 while (iter.hasNext()) {
                     val el = iter.next().get();
@@ -174,8 +180,9 @@ public abstract class FastThreadLocal<S> {
                     el.doCleanup(this);
                 }
                 theSet.clear(setIndex);
+            } finally {
+                lock.unlock();
             }
-            started = false;
         }
     }
 }
