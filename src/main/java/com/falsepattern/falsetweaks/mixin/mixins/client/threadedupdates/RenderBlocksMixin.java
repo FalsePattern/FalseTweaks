@@ -52,18 +52,15 @@ public abstract class RenderBlocksMixin {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = ThreadedChunkUpdateHelper.isMainThread();
 
-        boolean renderableOffThread = AGGRESSIVE_NEODYMIUM_THREADING || ThreadedChunkUpdateHelper.canBlockBeRenderedOffThread(block, pass, renderType);
         if (mainThread) {
             if (ThreadedChunkUpdateHelper.lastWorldRenderer == null) {
                 return 0;
             }
             val task = ((IRendererUpdateResultHolder) ThreadedChunkUpdateHelper.lastWorldRenderer).ft$getRendererUpdateTask();
 
-            if (task != null && !task.cancelled && renderableOffThread && pass >= 0) {
+            if (task != null && !task.cancelled && pass >= 0) {
                 return task.result[pass].renderedSomething ? 2 : 1;
             }
-            return 1;
-        } else if (!renderableOffThread) {
             return 1;
         }
 
