@@ -56,13 +56,13 @@ public class ToggleableTessellatorManager {
         val tess = (ToggleableTessellator) Compat.tessellator();
         tess.pass(pass);
         if (pass != 0) {
-            tess.disableTriangulatorLocal();
+//            tess.disableTriangulatorLocal();
         }
     }
 
     public static void postRenderBlocks(int pass) {
         if (pass != 0) {
-            ((ToggleableTessellator) Compat.tessellator()).enableTriangulatorLocal();
+//            ((ToggleableTessellator) Compat.tessellator()).enableTriangulatorLocal();
         }
     }
 }

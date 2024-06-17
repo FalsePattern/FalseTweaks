@@ -117,7 +117,7 @@ public class Compat {
 
     public static boolean enableTriangulation() {
         //Threaded chunk updates mess up the triangulator, so keep it off for now until the root cause is found.
-        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !ModuleConfig.THREADED_CHUNK_UPDATES() && !neodymiumActive();
+        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION;
     }
 
     public static Tessellator tessellator() {
