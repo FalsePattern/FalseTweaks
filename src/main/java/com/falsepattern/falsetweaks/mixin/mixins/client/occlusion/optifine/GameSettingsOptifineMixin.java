@@ -53,6 +53,7 @@ public abstract class GameSettingsOptifineMixin {
     @Dynamic
     @ModifyConstant(method = "loadOfOptions",
                     constant = @Constant(intValue = 32),
+                    remap = false,
                     require = 1)
     private int changeRenderDistanceOnSave(int oldRenderDistance) {
         return OcclusionConfig.RENDER_DISTANCE;
@@ -80,7 +81,8 @@ public abstract class GameSettingsOptifineMixin {
     @Redirect(method = "loadOfOptions",
               at = @At(value = "FIELD",
                        opcode = Opcodes.PUTFIELD,
-                       target = "Lnet/minecraft/client/settings/GameSettings;ofOcclusionFancy:Z"),
+                       target = "Lnet/minecraft/client/settings/GameSettings;ofOcclusionFancy:Z",
+                       remap = false),
               require = 1)
     private void noOcclusionFancy(GameSettings instance, boolean value) {
         ofOcclusionFancy = false;

@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Mixin(ASMDataTable.class)
+@Mixin(value = ASMDataTable.class,
+       remap = false)
 public abstract class ASMDataTableMixin implements ThreadSafeASMDataTable {
     @Shadow
     private Map<ModContainer, SetMultimap<String, ASMDataTable.ASMData>> containerAnnotationData;

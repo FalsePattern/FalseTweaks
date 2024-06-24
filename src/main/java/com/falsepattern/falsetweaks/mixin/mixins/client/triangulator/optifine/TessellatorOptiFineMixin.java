@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.optifine;
 
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -53,10 +54,11 @@ public abstract class TessellatorOptiFineMixin implements ITriangulatorTessellat
         shaderOn(false);
     }
 
-    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @Dynamic
     @Inject(method = "addVertex",
             at = @At(value = "INVOKE",
-                     target = "Lshadersmod/client/ShadersTess;addVertex(Lnet/minecraft/client/renderer/Tessellator;DDD)V"),
+                     target = "Lshadersmod/client/ShadersTess;addVertex(Lnet/minecraft/client/renderer/Tessellator;DDD)V",
+                     remap = false),
             require = 1)
     private void shaderAddVertex(CallbackInfo ci) {
         shaderOn(true);

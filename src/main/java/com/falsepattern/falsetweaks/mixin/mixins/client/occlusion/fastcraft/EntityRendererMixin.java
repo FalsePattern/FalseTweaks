@@ -37,7 +37,8 @@ public abstract class EntityRendererMixin {
     @Dynamic
     @Redirect(method = "renderWorld",
               at = @At(value = "INVOKE",
-                       target = "Lfastcraft/HC;t(Lnet/minecraft/client/renderer/RenderGlobal;Lnet/minecraft/entity/EntityLivingBase;Z)Z"),
+                       target = "Lfastcraft/HC;t(Lnet/minecraft/client/renderer/RenderGlobal;Lnet/minecraft/entity/EntityLivingBase;Z)Z",
+                       remap = false),
               require = 1)
     private boolean unhookUpdateRenderers(RenderGlobal instance, EntityLivingBase entity, boolean bool) {
         return instance.updateRenderers(entity, bool);

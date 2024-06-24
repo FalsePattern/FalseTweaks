@@ -23,6 +23,8 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
+import com.falsepattern.falsetweaks.mixin.bridge.occlison.WorldRendererMixinBridge;
+import com.falsepattern.falsetweaks.modules.occlusion.WorldRendererOcclusion;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
 import com.falsepattern.falsetweaks.modules.threadedupdates.NeodymiumCompat;
@@ -53,16 +55,13 @@ import java.util.List;
 import static com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper.AGGRESSIVE_NEODYMIUM_THREADING;
 
 @Mixin(value = WorldRenderer.class)
-public abstract class WorldRendererMixin implements IRendererUpdateResultHolder {
+public abstract class WorldRendererMixin implements IRendererUpdateResultHolder, WorldRendererMixinBridge, WorldRendererOcclusion {
 
     @Shadow
     public List<TileEntity> tileEntityRenderers;
     private ThreadedChunkUpdateHelper.UpdateTask arch$updateTask;
     @Unique
     private int ft$pass;
-    @Dynamic
-    @Shadow(remap = false)
-    private boolean ft$needsSort;
 
     @Shadow
     protected abstract void postRenderBlocks(int p_147891_1_, EntityLivingBase p_147891_2_);
@@ -91,10 +90,8 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
         return AGGRESSIVE_NEODYMIUM_THREADING ? 0 : constant;
     }
 
-    @SuppressWarnings("unused")
-    @Dynamic("Called by com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.WorldRenderer_NonOptiFineMixin and com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.optifine.WorldRendererMixin")
-    @Unique
-    private int ft$insertNextPass(int pass) {
+    @Override
+    public int ft$insertNextPass(int pass) {
         if (!AGGRESSIVE_NEODYMIUM_THREADING) {
             return pass;
         }
@@ -202,7 +199,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder 
             at = @At("HEAD"),
             require = 1)
     private void unMarkSort(CallbackInfo ci) {
-        ft$needsSort = false;
+        ft$needsSort(false);
     }
 
     @Redirect(method = "updateRendererSort",

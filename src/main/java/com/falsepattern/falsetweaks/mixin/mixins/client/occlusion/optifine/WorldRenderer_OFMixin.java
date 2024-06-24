@@ -39,7 +39,8 @@ public abstract class WorldRenderer_OFMixin {
     @Redirect(method = "setPosition",
               at = @At(value = "FIELD",
                        opcode = Opcodes.PUTFIELD,
-                       target = "Lnet/minecraft/client/renderer/WorldRenderer;needsBoxUpdate:Z"),
+                       target = "Lnet/minecraft/client/renderer/WorldRenderer;needsBoxUpdate:Z",
+                       remap = false),
               require = 1)
     private void noAABB(WorldRenderer instance, boolean value) {
         ((stubpackage.net.minecraft.client.renderer.WorldRenderer) instance).needsBoxUpdate = false;

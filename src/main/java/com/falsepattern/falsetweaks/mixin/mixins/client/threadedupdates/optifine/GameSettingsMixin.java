@@ -50,7 +50,9 @@ public abstract class GameSettingsMixin {
     @Redirect(method = "loadOfOptions",
               at = @At(value = "FIELD",
                        opcode = Opcodes.PUTFIELD,
-                       target = "Lnet/minecraft/client/settings/GameSettings;ofFastRender:Z"),
+                       target = "Lnet/minecraft/client/settings/GameSettings;ofFastRender:Z",
+                       remap = false),
+              remap = false,
               require = 1)
     private void noFastRender(GameSettings instance, boolean value) {
         ofFastRender = false;
@@ -60,7 +62,9 @@ public abstract class GameSettingsMixin {
     @Redirect(method = "loadOfOptions",
               at = @At(value = "FIELD",
                        opcode = Opcodes.PUTFIELD,
-                       target = "Lnet/minecraft/client/settings/GameSettings;ofChunkUpdates:I"),
+                       target = "Lnet/minecraft/client/settings/GameSettings;ofChunkUpdates:I",
+                       remap = false),
+              remap = false,
               require = 2)
     private void noChunkUpdates(GameSettings instance, int value) {
         ofChunkUpdates = 1;
@@ -70,7 +74,9 @@ public abstract class GameSettingsMixin {
     @Redirect(method = "loadOfOptions",
               at = @At(value = "FIELD",
                        opcode = Opcodes.PUTFIELD,
-                       target = "Lnet/minecraft/client/settings/GameSettings;ofChunkUpdatesDynamic:Z"),
+                       target = "Lnet/minecraft/client/settings/GameSettings;ofChunkUpdatesDynamic:Z",
+                       remap = false),
+              remap = false,
               require = 1)
     private void noChunkUpdates(GameSettings instance, boolean value) {
         ofChunkUpdatesDynamic = false;

@@ -36,7 +36,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
 
 @Pseudo
-@Mixin(targets = "GuiPerformanceSettingsOF")
+@Mixin(targets = "GuiPerformanceSettingsOF",
+       remap = false)
 public abstract class GuiPerformanceSettingsOFMixin extends GuiScreen {
     @Dynamic
     @Shadow(remap = false)

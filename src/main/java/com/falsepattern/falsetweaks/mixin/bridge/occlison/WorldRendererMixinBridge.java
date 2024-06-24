@@ -20,24 +20,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.falsepattern.falsetweaks.mixin.bridge.occlison;
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.particles;
-
-import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-
-import net.minecraft.client.particle.EffectRenderer;
-
-@Mixin(EffectRenderer.class)
-public abstract class EffectRendererMixin {
-    @Redirect(method = "renderParticles",
-              at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glDepthMask(Z)V",
-                       remap = false),
-              require = 2)
-    private void alwaysDepthMaskParticles(boolean flag) {
-        GL11.glDepthMask(true);
-    }
+public interface WorldRendererMixinBridge {
+    int ft$insertNextPass(int pass);
 }

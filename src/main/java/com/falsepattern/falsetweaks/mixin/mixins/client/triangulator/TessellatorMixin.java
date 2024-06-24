@@ -55,7 +55,8 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @Final
     public static Tessellator instance;
     // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
-    @Shadow(aliases = {"rawBufferSize"})
+    @Shadow(aliases = {"rawBufferSize"},
+            remap = false)
     public int field_78388_E;
     @Shadow
     private int drawMode;

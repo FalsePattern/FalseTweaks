@@ -49,7 +49,8 @@ public abstract class WorldClientMixin extends World {
     @Dynamic
     @Redirect(method = {"getLightBrightnessForSkyBlocks", "func_72802_i"},
               at = @At(value = "FIELD",
-                       target = "Lnet/minecraft/client/multiplayer/WorldClient;renderItemInFirstPerson:Z"),
+                       target = "Lnet/minecraft/client/multiplayer/WorldClient;renderItemInFirstPerson:Z",
+                       remap = false),
               require = 1)
     private boolean noHandLightOffThread(WorldClient self) {
         return renderItemInFirstPerson && ThreadedChunkUpdateHelper.isMainThread();

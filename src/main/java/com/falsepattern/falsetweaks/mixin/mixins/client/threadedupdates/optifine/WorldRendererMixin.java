@@ -23,11 +23,13 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.optifine;
 
+import com.falsepattern.falsetweaks.mixin.bridge.occlison.WorldRendererMixinBridge;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Dynamic;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,13 +45,7 @@ import static com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunk
 
 @Mixin(value = WorldRenderer.class,
        priority = 1001)
-public abstract class WorldRendererMixin implements IRendererUpdateResultHolder {
-    @Dynamic
-    @Shadow(remap = false)
-    private int ft$insertNextPass(int pass) {
-        return 0;
-    }
-
+public abstract class WorldRendererMixin implements IRendererUpdateResultHolder, WorldRendererMixinBridge {
     @ModifyConstant(method = "updateRenderer",
                     constant = @Constant(intValue = 0,
                                          ordinal = 1),

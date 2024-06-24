@@ -25,6 +25,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.bsp.foamfix;
 
 import com.falsepattern.falsetweaks.modules.bsp.IBSPTessellator;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,9 +35,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
 
-@SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
 @Mixin(Tessellator.class)
 public abstract class TessellatorBSPSortingMixin implements IBSPTessellator {
+    @Dynamic
     @Inject(method = "getVertexState_foamfix_old",
             at = @At(value = "HEAD"),
             cancellable = true,
@@ -45,6 +46,7 @@ public abstract class TessellatorBSPSortingMixin implements IBSPTessellator {
         cir.setReturnValue(ft$getVertexStateBSP(p_147564_1_, p_147564_2_, p_147564_3_));
     }
 
+    @Dynamic
     @Inject(method = {"setVertexState", "setVertexState_foamfix_old"},
             at = @At(value = "HEAD"),
             require = 1)

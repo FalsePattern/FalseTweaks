@@ -35,7 +35,8 @@ import net.minecraft.util.AxisAlignedBB;
 public abstract class WorldRenderer_VanillaMixin {
     @Redirect(method = "setPosition",
               at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V"),
+                       target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V",
+                       remap = false),
               require = 1)
     private void noNewList(int list, int mode) {
 
@@ -45,7 +46,8 @@ public abstract class WorldRenderer_VanillaMixin {
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/util/AxisAlignedBB;getBoundingBox(DDDDDD)Lnet/minecraft/util/AxisAlignedBB;"),
               slice = @Slice(from = @At(value = "INVOKE",
-                                        target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V")),
+                                        target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V",
+                                        remap = false)),
               require = 1)
     private AxisAlignedBB noCreateAABB(double p_72330_0_, double p_72330_2_, double p_72330_4_, double p_72330_6_, double p_72330_8_, double p_72330_10_) {
         return null;
@@ -61,7 +63,8 @@ public abstract class WorldRenderer_VanillaMixin {
 
     @Redirect(method = "setPosition",
               at = @At(value = "INVOKE",
-                       target = "Lorg/lwjgl/opengl/GL11;glEndList()V"),
+                       target = "Lorg/lwjgl/opengl/GL11;glEndList()V",
+                       remap = false),
               require = 1)
     private void noEndList() {
 

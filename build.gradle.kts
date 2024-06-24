@@ -124,7 +124,7 @@ dependencies {
     //V33b
     compileOnly(deobfCurse("dragonapi-235591:4722480"))
 
-    compileOnly("makamys:neodymium-mc1.7.10:0.3.2-unofficial:dev")
+    compileOnly("makamys:neodymium-mc1.7.10:0.3.3-unofficial:dev")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
         isTransitive = false

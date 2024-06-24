@@ -43,7 +43,7 @@ import static com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunk
 @Mixin(value = WorldRenderer.class,
        priority = 1001)
 public abstract class WorldRendererMixin implements NeodymiumWorldRendererThreadingBridge {
-    @Dynamic
+    @Dynamic(mixin = makamys.neodymium.mixin.MixinWorldRenderer.class)
     @Shadow(remap = false)
     private List<ChunkMesh> nd$chunkMeshes;
 

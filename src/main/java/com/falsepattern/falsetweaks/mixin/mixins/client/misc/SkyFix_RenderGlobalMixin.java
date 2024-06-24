@@ -73,6 +73,7 @@ public abstract class SkyFix_RenderGlobalMixin {
                                         target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;")),
               at = @At(value = "INVOKE",
                        target = "Lorg/lwjgl/opengl/GL11;glNewList(II)V",
+                       remap = false,
                        ordinal = 0),
               require = 1)
     private void bigDraw1Start(int list, int mode) {
@@ -85,6 +86,7 @@ public abstract class SkyFix_RenderGlobalMixin {
                                         target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;")),
               at = @At(value = "INVOKE",
                        target = "Lorg/lwjgl/opengl/GL11;glEndList()V",
+                       remap = false,
                        ordinal = 0),
               require = 1)
     private void bigDraw1End() {

@@ -43,7 +43,7 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 @Mixin(TextureMap.class)
 public abstract class TextureMapMixin {
-    @Shadow
+    @Shadow(remap = false)
     private boolean skipFirst;
 
     @Shadow
@@ -63,6 +63,7 @@ public abstract class TextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/common/ProgressManager;push(Ljava/lang/String;I)Lcpw/mods/fml/common/ProgressManager$ProgressBar;",
+                       remap = false,
                        ordinal = 1),
               require = 0,
               expect = 0)
@@ -73,6 +74,7 @@ public abstract class TextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/common/ProgressManager$ProgressBar;step(Ljava/lang/String;)V",
+                       remap = false,
                        ordinal = 1),
               require = 0,
               expect = 0)
@@ -83,6 +85,7 @@ public abstract class TextureMapMixin {
     @Redirect(method = "loadTextureAtlas",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/common/ProgressManager;pop(Lcpw/mods/fml/common/ProgressManager$ProgressBar;)V",
+                       remap = false,
                        ordinal = 1),
               require = 0,
               expect = 0)

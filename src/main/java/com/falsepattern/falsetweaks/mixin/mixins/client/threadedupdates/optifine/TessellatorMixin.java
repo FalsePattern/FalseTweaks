@@ -40,7 +40,7 @@ import java.nio.ShortBuffer;
 @Mixin(Tessellator.class)
 public abstract class TessellatorMixin implements ITessellatorOptiFineCompat {
     // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
-    @Shadow(aliases = {"rawBufferSize"})
+    @Shadow(aliases = {"rawBufferSize"}, remap = false)
     public int field_78388_E;
     @Dynamic
     @Shadow

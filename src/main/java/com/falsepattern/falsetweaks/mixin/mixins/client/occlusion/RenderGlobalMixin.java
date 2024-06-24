@@ -104,7 +104,8 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
 
     @Redirect(method = "loadRenderers",
               at = @At(value = "INVOKE",
-                       target = "LWrUpdates;makeWorldRenderer(Lnet/minecraft/world/World;Ljava/util/List;IIII)Lnet/minecraft/client/renderer/WorldRenderer;"),
+                       target = "LWrUpdates;makeWorldRenderer(Lnet/minecraft/world/World;Ljava/util/List;IIII)Lnet/minecraft/client/renderer/WorldRenderer;",
+                       remap = false),
               expect = 0)
     @Dynamic
     private WorldRenderer optifineMakeWorldRenderer(World worldObj, List tileEntities, int x, int y, int z, int glRenderListBase) {

@@ -38,7 +38,8 @@ public abstract class WorldRenderer_DAPIMixin {
     @Dynamic
     @Inject(method = "updateRenderer",
             at = @At(value = "INVOKE",
-                     target = "LReika/DragonAPI/Instantiable/Event/Client/RenderBlockAtPosEvent;fire(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;IIILnet/minecraft/client/renderer/WorldRenderer;I)Z"),
+                     target = "LReika/DragonAPI/Instantiable/Event/Client/RenderBlockAtPosEvent;fire(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;IIILnet/minecraft/client/renderer/WorldRenderer;I)Z",
+                     remap = false),
             require = 1)
     private void resetStackDragonAPI(CallbackInfo ci) {
         // Make sure the stack doesn't leak
