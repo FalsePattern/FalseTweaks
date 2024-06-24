@@ -304,7 +304,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
         Share.log.info("Creating " + threads + " chunk builder" + (threads > 1 ? "s" : ""));
         String nameBase = "Chunk Update Worker #";
-        if (Loader.isModLoaded("lumina")) {
+        if (Loader.isModLoaded("lumina") || Loader.isModLoaded("lumi")) {
             nameBase = "$LUMI_NO_RELIGHT" + nameBase;
         }
         CircularTaskQueue taskQueue = new CircularTaskQueue(rg.worldRenderers.length);
