@@ -28,6 +28,18 @@ import com.falsepattern.falsetweaks.util.ConfigFixUtil;
 public class AnimFixCompat {
     public static void executeConfigFixes() {
         HodgePodgeCompat.executeHodgepodgeConfigFixes();
+        Lwjgl3IfyCompat.execute3ifyConfigFixes();
+    }
+
+    public static class Lwjgl3IfyCompat {
+        public static void execute3ifyConfigFixes() {
+            ConfigFixUtil.fixConfig("lwjgl3ify.cfg", line -> {
+                if (line.contains("stbiTextureStiching")) {
+                    return line.replace("true", "false");
+                }
+                return line;
+            }, e -> Share.log.fatal("Failed to apply LWJGL3Ify texture optimization compatibility patches!"));
+        }
     }
 
     public static class HodgePodgeCompat {
