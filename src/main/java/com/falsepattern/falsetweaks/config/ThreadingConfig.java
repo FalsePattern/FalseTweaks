@@ -28,7 +28,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "threading")
 public class ThreadingConfig {
     @Config.Comment("The number of threads to use for chunk building.\n" +

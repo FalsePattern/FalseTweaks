@@ -27,7 +27,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "profiler")
 public class ProfilerConfig {
     @Config.Comment("Enable this to dump the profiler data to a file when the F3 profiler is closed.")

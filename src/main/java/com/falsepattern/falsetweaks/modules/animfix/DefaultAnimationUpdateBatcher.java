@@ -67,7 +67,7 @@ public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
         }
         memory = GLAllocation.createDirectIntBuffer(size);
         thread = new Thread(this::run);
-        thread.setName(Tags.MODNAME + " texture batching thread");
+        thread.setName(Tags.MOD_NAME + " texture batching thread");
         thread.setDaemon(true);
         thread.start();
     }

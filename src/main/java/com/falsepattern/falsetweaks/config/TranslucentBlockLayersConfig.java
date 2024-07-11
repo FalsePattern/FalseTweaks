@@ -27,7 +27,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "translucent_block_layers_fix")
 public class TranslucentBlockLayersConfig {
     @Config.Comment("The \"epsilon\" value used when shifting translucent block geometry closer to the camera.\n" +

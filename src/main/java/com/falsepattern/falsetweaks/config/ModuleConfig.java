@@ -27,7 +27,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "00_modules")
 @Config.RequiresMcRestart
 public class ModuleConfig {

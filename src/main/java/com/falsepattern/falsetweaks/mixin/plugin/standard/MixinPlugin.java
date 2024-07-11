@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MixinPlugin implements IMixinPlugin {
     @Getter
-    private final Logger logger = IMixinPlugin.createLogger(Tags.MODNAME);
+    private final Logger logger = IMixinPlugin.createLogger(Tags.MOD_NAME);
 
     @Override
     public ITargetedMod[] getTargetedModEnumValues() {

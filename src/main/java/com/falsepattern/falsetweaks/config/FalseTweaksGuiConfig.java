@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 public class FalseTweaksGuiConfig extends SimpleGuiConfig {
     public FalseTweaksGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, Tags.MODID, Tags.MODNAME, fetchConfigClasses());
+        super(parent, Tags.MOD_ID, Tags.MOD_NAME, fetchConfigClasses());
     }
 
     private static Class<?>[] fetchConfigClasses() {

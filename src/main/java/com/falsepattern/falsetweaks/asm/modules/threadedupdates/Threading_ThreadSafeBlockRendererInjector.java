@@ -86,7 +86,7 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
 
     @Override
     public String owner() {
-        return Tags.MODNAME;
+        return Tags.MOD_NAME;
     }
 
     @Override

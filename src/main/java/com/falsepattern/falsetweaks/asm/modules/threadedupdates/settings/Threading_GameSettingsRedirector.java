@@ -40,7 +40,7 @@ public final class Threading_GameSettingsRedirector implements TurboClassTransfo
 
     @Override
     public String owner() {
-        return Tags.MODNAME;
+        return Tags.MOD_NAME;
     }
 
     @Override

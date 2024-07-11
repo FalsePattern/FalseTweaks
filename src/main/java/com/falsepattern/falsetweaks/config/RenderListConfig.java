@@ -27,7 +27,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "item_render_lists")
 public class RenderListConfig {
     @Config.Comment("The total amount of renderlists FalseTweaks may allocate for optimized item rendering.\n" +

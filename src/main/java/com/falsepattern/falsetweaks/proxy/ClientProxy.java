@@ -26,7 +26,6 @@ package com.falsepattern.falsetweaks.proxy;
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
-import com.falsepattern.falsetweaks.asm.FalseTweaksTransformer;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
@@ -45,7 +44,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraftforge.client.ClientCommandHandler;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
@@ -149,7 +147,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent e) {
-        if (!e.modID.equals(Tags.MODID)) {
+        if (!e.modID.equals(Tags.MOD_ID)) {
             return;
         }
 

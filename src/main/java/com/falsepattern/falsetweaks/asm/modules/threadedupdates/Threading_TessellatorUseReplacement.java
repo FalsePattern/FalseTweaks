@@ -61,7 +61,7 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
 
     @Override
     public String owner() {
-        return Tags.MODNAME;
+        return Tags.MOD_NAME;
     }
 
     @Override

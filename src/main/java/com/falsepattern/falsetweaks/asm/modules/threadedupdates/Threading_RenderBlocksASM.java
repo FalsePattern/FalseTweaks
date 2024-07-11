@@ -41,7 +41,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 public class Threading_RenderBlocksASM implements TurboClassTransformer {
     @Override
     public String owner() {
-        return Tags.MODNAME;
+        return Tags.MOD_NAME;
     }
 
     @Override

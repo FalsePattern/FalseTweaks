@@ -35,7 +35,7 @@ import lombok.Getter;
 
 import java.util.Map;
 
-@IFMLLoadingPlugin.TransformerExclusions(Tags.GROUPNAME + ".asm")
+@IFMLLoadingPlugin.TransformerExclusions(Tags.ROOT_PKG + ".asm")
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
@@ -57,7 +57,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[]{Tags.GROUPNAME + ".asm.FalseTweaksTransformer"};
+        return new String[]{Tags.ROOT_PKG + ".asm.FalseTweaksTransformer"};
     }
 
     @Override

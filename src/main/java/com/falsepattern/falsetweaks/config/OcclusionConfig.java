@@ -29,7 +29,7 @@ import com.falsepattern.lib.config.ConfigurationManager;
 
 import static com.falsepattern.falsetweaks.api.Constants.MaximumRenderDistance;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "occlusion")
 public class OcclusionConfig {
 

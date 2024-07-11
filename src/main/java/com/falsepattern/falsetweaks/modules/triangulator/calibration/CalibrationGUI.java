@@ -44,7 +44,7 @@ public class CalibrationGUI extends GuiScreen {
     private static final int ID_DESCRIPTION = 0;
     private static final int ID_TOGGLE = 1;
     private static final int ID_APPLY = 2;
-    private final ResourceLocation reference = new ResourceLocation(Tags.MODID, "reference.png");
+    private final ResourceLocation reference = new ResourceLocation(Tags.MOD_ID, "reference.png");
     protected List<GuiLabel> labelList = new ArrayList<>();
     private boolean flip = false;
 

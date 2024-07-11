@@ -75,7 +75,7 @@ public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
 
     @Override
     public String owner() {
-        return Tags.MODNAME;
+        return Tags.MOD_NAME;
     }
 
     @Override

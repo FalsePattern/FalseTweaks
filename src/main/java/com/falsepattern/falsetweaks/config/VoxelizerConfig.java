@@ -34,7 +34,7 @@ import net.minecraft.launchwrapper.Launch;
 import java.util.HashSet;
 import java.util.Set;
 
-@Config(modid = Tags.MODID,
+@Config(modid = Tags.MOD_ID,
         category = "voxelizer")
 @Config.RequiresMcRestart
 public class VoxelizerConfig {
