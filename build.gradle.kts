@@ -1,6 +1,5 @@
-import com.falsepattern.fpgradle.dsl.*
 plugins {
-    id("fpgradle-minecraft") version("0.3.3")
+    id("fpgradle-minecraft") version("0.4.2")
 }
 
 group = "com.falsepattern"
@@ -56,56 +55,13 @@ minecraft_fp {
 }
 
 repositories {
-    maven("cursemaven", uri("https://mvn.falsepattern.com/cursemaven/")) {
-        content {
-            includeGroup("curse.maven")
-        }
-    }
-    maven("mavenpattern", uri("https://mvn.falsepattern.com/releases/")) {
-        content {
-            includeGroup("com.falsepattern")
-            includeGroup("makamys")
-        }
-    }
-    maven("jitpack", uri("https://mvn.falsepattern.com/jitpack/")) {
-        content {
-            includeGroup("com.github.basdxz")
-        }
-    }
-    maven("mega_uploads", uri("https://mvn.falsepattern.com/gtmega_uploads/")) {
-        content {
-            includeGroup("optifine")
-        }
-    }
-    maven("mega", uri("https://mvn.falsepattern.com/gtmega_releases/")) {
-        content {
-            includeGroup("codechicken")
-        }
-    }
-    ivy {
-        url = uri("https://files.vexatos.com/")
-        patternLayout {
-            artifact("[module]/[artifact]-[revision].[ext]")
-        }
-        content {
-            includeGroup("vexatos")
-        }
-        metadataSources {
-            artifact()
-        }
-    }
-    ivy {
-        url = uri("https://downloads.gtnewhorizons.com/")
-        patternLayout {
-            artifact("[organisation]/[artifact]-[revision].[ext]")
-        }
-        content {
-            includeGroup("Mods_for_Twitch")
-        }
-        metadataSources {
-            artifact()
-        }
-    }
+    cursemavenEX()
+    exclusive(mavenpattern(), "com.falsepattern", "makamys")
+    exclusive(jitpack(), "com.github.basdxz")
+    exclusive(maven("mega_uploads", "https://mvn.falsepattern.com/gtmega_uploads"), "optifine")
+    exclusive(mega(), "codechicken")
+    exclusive(ivy("https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
+    exclusive(ivy("https://downloads.gtnewhorizons.com/", "[organisation]/[artifact]-[revision].[ext]"), "Mods_for_Twitch")
 }
 
 dependencies {
@@ -127,7 +83,7 @@ dependencies {
     compileOnly("makamys:neodymium-mc1.7.10:0.3.3-unofficial:dev")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
-        isTransitive = false
+        excludeDeps()
     }
 
     compileOnly(deobfCurse("railcraft-51195:2458987"))
