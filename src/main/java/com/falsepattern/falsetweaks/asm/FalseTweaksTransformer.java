@@ -39,6 +39,9 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import cpw.mods.fml.relauncher.Side;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,19 +50,21 @@ import java.util.List;
 public class FalseTweaksTransformer extends MergeableTurboTransformer {
     private static List<TurboClassTransformer> transformers() {
         val transformers = new ArrayList<TurboClassTransformer>();
-        transformers.add(new RenderGlobalDeOptimizer());
-        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            transformers.add(new Threading_RenderBlocksASM());
-            if (ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS.length > 0) {
-                transformers.add(new Threading_TessellatorUseReplacement());
+        if (FMLLaunchHandler.side().isClient()) {
+            transformers.add(new RenderGlobalDeOptimizer());
+            if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+                transformers.add(new Threading_RenderBlocksASM());
+                if (ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS.length > 0) {
+                    transformers.add(new Threading_TessellatorUseReplacement());
+                }
+                if (ThreadingConfig.THREAD_SAFE_ISBRHS.length > 0) {
+                    transformers.add(new Threading_ThreadSafeBlockRendererInjector());
+                }
+                transformers.add(new Threading_BlockMinMax());
+                transformers.add(new Threading_BlockMinMaxRedirector());
+                transformers.add(new Threading_GameSettings());
+                transformers.add(new Threading_GameSettingsRedirector());
             }
-            if (ThreadingConfig.THREAD_SAFE_ISBRHS.length > 0) {
-                transformers.add(new Threading_ThreadSafeBlockRendererInjector());
-            }
-            transformers.add(new Threading_BlockMinMax());
-            transformers.add(new Threading_BlockMinMaxRedirector());
-            transformers.add(new Threading_GameSettings());
-            transformers.add(new Threading_GameSettingsRedirector());
         }
         return transformers;
     }

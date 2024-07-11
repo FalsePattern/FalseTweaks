@@ -28,6 +28,8 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.animfix.AnimFixCompat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadContainer;
+
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import lombok.Getter;
 
@@ -41,13 +43,15 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     static {
         ModuleConfig.init();
 
-        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            OcclusionCompat.executeConfigFixes();
-            MainThreadContainer.setMainThread();
-        }
+        if (FMLLaunchHandler.side().isClient()) {
+            if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+                OcclusionCompat.executeConfigFixes();
+                MainThreadContainer.setMainThread();
+            }
 
-        if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
-            AnimFixCompat.executeConfigFixes();
+            if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
+                AnimFixCompat.executeConfigFixes();
+            }
         }
     }
 
