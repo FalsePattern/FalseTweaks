@@ -88,6 +88,7 @@ public class ThreadingConfig {
                                "gregtech.api.util.LightingHelper",
                                "gregtech.common.render.GT_Renderer_Block",
                                "ic2.core.block.RenderBlockCrop",
+                               "lotr.client.render.*",
                                "lumien.randomthings.Client.Renderer.RenderWirelessLever",
                                "mods.natura.client.LeverRender",
                                "mods.railcraft.client.render.RenderFakeBlock",
