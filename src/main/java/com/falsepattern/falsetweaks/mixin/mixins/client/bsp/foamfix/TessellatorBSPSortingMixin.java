@@ -38,18 +38,16 @@ import net.minecraft.client.shader.TesselatorVertexState;
 @Mixin(Tessellator.class)
 public abstract class TessellatorBSPSortingMixin implements IBSPTessellator {
     @Dynamic
-    @Inject(method = "getVertexState_foamfix_old",
+    @Inject(method = {"getVertexState", "getVertexState_foamfix_old"},
             at = @At(value = "HEAD"),
-            cancellable = true,
-            require = 1)
+            cancellable = true)
     private void bspSort(float p_147564_1_, float p_147564_2_, float p_147564_3_, CallbackInfoReturnable<TesselatorVertexState> cir) {
         cir.setReturnValue(ft$getVertexStateBSP(p_147564_1_, p_147564_2_, p_147564_3_));
     }
 
     @Dynamic
     @Inject(method = {"setVertexState", "setVertexState_foamfix_old"},
-            at = @At(value = "HEAD"),
-            require = 1)
+            at = @At(value = "HEAD"))
     private void bspSort(TesselatorVertexState p_147565_1_, CallbackInfo ci) {
         ft$setVertexStateBSP(p_147565_1_);
     }
