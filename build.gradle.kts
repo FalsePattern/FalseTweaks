@@ -52,7 +52,16 @@ minecraft_fp {
 
 repositories {
     cursemavenEX()
-    exclusive(mavenpattern(), "com.falsepattern", "makamys")
+    mavenpattern() {
+        content {
+            includeGroups("com.falsepattern", "makamys")
+        }
+    }
+    mavenLocal {
+        content {
+            includeGroup("com.falsepattern")
+        }
+    }
     exclusive(jitpack(), "com.github.basdxz")
     exclusive(maven("mega_uploads", "https://mvn.falsepattern.com/gtmega_uploads"), "optifine")
     exclusive(mega(), "codechicken")
@@ -61,8 +70,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.2.5:api")
-    runtimeOnly("com.falsepattern:falsepatternlib-mc1.7.10:1.2.5:dev")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.0")
 
     compileOnly(rfg.deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
