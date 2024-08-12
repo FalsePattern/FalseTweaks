@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashSet;
 
 public class IllegalThreadingDrawing {
-    private static final Logger LOG = LogManager.getLogger("ANGRY|AS|FUCK");
+    private static final Logger LOG = LogManager.getLogger("THREADING INCOMPATIBILITY");
     private static final HashSet<String> BAD_CLASSES = new HashSet<>();
 
     public static void logIllegalMan(String modName, String modid) {
@@ -41,7 +41,16 @@ public class IllegalThreadingDrawing {
             return;
         }
 
-        LOG.fatal("Mod: [{}] with id: [{}] is not using threaded tess in class: [{}]", modName, modid, callerClassName);
-        LOG.fatal("", e);
+        loudWarning(modName, modid, callerClassName);
+        LOG.warn("", e);
+        loudWarning(modName, modid, callerClassName);
+    }
+
+    //loud warning to make sure user notices
+    private static void loudWarning(String modName, String modid, String callerClassName) {
+        for (int i = 0; i < 10; i++) {
+            LOG.fatal("Mod: [{}] with id: [{}] is not using threaded tess in class: [{}]. Please add it to the falsetweaks.cfg file, TESSELLATOR_USE_REPLACEMENT_TARGETS list!",
+                      modName, modid, callerClassName);
+        }
     }
 }
