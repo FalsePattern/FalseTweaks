@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.4.2")
+    id("fpgradle-minecraft") version("0.7.5")
 }
 
 group = "com.falsepattern"
@@ -33,7 +33,7 @@ minecraft_fp {
         changelog = "https://github.com/FalsePattern/FalseTweaks/releases/tag/$version"
         maven {
             repoName = "mavenpattern"
-            repoUrl = uri("https://mvn.falsepattern.com/releases/")
+            repoUrl = "https://mvn.falsepattern.com/releases/"
         }
         curseforge {
             projectId = "665744"
@@ -97,9 +97,9 @@ dependencies {
     // OpenComputers MC1.7.10-1.8.3+089dd28
     compileOnly(deobfCurse("opencomputers-223008:4630534"))
     // Computronics 1.7.10-1.6.6
-    compileOnly(rfg.deobf("vexatos:Computronics:1.7.10-1.6.6"))
+    compileOnly(deobf("vexatos:Computronics:1.7.10-1.6.6"))
     // ExtraCells 1.7.10-2.5.0-14
-    compileOnly(rfg.deobf("Mods_for_Twitch:ExtraCells:1.7.10-2.5.0-14"))
+    compileOnly(deobf("Mods_for_Twitch:ExtraCells:1.7.10-2.5.0-14"))
     // Automagy 0.28.2
     compileOnly(deobfCurse("automagy-222153:2285272"))
 
