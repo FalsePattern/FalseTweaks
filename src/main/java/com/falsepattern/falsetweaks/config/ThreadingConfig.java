@@ -62,49 +62,12 @@ public class ThreadingConfig {
     @Config.LangKey("config.falsetweaks.threading.debug")
     @Config.DefaultBoolean(false)
     public static boolean EXTRA_DEBUG_INFO;
-    @Config.Comment("Classes added here will be automatically patched to use the threaded Tessellator." +
+    @Config.Comment("Classes added here will be automatically patched to use the threaded Tessellator.\n" +
+                    "FalseTweaks also includes an internal hardcoded list of patched classes.\n" +
                     "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)\n" +
                     "This patch covers most edge cases, however some implementations will still require manual patches.")
     @Config.LangKey("config.falsetweaks.threading.tessellatorUseReplacementTargets")
-    @Config.DefaultStringList({"appeng.client.render.*",
-                               "binnie.extratrees.block.DoorBlockRenderer",
-                               "biomesoplenty.client.render.blocks.*",
-                               "buildcraft.core.render.RenderingMarkers",
-                               "buildcraft.silicon.render.RenderLaserTable",
-                               "buildcraft.transport.render.PipeRendererWorld",
-                               "codechicken.lib.render.CCRenderState",
-                               "com.carpentersblocks.renderer.*",
-                               "com.enderio.core.client.render.*",
-                               "com.jaquadro.minecraft.storagedrawers.util.*",
-                               "com.rwtema.extrautils.block.render.*",
-                               "com.thecodewarrior.catwalks.render.*",
-                               "crazypants.enderio.machine.OverlayRenderer",
-                               "extracells.part.PartECBase",
-                               "extracells.render.block.RendererHardMEDrive$",
-                               "forestry.apiculture.render.RenderCandleBlock",
-                               "forestry.core.render.RenderOverlayBlock",
-                               "gcewing.architecture.BaseWorldRenderTarget",
-                               "gregtech.api.objects.GT_RenderedTexture",
-                               "gregtech.api.util.LightingHelper",
-                               "gregtech.common.render.GT_Renderer_Block",
-                               "ic2.core.block.RenderBlockCrop",
-                               "lotr.client.render.*",
-                               "lumien.randomthings.Client.Renderer.RenderWirelessLever",
-                               "mods.natura.client.LeverRender",
-                               "mods.railcraft.client.render.RenderFakeBlock",
-                               "net.malisis.core.renderer.MalisisRenderer",
-                               "net.minecraftforge.fluids.RenderBlockFluid",
-                               "openmods.renderer.FixedRenderBlocks",
-                               "tb.client.render.block.ThaumicRelocatorRenderer",
-                               "team.chisel.ctmlib.*",
-                               "thaumcraft.client.renderers.block.*",
-                               "thaumic.tinkerer.client.render.block.kami.RenderWarpGate",
-                               "thaumicenergistics.client.render.RenderBlockProviderBase",
-                               "thaumicenergistics.common.parts.ThEPartBase",
-                               "tuhljin.automagy.renderers.RenderBlockGlowOverlay",
-                               "twilightforest.client.renderer.blocks.RenderBlockTFCastleMagic",
-                               "vswe.stevescarts.Renders.RendererUpgrade",
-                               "vswe.stevesfactory.blocks.RenderCamouflage"})
+    @Config.DefaultStringList({})
     @Config.ListMaxLength(Integer.MAX_VALUE)
     @Config.StringMaxLength(65535)
     @Config.RequiresMcRestart

@@ -49,14 +49,60 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
 
     private static final Set<String> CLASS_NAMES = new HashSet<>();
     private static final List<String> PREFIXES = new ArrayList<>();
-    static {
-        for (val targetName: ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS) {
+
+    private static final String[] HARDCODED = new String[] {
+            "appeng.client.render.*",
+            "binnie.extratrees.block.DoorBlockRenderer",
+            "biomesoplenty.client.render.blocks.*",
+            "buildcraft.core.render.RenderingMarkers",
+            "buildcraft.silicon.render.RenderLaserTable",
+            "buildcraft.transport.render.PipeRendererWorld",
+            "codechicken.lib.render.CCRenderState",
+            "com.carpentersblocks.renderer.*",
+            "com.enderio.core.client.render.*",
+            "com.jaquadro.minecraft.storagedrawers.util.*",
+            "com.rwtema.extrautils.block.render.*",
+            "com.thecodewarrior.catwalks.render.*",
+            "crazypants.enderio.machine.OverlayRenderer",
+            "extracells.part.PartECBase",
+            "extracells.render.block.RendererHardMEDrive$",
+            "forestry.apiculture.render.RenderCandleBlock",
+            "forestry.core.render.RenderOverlayBlock",
+            "gcewing.architecture.BaseWorldRenderTarget",
+            "gregtech.api.objects.GT_RenderedTexture",
+            "gregtech.api.util.LightingHelper",
+            "gregtech.common.render.GT_Renderer_Block",
+            "ic2.core.block.RenderBlockCrop",
+            "lotr.client.render.*",
+            "lumien.randomthings.Client.Renderer.RenderWirelessLever",
+            "mods.natura.client.LeverRender",
+            "mods.railcraft.client.render.RenderFakeBlock",
+            "net.malisis.core.renderer.MalisisRenderer",
+            "net.minecraftforge.fluids.RenderBlockFluid",
+            "openmods.renderer.FixedRenderBlocks",
+            "tb.client.render.block.ThaumicRelocatorRenderer",
+            "team.chisel.ctmlib.*",
+            "thaumcraft.client.renderers.block.*",
+            "thaumic.tinkerer.client.render.block.kami.RenderWarpGate",
+            "thaumicenergistics.client.render.RenderBlockProviderBase",
+            "thaumicenergistics.common.parts.ThEPartBase",
+            "tuhljin.automagy.renderers.RenderBlockGlowOverlay",
+            "twilightforest.client.renderer.blocks.RenderBlockTFCastleMagic",
+            "vswe.stevescarts.Renders.RendererUpgrade",
+            "vswe.stevesfactory.blocks.RenderCamouflage",
+    };
+    public static void addAll(String... names) {
+        for (val targetName: names) {
             if (!targetName.endsWith("*")) {
                 CLASS_NAMES.add(targetName);
             } else {
                 PREFIXES.add(targetName.substring(0, targetName.length() - 1));
             }
         }
+    }
+    static {
+        addAll(HARDCODED);
+        addAll(ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS);
     }
 
     @Override
