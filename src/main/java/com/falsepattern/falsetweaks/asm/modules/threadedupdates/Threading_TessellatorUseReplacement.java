@@ -60,6 +60,7 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
             "codechicken.lib.render.CCRenderState",
             "com.carpentersblocks.renderer.*",
             "com.enderio.core.client.render.*",
+            "com.hbm.render.block.*",
             "com.jaquadro.minecraft.storagedrawers.util.*",
             "com.rwtema.extrautils.block.render.*",
             "com.thecodewarrior.catwalks.render.*",

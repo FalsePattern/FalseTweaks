@@ -102,6 +102,8 @@ dependencies {
     compileOnly(deobf("Mods_for_Twitch:ExtraCells:1.7.10-2.5.0-14"))
     // Automagy 0.28.2
     compileOnly(deobfCurse("automagy-222153:2285272"))
+    // NTM 1.0.27_X5027
+    compileOnly(deobfCurse("hbm-ntm-235439:5534354"))
 
     compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
 }
