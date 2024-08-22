@@ -118,7 +118,8 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
     @Redirect(method = "reset",
               at = @At(value = "INVOKE",
                        target = "Ljava/nio/ByteBuffer;clear()Ljava/nio/Buffer;"),
-              require = 1)
+              require = 0, //gtnhlib crashes the game if this is nonzero
+              expect = 1)
     private Buffer removeStaticBufferAccessOutsideSingleton(ByteBuffer buffer) {
         if (((Object) this) == Tessellator.instance) {
             return buffer.clear();
