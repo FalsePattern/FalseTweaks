@@ -83,10 +83,7 @@ public class ThreadingConfig {
                     "Custom threadlocal managed by a utility mod (returns the same instance per thread): com.example.ExampleRenderer:com.mymod.ThreadTools?threadExampleRenderer\n" +
                     "All of these MUST be zero argument methods!")
     @Config.LangKey("config.falsetweaks.threading.threadSafeISBRH")
-    @Config.DefaultStringList({
-            "net.minecraftforge.fluids.RenderBlockFluid:safe",
-            "com.falsepattern.rple.api.client.render.LampRenderer:safe"
-    })
+    @Config.DefaultStringList({})
     @Config.ListMaxLength(Integer.MAX_VALUE)
     @Config.StringMaxLength(65535)
     @Config.RequiresMcRestart

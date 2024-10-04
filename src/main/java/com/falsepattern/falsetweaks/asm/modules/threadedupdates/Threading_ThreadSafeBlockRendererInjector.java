@@ -57,8 +57,36 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
     private static final Handle LAMBDA_META_FACTORY = new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
                                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
 
-    static {
-        for (val entry: ThreadingConfig.THREAD_SAFE_ISBRHS) {
+    private static final String[] HARDCODED = new String[] {
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersBarrier:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersBed:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersBlock:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersButton:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersCollapsibleBlock:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersDaylightSensor:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersDoor:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersFlowerPot:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersGarageDoor:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersGate:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersHatch:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersLadder:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersLever:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersPressurePlate:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersSafe:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersSlope:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersStairs:default!",
+            "com.carpentersblocks.renderer.BlockHandlerCarpentersTorch:default!",
+            "com.falsepattern.rple.api.client.render.LampRenderer:safe",
+            "com.jaquadro.minecraft.storagedrawers.client.renderer.ControllerRenderer:default!",
+            "com.jaquadro.minecraft.storagedrawers.client.renderer.DrawersCustomRenderer:default!",
+            "com.jaquadro.minecraft.storagedrawers.client.renderer.DrawersRenderer:default!",
+            "com.jaquadro.minecraft.storagedrawers.client.renderer.FramingTableRenderer:default!",
+            "com.jaquadro.minecraft.storagedrawers.client.renderer.TrimCustomRenderer:default!",
+            "net.minecraftforge.fluids.RenderBlockFluid:safe",
+    };
+
+    public static void addAll(String... entries) {
+        for (val entry : entries) {
             val parts = entry.split(":");
             val className = parts[0];
             val internalName = className.replace('.', '/');
@@ -82,6 +110,10 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
                 SUPPLIERS.put(internalName, generator);
             }
         }
+    }
+    static {
+        addAll(HARDCODED);
+        addAll(ThreadingConfig.THREAD_SAFE_ISBRHS);
     }
 
     @Override
