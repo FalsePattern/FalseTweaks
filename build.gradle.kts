@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.7.5")
+    id("fpgradle-minecraft") version("0.8.2")
 }
 
 group = "com.falsepattern"
@@ -70,9 +70,9 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.2")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.4")
 
-    compileOnly(rfg.deobf("optifine:optifine:1.7.10_hd_u_e7"))
+    compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
     implementation("org.joml:joml:1.10.5")
 
