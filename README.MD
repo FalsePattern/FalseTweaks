@@ -9,6 +9,7 @@ This mod completely replaces Triangulator and AnimFix. Make sure you delete thes
 
 ## List of major features:
 - Multithreaded chunk rendering (compatible with OptiFine and FastCraft)
+- Dynamic Lights
 - Replaced minecraft's quad-based rendering with triangle-based rendering
 - Fixed ambient occlusion and smooth lighting (vanilla bugs MC-138211 and MC-43968)
 - Optimized beacon beam rendering
