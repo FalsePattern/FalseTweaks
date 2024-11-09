@@ -156,7 +156,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder,
             net.minecraftforge.client.ForgeHooksClient.onPostRenderWorld((WorldRenderer) (Object) this, pass);
         } else {
             if (!ft$getRendererUpdateTask().cancelled) {
-                ((ICapturableTessellator) Tessellator.instance).arch$addTessellatorVertexState(ft$getRendererUpdateTask().result[pass].renderedQuads());
+                ((ICapturableTessellator) ThreadedChunkUpdateHelper.mainThreadTessellator()).arch$addTessellatorVertexState(ft$getRendererUpdateTask().result[pass].renderedQuads());
             }
             postRenderBlocks(pass, entity);
         }

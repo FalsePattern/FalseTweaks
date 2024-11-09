@@ -73,6 +73,11 @@ public class ThreadingConfig {
     @Config.RequiresMcRestart
     public static String[] TESSELLATOR_USE_REPLACEMENT_TARGETS;
 
+    @Config.Comment("Patches every class with the thread safe tessellator code. Overrides TESSELLATOR_USE_REPLACEMENT_TARGETS")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean TESSELLATOR_REPLACE_EVERYTHING;
+
     @Config.Comment("ISimpleBlockRenderingHandler classes added here will be treated as thread-safe.\n" +
                     "In many cases, these classes should also be included in TESSELLATOR_USE_REPLACEMENT_TARGETS.\n" +
                     "Syntax: classname:constructor\n" +

@@ -31,8 +31,11 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadContainer;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import lombok.Getter;
 
+import lombok.Getter;
+import lombok.val;
+
+import java.util.List;
 import java.util.Map;
 
 @IFMLLoadingPlugin.TransformerExclusions(Tags.ROOT_PKG + ".asm")
@@ -47,12 +50,25 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
             if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
                 OcclusionCompat.executeConfigFixes();
                 MainThreadContainer.setMainThread();
+                pleaseDontBreakMyThreadedRendering();
             }
 
             if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
                 AnimFixCompat.executeConfigFixes();
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void pleaseDontBreakMyThreadedRendering() {
+        // Evil hack
+        try {
+            val theClass = Class.forName("com.gtnewhorizon.gtnhlib.core.transformer.TessellatorRedirectorTransformer");
+            val exclusionsField = theClass.getDeclaredField("TransformerExclusions");
+            exclusionsField.setAccessible(true);
+            val exclusions = (List<String>) exclusionsField.get(null);
+            exclusions.set(0, "");
+        } catch (Throwable ignored) {}
     }
 
     @Override

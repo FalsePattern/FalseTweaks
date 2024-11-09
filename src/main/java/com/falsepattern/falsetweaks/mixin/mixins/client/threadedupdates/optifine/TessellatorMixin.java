@@ -23,6 +23,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.optifine;
 
 import com.falsepattern.falsetweaks.modules.threadedupdates.ITessellatorOptiFineCompat;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,7 +62,7 @@ public abstract class TessellatorMixin implements ITessellatorOptiFineCompat {
                        target = "Lnet/minecraft/client/renderer/GLAllocation;createDirectByteBuffer(I)Ljava/nio/ByteBuffer;"),
               require = 1)
     private ByteBuffer noReallocateNonMainTessellators(int size) {
-        if ((Object) this != Tessellator.instance) {
+        if ((Object) this != ThreadedChunkUpdateHelper.mainThreadTessellator()) {
             return byteBuffer;
         }
         return GLAllocation.createDirectByteBuffer(size);

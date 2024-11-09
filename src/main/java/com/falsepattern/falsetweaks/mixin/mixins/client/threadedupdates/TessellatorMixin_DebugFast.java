@@ -63,7 +63,7 @@ public abstract class TessellatorMixin_DebugFast {
 
     @Unique
     private void ft$verifyThread() {
-        if (((Object) this) == Tessellator.instance) {
+        if (((Object) this) == ThreadedChunkUpdateHelper.mainThreadTessellator()) {
             if (!ThreadedChunkUpdateHelper.isMainThread()) {
                 val modC = Loader.instance().activeModContainer();
                 IllegalThreadingDrawing.logIllegalMan(modC.getName(), modC.getModId());

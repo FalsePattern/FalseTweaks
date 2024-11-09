@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -121,7 +122,7 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
               require = 0, //gtnhlib crashes the game if this is nonzero
               expect = 1)
     private Buffer removeStaticBufferAccessOutsideSingleton(ByteBuffer buffer) {
-        if (((Object) this) == Tessellator.instance) {
+        if (((Object) this) == ThreadedChunkUpdateHelper.mainThreadTessellator()) {
             return buffer.clear();
         }
         return buffer;

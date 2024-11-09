@@ -50,6 +50,11 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
     private static final Set<String> CLASS_NAMES = new HashSet<>();
     private static final List<String> PREFIXES = new ArrayList<>();
 
+    private static final boolean REPLACE_EVERYTHING;
+    private static final String[] REPLACE_EVERYTHING_WHITELIST = new String[] {
+            "com.falsepattern.falsetweaks.",
+    };
+
     private static final String[] HARDCODED = new String[] {
             "appeng.client.render.*",
             "appeng.facade.FacadePart",
@@ -115,6 +120,7 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
     static {
         addAll(HARDCODED);
         addAll(ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS);
+        REPLACE_EVERYTHING = ThreadingConfig.TESSELLATOR_REPLACE_EVERYTHING;
     }
 
     @Override
@@ -129,13 +135,21 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
 
     @Override
     public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
-        if (CLASS_NAMES.contains(className))
+        if (REPLACE_EVERYTHING) {
+            for (val entry: REPLACE_EVERYTHING_WHITELIST) {
+                if (className.startsWith(entry))
+                    return false;
+            }
             return true;
-        for (val prefix: PREFIXES) {
-            if (className.startsWith(prefix))
+        } else {
+            if (CLASS_NAMES.contains(className))
                 return true;
+            for (val prefix : PREFIXES) {
+                if (className.startsWith(prefix))
+                    return true;
+            }
+            return false;
         }
-        return false;
     }
 
     @Override

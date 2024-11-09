@@ -40,6 +40,6 @@ public class ThreadedChunkUpdates {
         if (ThreadedChunkUpdateHelper.instance != null) {
             return ThreadedChunkUpdateHelper.instance.getThreadTessellator();
         }
-        return null;
+        return ThreadedChunkUpdateHelper.mainThreadTessellator();
     }
 }

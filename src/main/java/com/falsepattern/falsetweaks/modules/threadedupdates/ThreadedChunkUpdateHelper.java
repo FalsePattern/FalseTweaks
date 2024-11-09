@@ -489,9 +489,13 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         // TODO: destroy state when chunks are reloaded or server is stopped
     }
 
+    public static Tessellator mainThreadTessellator() {
+        return Tessellator.instance;
+    }
+
     public Tessellator getThreadTessellator() {
         if (isMainThread()) {
-            return Tessellator.instance;
+            return mainThreadTessellator();
         } else {
             return threadTessellator.get();
         }

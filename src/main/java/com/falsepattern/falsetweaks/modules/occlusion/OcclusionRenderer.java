@@ -27,6 +27,7 @@ import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
 import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
 import lombok.val;
@@ -567,7 +568,7 @@ public class OcclusionRenderer {
     }
 
     private static void renderAABBTextured(AxisAlignedBB AABB) {
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = ThreadedChunkUpdateHelper.mainThreadTessellator();
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(1, 1, 1, 1);
         tessellator.setBrightness(240);

@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks;
 import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
 import makamys.neodymium.Neodymium;
@@ -124,7 +125,7 @@ public class Compat {
         if (ThreadingCompat.isThreadedChunkUpdatingEnabled()) {
             return ThreadedChunkUpdates.getThreadTessellator();
         }
-        return Tessellator.instance;
+        return ThreadedChunkUpdateHelper.mainThreadTessellator() ;
     }
 
     public static boolean isShaders() {
