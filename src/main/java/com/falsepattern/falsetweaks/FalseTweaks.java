@@ -26,6 +26,9 @@ package com.falsepattern.falsetweaks;
 import com.falsepattern.falsetweaks.proxy.CommonProxy;
 import lombok.val;
 
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiErrorScreen;
+import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -42,7 +45,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
      dependencies = "required-after:falsepatternlib@[1.4.2,);" +
-                    "after:neodymium@[0.3.2,);")
+                    "after:neodymium@[0.3.2,);"
+     )
 public class FalseTweaks {
 
     @SidedProxy(clientSide = Tags.ROOT_PKG + ".proxy.ClientProxy",
@@ -57,22 +61,21 @@ public class FalseTweaks {
         proxy.construct(e);
     }
 
-    private static Error idiot(String modname) {
-        val loudWarning = new StringBuilder();
-        for (int i = 0; i < 100; i++) {
-            loudWarning.append("REMOVE ").append(modname).append(" FROM YOUR MODS DIRECTORY, IT HAS BEEN MERGED INTO FALSETWEAKS\n");
-        }
-        return new Error(loudWarning.toString());
+    private static CustomModLoadingErrorDisplayException builtinMod(String modname) {
+        return new MultiLineLoadingException("Remove " + modname + " from your mods directory.\nIt has been merged into FalseTweaks!");
     }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         proxy.preInit(e);
         if (Loader.isModLoaded("animfix")) {
-            throw idiot("animfix");
+            throw builtinMod("animfix");
         }
         if (Loader.isModLoaded("triangulator")) {
-            throw idiot("triangulator");
+            throw builtinMod("triangulator");
+        }
+        if (Loader.isModLoaded("DynamicLights")) {
+            throw new MultiLineLoadingException("Remove the DynamicLights mod and restart the game!\nFalseTweaks has built-in dynamic lights support.");
         }
     }
 
@@ -89,5 +92,27 @@ public class FalseTweaks {
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent e) {
         proxy.loadComplete(e);
+    }
+
+    private static class MultiLineLoadingException extends CustomModLoadingErrorDisplayException {
+        private final String[] lines;
+        public MultiLineLoadingException(String text) {
+            lines = text.split("\n");
+        }
+
+        @Override
+        public void initGui(GuiErrorScreen errorScreen, FontRenderer fontRenderer) {
+
+        }
+
+        @Override
+        public void drawScreen(GuiErrorScreen errorScreen, FontRenderer fontRenderer, int mouseRelX, int mouseRelY, float tickTime) {
+            int offset = errorScreen.height / 2 - (lines.length * 5);
+            int x = errorScreen.width / 2;
+            for (val line: lines) {
+                errorScreen.drawCenteredString(fontRenderer, line, x, offset, 0xFFFFFF);
+                offset += 10;
+            }
+        }
     }
 }
