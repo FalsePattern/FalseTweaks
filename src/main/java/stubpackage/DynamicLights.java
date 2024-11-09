@@ -23,9 +23,65 @@
 package stubpackage;
 
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
 
 public class DynamicLights {
-    public static void update(RenderGlobal rg) {
 
+    public static void entityAdded(Entity entityIn, RenderGlobal renderGlobal) {
+
+    }
+
+    public static void entityRemoved(Entity entityIn, RenderGlobal renderGlobal) {
+
+    }
+
+    public static void update(RenderGlobal renderGlobal) {
+
+    }
+
+    private static void updateMapDynamicLights(RenderGlobal renderGlobal) {
+
+    }
+
+    public static int getCombinedLight(int x, int y, int z, int combinedLight) {
+        return 0;
+    }
+
+    public static int getCombinedLight(Entity entity, int combinedLight) {
+        return 0;
+    }
+
+    public static int getCombinedLight(double lightPlayer, int combinedLight) {
+        return 0;
+    }
+
+    public static double getLightLevel(int x, int y, int z) {
+        return 0;
+    }
+
+    public static int getLightLevel(ItemStack itemStack) {
+        return 0;
+    }
+
+    public static int getLightLevel(Entity entity) {
+        return 0;
+    }
+
+    public static void removeLights(RenderGlobal renderGlobal) {
+
+    }
+
+    public static void clear() {
+
+    }
+
+    public static int getCount() {
+        return 0;
+    }
+
+    public static ItemStack getItemStack(EntityItem entityItem) {
+        return null;
     }
 }

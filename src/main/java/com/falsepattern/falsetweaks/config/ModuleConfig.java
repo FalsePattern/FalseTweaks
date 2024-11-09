@@ -122,6 +122,12 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
 
+    @Config.Comment("Enables dynamic lights code injections.\n" +
+                    "See the dynamiclights config entry for more configurability.")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean DYNAMIC_LIGHTS;
+
     @Config.Comment("Gets rid of that obnoxious burst of minecart sounds when joining a world.")
     @Config.DefaultBoolean(true)
     public static boolean MINECART_EAR_BLAST_FIX;
@@ -147,6 +153,7 @@ public class ModuleConfig {
         TranslucentBlockLayersConfig.init();
         OcclusionConfig.init();
         ThreadingConfig.init();
+        DynamicLightsConfig.init();
     }
 
     public static boolean TRIANGULATOR() {

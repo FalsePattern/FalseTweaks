@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.config;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
@@ -39,6 +40,9 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
 
     private static Class<?>[] fetchConfigClasses() {
         val result = new ArrayList<Class<?>>();
+        if (ModuleConfig.DYNAMIC_LIGHTS && !Compat.optiFineHasDynamicLights()) {
+            result.add(DynamicLightsConfig.class);
+        }
         if (ModuleConfig.TRIANGULATOR()) {
             result.add(TriangulatorConfig.class);
         }

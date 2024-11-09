@@ -75,6 +75,7 @@ dependencies {
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
     implementation("org.joml:joml:1.10.5")
+    implementation("it.unimi.dsi:fastutil:8.5.13")
 
     compileOnly(deobfCurse("redstone-paste-67508:2211249"))
 

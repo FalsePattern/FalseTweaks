@@ -23,6 +23,7 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
@@ -34,14 +35,12 @@ import org.lwjgl.opengl.GL33;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiVideoSettings;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderList;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.RenderDistanceSorter;
@@ -649,7 +648,10 @@ public class OcclusionRenderer {
         playerX = view.posX;
         playerY = view.posY;
         playerZ = view.posZ;
-        OcclusionCompat.OptiFineCompat.updateDynamicLights(rg);
+        val dl = FTDynamicLights.frontend();
+        if (dl.enabled()) {
+            dl.update(rg);
+        }
         CameraInfo cam = CameraInfo.getInstance();
         cam.update(view, tick);
         val prof = rg.theWorld.theProfiler;

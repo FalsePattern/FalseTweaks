@@ -24,6 +24,9 @@
 package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.modules.dynlights.ChunkCacheFT;
+import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import shadersmod.client.Shaders;
 import stubpackage.ChunkCacheOF;
 import stubpackage.Config;
@@ -67,8 +70,26 @@ public class OptiFineCompat {
         }
         if (HAS_CHUNKCACHE) {
             return WrappedOF.createOFChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        } else if (ModuleConfig.DYNAMIC_LIGHTS) {
+            return new ChunkCacheFT(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
         } else {
             return new ChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        }
+    }
+
+    public static void renderStart(ChunkCache cc) {
+        if (HAS_CHUNKCACHE) {
+            WrappedOF.renderStart(cc);
+        } else if (cc instanceof ChunkCacheFT) {
+            ((ChunkCacheFT) cc).renderStart();
+        }
+    }
+
+    public static void renderFinish(ChunkCache cc) {
+        if (HAS_CHUNKCACHE) {
+            WrappedOF.renderFinish(cc);
+        } else if (cc instanceof ChunkCacheFT) {
+            ((ChunkCacheFT) cc).renderFinish();
         }
     }
 
@@ -82,6 +103,13 @@ public class OptiFineCompat {
     private static class WrappedOF {
         private static ChunkCache createOFChunkCache(World world, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, int subIn) {
             return new ChunkCacheOF(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
+        }
+
+        private static void renderStart(ChunkCache cc) {
+            ((ChunkCacheOF)cc).renderStart();
+        }
+        private static void renderFinish(ChunkCache cc) {
+            ((ChunkCacheOF)cc).renderFinish();
         }
     }
 }

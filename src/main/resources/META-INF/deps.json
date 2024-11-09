@@ -11,7 +11,8 @@
     },
     "obf": {
       "common": [
-        "org.joml:joml:1.10.5"
+        "org.joml:joml:1.10.5",
+        "it.unimi.dsi:fastutil:8.5.13"
       ],
       "client": [],
       "server": []

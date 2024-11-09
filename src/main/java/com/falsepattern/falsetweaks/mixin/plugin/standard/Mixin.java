@@ -37,13 +37,14 @@ import java.util.function.Predicate;
 import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_SAFETY_CHECKS;
 import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_THREADED_BLOCK_BOUNDS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.BSP;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.DYNLIGHTS_NONOF;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.THREADING;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.TRIANGULATOR;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.VOXELIZER;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_ANY_OPTIFINE;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_SHADERS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.NEODYMIUM;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.OPTIFINE_WITH_SHADERS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_ANY_OPTIFINE;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_SHADERS;
@@ -302,6 +303,18 @@ public enum Mixin implements IMixin {
 
     //endregion
 
+    //region Dynamic Lights Module
+
+    DynLights_ItemRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.ItemRendererMixin"),
+    DynLights_RenderGlobalMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.RenderGlobalMixin"),
+    DynLights_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldClientMixin"),
+    DynLights_WorldRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldRendererMixin"),
+    DynLights_NonThread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING.negate()), "dynlights.nonthread.WorldClientMixin"),
+    DynLights_Thread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING), "dynlights.thread.WorldClientMixin"),
+    DynLights_OF_DynamicLightsMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS).and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS), "dynlights.of.DynamicLightsMixin"),
+
+    //endregion Dynamic Lights Module
+
     //region Misc Modules
     ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),
 
@@ -347,6 +360,7 @@ public enum Mixin implements IMixin {
         public static final Predicate<List<ITargetedMod>> THREADING = condition(ModuleConfig::THREADED_CHUNK_UPDATES);
         public static final Predicate<List<ITargetedMod>> BSP = condition(ModuleConfig::BSP_SORTING);
         public static final Predicate<List<ITargetedMod>> VOXELIZER = condition(() -> ModuleConfig.VOXELIZER);
+        public static final Predicate<List<ITargetedMod>> DYNLIGHTS_NONOF = condition(() -> ModuleConfig.DYNAMIC_LIGHTS).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS);
     }
 }
 

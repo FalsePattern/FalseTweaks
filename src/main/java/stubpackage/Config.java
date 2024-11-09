@@ -38,4 +38,12 @@ public class Config {
     public static boolean isDynamicLights() {
         return false;
     }
+
+    public static boolean isDynamicLightsFast() {
+        return false;
+    }
+
+    public static boolean isDynamicHandLight() {
+        return false;
+    }
 }

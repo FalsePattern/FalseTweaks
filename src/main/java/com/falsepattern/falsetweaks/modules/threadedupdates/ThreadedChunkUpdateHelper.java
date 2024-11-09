@@ -422,6 +422,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         wro.ft$needsSort(false);
 
         if (chunkcache != null && !chunkcache.extendedLevelsInChunkCache()) {
+            OptiFineCompat.renderStart(chunkcache);
             RenderBlocks renderblocks = new RenderBlocks(chunkcache);
 
             for (int pass = 0; pass < 2; pass++) {
@@ -471,6 +472,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 task.result[pass].nextPass = nextPass;
             }
             ThreadedClientHooks.threadRenderPass.set(-1);
+            OptiFineCompat.renderFinish(chunkcache);
         }
         debugLog(() -> "Result of updating " + worldRendererToString(wr) + ": " + worldRendererUpdateTaskToString(wr));
     }

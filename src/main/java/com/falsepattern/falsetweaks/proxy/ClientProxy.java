@@ -29,6 +29,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
+import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.occlusion.leakfix.LeakFix;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
@@ -127,6 +128,10 @@ public class ClientProxy extends CommonProxy {
 
         if (ModuleConfig.TRIANGULATOR()) {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
+        }
+
+        if (ModuleConfig.DYNAMIC_LIGHTS) {
+            DynamicLightsDrivers.postInit();
         }
         Compat.applyCompatibilityTweaks();
 

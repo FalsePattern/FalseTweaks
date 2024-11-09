@@ -30,7 +30,6 @@ import com.falsepattern.falsetweaks.util.ConfigFixUtil;
 import lombok.val;
 import shadersmod.client.Shaders;
 import stubpackage.Config;
-import stubpackage.DynamicLights;
 import stubpackage.net.minecraft.client.renderer.EntityRenderer;
 
 import net.minecraft.client.gui.GuiOptionButton;
@@ -116,16 +115,6 @@ public class OcclusionCompat {
                 result.add(option);
             }
             return result.toArray(new GameSettings.Options[0]);
-        }
-
-        public static void updateDynamicLights(RenderGlobal rg) {
-            if (!Compat.optiFineHasDynamicLights()) {
-                return;
-            }
-            if (!Config.isDynamicLights()) {
-                return;
-            }
-            DynamicLights.update(rg);
         }
     }
 
