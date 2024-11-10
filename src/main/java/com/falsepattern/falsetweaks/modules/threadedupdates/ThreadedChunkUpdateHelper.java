@@ -38,6 +38,9 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.minecraft.block.Block;
@@ -199,6 +202,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         return flags;
     }
 
+    private static final IntSet alreadyWarnedRenderTypes = new IntArraySet();
+
     private static int doChunkUpdateForRenderPassBlock(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, RenderBlocks renderblocks, int x, int y, int z, int flags) {
         Block block = chunkcache.getBlock(x, y, z);
 
@@ -230,7 +235,17 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
             }
 
-            flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
+            try {
+                flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
+            } catch (Exception e) {
+                synchronized (alreadyWarnedRenderTypes) {
+                    val rt = block.getRenderType();
+                    if (!alreadyWarnedRenderTypes.contains(rt)) {
+                        alreadyWarnedRenderTypes.add(rt);
+                        Share.log.error("Exception while rendering a block!", e);
+                    }
+                }
+            }
 
             if (block.getRenderType() == 0 && x == playerX && y == playerY && z == playerZ) {
                 renderblocks.setRenderFromInside(true);
