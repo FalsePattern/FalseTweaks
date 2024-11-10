@@ -35,8 +35,12 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import lombok.Getter;
 import lombok.val;
 
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @IFMLLoadingPlugin.TransformerExclusions(Tags.ROOT_PKG + ".asm")
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
@@ -73,6 +77,15 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            try {
+                val f = LaunchClassLoader.class.getDeclaredField("transformerExceptions");
+                f.setAccessible(true);
+                @SuppressWarnings("unchecked") val s = (Set<String>) f.get(Launch.classLoader);
+                s.remove("com.gtnewhorizon.gtnhlib.client.renderer.TessellatorManager");
+            } catch (Throwable ignored) {
+            }
+        }
         return new String[]{Tags.ROOT_PKG + ".asm.FalseTweaksTransformer"};
     }
 

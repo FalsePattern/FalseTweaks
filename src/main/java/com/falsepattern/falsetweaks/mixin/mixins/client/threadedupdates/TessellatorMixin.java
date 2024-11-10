@@ -27,6 +27,8 @@ import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.OptiFineCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -116,16 +118,15 @@ public abstract class TessellatorMixin implements ICapturableTessellator {
      * @reason Allow using multiple tessellator instances concurrently by removing static field access in alternate
      * instances.
      */
-    @Redirect(method = "reset",
-              at = @At(value = "INVOKE",
+    @WrapOperation(method = "reset",
+                   at = @At(value = "INVOKE",
                        target = "Ljava/nio/ByteBuffer;clear()Ljava/nio/Buffer;"),
-              require = 0, //gtnhlib crashes the game if this is nonzero
-              expect = 1)
-    private Buffer removeStaticBufferAccessOutsideSingleton(ByteBuffer buffer) {
+                   require = 1)
+    private Buffer removeStaticBufferAccessOutsideSingleton(ByteBuffer instance, Operation<Buffer> original) {
         if (((Object) this) == ThreadedChunkUpdateHelper.mainThreadTessellator()) {
-            return buffer.clear();
+            instance.clear();
         }
-        return buffer;
+        return instance;
     }
 
     @Inject(method = "startDrawingQuads",

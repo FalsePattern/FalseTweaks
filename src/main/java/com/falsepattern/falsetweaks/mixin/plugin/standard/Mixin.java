@@ -237,6 +237,11 @@ public enum Mixin implements IMixin {
                                                          THREADING.and(require(TargetedMod.AUTOMAGY)),
                                                          "threadedupdates.automagy.RenderBlockGlowOverlayMixin"),
 
+    // GTNHLib
+    ThreadedUpdates_GTNHLib_TessellatorManagerMixin(Side.CLIENT,
+                                                    THREADING.and(require(TargetedMod.GTNHLIB)),
+                                                    "threadedupdates.gtnhlib.TessellatorManagerMixin"),
+
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module
