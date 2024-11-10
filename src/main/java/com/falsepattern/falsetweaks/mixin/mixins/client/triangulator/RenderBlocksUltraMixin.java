@@ -358,7 +358,11 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     private boolean shouldSideBeRenderedQuick(Block block, int x, int y, int z, Facing facing) {
-        return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
+        try {
+            return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
+        } catch (Throwable ignored) {
+            return true;
+        }
     }
 
     private boolean renderFace(Facing facing) {
