@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.modules.triangulator.calibration;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.text.FormattedText;
 import lombok.AccessLevel;
@@ -84,6 +85,9 @@ public class Calibration {
     @SneakyThrows
     @SubscribeEvent
     public void onSinglePlayer(EntityJoinWorldEvent e) {
+        if (TriangulatorConfig.SUPPRESS_CALIBRATION)
+            return;
+
         if (!(e.entity instanceof EntityPlayerSP)) {
             return;
         }

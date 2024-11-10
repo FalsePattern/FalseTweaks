@@ -53,6 +53,10 @@ public class TriangulatorConfig {
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
+    @Config.Comment("Disable the calibration chat prompt")
+    @Config.LangKey("config.falsetweaks.triangulator.suppress_calibration")
+    @Config.DefaultBoolean(false)
+    public static boolean SUPPRESS_CALIBRATION;
 
     @Config.Comment("The \"epsilon\" value for the block crack fix inside chunks. Set this a bit higher if you can\n" +
                     "still see light leaking between solid blocks in dark areas.\n" +
