@@ -42,7 +42,8 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
      dependencies = "required-after:falsepatternlib@[1.4.2,);" +
-                    "after:neodymium@[0.3.2,);"
+                    "after:neodymium@[0.3.2,);" +
+                    "after:gtnhlib@[0.5.20,);"
      )
 public class FalseTweaks {
 

@@ -33,6 +33,7 @@ import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
 import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
 import com.google.common.base.Preconditions;
+import com.gtnewhorizon.gtnhlib.api.CapturingTesselator;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -513,6 +514,16 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             return mainThreadTessellator();
         } else {
             return threadTessellator.get();
+        }
+    }
+
+    public static class GTNHLibCompat extends ThreadedChunkUpdateHelper {
+        @Override
+        public Tessellator getThreadTessellator() {
+            if (CapturingTesselator.isCapturing()) {
+                return CapturingTesselator.getThreadTesselator();
+            }
+            return super.getThreadTessellator();
         }
     }
 
