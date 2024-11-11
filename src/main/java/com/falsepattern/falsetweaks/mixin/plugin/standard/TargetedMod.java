@@ -54,7 +54,6 @@ public enum TargetedMod implements ITargetedMod {
     COMPUTRONICS("Computronics", false, contains("Computronics-")),
     EXTRA_CELLS("Extra Cells 2", false, contains("ExtraCells-")),
     AUTOMAGY("Automagy", false, contains("Automagy-")),
-    GTNHLIB("GTNHLib", false, contains("gtnhlib-"))
     ;
 
     public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITHOUT_SHADERS = require(OPTIFINE_WITHOUT_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));

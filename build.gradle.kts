@@ -75,7 +75,7 @@ dependencies {
 
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
-    compileOnly("com.github.GTNewHorizons:GTNHLib:0.5.19:dev")
+    compileOnly("com.github.GTNewHorizons:GTNHLib:0.5.20:api")
 
     implementation("org.joml:joml:1.10.5")
     implementation("it.unimi.dsi:fastutil:8.5.13")

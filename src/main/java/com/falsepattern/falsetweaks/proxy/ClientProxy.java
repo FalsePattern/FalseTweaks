@@ -39,6 +39,7 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateH
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSection;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSerializer;
+import cpw.mods.fml.common.Loader;
 import lombok.val;
 
 import net.minecraft.client.Minecraft;
@@ -104,7 +105,11 @@ public class ClientProxy extends CommonProxy {
     public void init(FMLInitializationEvent e) {
         super.init(e);
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper();
+            if (Loader.isModLoaded("gtnhlib")) {
+                ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper.GTNHLibCompat();
+            } else {
+                ThreadedChunkUpdateHelper.instance = new ThreadedChunkUpdateHelper();
+            }
             ThreadedChunkUpdateHelper.instance.init();
         }
     }
