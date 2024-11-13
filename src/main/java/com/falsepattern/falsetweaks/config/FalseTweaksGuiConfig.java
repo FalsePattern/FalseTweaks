@@ -26,42 +26,64 @@ package com.falsepattern.falsetweaks.config;
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.SimpleGuiConfig;
+import com.falsepattern.lib.config.ConfigurationManager;
 import lombok.val;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
+
+import cpw.mods.fml.client.config.DummyConfigElement;
+import cpw.mods.fml.client.config.DummyConfigElement.DummyCategoryElement;
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.config.IConfigElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class FalseTweaksGuiConfig extends SimpleGuiConfig {
+public class FalseTweaksGuiConfig extends GuiConfig {
     public FalseTweaksGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, Tags.MOD_ID, Tags.MOD_NAME, fetchConfigClasses());
+        super(parent,
+              getConfigElements(),
+              Tags.MOD_ID,
+              false,
+              false,
+              Tags.MOD_NAME + " Configuration"
+              );
     }
 
-    private static Class<?>[] fetchConfigClasses() {
-        val result = new ArrayList<Class<?>>();
-        if (ModuleConfig.DYNAMIC_LIGHTS && !Compat.optiFineHasDynamicLights()) {
-            result.add(DynamicLightsConfig.class);
+    @SuppressWarnings({"rawtypes"})
+    private static List<IConfigElement> getConfigElements() throws ConfigException {
+        val result = new ArrayList<IConfigElement>();
+        if (Compat.dynamicLightsPresent()) {
+            result.add(category("dynlights", DynamicLightsConfig.class));
         }
         if (ModuleConfig.TRIANGULATOR()) {
-            result.add(TriangulatorConfig.class);
+            result.add(category("triangulator", TriangulatorConfig.class));
         }
         if (ModuleConfig.ITEM_RENDER_LISTS) {
-            result.add(RenderListConfig.class);
+            result.add(category("item_render_lists", RenderListConfig.class));
         }
         if (ModuleConfig.VOXELIZER) {
-            result.add(VoxelizerConfig.class);
+            result.add(category("voxelizer", VoxelizerConfig.class));
         }
         if (ModuleConfig.ADVANCED_PROFILER) {
-            result.add(ProfilerConfig.class);
+            result.add(category("profiler", ProfilerConfig.class));
         }
         if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
-            result.add(TranslucentBlockLayersConfig.class);
+            result.add(category("translucent_block_layers_fix", TranslucentBlockLayersConfig.class));
         }
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            result.add(OcclusionConfig.class);
-            result.add(ThreadingConfig.class);
+            result.add(category("occlusion", OcclusionConfig.class));
+            result.add(category("threading", ThreadingConfig.class));
         }
-        return result.toArray(new Class<?>[0]);
+        return result;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static IConfigElement category(String name, Class<?> klass) throws ConfigException {
+        return new DummyCategoryElement(name,
+                                        "config.falsetweaks." + name + ".category",
+                                        ConfigurationManager.getConfigElementsMulti(klass));
     }
 }

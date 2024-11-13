@@ -41,7 +41,7 @@ public class ThreadingConfig {
     public static int CHUNK_UPDATE_THREADS;
 
     @Config.Comment("Disable this to use a slower, but more accurate thread safety check in the tessellator.")
-    @Config.LangKey("config.falsetweaks.threading.fast_safety")
+    @Config.LangKey("config.falsetweaks.threading.fastSafety")
     @Config.DefaultBoolean(true)
     public static boolean FAST_SAFETY_CHECKS;
 
@@ -62,6 +62,7 @@ public class ThreadingConfig {
     @Config.LangKey("config.falsetweaks.threading.debug")
     @Config.DefaultBoolean(false)
     public static boolean EXTRA_DEBUG_INFO;
+
     @Config.Comment("Classes added here will be automatically patched to use the threaded Tessellator.\n" +
                     "FalseTweaks also includes an internal hardcoded list of patched classes.\n" +
                     "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)\n" +
@@ -74,6 +75,7 @@ public class ThreadingConfig {
     public static String[] TESSELLATOR_USE_REPLACEMENT_TARGETS;
 
     @Config.Comment("Patches every class with the thread safe tessellator code. Overrides TESSELLATOR_USE_REPLACEMENT_TARGETS")
+    @Config.LangKey("config.falsetweaks.threading.tessellatorReplaceEverything")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean TESSELLATOR_REPLACE_EVERYTHING;
