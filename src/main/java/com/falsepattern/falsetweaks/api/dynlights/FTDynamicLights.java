@@ -26,7 +26,12 @@ public class FTDynamicLights {
     }
 
     @StableAPI.Expose
-    public static boolean isDynamicHandLight() {
-        return DynamicLightsDrivers.isDynamicHandLight();
+    public static boolean isDynamicHandLight(boolean forWorld) {
+        return DynamicLightsDrivers.isDynamicHandLight(forWorld);
+    }
+
+    @StableAPI.Expose
+    public static boolean isCircular() {
+        return DynamicLightsDrivers.isCircular();
     }
 }

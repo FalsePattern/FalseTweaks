@@ -10,6 +10,8 @@ import net.minecraft.item.ItemStack;
 @StableAPI(since = "__EXPERIMENTAL__")
 public interface DynamicLightsDriver {
     @StableAPI.Expose
+    DynamicLightsDriver forWorldMesh();
+    @StableAPI.Expose
     boolean enabled();
     @StableAPI.Expose
     void entityAdded(Entity entityIn, RenderGlobal renderGlobal);
@@ -22,19 +24,9 @@ public interface DynamicLightsDriver {
     @StableAPI.Expose
     int getCombinedLight(Entity entity, int combinedLight);
     @StableAPI.Expose
-    int getCombinedLight(double lightPlayer, int combinedLight);
-    @StableAPI.Expose
-    double getLightLevel(int x, int y, int z);
-    @StableAPI.Expose
-    int getLightLevel(ItemStack itemStack);
-    @StableAPI.Expose
-    int getLightLevel(Entity entity);
-    @StableAPI.Expose
     void removeLights(RenderGlobal renderGlobal);
     @StableAPI.Expose
     void clear();
     @StableAPI.Expose
     int getCount();
-    @StableAPI.Expose
-    ItemStack getItemStack(EntityItem entityItem);
 }

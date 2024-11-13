@@ -135,7 +135,7 @@ public class ClientProxy extends CommonProxy {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
         }
 
-        if (ModuleConfig.DYNAMIC_LIGHTS) {
+        if (Compat.dynamicLightsPresent()) {
             DynamicLightsDrivers.postInit();
         }
         Compat.applyCompatibilityTweaks();

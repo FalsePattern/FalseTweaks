@@ -77,6 +77,10 @@ public class Compat {
         return OPTIFINE;
     }
 
+    public static boolean dynamicLightsPresent() {
+        return ModuleConfig.DYNAMIC_LIGHTS || optiFineHasDynamicLights();
+    }
+
     public static boolean optiFineHasDynamicLights() {
         if (!optiFineInstalled()) {
             return false;

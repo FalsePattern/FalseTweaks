@@ -310,7 +310,8 @@ public enum Mixin implements IMixin {
     DynLights_WorldRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldRendererMixin"),
     DynLights_NonThread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING.negate()), "dynlights.nonthread.WorldClientMixin"),
     DynLights_Thread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING), "dynlights.thread.WorldClientMixin"),
-    DynLights_OF_DynamicLightsMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS).and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS), "dynlights.of.DynamicLightsMixin"),
+    DynLights_OF_ChunkCacheOFMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "dynlights.of.ChunkCacheOFMixin"),
+    DynLights_OF_DynamicLightsMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "dynlights.of.DynamicLightsMixin"),
 
     //endregion Dynamic Lights Module
 

@@ -10,6 +10,12 @@ import net.minecraft.item.ItemStack;
 public class DynamicLightsNoOp implements DynamicLightsDriver {
     public static final DynamicLightsNoOp INSTANCE = new DynamicLightsNoOp();
     private DynamicLightsNoOp() {}
+
+    @Override
+    public DynamicLightsDriver forWorldMesh() {
+        return INSTANCE;
+    }
+
     @Override
     public boolean enabled() {
         return false;
@@ -32,32 +38,12 @@ public class DynamicLightsNoOp implements DynamicLightsDriver {
 
     @Override
     public int getCombinedLight(int x, int y, int z, int combinedLight) {
-        return 0;
+        return combinedLight;
     }
 
     @Override
     public int getCombinedLight(Entity entity, int combinedLight) {
-        return 0;
-    }
-
-    @Override
-    public int getCombinedLight(double lightPlayer, int combinedLight) {
-        return 0;
-    }
-
-    @Override
-    public double getLightLevel(int x, int y, int z) {
-        return 0;
-    }
-
-    @Override
-    public int getLightLevel(ItemStack itemStack) {
-        return 0;
-    }
-
-    @Override
-    public int getLightLevel(Entity entity) {
-        return 0;
+        return combinedLight;
     }
 
     @Override
@@ -73,10 +59,5 @@ public class DynamicLightsNoOp implements DynamicLightsDriver {
     @Override
     public int getCount() {
         return 0;
-    }
-
-    @Override
-    public ItemStack getItemStack(EntityItem entityItem) {
-        return null;
     }
 }

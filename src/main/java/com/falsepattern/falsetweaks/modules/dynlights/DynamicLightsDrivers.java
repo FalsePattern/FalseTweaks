@@ -10,7 +10,7 @@ import stubpackage.Config;
 
 public class DynamicLightsDrivers {
     private static int backendPriority = 1000;
-    public static DynamicLightsDriver backend;
+    private static DynamicLightsDriver backend;
     public static DynamicLightsDriver frontend = DynamicLightsNoOp.INSTANCE;
     private static boolean initialized = false;
 
@@ -30,16 +30,10 @@ public class DynamicLightsDrivers {
 
     public static void postInit() {
         initialized = true;
-        if (Compat.optiFineHasDynamicLights()) {
-            frontend = new DynamicLightsOF();
-        } else if (DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled) {
-            if (backend == null) {
-                backend = new DynamicLights();
-            }
-            frontend = backend;
-        } else {
-            backend = frontend = DynamicLightsNoOp.INSTANCE;
+        if (backend == null) {
+            backend = DynamicLights.INSTANCE;
         }
+        frontend = backend;
     }
 
     public static boolean isDynamicLights() {
@@ -57,12 +51,20 @@ public class DynamicLightsDrivers {
             return ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE == DynamicLightsConfig.DynamicLightsState.Fast;
         }
     }
-    public static boolean isDynamicHandLight() {
+    public static boolean isDynamicHandLight(boolean forWorld) {
         if (Compat.optiFineHasDynamicLights()) {
-            return OptiFineCompat.isDynamicHandLight();
+            if (Compat.isShaders()) {
+                return OptiFineCompat.isDynamicHandLight();
+            } else {
+                return !(forWorld && Compat.neodymiumActive()) && OptiFineCompat.isDynamicLights();
+            }
         } else {
-            return ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled && DynamicLightsConfig.DYNAMIC_HAND_LIGHT;
+            return !(forWorld && Compat.neodymiumActive()) && ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled && DynamicLightsConfig.DYNAMIC_HAND_LIGHT;
         }
+    }
+
+    public static boolean isCircular() {
+        return DynamicLightsConfig.CIRCULAR;
     }
 
     private static class OptiFineCompat {

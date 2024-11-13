@@ -15,6 +15,10 @@ public class DynamicLightsConfig {
     @Config.LangKey("config.falsetweaks.dynlights.hand_light")
     @Config.DefaultBoolean(true)
     public static boolean DYNAMIC_HAND_LIGHT;
+    @Config.Comment("Set this to false if you want to make dynamic lights diamond-shaped, like block lights.")
+    @Config.LangKey("config.falsetweaks.dynlights.circular")
+    @Config.DefaultBoolean(true)
+    public static boolean CIRCULAR;
     static {
         ConfigurationManager.selfInit();
     }

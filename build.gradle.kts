@@ -108,6 +108,10 @@ dependencies {
     compileOnly(deobfCurse("automagy-222153:2285272"))
     // NTM 1.0.27_X5027
     compileOnly(deobfCurse("hbm-ntm-235439:5534354"))
+    // Xaero's Minimap v21.10.43
+    devOnlyNonPublishable(deobfCurse("xaeros_minimap-263420:5772981"))
+    // Xaero's World Map 1.14.1.32
+    devOnlyNonPublishable(deobfCurse("xaerosworldmap-317780:5658209"))
 
     compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
 }

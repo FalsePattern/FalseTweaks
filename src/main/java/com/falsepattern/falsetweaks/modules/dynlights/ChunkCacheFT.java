@@ -50,7 +50,7 @@ public class ChunkCacheFT extends ChunkCache {
         int light = super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
         val dl = FTDynamicLights.frontend();
         if (dl.enabled() && !this.getBlock(x, y, z).isOpaqueCube()) {
-            light = DynamicLightsDrivers.frontend.getCombinedLight(x, y, z, light);
+            light = dl.forWorldMesh().getCombinedLight(x, y, z, light);
         }
 
         return light;
