@@ -82,9 +82,6 @@ dependencies {
 
     compileOnly(deobfCurse("redstone-paste-67508:2211249"))
 
-    //V33a
-    compileOnly(deobfCurse("chromaticraft-235590:4721192"))
-
     //V33b
     compileOnly(deobfCurse("dragonapi-235591:4722480"))
 

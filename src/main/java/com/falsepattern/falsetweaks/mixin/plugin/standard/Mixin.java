@@ -79,11 +79,6 @@ public enum Mixin implements IMixin {
                                    TRIANGULATOR.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                    "triangulator.optifine.TessellatorOptiFineMixin"),
 
-    //ChromatiCraft
-    Tri_CCRuneRendererMixin(Side.CLIENT,
-                            TRIANGULATOR.and(require(TargetedMod.CHROMATICRAFT)),
-                            "triangulator.chromaticraft.RuneRendererMixin"),
-
     //RedstonePaste
     Tri_RedstonePasteHighlighterMixin(Side.CLIENT,
                                       TRIANGULATOR.and(require(TargetedMod.REDSTONEPASTE)),

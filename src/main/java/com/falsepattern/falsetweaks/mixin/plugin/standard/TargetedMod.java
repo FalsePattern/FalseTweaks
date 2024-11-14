@@ -43,7 +43,6 @@ public enum TargetedMod implements ITargetedMod {
     OPTIFINE_WITH_SHADERS("OptiFine with shaders", false, contains("optifine").and(OPTIFINE_SHADERSMOD_VERSIONS)),
     OPTIFINE_WITH_DYNAMIC_LIGHTS("OptiFine with dynamic lights", false, contains("optifine").and(OPTIFINE_DYNAMIC_LIGHTS_VERSIONS)),
     FASTCRAFT("FastCraft", false, contains("fastcraft")),
-    CHROMATICRAFT("ChromatiCraft", false, contains("chromaticraft")),
     REDSTONEPASTE("RedstonePaste", false, contains("redstonepaste")),
     APPARATUS("Apparatus", false, contains("apparatus")),
     RAILCRAFT("Railcraft", true, contains("railcraft")),

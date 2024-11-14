@@ -123,8 +123,13 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private Vector3ic frontDir;
     private boolean[] states;
     private double[] bounds;
-    @Setter
-    private boolean reusePreviousStates;
+    private boolean[] reusePreviousStates;
+
+    @Override
+    public void reusePreviousStates(boolean state) {
+        Arrays.fill(reusePreviousStates, state);
+    }
+
     @Setter
     private boolean enableMultiRenderReuse;
     private boolean disableCrackFix;
@@ -586,9 +591,6 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         drewSomething |= renderFace(Facing.XPOS);
 
         this.enableAO = false;
-        if (drewSomething && enableMultiRenderReuse) {
-            reusePreviousStates = true;
-        }
         return drewSomething;
     }
 
@@ -597,18 +599,23 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             require = 2)
     private void setupStates(CallbackInfo ci) {
         states = new boolean[6];
+        reusePreviousStates = new boolean[6];
     }
 
     private void reuse(Facing.Direction dir) {
-        if (reusePreviousStates) {
-            ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(states[dir.ordinal()]);
+        val ord = dir.ordinal();
+        if (reusePreviousStates[ord]) {
+            ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation(states[ord]);
         } else {
             states[dir.ordinal()] = ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation();
         }
+        if (enableMultiRenderReuse) {
+            reusePreviousStates[ord] = true;
+        }
     }
 
-    private void aoFix() {
-        if (reusePreviousStates) {
+    private void aoFix(Facing.Direction dir) {
+        if (reusePreviousStates[dir.ordinal()]) {
             return;
         }
         var avgTopLeft = avg(colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft);
@@ -643,7 +650,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_XNEG);
         reuse(Facing.Direction.FACE_XNEG);
     }
 
@@ -661,7 +668,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseXPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_XPOS);
         reuse(Facing.Direction.FACE_XPOS);
     }
 
@@ -679,7 +686,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseYNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_YNEG);
         reuse(Facing.Direction.FACE_YNEG);
     }
 
@@ -698,7 +705,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseYPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_YPOS);
         reuse(Facing.Direction.FACE_YPOS);
     }
 
@@ -717,7 +724,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseZNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_ZNEG);
         reuse(Facing.Direction.FACE_ZNEG);
     }
 
@@ -735,7 +742,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             at = @At(value = "HEAD"),
             require = 1)
     private void reuseZPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
-        aoFix();
+        aoFix(Facing.Direction.FACE_ZPOS);
         reuse(Facing.Direction.FACE_ZPOS);
     }
 
