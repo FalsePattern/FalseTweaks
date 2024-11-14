@@ -128,6 +128,11 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean DYNAMIC_LIGHTS;
 
+    @Config.Comment("Wraps block renderer code and tile entity renderer code in extra opengl state guards.")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean RENDERING_SAFETY;
+
     @Config.Comment("Gets rid of that obnoxious burst of minecart sounds when joining a world.")
     @Config.DefaultBoolean(true)
     public static boolean MINECART_EAR_BLAST_FIX;
@@ -154,6 +159,7 @@ public class ModuleConfig {
         OcclusionConfig.init();
         ThreadingConfig.init();
         DynamicLightsConfig.init();
+        RenderingSafetyConfig.init();
     }
 
     public static boolean TRIANGULATOR() {

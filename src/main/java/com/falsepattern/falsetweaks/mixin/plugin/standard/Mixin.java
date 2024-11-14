@@ -345,6 +345,10 @@ public enum Mixin implements IMixin {
     Debug_Occlusion_Neodymium_GPUMemoryManagerMixin(Side.CLIENT, THREADING.and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.GPUMemoryManagerMixin"),
     //endregion Debug
 
+    //region Render Safety
+    RenderingSafety_RenderingRegistryMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderingRegistryMixin"),
+    RenderingSafety_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.TileEntityRendererDispatcherMixin"),
+
     ;
     // @formatter:on
 

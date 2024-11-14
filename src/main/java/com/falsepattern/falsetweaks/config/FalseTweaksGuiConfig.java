@@ -77,6 +77,9 @@ public class FalseTweaksGuiConfig extends GuiConfig {
             result.add(category("occlusion", OcclusionConfig.class));
             result.add(category("threading", ThreadingConfig.class));
         }
+        if (ModuleConfig.RENDERING_SAFETY) {
+            result.add(category("rendering_safety", RenderingSafetyConfig.class));
+        }
         return result;
     }
 
