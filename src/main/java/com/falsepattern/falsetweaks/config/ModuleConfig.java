@@ -122,11 +122,23 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
 
-    @Config.Comment("Enables dynamic lights code injections.\n" +
-                    "See the dynamiclights config entry for more configurability.")
+    @Config.Comment({
+            "OptiFine-style dynamic lights, but works without OptiFine",
+            "Force-enables CHUNK_CACHE.",
+            "Implicitly enabled when OptiFine is installed for compatibility.",
+            "See the dynamiclights config entry for more configs.",
+    })
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean DYNAMIC_LIGHTS;
+
+    @Config.Comment({
+            "Replaces the renderer chunk cache with a more efficient version.",
+            "FPS impact: Faster chunk rendering"
+    })
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean FASTER_CHUNK_CACHE;
 
     @Config.Comment("Wraps block renderer code and tile entity renderer code in extra opengl state guards.")
     @Config.DefaultBoolean(true)
@@ -136,6 +148,7 @@ public class ModuleConfig {
     @Config.Comment("Gets rid of that obnoxious burst of minecart sounds when joining a world.")
     @Config.DefaultBoolean(true)
     public static boolean MINECART_EAR_BLAST_FIX;
+
     @Config.Comment("Improves the performance of the minecraft sky mesh.\n" +
                     "Also fixes the weird white lines that some OptiFine shaderpacks get with huge render distances.\n" +
                     "FPS impact: Negligible gain")

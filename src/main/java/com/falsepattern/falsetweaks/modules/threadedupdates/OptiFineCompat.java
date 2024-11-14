@@ -25,8 +25,7 @@ package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.modules.dynlights.ChunkCacheFT;
-import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
+import com.falsepattern.falsetweaks.modules.cc.ChunkCacheFT;
 import shadersmod.client.Shaders;
 import stubpackage.ChunkCacheOF;
 import stubpackage.Config;
@@ -70,7 +69,7 @@ public class OptiFineCompat {
         }
         if (HAS_CHUNKCACHE) {
             return WrappedOF.createOFChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
-        } else if (ModuleConfig.DYNAMIC_LIGHTS) {
+        } else if (ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE) {
             return new ChunkCacheFT(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
         } else {
             return new ChunkCache(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);

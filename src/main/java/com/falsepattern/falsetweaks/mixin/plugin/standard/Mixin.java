@@ -302,13 +302,15 @@ public enum Mixin implements IMixin {
     DynLights_ItemRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.ItemRendererMixin"),
     DynLights_RenderGlobalMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.RenderGlobalMixin"),
     DynLights_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldClientMixin"),
-    DynLights_WorldRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldRendererMixin"),
     DynLights_NonThread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING.negate()), "dynlights.nonthread.WorldClientMixin"),
     DynLights_Thread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING), "dynlights.thread.WorldClientMixin"),
-    DynLights_OF_ChunkCacheOFMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "dynlights.of.ChunkCacheOFMixin"),
     DynLights_OF_DynamicLightsMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "dynlights.of.DynamicLightsMixin"),
-
     //endregion Dynamic Lights Module
+
+    //region Chunk Cache Module
+    CC_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS), "cc.WorldRendererMixin"),
+    CC_OF_ChunkCacheOFMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "cc.of.ChunkCacheOFMixin"),
+    //endregion Chunk Cache Module
 
     //region Misc Modules
     ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),

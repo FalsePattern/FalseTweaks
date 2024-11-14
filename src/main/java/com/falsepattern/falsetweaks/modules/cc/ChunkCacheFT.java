@@ -1,13 +1,12 @@
-package com.falsepattern.falsetweaks.modules.dynlights;
+package com.falsepattern.falsetweaks.modules.cc;
 
-import com.falsepattern.falsetweaks.api.dynlights.DynamicLightsDriver;
 import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
+import com.falsepattern.falsetweaks.modules.dynlights.ArrayCache;
 import lombok.val;
 
 import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.world.ChunkCache;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class ChunkCacheFT extends ChunkCache {

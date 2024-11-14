@@ -1,11 +1,10 @@
-package com.falsepattern.falsetweaks.mixin.mixins.client.dynlights;
+package com.falsepattern.falsetweaks.mixin.mixins.client.cc;
 
-import com.falsepattern.falsetweaks.modules.dynlights.ChunkCacheFT;
+import com.falsepattern.falsetweaks.modules.cc.ChunkCacheFT;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
