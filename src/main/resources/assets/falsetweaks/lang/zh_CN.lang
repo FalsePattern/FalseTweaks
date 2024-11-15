@@ -66,6 +66,7 @@ config.falsetweaks.threading.logISBRHErrors=记录 ISimpleBlockRenderingHandler 
 #TODO config.falsetweaks.rendering_safety.category.tooltip=OpenGL state leakage fixes for inventory block renderers and tile entities
 #TODO config.falsetweaks.rendering_safety.block=Enable for inventory blocks
 #TODO config.falsetweaks.rendering_safety.tesr=Enable for tile entities
+#TODO config.falsetweaks.rendering_safety.item=Enable for items
 
 gui.triangulator.calibrationdescription.line0=点击切换按钮直到
 gui.triangulator.calibrationdescription.line1=黄色和蓝色方块看起来一样，

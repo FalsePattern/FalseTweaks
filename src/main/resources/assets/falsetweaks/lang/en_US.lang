@@ -65,6 +65,7 @@ config.falsetweaks.rendering_safety.category=Rendering Safety
 config.falsetweaks.rendering_safety.category.tooltip=OpenGL state leakage fixes for inventory block renderers and tile entities
 config.falsetweaks.rendering_safety.block=Enable for inventory blocks
 config.falsetweaks.rendering_safety.tesr=Enable for tile entities
+config.falsetweaks.rendering_safety.item=Enable for items
 
 gui.triangulator.calibrationdescription.line0=Click the Toggle button until the
 gui.triangulator.calibrationdescription.line1=yellow and the blue squares look the same,

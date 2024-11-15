@@ -1,6 +1,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.rendersafety;
 
 import com.falsepattern.falsetweaks.config.RenderingSafetyConfig;
+import com.falsepattern.falsetweaks.modules.rendersafety.SafetyUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import lombok.val;
@@ -9,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -22,10 +24,8 @@ public abstract class RenderingRegistryMixin {
                    require = 1)
     private void wrapBlock(ISimpleBlockRenderingHandler instance, Block block, int metadata, int modelID, RenderBlocks renderer, Operation<Void> original) {
         val enable = RenderingSafetyConfig.ENABLE_BLOCK;
-        if (enable)
-            GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        SafetyUtil.pre(enable);
         original.call(instance, block, metadata, modelID, renderer);
-        if (enable)
-            GL11.glPopAttrib();
+        SafetyUtil.post(enable);
     }
 }

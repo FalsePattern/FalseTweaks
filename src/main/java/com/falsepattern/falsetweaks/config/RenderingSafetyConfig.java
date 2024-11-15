@@ -15,6 +15,10 @@ public class RenderingSafetyConfig {
     @Config.LangKey("config.falsetweaks.rendering_safety.tesr")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_TESR;
+    @Config.Comment("Enable safety wrapper for items.")
+    @Config.LangKey("config.falsetweaks.rendering_safety.item")
+    @Config.DefaultBoolean(true)
+    public static boolean ENABLE_ITEM;
 
     static {
         ConfigurationManager.selfInit();
