@@ -231,7 +231,8 @@ public class DynamicLights implements DynamicLightsDriver {
         return MathUtil.clamp(lightLevelMax, 0.0, 15.0);
     }
 
-    private static int getLightLevel(ItemStack itemStack) {
+    // Note: Public for easier compat with https://github.com/Tesseract4D/OffhandLights, do not refactor.
+    public static int getLightLevel(ItemStack itemStack) {
         if (itemStack == null) {
             return 0;
         } else {
