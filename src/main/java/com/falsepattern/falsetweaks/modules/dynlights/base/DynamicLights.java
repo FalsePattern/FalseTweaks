@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -36,7 +39,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 public class DynamicLights implements DynamicLightsDriver {
     public static final DynamicLights INSTANCE = new DynamicLights(false);
     private static final DynamicLights FOR_WORLD = new DynamicLights(true);
-    private static final DynamicLightsMap mapDynamicLights = new DynamicLightsMap();
+
+    private static final Int2ObjectMap<DynamicLight> mapDynamicLights = new Int2ObjectArrayMap<>(1024);
     private static final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     private static long timeUpdateMs = 0L;
@@ -115,11 +119,8 @@ public class DynamicLights implements DynamicLightsDriver {
             val lock = busyWaitWriteLock();
             try {
                 updateMapDynamicLights(renderGlobal);
-                if (mapDynamicLights.size() > 0) {
-                    List<DynamicLight> dynamicLights = mapDynamicLights.valueList();
-
-                    for(int i = 0; i < dynamicLights.size(); ++i) {
-                        DynamicLight dynamicLight = (DynamicLight)dynamicLights.get(i);
+                if (!mapDynamicLights.isEmpty()) {
+                    for (val dynamicLight : mapDynamicLights.values()) {
                         dynamicLight.update(renderGlobal);
                     }
                 }
@@ -183,10 +184,7 @@ public class DynamicLights implements DynamicLightsDriver {
         double lightLevelMax = 0.0;
         val lock = busyWaitReadLock();
         try {
-            List<DynamicLight> dynamicLights = mapDynamicLights.valueList();
-
-            for(int i = 0; i < dynamicLights.size(); ++i) {
-                DynamicLight dynamicLight = dynamicLights.get(i);
+            for (val dynamicLight: mapDynamicLights.values()) {
                 if (!DynamicLightsDrivers.isDynamicHandLight(forWorld) && dynamicLight.getEntity() == rve) {
                     continue;
                 }
@@ -304,14 +302,11 @@ public class DynamicLights implements DynamicLightsDriver {
     public void removeLights(RenderGlobal renderGlobal) {
         val lock = busyWaitWriteLock();
         try {
-            List<DynamicLight> dynamicLights = mapDynamicLights.valueList();
-
-            for(int i = 0; i < dynamicLights.size(); ++i) {
-                DynamicLight dynamicLight = (DynamicLight)dynamicLights.get(i);
+            for (val dynamicLight: mapDynamicLights.values()) {
                 dynamicLight.updateLitChunks(renderGlobal);
             }
 
-            dynamicLights.clear();
+            mapDynamicLights.clear();
         } finally {
             lock.unlock();
         }
