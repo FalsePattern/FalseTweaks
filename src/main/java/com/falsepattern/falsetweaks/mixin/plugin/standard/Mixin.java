@@ -345,6 +345,7 @@ public enum Mixin implements IMixin {
     //region Render Safety
     RenderingSafety_ForgeHooksClientMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.ForgeHooksClientMixin"),
     RenderingSafety_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.ItemRendererMixin"),
+    RenderingSafety_RenderHelperMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderHelperMixin"),
     RenderingSafety_RenderingRegistryMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderingRegistryMixin"),
     RenderingSafety_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(avoid(TargetedMod.DRAGONAPI)), "rendersafety.TileEntityRendererDispatcherMixin"),
     RenderingSafety_DragonAPI_TileEntityRenderEventMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(require(TargetedMod.DRAGONAPI)), "rendersafety.dragonapi.TileEntityRenderEventMixin"),
