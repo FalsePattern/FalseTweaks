@@ -1,12 +1,8 @@
 package com.falsepattern.falsetweaks.modules.dynlights.base;
 
 import com.falsepattern.falsetweaks.Compat;
-import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
-import com.falsepattern.falsetweaks.modules.dynlights.BlockPosUtil;
 import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import com.falsepattern.lib.util.MathUtil;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import lombok.Getter;
 import lombok.val;
 
@@ -15,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class DynamicLight {

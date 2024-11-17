@@ -4,11 +4,9 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.api.dynlights.DynamicLightsDriver;
 import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
-import com.falsepattern.falsetweaks.config.DynamicLightsConfig;
 import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import com.falsepattern.lib.util.MathUtil;
 
-import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

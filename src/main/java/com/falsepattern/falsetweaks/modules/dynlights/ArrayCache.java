@@ -1,12 +1,9 @@
 package com.falsepattern.falsetweaks.modules.dynlights;
 
-import it.unimi.dsi.fastutil.Stack;
 import it.unimi.dsi.fastutil.objects.AbstractObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.lang.reflect.Array;
-import java.util.ArrayDeque;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ArrayCache<T> {
