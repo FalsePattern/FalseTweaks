@@ -68,6 +68,13 @@ config.falsetweaks.threading.logISBRHErrors=记录 ISimpleBlockRenderingHandler 
 #TODO config.falsetweaks.rendering_safety.tesr=Enable for tile entities
 #TODO config.falsetweaks.rendering_safety.item=Enable for items
 
+#TODO config.falsetweaks.optispam.category=Optifine log spam fixes
+#TODO config.falsetweaks.optispam.category.tooltip=Suppresses a bunch of log spam coming from optifine's shader system. As a bonus, this also makes shader loading faster!
+#TODO config.falsetweaks.optispam.ambiguous=Silence ambiguous shader options warnings
+#TODO config.falsetweaks.optispam.block_not_found=Block not found
+#TODO config.falsetweaks.optispam.invalid_id=Invalid IDs
+#TODO config.falsetweaks.optispam.custom_uniforms=Custom uniforms
+
 gui.triangulator.calibrationdescription.line0=点击切换按钮直到
 gui.triangulator.calibrationdescription.line1=黄色和蓝色方块看起来一样，
 gui.triangulator.calibrationdescription.line2=然后按应用按钮。

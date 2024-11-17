@@ -80,6 +80,9 @@ public class FalseTweaksGuiConfig extends GuiConfig {
         if (ModuleConfig.RENDERING_SAFETY) {
             result.add(category("rendering_safety", RenderingSafetyConfig.class));
         }
+        if (ModuleConfig.OPTIFINE_LOGSPAM_FIX && Compat.optiFineHasShaders()) {
+            result.add(category("optispam", OptiSpamConfig.class));
+        }
         return result;
     }
 

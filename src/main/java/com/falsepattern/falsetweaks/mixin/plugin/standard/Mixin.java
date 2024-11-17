@@ -350,7 +350,14 @@ public enum Mixin implements IMixin {
     RenderingSafety_RenderingRegistryMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderingRegistryMixin"),
     RenderingSafety_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(avoid(TargetedMod.DRAGONAPI)), "rendersafety.TileEntityRendererDispatcherMixin"),
     RenderingSafety_DragonAPI_TileEntityRenderEventMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(require(TargetedMod.DRAGONAPI)), "rendersafety.dragonapi.TileEntityRenderEventMixin"),
+    //endregion Render Safety
 
+    //region OptiFine Spam Fix
+    OptiSpam_BlockAliasesMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.BlockAliasesMixin"),
+    OptiSpam_ConnectedParserMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ConnectedParserMixin"),
+    OptiSpam_ShaderExpressionResolverMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderExpressionResolverMixin"),
+    OptiSpam_ShaderPackParserMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderPackParserMixin"),
+    //endregion OptiFine Spam Fix
     ;
     // @formatter:on
 

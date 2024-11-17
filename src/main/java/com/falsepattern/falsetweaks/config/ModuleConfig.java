@@ -162,6 +162,11 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean OVERLAY_CRASH_FIX;
 
+    @Config.Comment("Suppresses logspam coming from optifine's shader system. Makes shaderpack reloads faster.")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean OPTIFINE_LOGSPAM_FIX;
+
     static {
         ConfigurationManager.selfInit();
         ProfilerConfig.init();
@@ -173,6 +178,7 @@ public class ModuleConfig {
         ThreadingConfig.init();
         DynamicLightsConfig.init();
         RenderingSafetyConfig.init();
+        OptiSpamConfig.init();
     }
 
     public static boolean TRIANGULATOR() {
