@@ -328,6 +328,7 @@ public enum Mixin implements IMixin {
 
     RealmShutUp_GuiMainMenuMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_GuiMainMenuMixin"),
     RealmShutUp_RealmsBridgeMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_RealmsBridgeMixin"),
+    OverlayCrashFix_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OVERLAY_CRASH_FIX), "misc.OverlayCrashFix_ItemRendererMixin"),
     //endregion Misc Modules
 
     //region Particles

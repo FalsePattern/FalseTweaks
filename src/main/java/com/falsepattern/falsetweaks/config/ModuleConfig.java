@@ -156,11 +156,11 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean SKY_MESH_OPTIMIZATION;
 
-    @Config.Comment("Fixes an occasional crash that happens when joining worlds due to a null-safety issue in biome code.\n" +
+    @Config.Comment("Fixes an occasional crash that happens when trying to render a GUI block overlay (more common with optifine shaders enabled.)\n" +
                     "FPS impact: Zero")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
-    public static boolean GETBIOME_CRASH_FIX;
+    public static boolean OVERLAY_CRASH_FIX;
 
     static {
         ConfigurationManager.selfInit();
