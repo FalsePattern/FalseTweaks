@@ -34,7 +34,7 @@ public class DynamicLight {
     }
 
     public void update(RenderGlobal renderGlobal) {
-        val isHandLight = entity == Minecraft.getMinecraft().renderViewEntity && Compat.neodymiumActive();
+        val isHandLight = entity == Minecraft.getMinecraft().renderViewEntity && Compat.neodymiumActive() && !Compat.isShaders();
         if (!isHandLight && DynamicLightsDrivers.isDynamicLightsFast()) {
             long timeNowMs = System.currentTimeMillis();
             if (timeNowMs < this.timeCheckMs + 500L) {
