@@ -1,11 +1,11 @@
 # Configs
 # Notice for translators: <config key>.tooltip allows you to localize the tooltip for the hover text even if it's not present in this file
 
-#TODO config.falsetweaks.dynlights.category=Dynamic lights
-#TODO config.falsetweaks.dynlights.category.tooltip=Dynamic lights
-#TODO config.falsetweaks.dynlights.state=Mode
-#TODO config.falsetweaks.dynlights.hand_light=Hand light
-#TODO config.falsetweaks.dynlights.circular=Circular
+config.falsetweaks.dynlights.category=动态光源
+config.falsetweaks.dynlights.category.tooltip=动态光源
+config.falsetweaks.dynlights.state=动态光源模式
+config.falsetweaks.dynlights.hand_light=手持光源
+config.falsetweaks.dynlights.circular=圆形
 
 config.falsetweaks.triangulator.category=Triangulator
 #TODO config.falsetweaks.triangulator.category.tooltip=Miscellaneous block rendering bug fixes
