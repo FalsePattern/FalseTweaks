@@ -40,7 +40,7 @@ config.falsetweaks.translucent_block_layers_fix.category.tooltip=修复偶尔出
 config.falsetweaks.translucent_block_layers_fix.epsilon=epsilon
 
 config.falsetweaks.occlusion.category=遮挡
-#TODO config.falsetweaks.occlusion.category.tooltip=Improved chunk rendering scheduler
+config.falsetweaks.occlusion.category.tooltip=改进的区块渲染调度器
 config.falsetweaks.occlusion.dynamic=动态区块更新
 config.falsetweaks.occlusion.updates_per_second=每秒更新区块数
 config.falsetweaks.occlusion.cache_size_target=目标缓存大小
@@ -54,13 +54,12 @@ config.falsetweaks.threading.neodymium=钕(Neodymium)多线程
 config.falsetweaks.threading.queuesize=每线程更新队列大小
 config.falsetweaks.threading.noblock=禁用阻塞区块更新
 config.falsetweaks.threading.tessellatorUseReplacementTargets=细分器使用替代目标
-#TODO replace line below with: config.falsetweaks.threading.logISBRHErrors=Log renderer registration errors
-config.falsetweaks.threading.logISBRHErrors=记录 ISimpleBlockRenderingHandler 注册错误
-#TODO config.falsetweaks.threading.threadSafeISBRH=Thread Safe ISBRHs
-#TODO config.falsetweaks.threading.debug=Extra debug info
-#TODO config.falsetweaks.threading.fastThreadedBlockBounds=Fast threaded block bounds
-#TODO config.falsetweaks.threading.fastSafety=Faster safety checks
-#TODO config.falsetweaks.threading.tessellatorReplaceEverything=Tessellator replace everything
+config.falsetweaks.threading.logISBRHErrors=Log renderer registration errorsconfig.falsetweaks.threading.logISBRHErrors=记录渲染器注册错误
+config.falsetweaks.threading.threadSafeISBRH=线程安全的ISBRH
+config.falsetweaks.threading.debug=额外调试信息
+config.falsetweaks.threading.fastThreadedBlockBounds=快速多线程方块边界
+config.falsetweaks.threading.fastSafety=更快的安全检查
+config.falsetweaks.threading.tessellatorReplaceEverything=Tessellator 替换所有图形
 
 config.falsetweaks.rendering_safety.category=渲染安全
 config.falsetweaks.rendering_safety.category.tooltip=用于物品栏方块渲染器和方块实体的 OpenGL 状态泄漏修复
@@ -73,7 +72,7 @@ config.falsetweaks.optispam.category.tooltip=抑制来自 Optifine 着色器系�
 config.falsetweaks.optispam.ambiguous=静默不明确的的着色器选项警告
 config.falsetweaks.optispam.block_not_found=未找到方块
 config.falsetweaks.optispam.invalid_id=无效 ID
-config.falsetweaks.optispam.custom_uniforms=Custom uniforms
+config.falsetweaks.optispam.custom_uniforms=自定义统一变量
 
 gui.triangulator.calibrationdescription.line0=点击切换按钮直到
 gui.triangulator.calibrationdescription.line1=黄色和蓝色方块看起来一样，
