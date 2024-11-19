@@ -3,25 +3,25 @@
 
 config.falsetweaks.dynlights.category=动态光源
 config.falsetweaks.dynlights.category.tooltip=动态光源
-config.falsetweaks.dynlights.state=动态光源模式
+config.falsetweaks.dynlights.state=模式
 config.falsetweaks.dynlights.hand_light=手持光源
 config.falsetweaks.dynlights.circular=圆形
 
 config.falsetweaks.triangulator.category=Triangulator
-#TODO config.falsetweaks.triangulator.category.tooltip=Miscellaneous block rendering bug fixes
+config.falsetweaks.triangulator.category.tooltip=杂项方块渲染漏洞修复
 config.falsetweaks.triangulator.enable_quad_triangulation=启用四边形三角化
 config.falsetweaks.triangulator.fix_block_crack=方块边缘裂缝修复
 config.falsetweaks.triangulator.render_hook_compat_mode=渲染钩子兼容模式
-#TODO config.falsetweaks.triangulator.suppress_calibration=Suppress calibration prompt
+config.falsetweaks.triangulator.suppress_calibration=禁用校准提示
 config.falsetweaks.triangulator.block_crack_fix_epsilon=方块裂缝修复 epsilon
 config.falsetweaks.triangulator.block_crack_fix_blacklist=方块裂缝修复黑名单
 
 config.falsetweaks.item_render_lists.category=物品渲染列表
-#TODO config.falsetweaks.item_render_lists.category.tooltip=Optimizations for items in your hand or in the world
+config.falsetweaks.item_render_lists.category.tooltip=优化手中或世界中的物品
 config.falsetweaks.item_render_lists.max_buffer_size=最大缓冲区大小
 
 config.falsetweaks.voxelizer.category=Voxelizer
-#TODO config.falsetweaks.voxelizer.category.tooltip=3D item rendering framework
+config.falsetweaks.voxelizer.category.tooltip=3D 物品渲染框架
 config.falsetweaks.voxelizer.forced_layers=强制层
 config.falsetweaks.voxelizer.mesh_optimization_strategy=网格优化策略
 config.falsetweaks.voxelizer.3d_rails=3D 铁轨
@@ -32,11 +32,11 @@ config.falsetweaks.voxelizer.rail_thickness=铁轨厚度
 config.falsetweaks.voxelizer.verbose_log=详细日志
 
 config.falsetweaks.profiler.category=性能分析器
-#TODO config.falsetweaks.profiler.category.tooltip=Better than vanilla profiler
+config.falsetweaks.profiler.category.tooltip=比原版更好的性能分析器
 config.falsetweaks.profiler.dump=在分析结束时导出到文件
 
 config.falsetweaks.translucent_block_layers_fix.category=透明块层修复
-#TODO config.falsetweaks.translucent_block_layers_fix.category.tooltip=Fixes an occasional visual bug that happens with overlapping transparent blocks
+config.falsetweaks.translucent_block_layers_fix.category.tooltip=修复偶尔出现于重叠透明方块的视觉错误
 config.falsetweaks.translucent_block_layers_fix.epsilon=epsilon
 
 config.falsetweaks.occlusion.category=遮挡
@@ -48,9 +48,9 @@ config.falsetweaks.occlusion.render_distance=最大渲染距离
 config.falsetweaks.occlusion.aggressive_clipping_helper=激进的裁剪辅助优化
 
 config.falsetweaks.threading.category=多线程更新
-#TODO config.falsetweaks.threading.category.tooltip=Multi-threaded chunk rendering
+config.falsetweaks.threading.category.tooltip=多线程区块渲染
 config.falsetweaks.threading.threads=区块更新线程
-config.falsetweaks.threading.neodymium=铷（Neodymium） 多线程
+config.falsetweaks.threading.neodymium=钕(Neodymium)多线程
 config.falsetweaks.threading.queuesize=每线程更新队列大小
 config.falsetweaks.threading.noblock=禁用阻塞区块更新
 config.falsetweaks.threading.tessellatorUseReplacementTargets=细分器使用替代目标
@@ -62,18 +62,18 @@ config.falsetweaks.threading.logISBRHErrors=记录 ISimpleBlockRenderingHandler 
 #TODO config.falsetweaks.threading.fastSafety=Faster safety checks
 #TODO config.falsetweaks.threading.tessellatorReplaceEverything=Tessellator replace everything
 
-#TODO config.falsetweaks.rendering_safety.category=Rendering Safety
-#TODO config.falsetweaks.rendering_safety.category.tooltip=OpenGL state leakage fixes for inventory block renderers and tile entities
-#TODO config.falsetweaks.rendering_safety.block=Enable for inventory blocks
-#TODO config.falsetweaks.rendering_safety.tesr=Enable for tile entities
-#TODO config.falsetweaks.rendering_safety.item=Enable for items
+config.falsetweaks.rendering_safety.category=渲染安全
+config.falsetweaks.rendering_safety.category.tooltip=用于物品栏方块渲染器和方块实体的 OpenGL 状态泄漏修复
+config.falsetweaks.rendering_safety.block=为物品栏方块启用
+config.falsetweaks.rendering_safety.tesr=为方块实体启用
+config.falsetweaks.rendering_safety.item=为物品启用
 
-#TODO config.falsetweaks.optispam.category=Optifine log spam fixes
-#TODO config.falsetweaks.optispam.category.tooltip=Suppresses a bunch of log spam coming from optifine's shader system. As a bonus, this also makes shader loading faster!
-#TODO config.falsetweaks.optispam.ambiguous=Silence ambiguous shader options warnings
-#TODO config.falsetweaks.optispam.block_not_found=Block not found
-#TODO config.falsetweaks.optispam.invalid_id=Invalid IDs
-#TODO config.falsetweaks.optispam.custom_uniforms=Custom uniforms
+config.falsetweaks.optispam.category=高清修复(Optifine)日志冗余修复
+config.falsetweaks.optispam.category.tooltip=抑制来自 Optifine 着色器系统的大量日志冗余。加快了着色器加载速度！
+config.falsetweaks.optispam.ambiguous=静默不明确的的着色器选项警告
+config.falsetweaks.optispam.block_not_found=未找到方块
+config.falsetweaks.optispam.invalid_id=无效 ID
+config.falsetweaks.optispam.custom_uniforms=Custom uniforms
 
 gui.triangulator.calibrationdescription.line0=点击切换按钮直到
 gui.triangulator.calibrationdescription.line1=黄色和蓝色方块看起来一样，
@@ -84,7 +84,7 @@ gui.triangulator.calibration.apply=应用
 chat.triangulator.calibration.message=FalseTweaks 的 Triangulator 模块尚未校准。点击这条消息进行校准。
 chat.triangulator.calibrated.message=Triangulator 模块成功校准。
 gui.falsetweaks.occlusion.debug.title=[FalseTweaks 遮挡引擎]
-gui.falsetweaks.occlusion.debug.ndcompat=-铷（Neodymium） 兼容模式-
+gui.falsetweaks.occlusion.debug.ndcompat=-钕(Neodymium)兼容模式-
 gui.falsetweaks.occlusion.debug.ndaggressive=~~~Neodymium magnetized~~~
 gui.falsetweaks.occlusion.debug.total=总区块渲染器：%1d
 gui.falsetweaks.occlusion.debug.active=活动区块渲染器：%1d
