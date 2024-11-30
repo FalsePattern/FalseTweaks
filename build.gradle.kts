@@ -105,6 +105,8 @@ dependencies {
     compileOnly(deobfCurse("automagy-222153:2285272"))
     // NTM 1.0.27_X5027
     compileOnly(deobfCurse("hbm-ntm-235439:5534354"))
+    // TechGuns 1.2
+    compileOnly(deobfCurse("techguns-244201:2429662"))
 
     compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
 }

@@ -231,6 +231,11 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_Automagy_RenderBlockGlowOverlayMixin(Side.CLIENT,
                                                          THREADING.and(require(TargetedMod.AUTOMAGY)),
                                                          "threadedupdates.automagy.RenderBlockGlowOverlayMixin"),
+
+    // Techguns
+    ThreadedUpdates_Techguns_RenderLadderMixin(Side.CLIENT,
+                                               THREADING.and(require(TargetedMod.TECHGUNS)),
+                                               "threadedupdates.techguns.RenderLadderMixin"),
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module
