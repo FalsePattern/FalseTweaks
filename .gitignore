@@ -1,6 +1,5 @@
-
-# Created by https://www.toptal.com/developers/gitignore/api/intellij+all,gradle,forgegradle,java
-# Edit at https://www.toptal.com/developers/gitignore?templates=intellij+all,gradle,forgegradle,java
+# Created by https://www.toptal.com/developers/gitignore/api/gradle,forgegradle,kotlin,java,scala,intellij+all
+# Edit at https://www.toptal.com/developers/gitignore?templates=gradle,forgegradle,kotlin,java,scala,intellij+all
 
 ### ForgeGradle ###
 # Minecraft client/server files
@@ -70,6 +69,9 @@ atlassian-ide-plugin.xml
 # Cursive Clojure plugin
 .idea/replstate.xml
 
+# SonarLint plugin
+.idea/sonarlint/
+
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
@@ -83,20 +85,13 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 ### Intellij+all Patch ###
-# Ignores the whole .idea folder and all .iml files
-# See https://github.com/joeblau/gitignore.io/issues/186 and https://github.com/joeblau/gitignore.io/issues/360
+# Ignore everything but code style settings and run configurations
+# that are supposed to be shared within teams.
 
-.idea/
+.idea/*
 
-# Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-249601023
-
-*.iml
-modules.xml
-.idea/misc.xml
-*.ipr
-
-# Sonarlint plugin
-.idea/sonarlint
+!.idea/codeStyles
+!.idea/runConfigurations
 
 ### Java ###
 # Compiled class file
@@ -122,10 +117,29 @@ modules.xml
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+replay_pid*
+
+### Kotlin ###
+# Compiled class file
+
+# Log file
+
+# BlueJ files
+
+# Mobile Tools for Java (J2ME)
+
+# Package Files #
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+
+### Scala ###
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 
 ### Gradle ###
 .gradle
-build/
+**/build/
+!src/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -133,14 +147,11 @@ gradle-app.setting
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
+# Avoid ignore Gradle wrappper properties
+!gradle-wrapper.properties
+
 # Cache of project
 .gradletasknamecache
-
-# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
-# gradle/wrapper/gradle-wrapper.properties
-
-### Gradle Patch ###
-**/build/
 
 # Eclipse Gradle plugin generated files
 # Eclipse Core
@@ -148,6 +159,10 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# End of https://www.toptal.com/developers/gitignore/api/intellij+all,gradle,forgegradle,java
+### Gradle Patch ###
+# Java heap dump
+*.hprof
 
-srgmap.cfg
+# End of https://www.toptal.com/developers/gitignore/api/gradle,forgegradle,kotlin,java,scala,intellij+all
+
+!.idea/copyright
