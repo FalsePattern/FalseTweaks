@@ -33,7 +33,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.shader.TesselatorVertexState;
 
-@Mixin(Tessellator.class)
+@Mixin(value = Tessellator.class,
+       priority = 900) // Hodgepodge conflict
 public abstract class TessellatorBSPSortingMixin implements IBSPTessellator {
     /**
      * @author FalsePattern

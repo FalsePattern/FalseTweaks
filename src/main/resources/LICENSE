@@ -83,3 +83,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 Some parts of the threading codebase use logic adapted from Angelica (GTNH Team), which is also
 licensed under the GNU Lesser General Public License, Version 3.
 --------------------------------
+The mipmapfix memoized exponent logic has been ported from HodgePodge (GTNH Team), which is also
+licensed under the GNU Lesser General Public License, Version 3.
+--------------------------------
