@@ -30,11 +30,13 @@ import com.falsepattern.lib.config.ConfigurationManager;
 @Config(modid = Tags.MOD_ID,
         category = "translucent_block_layers_fix")
 public class TranslucentBlockLayersConfig {
-    @Config.Comment("The \"epsilon\" value used when shifting translucent block geometry closer to the camera.\n" +
-                    "Values too low will cause near blocks to suffer from Z-Fighting,\n" +
-                    "values too high will cause translucent geometry to leak through far away blocks.\n" +
-                    "Advanced setting.\n" +
-                    "FPS impact: Unknown")
+    @Config.Comment({
+            "The \"epsilon\" value used when shifting translucent block geometry closer to the camera.",
+            "Values too low will cause near blocks to suffer from Z-Fighting,",
+            "values too high will cause translucent geometry to leak through far away blocks.",
+            "Advanced setting.",
+            "FPS impact: Unknown"
+    })
     @Config.LangKey("config.falsetweaks.misc.translucent_block_layers_fix_epsilon")
     @Config.DefaultDouble(0.001)
     @Config.RangeDouble(min = 0,

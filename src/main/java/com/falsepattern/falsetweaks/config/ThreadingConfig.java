@@ -31,13 +31,16 @@ import com.falsepattern.lib.config.ConfigurationManager;
 @Config(modid = Tags.MOD_ID,
         category = "threading")
 public class ThreadingConfig {
-    @Config.Comment("The number of threads to use for chunk building.\n" +
-                    "0   - For very low-end CPUs. Makes chunk building run on a throttled thread to avoid freezing your pc\n" +
-                    "1   - Recommended\n" +
-                    "2-8 - For higher-end systems, with diminishing results")
+    @Config.Comment({
+            "The number of threads to use for chunk building.",
+            "0   - For very low-end CPUs. Makes chunk building run on a throttled thread to avoid freezing your pc",
+            "1   - Recommended",
+            "2-8 - For higher-end systems, with diminishing results"
+    })
     @Config.LangKey("config.falsetweaks.threading.threads")
     @Config.DefaultInt(1)
-    @Config.RangeInt(min = 0, max = 8)
+    @Config.RangeInt(min = 0,
+                     max = 8)
     public static int CHUNK_UPDATE_THREADS;
 
     @Config.Comment("Disable this to use a slower, but more accurate thread safety check in the tessellator.")
@@ -45,28 +48,34 @@ public class ThreadingConfig {
     @Config.DefaultBoolean(true)
     public static boolean FAST_SAFETY_CHECKS;
 
-    @Config.Comment("EXPERIMENTAL AND UNSUPPORTED FEATURE!\n" +
-                    "DO NOT REPORT CRASHES IF YOU TURN THIS ON!\n\n" +
-                    "This enabled deep integration with Neodymium.\n" +
-                    "Needs a game restart to change.\n" +
-                    "Only effective if Neodymium is installed.\n" +
-                    "FPS Impact: Unknown")
+    @Config.Comment({
+            "EXPERIMENTAL AND UNSUPPORTED FEATURE!",
+            "DO NOT REPORT CRASHES IF YOU TURN THIS ON!\n",
+            "This enabled deep integration with Neodymium.",
+            "Needs a game restart to change.",
+            "Only effective if Neodymium is installed.",
+            "FPS Impact: Unknown"
+    })
     @Config.LangKey("config.falsetweaks.threading.neodymium")
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS;
 
-    @Config.Comment("Enables some extra debug info for error stacktraces.\n" +
-                    "EXPENSIVE! Only turn this on for debugging purposes!\n" +
-                    "FPS Impact: significant slowdown")
+    @Config.Comment({
+            "Enables some extra debug info for error stacktraces.",
+            "EXPENSIVE! Only turn this on for debugging purposes!",
+            "FPS Impact: significant slowdown"
+    })
     @Config.LangKey("config.falsetweaks.threading.debug")
     @Config.DefaultBoolean(false)
     public static boolean EXTRA_DEBUG_INFO;
 
-    @Config.Comment("Classes added here will be automatically patched to use the threaded Tessellator.\n" +
-                    "FalseTweaks also includes an internal hardcoded list of patched classes.\n" +
-                    "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)\n" +
-                    "This patch covers most edge cases, however some implementations will still require manual patches.")
+    @Config.Comment({
+            "Classes added here will be automatically patched to use the threaded Tessellator.",
+            "FalseTweaks also includes an internal hardcoded list of patched classes.",
+            "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)",
+            "This patch covers most edge cases, however some implementations will still require manual patches."
+    })
     @Config.LangKey("config.falsetweaks.threading.tessellatorUseReplacementTargets")
     @Config.DefaultStringList({})
     @Config.ListMaxLength(Integer.MAX_VALUE)
@@ -80,15 +89,17 @@ public class ThreadingConfig {
     @Config.RequiresMcRestart
     public static boolean TESSELLATOR_REPLACE_EVERYTHING;
 
-    @Config.Comment("ISimpleBlockRenderingHandler classes added here will be treated as thread-safe.\n" +
-                    "In many cases, these classes should also be included in TESSELLATOR_USE_REPLACEMENT_TARGETS.\n" +
-                    "Syntax: classname:constructor\n" +
-                    "Examples:\n" +
-                    "Implicitly thread-safe (stateless):                                                 com.example.ExampleRenderer:safe\n" +
-                    "Default constructor (aka: new ExampleRenderer()):                                   com.example.ExampleRenderer:default!\n" +
-                    "Custom constructor supplied by a utility mod (creates a new instance every call):   com.example.ExampleRenderer:com.mymod.ThreadTools!createExampleRenderer\n" +
-                    "Custom threadlocal managed by a utility mod (returns the same instance per thread): com.example.ExampleRenderer:com.mymod.ThreadTools?threadExampleRenderer\n" +
-                    "All of these MUST be zero argument methods!")
+    @Config.Comment({
+            "ISimpleBlockRenderingHandler classes added here will be treated as thread-safe.",
+            "In many cases, these classes should also be included in TESSELLATOR_USE_REPLACEMENT_TARGETS.",
+            "Syntax: classname:constructor",
+            "Examples:",
+            "Implicitly thread-safe (stateless):                                                 com.example.ExampleRenderer:safe",
+            "Default constructor (aka: new ExampleRenderer()):                                   com.example.ExampleRenderer:default!",
+            "Custom constructor supplied by a utility mod (creates a new instance every call):   com.example.ExampleRenderer:com.mymod.ThreadTools!createExampleRenderer",
+            "Custom threadlocal managed by a utility mod (returns the same instance per thread): com.example.ExampleRenderer:com.mymod.ThreadTools?threadExampleRenderer",
+            "All of these MUST be zero argument methods!"
+    })
     @Config.LangKey("config.falsetweaks.threading.threadSafeISBRH")
     @Config.DefaultStringList({})
     @Config.ListMaxLength(Integer.MAX_VALUE)

@@ -46,58 +46,74 @@ public class VoxelizerConfig {
     private static final Set<Class<?>> knownClassExcludes = new HashSet<>();
     @Config.Ignore
     private static final Set<Class<?>> knownClassIncludes = new HashSet<>();
-    @Config.Comment("You can use this property to fix any incorrectly detected overlays.\n" +
-                    "Syntax: texture_name=layer, where layer is the multiplier.\n" +
-                    "The default behaviour is that if the texture name ends with _overlay, its layer is set to 1,\n" +
-                    "This can be used to override that.\n" +
-                    "For reference: layer 0 is regular rendering, layer 1 is on top layer 0, layer 2 is on top of layer 1, etc.\n" +
-                    "Also supports negatives, but going below -1 is undefined behaviour. (-1 is used for the liquid inside potions by default)")
+    @Config.Comment({
+            "You can use this property to fix any incorrectly detected overlays.",
+            "Syntax: texture_name=layer, where layer is the multiplier.",
+            "The default behaviour is that if the texture name ends with _overlay, its layer is set to 1,",
+            "This can be used to override that.",
+            "For reference: layer 0 is regular rendering, layer 1 is on top layer 0, layer 2 is on top of layer 1, etc.",
+            "Also supports negatives, but going below -1 is undefined behaviour. (-1 is used for the liquid inside potions by default)"
+    })
     @Config.DefaultStringList({"potion_overlay=-1"})
     @Config.LangKey("config.falsetweaks.voxelizer.forced_layers")
     public static String[] FORCED_LAYERS;
 
-    @Config.Comment("The merging strategy preset to use for the voxelized mesh optimization.\n" +
-                    "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.\n" +
-                    "FPS impact: Depends on setup.")
+    @Config.Comment({
+            "The merging strategy preset to use for the voxelized mesh optimization.",
+            "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.",
+            "FPS impact: Depends on setup."
+    })
     @Config.DefaultEnum("Best_2")
     @Config.LangKey("config.falsetweaks.voxelizer.mesh_optimization_strategy")
     public static StrategyPreset MESH_OPTIMIZATION_STRATEGY_PRESET;
 
-    @Config.Comment("Makes rails 3-dimensional. Doesn't require game restart.\n" +
-                    "FPS impact: basically none")
+    @Config.Comment({
+            "Makes rails 3-dimensional. Doesn't require game restart.",
+            "FPS impact: basically none"
+    })
     @Config.LangKey("config.falsetweaks.voxelizer.3d_rails")
     @Config.DefaultBoolean(true)
     public static boolean RAILS_3D;
 
-    @Config.Comment("If set to true, the mesh compiler will print out detailed information when textures are compiled\n" +
-                    "into meshes.")
+    @Config.Comment({
+            "If set to true, the mesh compiler will print out detailed information when textures are compiled",
+            "into meshes."
+    })
     @Config.LangKey("config.falsetweaks.voxelizer.debug_mesh_compilation")
     @Config.DefaultBoolean(false)
     public static boolean DEBUG_MESH_COMPILATION;
 
-    @Config.Comment("Item textures to disable voxelization for. Used to fix issues with certain items.\n" +
-                    "This is a PREFIX check, so you can also just specify a mod ID, and all items from it will skip getting voxelized.\n" +
-                    "Needs a game restart to apply changes (cached for performance).\n" +
-                    "Syntax: modid:texturename")
+    @Config.Comment({
+            "Item textures to disable voxelization for. Used to fix issues with certain items.",
+            "This is a PREFIX check, so you can also just specify a mod ID, and all items from it will skip getting voxelized.",
+            "Needs a game restart to apply changes (cached for performance).",
+            "Syntax: modid:texturename"
+    })
     @Config.DefaultStringList({"avaritia:infinity"})
     @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
     public static String[] EXCLUSION_LIST;
 
-    @Config.Comment("Classes to disable voxelization for. Used to fix issues with certain items.\n" +
-                    "This is an instanceof check, so superclasses are also checked.\n" +
-                    "Needs a game restart to apply changes (cached for performance).")
+    @Config.Comment({
+            "Classes to disable voxelization for. Used to fix issues with certain items.",
+            "This is an instanceof check, so superclasses are also checked.",
+            "Needs a game restart to apply changes (cached for performance)."
+    })
     @Config.DefaultStringList({"cofh.lib.render.IFluidOverlayItem"})
     @Config.LangKey("config.falsetweaks.voxelizer.class_exclusion_list")
     public static String[] CLASS_EXCLUSION_LIST;
 
-    @Config.Comment("The thickness of the 3D rails. Doesn't require game restart. 1 is vanilla thickness.\n" +
-                    "FPS impact: basically none")
+    @Config.Comment({
+            "The thickness of the 3D rails. Doesn't require game restart. 1 is vanilla thickness.",
+            "FPS impact: basically none"
+    })
     @Config.LangKey("config.falsetweaks.voxelizer.rail_thickness")
     @Config.DefaultDouble(1)
     public static double RAIL_THICKNESS;
 
-    @Config.Comment("Extremely verbose debug logging. This will spam your log.\n" +
-                    "Only useful on resource pack reloads.")
+    @Config.Comment({
+            "Extremely verbose debug logging. This will spam your log.",
+            "Only useful on resource pack reloads."
+    })
     @Config.LangKey("config.falsetweaks.voxelizer.verbose_log")
     @Config.DefaultBoolean(false)
     public static boolean VERBOSE_LOG;

@@ -30,12 +30,15 @@ import com.falsepattern.lib.config.ConfigurationManager;
 @Config(modid = Tags.MOD_ID,
         category = "item_render_lists")
 public class RenderListConfig {
-    @Config.Comment("The total amount of renderlists FalseTweaks may allocate for optimized item rendering.\n" +
-                    "When the limit is exceeded, the render list that was used the longest time ago gets released.\n" +
-                    "Bigger buffer sizes use more VRAM, but also get a higher average performance.\n" +
-                    "256 should be good enough for most modded games, and going above 1024 is not recommended unless\n" +
-                    "you have a lot of VRAM.\n" + "(Only useful if you have ITEM_RENDERLISTS turned on)\n" +
-                    "FPS impact: zero when tuned right")
+    @Config.Comment({
+            "The total amount of renderlists FalseTweaks may allocate for optimized item rendering.",
+            "When the limit is exceeded, the render list that was used the longest time ago gets released.",
+            "Bigger buffer sizes use more VRAM, but also get a higher average performance.",
+            "256 should be good enough for most modded games, and going above 1024 is not recommended unless",
+            "you have a lot of VRAM.",
+            "(Only useful if you have ITEM_RENDERLISTS turned on)",
+            "FPS impact: zero when tuned right"
+    })
     @Config.RangeInt(min = 64)
     @Config.LangKey("config.falsetweaks.item_render_lists.max_buffer_size")
     @Config.DefaultInt(256)
