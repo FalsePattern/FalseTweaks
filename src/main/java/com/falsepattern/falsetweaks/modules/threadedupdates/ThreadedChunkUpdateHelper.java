@@ -264,9 +264,10 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     public static boolean isMainThread() {
+        val thread = Thread.currentThread();
         if (MAIN_THREAD == null)
-            throw new AssertionError("Main thread not setup, mad.");
-        return Thread.currentThread() == MAIN_THREAD;
+            return thread.getName().equals("Client thread");
+        return thread == MAIN_THREAD;
     }
 
     private static String worldRendererToString(WorldRenderer wr) {

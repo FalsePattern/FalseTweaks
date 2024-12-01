@@ -157,6 +157,7 @@ public enum Mixin implements IMixin {
 
     //region Threaded Chunk Updates
     ThreadedUpdates_GameSettings(Side.CLIENT, THREADING, "threadedupdates.GameSettingsMixin"),
+    ThreadedUpdates_OpenGLHelperMixin(Side.CLIENT, THREADING, "threadedupdates.OpenGLHelperMixin"),
     ThreadedUpdates_ChunkProviderClientMixin(Side.CLIENT, THREADING, "threadedupdates.ChunkProviderClientMixin"),
     ThreadedUpdates_ForgeHooksClientMixin(Side.CLIENT, THREADING, "threadedupdates.ForgeHooksClientMixin"),
     ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, THREADING, "threadedupdates.RenderBlocksMixin"),
