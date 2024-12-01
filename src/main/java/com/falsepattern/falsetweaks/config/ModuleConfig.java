@@ -94,6 +94,11 @@ public class ModuleConfig {
                     "FPS impact: Unknown")
     @Config.DefaultBoolean(false)
     public static boolean BLOCK_LAYER_TRANSPARENCY_FIX;
+    @Config.Comment({
+            "Particle water transparency fix"
+    })
+    @Config.DefaultBoolean(true)
+    public static boolean PARTICLE_TRANSPARENCY_FIX;
 
     @Config.Comment("3D particles (experimental)\n" +
                     "FPS impact: Unknown")

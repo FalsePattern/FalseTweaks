@@ -21,7 +21,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.particles;
+package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.particle.EffectRenderer;
 
 @Mixin(EffectRenderer.class)
-public abstract class EffectRendererMixin {
+public abstract class ParticleTransparency_EffectRendererMixin {
     @Redirect(method = "renderParticles",
               at = @At(value = "INVOKE",
                        target = "Lorg/lwjgl/opengl/GL11;glDepthMask(Z)V",

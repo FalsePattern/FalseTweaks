@@ -351,13 +351,12 @@ public enum Mixin implements IMixin {
     RealmShutUp_GuiMainMenuMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_GuiMainMenuMixin"),
     RealmShutUp_RealmsBridgeMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_RealmsBridgeMixin"),
     OverlayCrashFix_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OVERLAY_CRASH_FIX), "misc.OverlayCrashFix_ItemRendererMixin"),
+    ParticleTransparency_EffectRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.PARTICLE_TRANSPARENCY_FIX), "misc.ParticleTransparency_EffectRendererMixin"),
     //endregion Misc Modules
 
-    //region Particles
-
-    Particles_EntityDiggingFXMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "particles.EntityDiggingFXMixin"),
-    Particles_EffectRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "particles.EffectRendererMixin"),
-    //endregion Particles
+    //region Cubic Particles
+    Particles_EntityDiggingFXMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "cubicparticles.EntityDiggingFXMixin"),
+    //endregion Cubic Particles
 
     //region Debug
     Debug_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> Debug.ENABLED), "debug.TileEntityRendererDispatcherMixin"),

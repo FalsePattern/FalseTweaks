@@ -21,7 +21,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.particles;
+package com.falsepattern.falsetweaks.modules.cubicparticles;
 
 import net.minecraft.client.renderer.Tessellator;
 
