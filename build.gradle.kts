@@ -71,7 +71,7 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.4")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.7")
     implementation("org.joml:joml:1.10.5")
     implementation("it.unimi.dsi:fastutil:8.5.13")
 
@@ -79,7 +79,7 @@ dependencies {
 
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
-    compileOnly("com.github.GTNewHorizons:GTNHLib:0.5.20:api")
+    compileOnly("com.github.GTNewHorizons:GTNHLib:0.5.21:api")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") { excludeDeps() }
     compileOnly("com.github.jss2a98aj:NotFine:0.2.5:dev") { excludeDeps() }
