@@ -1,4 +1,7 @@
-/* Copyright (C) 2022-2024 FalsePattern
+/*
+ * This file is part of FalseTweaks.
+ *
+ * Copyright (C) 2022-2024 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
