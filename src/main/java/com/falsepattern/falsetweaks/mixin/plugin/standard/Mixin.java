@@ -236,6 +236,17 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_Techguns_RenderLadderMixin(Side.CLIENT,
                                                THREADING.and(require(TargetedMod.TECHGUNS)),
                                                "threadedupdates.techguns.RenderLadderMixin"),
+
+    // Malisis Mods
+    ThreadedUpdates_Malisis_MalisisRendererMixin(Side.CLIENT,
+                                                 THREADING.and(require(TargetedMod.MALISIS)),
+                                                 "threadedupdates.malisis.MalisisRendererMixin"),
+    ThreadedUpdates_Malisis_ParameterMixin(Side.CLIENT,
+                                           THREADING.and(require(TargetedMod.MALISIS)),
+                                           "threadedupdates.malisis.ParameterMixin"),
+    ThreadedUpdates_Malisis_NH_ParameterMixin(Side.CLIENT,
+                                           THREADING.and(require(TargetedMod.MALISIS_NH)),
+                                           "threadedupdates.malisis.nh.ParameterMixin"),
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module

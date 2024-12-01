@@ -107,6 +107,8 @@ dependencies {
     compileOnly(deobfCurse("hbm-ntm-235439:5534354"))
     // TechGuns 1.2
     compileOnly(deobfCurse("techguns-244201:2429662"))
+    // Malisis Core 0.14.3
+    compileOnly(deobfCurse("malisiscore-223896:2283267"))
 
     compileOnly("codechicken:codechickencore-mc1.7.10:1.4.0-mega:dev")
 }
