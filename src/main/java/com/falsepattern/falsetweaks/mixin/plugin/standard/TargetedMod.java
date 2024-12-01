@@ -56,6 +56,7 @@ public enum TargetedMod implements ITargetedMod {
     TECHGUNS("Techguns", false, contains("techguns")),
     MALISIS("Malisis Mods", false, contains("malisis")),
     MALISIS_NH("Malisis Mods NH", false, contains("malisis").and(contains("gtnh"))),
+    NOTFINE("NotFine", false, contains("notfine-")),
     ;
 
     public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITHOUT_SHADERS = require(OPTIFINE_WITHOUT_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));

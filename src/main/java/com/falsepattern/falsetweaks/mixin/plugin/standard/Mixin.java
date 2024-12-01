@@ -247,6 +247,12 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_Malisis_NH_ParameterMixin(Side.CLIENT,
                                            THREADING.and(require(TargetedMod.MALISIS_NH)),
                                            "threadedupdates.malisis.nh.ParameterMixin"),
+
+    // NotFine
+    ThreadedUpdates_NotFine_CTMUtilsMixin(Side.CLIENT,
+                                          THREADING.and(require(TargetedMod.NOTFINE)),
+                                          "threadedupdates.notfine.CTMUtilsMixin"),
+
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module

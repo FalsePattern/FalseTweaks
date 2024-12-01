@@ -56,10 +56,6 @@ public class FalseTweaksTransformer extends MergeableTurboTransformer {
                 transformers.add(new Threading_RenderBlocksASM());
                 transformers.add(new Threading_TessellatorUseReplacement());
                 transformers.add(new Threading_ThreadSafeBlockRendererInjector());
-                transformers.add(new Threading_BlockMinMax());
-                transformers.add(new Threading_BlockMinMaxRedirector());
-                transformers.add(new Threading_GameSettings());
-                transformers.add(new Threading_GameSettingsRedirector());
             }
         }
         return transformers;

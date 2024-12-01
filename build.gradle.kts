@@ -63,7 +63,7 @@ repositories {
         }
     }
     exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon"), "com.github.GTNewHorizons")
-    exclusive(jitpack(), "com.github.basdxz")
+    exclusive(jitpack(), "com.github.basdxz", "com.github.jss2a98aj")
     exclusive(maven("mega_uploads", "https://mvn.falsepattern.com/gtmega_uploads"), "optifine")
     exclusive(mega(), "codechicken")
     exclusive(ivy("https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
@@ -88,6 +88,10 @@ dependencies {
     compileOnly("makamys:neodymium-mc1.7.10:0.3.3-unofficial:dev")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") {
+        excludeDeps()
+    }
+
+    compileOnly("com.github.jss2a98aj:NotFine:0.2.5:dev") {
         excludeDeps()
     }
 

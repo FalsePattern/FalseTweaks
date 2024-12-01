@@ -23,7 +23,6 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.particles;
 
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,9 +34,9 @@ public abstract class EffectRendererMixin {
     @Redirect(method = "renderParticles",
               at = @At(value = "INVOKE",
                        target = "Lorg/lwjgl/opengl/GL11;glDepthMask(Z)V",
-                       remap = false),
-              require = 2)
+                       ordinal = 0,
+                       remap = false))
     private void alwaysDepthMaskParticles(boolean flag) {
-        GL11.glDepthMask(true);
+
     }
 }

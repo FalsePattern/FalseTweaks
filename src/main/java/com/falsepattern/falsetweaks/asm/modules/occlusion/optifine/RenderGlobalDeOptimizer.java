@@ -32,13 +32,6 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-import net.minecraft.launchwrapper.Launch;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import cpw.mods.fml.relauncher.Side;
-
 /**
  * OptiFine does some weird optimizations that conflict with the occlusion code.
  * So I just remove them :3
@@ -69,40 +62,6 @@ public class RenderGlobalDeOptimizer implements TurboClassTransformer {
             return false;
         }
         return LazyOptiFineCheck.hasOptiFine();
-    }
-
-    private static class LazyOptiFineCheck {
-        private static Boolean optifineDetected = null;
-        private static boolean hasOptiFine() {
-            Boolean detected = optifineDetected;
-            if (detected == null) {
-                if (FMLLaunchHandler.side().isClient()) {
-                    try {
-                        //We might be too early but let's try the standard way
-                        detected = FMLClientHandler.instance().hasOptifine();
-                    } catch (Throwable ignored) {
-                        //Ok, we'll do it manually then
-                        try {
-                            ClassLoader cl;
-                            cl = Loader.instance().getModClassLoader();
-                            if (cl == null) {
-                                cl = Launch.classLoader;
-                            }
-                            Class.forName("Config", false, cl);
-                            detected = true;
-                        } catch (Throwable ignored1) {
-                            //99.9% sure that optifine is not present
-                            detected = false;
-                        }
-                    }
-                } else {
-                    //server shouldn't have OF
-                    detected = false;
-                }
-                optifineDetected = detected;
-            }
-            return detected;
-        }
     }
 
     @Override

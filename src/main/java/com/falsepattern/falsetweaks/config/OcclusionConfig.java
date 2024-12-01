@@ -35,7 +35,7 @@ public class OcclusionConfig {
 
     @Config.Comment("Similar to OptiFine's \"Dynamic Updates\" feature, where chunks load faster when you don't move the player at all.")
     @Config.LangKey("config.falsetweaks.occlusion.dynamic")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean DYNAMIC_CHUNK_UPDATES;
 
     @Config.Comment("The amount of chunks renderers to update PER SECOND. This is a MAXIMUM limit, not a minimum.\n" +

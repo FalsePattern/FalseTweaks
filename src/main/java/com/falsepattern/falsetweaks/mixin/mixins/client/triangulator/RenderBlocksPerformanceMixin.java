@@ -30,7 +30,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 
-@Mixin(RenderBlocks.class)
+@Mixin(value = RenderBlocks.class,
+       priority = 900) // Notfine compat
 public abstract class RenderBlocksPerformanceMixin implements IRenderBlocksMixin {
     /**
      * @author FalsePattern

@@ -415,12 +415,9 @@ public class OcclusionRenderer {
         val prof = rg.theWorld.theProfiler;
         int updateLimit;
         long currentFrameTime = System.nanoTime();
-        if (fastUpdate) {
-            updateLimit = -1;
-        } else {
-            double frameTimeDeltaSeconds = (currentFrameTime - lastUpdateTime) / (double) NANOS_PER_SEC;
-            updateLimit = (int) (OcclusionConfig.CHUNK_UPDATES_PER_SECOND * frameTimeDeltaSeconds) + 1;
-        }
+        int updatesPerSec = OcclusionConfig.CHUNK_UPDATES_PER_SECOND * (fastUpdate ? 2 : 1);
+        double frameTimeDeltaSeconds = (currentFrameTime - lastUpdateTime) / (double) NANOS_PER_SEC;
+        updateLimit = (int) (updatesPerSec * frameTimeDeltaSeconds) + 1;
         lastUpdateTime = currentFrameTime;
         int updates = 0;
 

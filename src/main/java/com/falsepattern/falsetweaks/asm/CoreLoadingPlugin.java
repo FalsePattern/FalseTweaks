@@ -34,6 +34,8 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import lombok.Getter;
 import lombok.val;
+import org.spongepowered.asm.launch.GlobalProperties;
+import org.spongepowered.asm.service.mojang.MixinServiceLaunchWrapper;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -77,6 +79,11 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
+
+        val mixinTweakClasses = GlobalProperties.<List<String>>get(MixinServiceLaunchWrapper.BLACKBOARD_KEY_TWEAKCLASSES);
+        if (mixinTweakClasses != null) {
+            mixinTweakClasses.add(Tags.ROOT_PKG + ".asm.MixinCompatHackTweaker");
+        }
         return new String[]{Tags.ROOT_PKG + ".asm.FalseTweaksTransformer"};
     }
 
