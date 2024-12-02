@@ -23,8 +23,10 @@
 
 package com.falsepattern.falsetweaks.asm;
 
-import com.falsepattern.falsetweaks.Tags;
+import lombok.SneakyThrows;
+import lombok.val;
 
+import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -49,8 +51,12 @@ public class MixinCompatHackTweaker implements ITweaker {
     }
 
     @Override
+    @SneakyThrows
     public String[] getLaunchArguments() {
-        Launch.classLoader.registerTransformer(Tags.ROOT_PKG + ".asm.FalseTweaksFieldHackTransformer");
+        val f = LaunchClassLoader.class.getDeclaredField("transformers");
+        f.setAccessible(true);
+        val transformers = (List<IClassTransformer>) f.get(Launch.classLoader);
+        transformers.add(CoreLoadingPlugin.FIELD_HACK_TF);
         return new String[0];
     }
 }

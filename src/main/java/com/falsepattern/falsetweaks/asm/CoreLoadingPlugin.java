@@ -37,8 +37,7 @@ import lombok.val;
 import org.spongepowered.asm.launch.GlobalProperties;
 import org.spongepowered.asm.service.mojang.MixinServiceLaunchWrapper;
 
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraft.launchwrapper.IClassTransformer;
 
 import java.util.List;
 import java.util.Map;
@@ -77,12 +76,14 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         } catch (Throwable ignored) {}
     }
 
+    static IClassTransformer FIELD_HACK_TF;
+
     @Override
     public String[] getASMTransformerClass() {
-
         val mixinTweakClasses = GlobalProperties.<List<String>>get(MixinServiceLaunchWrapper.BLACKBOARD_KEY_TWEAKCLASSES);
         if (mixinTweakClasses != null) {
-            mixinTweakClasses.add(Tags.ROOT_PKG + ".asm.MixinCompatHackTweaker");
+            FIELD_HACK_TF = new FalseTweaksFieldHackTransformer();
+            mixinTweakClasses.add(MixinCompatHackTweaker.class.getName());
         }
         return new String[]{Tags.ROOT_PKG + ".asm.FalseTweaksTransformer"};
     }
