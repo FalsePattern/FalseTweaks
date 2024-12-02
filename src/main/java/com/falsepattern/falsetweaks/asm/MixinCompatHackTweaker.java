@@ -50,7 +50,7 @@ public class MixinCompatHackTweaker implements ITweaker {
 
     @Override
     public String[] getLaunchArguments() {
-        Launch.classLoader.registerTransformer(Tags.ROOT_PKG + ".asm.modules.threadedupdates.block.Threading_BlockMinMaxTransformer");
+        Launch.classLoader.registerTransformer(Tags.ROOT_PKG + ".asm.FalseTweaksFieldHackTransformer");
         return new String[0];
     }
 }
