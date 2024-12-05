@@ -310,6 +310,13 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             for (val thread : currentThreads) {
                 thread.interrupt();
             }
+            for (val thread : currentThreads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             currentThreads = null;
         }
         if (workSorter != null) {
