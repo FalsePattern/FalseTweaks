@@ -32,7 +32,7 @@ import java.util.Optional;
 public final class Modules {
     @StableAPI.Expose
     public static boolean startupOptimizationsActive() {
-        return ModuleConfig.STARTUP_OPTIMIZATIONS_V2;
+        return ModuleConfig.STARTUP_OPTIMIZATIONS;
     }
 
     @StableAPI.Expose

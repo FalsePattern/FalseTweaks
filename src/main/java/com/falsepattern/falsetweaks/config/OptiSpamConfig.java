@@ -27,26 +27,32 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Options to reduce the amount of logspam by OptiFine")
 @Config(modid = Tags.MOD_ID,
         category = "optifine_log_spam_fixes")
+@Config.LangKey
 public class OptiSpamConfig {
     @Config.Comment("Suppresses \"Ambiguous shader option: ...\" warnings.")
-    @Config.LangKey("config.falsetweaks.optispam.ambiguous")
+    @Config.LangKey
+    @Config.Name(value = "ambiguousShaderOption", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean AMBIGUOUS_SHADER_OPTION;
 
     @Config.Comment("Suppresses \"Block not found for name: ...\" warnings.")
-    @Config.LangKey("config.falsetweaks.optispam.block_not_found")
+    @Config.LangKey
+    @Config.Name(value = "blockNotFound", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean BLOCK_NOT_FOUND;
 
     @Config.Comment("Suppresses \"Invalid block metadata: ...\" and \"Invalid block ID mapping: ...\" warnings.")
-    @Config.LangKey("config.falsetweaks.optispam.invalid_id")
+    @Config.LangKey
+    @Config.Name(value = "invalidId", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean INVALID_ID;
 
     @Config.Comment("Suppresses \"Expression already defined: ...\" and \"Custom uniform/variable: ...\" logs.")
-    @Config.LangKey("config.falsetweaks.optispam.custom_uniforms")
+    @Config.LangKey
+    @Config.Name(value = "customUniforms", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean CUSTOM_UNIFORMS;
 

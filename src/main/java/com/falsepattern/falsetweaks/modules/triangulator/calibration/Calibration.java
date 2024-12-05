@@ -57,9 +57,9 @@ public class Calibration {
 
     @SneakyThrows
     public static void setCalibration(boolean flip) {
-        CalibrationConfig.FLIP_DIAGONALS = flip;
-        CalibrationConfig.GPU_HASH = gpuHash();
-        ConfigurationManager.saveToFile(true, CalibrationConfig.class);
+        TriangulatorConfig.Calibration.FLIP_DIAGONALS = flip;
+        TriangulatorConfig.Calibration.GPU_HASH = gpuHash();
+        ConfigurationManager.saveToFile(true, TriangulatorConfig.Calibration.class);
         Minecraft.getMinecraft().renderGlobal.loadRenderers();
     }
 
@@ -91,7 +91,7 @@ public class Calibration {
         if (!(e.entity instanceof EntityPlayerSP)) {
             return;
         }
-        if (gpuHash().equals(CalibrationConfig.GPU_HASH)) {
+        if (gpuHash().equals(TriangulatorConfig.Calibration.GPU_HASH)) {
             return;
         }
         if (ModuleConfig.TRIANGULATOR()) {

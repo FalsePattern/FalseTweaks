@@ -27,11 +27,14 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Improved Shift+F3 profiler")
 @Config(modid = Tags.MOD_ID,
         category = "profiler")
+@Config.LangKey
 public class ProfilerConfig {
     @Config.Comment("Enable this to dump the profiler data to a file when the F3 profiler is closed.")
-    @Config.LangKey("config.falsetweaks.profiler.dump")
+    @Config.LangKey
+    @Config.Name(value = "dumpOnClose", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean DUMP_ON_CLOSE;
 

@@ -27,21 +27,31 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Dynamic hand and entity lights")
 @Config(modid = Tags.MOD_ID,
-        category = "dynamiclights")
+        category = "dynamic_lights",
+        categoryMigrations = "dynamiclights")
+@Config.LangKey
 public class DynamicLightsConfig {
+
     @Config.Comment("Enable/disable dynamic lights without restarting the game")
-    @Config.LangKey("config.falsetweaks.dynlights.state")
+    @Config.LangKey
+    @Config.Name(value = "state", migrations = "")
     @Config.DefaultEnum("Fast")
     public static DynamicLightsState STATE;
+
     @Config.Comment("Should items/blocks held by the player emit light?")
-    @Config.LangKey("config.falsetweaks.dynlights.hand_light")
+    @Config.LangKey
+    @Config.Name(value = "handLight", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean DYNAMIC_HAND_LIGHT;
+
     @Config.Comment("Set this to false if you want to make dynamic lights diamond-shaped, like block lights.")
-    @Config.LangKey("config.falsetweaks.dynlights.circular")
+    @Config.LangKey
+    @Config.Name(value = "circular", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean CIRCULAR;
+
     static {
         ConfigurationManager.selfInit();
     }

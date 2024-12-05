@@ -27,8 +27,10 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Options for the translucent block layer fixes")
 @Config(modid = Tags.MOD_ID,
         category = "translucent_block_layers_fix")
+@Config.LangKey
 public class TranslucentBlockLayersConfig {
     @Config.Comment({
             "The \"epsilon\" value used when shifting translucent block geometry closer to the camera.",
@@ -37,10 +39,11 @@ public class TranslucentBlockLayersConfig {
             "Advanced setting.",
             "FPS impact: Unknown"
     })
-    @Config.LangKey("config.falsetweaks.misc.translucent_block_layers_fix_epsilon")
-    @Config.DefaultDouble(0.001)
+    @Config.Name(value = "epsilon", migrations = "")
+    @Config.LangKey
     @Config.RangeDouble(min = 0,
                         max = 0.1)
+    @Config.DefaultDouble(0.001)
     public static double TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON;
 
     static {

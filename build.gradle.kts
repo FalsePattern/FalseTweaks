@@ -71,7 +71,7 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.4.7")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.0")
     implementation("org.joml:joml:1.10.5")
     implementation("it.unimi.dsi:fastutil:8.5.13")
 

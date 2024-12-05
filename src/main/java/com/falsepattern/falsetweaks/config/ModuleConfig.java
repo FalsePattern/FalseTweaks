@@ -27,8 +27,10 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Toggles for all FalseTweaks modules")
 @Config(modid = Tags.MOD_ID,
         category = "00_modules")
+@Config.LangKey
 @Config.RequiresMcRestart
 public class ModuleConfig {
     @Config.Comment({
@@ -36,8 +38,10 @@ public class ModuleConfig {
             "Not compatible with some badly-written mods.",
             "FPS impact: None, but makes startup a bit faster"
     })
+    @Config.LangKey
+    @Config.Name(value = "startupOptimizations", migrations = "STARTUP_OPTIMIZATIONS_V2")
     @Config.DefaultBoolean(false)
-    public static boolean STARTUP_OPTIMIZATIONS_V2;
+    public static boolean STARTUP_OPTIMIZATIONS;
 
     @Config.Comment({
             "Enable/Disable texture optimizations. This includes:",
@@ -45,6 +49,8 @@ public class ModuleConfig {
             "- Faster texture atlas packing during startup",
             "FPS impact: Reduced stuttering in heavily modded packs"
     })
+    @Config.LangKey
+    @Config.Name(value = "textureOptimizations", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean TEXTURE_OPTIMIZATIONS;
 
@@ -53,6 +59,8 @@ public class ModuleConfig {
             "an experimental feature.",
             "Also includes the 3D rails."
     })
+    @Config.LangKey("config.falsetweaks.voxelizer")
+    @Config.Name(value = "voxelizer", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean VOXELIZER;
 
@@ -63,6 +71,8 @@ public class ModuleConfig {
             "property to false in the triangulator category.",
             "FPS impact: Tiny performance decrease, but smooth lighting will look way better."
     })
+    @Config.LangKey("config.falsetweaks.triangulator")
+    @Config.Name(value = "triangulator", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean TRIANGULATOR;
 
@@ -71,6 +81,8 @@ public class ModuleConfig {
             "Force-enables TRIANGULATOR.",
             "FPS impact: A little bit less stuttering when moving around with a lot of stained glass-like blocks around"
     })
+    @Config.LangKey
+    @Config.Name(value = "bspSorting", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean BSP_SORTING;
 
@@ -81,10 +93,14 @@ public class ModuleConfig {
             "(same things that chunks use) to minimize the amount of work done by the cpu for every single item.",
             "FPS impact: Decent improvement with lots of items on ground"
     })
+    @Config.LangKey("config.falsetweaks.item_render_lists")
+    @Config.Name(value = "itemRenderLists", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean ITEM_RENDER_LISTS;
 
     @Config.Comment("Disables the Realms button on the main menu.")
+    @Config.LangKey
+    @Config.Name(value = "noRealmsOnMenu", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean NO_REALMS_ON_MENU;
 
@@ -93,6 +109,8 @@ public class ModuleConfig {
             "you can toggle said optimization here.",
             "FPS impact: Tiny improvement near beacons"
     })
+    @Config.LangKey
+    @Config.Name(value = "beaconOptimization", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean BEACON_OPTIMIZATION;
 
@@ -101,6 +119,8 @@ public class ModuleConfig {
             "actually BEHIND the transparent part. Sorting the tile entities before rendering fixes this bug.",
             "FPS impact: Slight decrease"
     })
+    @Config.LangKey
+    @Config.Name(value = "tileEntityTransparencyFix", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean TE_TRANSPARENCY_FIX;
 
@@ -110,17 +130,20 @@ public class ModuleConfig {
             "at the cost of far away geometry sometimes rendering on top of opaque geometry. (>100~ blocks)",
             "FPS impact: Unknown"
     })
+    @Config.LangKey("config.falsetweaks.translucent_block_layers_fix")
+    @Config.Name(value = "translucentBlockLayersFix", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean BLOCK_LAYER_TRANSPARENCY_FIX;
 
-    @Config.Comment("Particle water transparency fix")
+    @Config.Comment("Fixes layering issues with particles always rendering behind water.")
+    @Config.LangKey
+    @Config.Name(value = "particleTransparencyFix", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean PARTICLE_TRANSPARENCY_FIX;
 
-    @Config.Comment({
-            "3D particles (experimental)",
-            "FPS impact: Unknown"
-    })
+    @Config.Comment("3D block breaking particles")
+    @Config.LangKey
+    @Config.Name(value = "cubicParticles", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean CUBIC_PARTICLES;
 
@@ -130,6 +153,8 @@ public class ModuleConfig {
             "2. Replaces the mipmap generation with a multithreaded system, which scales with the number of cores in your system.",
             "FPS impact: none, but resource pack reload times (and startup time) are cut down by a lot"
     })
+    @Config.LangKey
+    @Config.Name(value = "mipmapFix", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean MIPMAP_FIX;
 
@@ -138,6 +163,8 @@ public class ModuleConfig {
             "Also check the profiler config category!",
             "FPS impact: Slightly faster profiler"
     })
+    @Config.LangKey("config.falsetweaks.profiler")
+    @Config.Name(value = "advancedProfiler", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean ADVANCED_PROFILER;
 
@@ -148,6 +175,8 @@ public class ModuleConfig {
             "COMPATIBLE WITH OPTIFINE AND SHADERS",
             "FPS impact: Significant FPS and world rendering speed gains. Even higher with Neodymium installed."
     })
+    @Config.LangKey("config.falsetweaks.threading")
+    @Config.Name(value = "threadedChunkUpdates", migrations = "")
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
@@ -158,6 +187,8 @@ public class ModuleConfig {
             "Implicitly enabled when OptiFine is installed for compatibility.",
             "See the dynamiclights config entry for more configs.",
     })
+    @Config.LangKey("config.falsetweaks.dynamic_lights")
+    @Config.Name(value = "dynamicLights", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean DYNAMIC_LIGHTS;
@@ -166,16 +197,22 @@ public class ModuleConfig {
             "Replaces the renderer chunk cache with a more efficient version.",
             "FPS impact: Faster chunk rendering"
     })
+    @Config.LangKey
+    @Config.Name(value = "fasterChunkCache", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean FASTER_CHUNK_CACHE;
 
     @Config.Comment("Wraps block renderer code and tile entity renderer code in extra opengl state guards.")
+    @Config.LangKey
+    @Config.Name(value = "renderingSafety", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean RENDERING_SAFETY;
 
     @Config.Comment("Gets rid of that obnoxious burst of minecart sounds when joining a world.")
+    @Config.LangKey
+    @Config.Name(value = "minecartEarBlastFix", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean MINECART_EAR_BLAST_FIX;
 
@@ -184,6 +221,8 @@ public class ModuleConfig {
             "Also fixes the weird white lines that some OptiFine shaderpacks get with huge render distances.",
             "FPS impact: Negligible gain"
     })
+    @Config.LangKey
+    @Config.Name(value = "skyMeshOptimization", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean SKY_MESH_OPTIMIZATION;
@@ -192,11 +231,15 @@ public class ModuleConfig {
             "Fixes an occasional crash that happens when trying to render a GUI block overlay (more common with optifine shaders enabled.)",
             "FPS impact: Zero"
     })
+    @Config.LangKey
+    @Config.Name(value = "overlayCrashFix", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean OVERLAY_CRASH_FIX;
 
     @Config.Comment("Suppresses logspam coming from optifine's shader system. Makes shaderpack reloads faster.")
+    @Config.LangKey("config.falsetweaks.optifine_log_spam_fixes")
+    @Config.Name(value = "optifineLogSpamFixes", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean OPTIFINE_LOGSPAM_FIX;

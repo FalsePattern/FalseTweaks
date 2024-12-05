@@ -28,8 +28,10 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Multithreaded rendering settings. Also look at the occlusion category.")
 @Config(modid = Tags.MOD_ID,
         category = "threading")
+@Config.LangKey
 public class ThreadingConfig {
     @Config.Comment({
             "The number of threads to use for chunk building.",
@@ -37,36 +39,38 @@ public class ThreadingConfig {
             "1   - Recommended",
             "2-8 - For higher-end systems, with diminishing results"
     })
-    @Config.LangKey("config.falsetweaks.threading.threads")
+    @Config.LangKey
+    @Config.Name(value = "threads", migrations = "")
     @Config.DefaultInt(1)
     @Config.RangeInt(min = 0,
                      max = 8)
     public static int CHUNK_UPDATE_THREADS;
 
     @Config.Comment("Disable this to use a slower, but more accurate thread safety check in the tessellator.")
-    @Config.LangKey("config.falsetweaks.threading.fastSafety")
+    @Config.LangKey
+    @Config.Name(value = "fastChecks", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean FAST_SAFETY_CHECKS;
 
     @Config.Comment({
-            "EXPERIMENTAL AND UNSUPPORTED FEATURE!",
-            "DO NOT REPORT CRASHES IF YOU TURN THIS ON!\n",
             "This enabled deep integration with Neodymium.",
             "Needs a game restart to change.",
             "Only effective if Neodymium is installed.",
-            "FPS Impact: Unknown"
+            "FPS Impact: Huge increase"
     })
-    @Config.LangKey("config.falsetweaks.threading.neodymium")
-    @Config.DefaultBoolean(false)
+    @Config.LangKey
+    @Config.Name(value = "neodymiumThreading", migrations = "UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS")
+    @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
-    public static boolean UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS;
+    public static boolean NEODYMIUM_THREADING;
 
     @Config.Comment({
             "Enables some extra debug info for error stacktraces.",
             "EXPENSIVE! Only turn this on for debugging purposes!",
             "FPS Impact: significant slowdown"
     })
-    @Config.LangKey("config.falsetweaks.threading.debug")
+    @Config.LangKey
+    @Config.Name(value = "extraDebugInfo", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean EXTRA_DEBUG_INFO;
 
@@ -76,15 +80,17 @@ public class ThreadingConfig {
             "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)",
             "This patch covers most edge cases, however some implementations will still require manual patches."
     })
-    @Config.LangKey("config.falsetweaks.threading.tessellatorUseReplacementTargets")
-    @Config.DefaultStringList({})
+    @Config.LangKey
+    @Config.Name(value = "tessellatorReplacementTargets", migrations = "")
     @Config.ListMaxLength(Integer.MAX_VALUE)
     @Config.StringMaxLength(65535)
+    @Config.DefaultStringList({})
     @Config.RequiresMcRestart
     public static String[] TESSELLATOR_USE_REPLACEMENT_TARGETS;
 
     @Config.Comment("Patches every class with the thread safe tessellator code. Overrides TESSELLATOR_USE_REPLACEMENT_TARGETS")
-    @Config.LangKey("config.falsetweaks.threading.tessellatorReplaceEverything")
+    @Config.LangKey
+    @Config.Name(value = "tessellatorReplaceEverything", migrations = "")
     @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean TESSELLATOR_REPLACE_EVERYTHING;
@@ -100,7 +106,8 @@ public class ThreadingConfig {
             "Custom threadlocal managed by a utility mod (returns the same instance per thread): com.example.ExampleRenderer:com.mymod.ThreadTools?threadExampleRenderer",
             "All of these MUST be zero argument methods!"
     })
-    @Config.LangKey("config.falsetweaks.threading.threadSafeISBRH")
+    @Config.LangKey
+    @Config.Name(value = "threadSafeBlockRenderers", migrations = "")
     @Config.DefaultStringList({})
     @Config.ListMaxLength(Integer.MAX_VALUE)
     @Config.StringMaxLength(65535)
@@ -108,12 +115,14 @@ public class ThreadingConfig {
     public static String[] THREAD_SAFE_ISBRHS;
 
     @Config.Comment("Disables the logging of block rendering handler registrations.")
-    @Config.LangKey("config.falsetweaks.threading.logISBRHErrors")
+    @Config.LangKey
+    @Config.Name(value = "logBlockRendererErrors", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean LOG_ISBRH_ERRORS;
 
     @Config.Comment("Speeds up the threading of block bounds, try turning this off if you get compatibility issues.")
-    @Config.LangKey("config.falsetweaks.threading.fastThreadedBlockBounds")
+    @Config.LangKey
+    @Config.Name(value = "fastThreadedBlockBounds", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean FAST_THREADED_BLOCK_BOUNDS;
 
@@ -131,7 +140,7 @@ public class ThreadingConfig {
             } else if (!Compat.neodymiumInstalled()) {
                 AGGRESSIVE_NEODYMIUM_THREADING = false;
             } else {
-                AGGRESSIVE_NEODYMIUM_THREADING = UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS;
+                AGGRESSIVE_NEODYMIUM_THREADING = NEODYMIUM_THREADING;
             }
         }
         return AGGRESSIVE_NEODYMIUM_THREADING;

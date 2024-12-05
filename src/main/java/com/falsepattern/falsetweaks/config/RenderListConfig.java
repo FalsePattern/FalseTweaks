@@ -27,8 +27,10 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("Options for the item rendering optimizations")
 @Config(modid = Tags.MOD_ID,
         category = "item_render_lists")
+@Config.LangKey
 public class RenderListConfig {
     @Config.Comment({
             "The total amount of renderlists FalseTweaks may allocate for optimized item rendering.",
@@ -36,11 +38,11 @@ public class RenderListConfig {
             "Bigger buffer sizes use more VRAM, but also get a higher average performance.",
             "256 should be good enough for most modded games, and going above 1024 is not recommended unless",
             "you have a lot of VRAM.",
-            "(Only useful if you have ITEM_RENDERLISTS turned on)",
             "FPS impact: zero when tuned right"
     })
+    @Config.LangKey
+    @Config.Name(value = "maxBufferSize", migrations = "")
     @Config.RangeInt(min = 64)
-    @Config.LangKey("config.falsetweaks.item_render_lists.max_buffer_size")
     @Config.DefaultInt(256)
     public static int MAX_BUFFER_SIZE;
 

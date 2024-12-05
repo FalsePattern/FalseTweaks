@@ -27,21 +27,26 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
+@Config.Comment("OpenGL state leak and crash protections")
 @Config(modid = Tags.MOD_ID,
         category = "rendering_safety")
+@Config.LangKey
 public class RenderingSafetyConfig {
     @Config.Comment("Enable safety wrapper for inventory blocks.")
-    @Config.LangKey("config.falsetweaks.rendering_safety.block")
+    @Config.LangKey
+    @Config.Name(value = "block", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_BLOCK;
 
     @Config.Comment("Enable safety wrapper for tile entities.")
-    @Config.LangKey("config.falsetweaks.rendering_safety.tesr")
+    @Config.LangKey
+    @Config.Name(value = "tesr", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_TESR;
 
     @Config.Comment("Enable safety wrapper for items.")
-    @Config.LangKey("config.falsetweaks.rendering_safety.item")
+    @Config.LangKey
+    @Config.Name(value = "item", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_ITEM;
 

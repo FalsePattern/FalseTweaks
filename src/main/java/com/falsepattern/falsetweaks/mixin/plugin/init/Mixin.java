@@ -39,12 +39,12 @@ public enum Mixin implements IMixin {
     // @formatter:off
     //region Startup Optimizations Module
 
-    ASMDataTableMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ASMDataTableMixin"),
+    ASMDataTableMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ASMDataTableMixin"),
 
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS_V2), "startup.ModDiscovererMixin"),
+    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.DirectoryDiscovererMixin"),
+    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.JarDiscovererMixin"),
+    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModContainerFactoryMixin"),
+    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModDiscovererMixin"),
 
     //endregion Startup Optimizations Module
     // @formatter:on

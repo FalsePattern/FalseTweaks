@@ -1,78 +1,93 @@
 # Configs
 # Notice for translators: <config key>.tooltip allows you to localize the tooltip for the hover text even if it's not present in this file
 
-config.falsetweaks.dynlights.category=Dynamic lights
-config.falsetweaks.dynlights.category.tooltip=Dynamic lights
-config.falsetweaks.dynlights.state=Mode
-config.falsetweaks.dynlights.hand_light=Hand light
-config.falsetweaks.dynlights.circular=Circular
+config.falsetweaks.00_modules=Modules
+config.falsetweaks.00_modules.tooltip=Every option in here requires a game restart to change.
+config.falsetweaks.00_modules.startupOptimizations=Startup optimizations
+config.falsetweaks.00_modules.textureOptimizations=Texture optimizations
+config.falsetweaks.00_modules.bspSorting=BSP geometry sorting
+config.falsetweaks.00_modules.noRealmsOnMenu=No realms on main menu
+config.falsetweaks.00_modules.beaconOptimization=Beacon optimizations
+config.falsetweaks.00_modules.tileEntityTransparencyFix=Tile entity transparency fix
+config.falsetweaks.00_modules.particleTransparencyFix=Particle transparency fix
+config.falsetweaks.00_modules.cubicParticles=Cubic particles
+config.falsetweaks.00_modules.mipmapFix=Mipmap fix
+config.falsetweaks.00_modules.fasterChunkCache=Faster chunk cache
+config.falsetweaks.00_modules.rendering_safety=Rendering safety
+config.falsetweaks.00_modules.minecartEarBlastFix=Minecart sounds on login fix
+config.falsetweaks.00_modules.skyMeshOptimization=Sky mesh optimization
+config.falsetweaks.00_modules.overlayCrashFix=Overlay crash fix
 
-config.falsetweaks.triangulator.category=Triangulator
-config.falsetweaks.triangulator.category.tooltip=Miscellaneous block rendering bug fixes
-config.falsetweaks.triangulator.enable_quad_triangulation=Enable quad triangulation
-config.falsetweaks.triangulator.fix_block_crack=Block edge crack fix
-config.falsetweaks.triangulator.render_hook_compat_mode=Render hook compatibility mode
-config.falsetweaks.triangulator.suppress_calibration=Suppress calibration prompt
-config.falsetweaks.triangulator.block_crack_fix_epsilon=Block crack fix epsilon
-config.falsetweaks.triangulator.block_crack_fix_blacklist=Block crack fix blacklist
+config.falsetweaks.dynamic_lights=Dynamic lights
+config.falsetweaks.dynamic_lights.tooltip=Dynamic lights
+config.falsetweaks.dynamic_lights.state=Mode
+config.falsetweaks.dynamic_lights.handLight=Hand light
+config.falsetweaks.dynamic_lights.circular=Circular
 
-config.falsetweaks.item_render_lists.category=Item Render Lists
-config.falsetweaks.item_render_lists.category.tooltip=Optimizations for items in your hand or in the world
+config.falsetweaks.triangulator=Triangulator
+config.falsetweaks.triangulator.tooltip=Miscellaneous block rendering bug fixes
+config.falsetweaks.triangulator.quadTriangulation=Enable quad triangulation
+config.falsetweaks.triangulator.fixBlockCrack=Block edge crack fix
+config.falsetweaks.triangulator.renderHookCompatMode=Render hook compatibility mode
+config.falsetweaks.triangulator.hideCalibrationPrompt=Hide calibration prompt
+config.falsetweaks.triangulator.blockCrackFixEpsilon=Block crack fix epsilon
+config.falsetweaks.triangulator.blockCrackFixBlacklist=Block crack fix blacklist
+
+config.falsetweaks.item_render_lists=Item Render Lists
+config.falsetweaks.item_render_lists.tooltip=Optimizations for items in your hand or in the world
 config.falsetweaks.item_render_lists.max_buffer_size=Maximum buffer size
 
-config.falsetweaks.voxelizer.category=Voxelizer
-config.falsetweaks.voxelizer.category.tooltip=3D item rendering framework
-config.falsetweaks.voxelizer.forced_layers=Forced layers
-config.falsetweaks.voxelizer.mesh_optimization_strategy=Mesh optimization strategy
-config.falsetweaks.voxelizer.3d_rails=3D rails
-config.falsetweaks.voxelizer.debug_mesh_compilation=Debug mesh compilation
-config.falsetweaks.voxelizer.exclusion_list=Texture exclusion list
-config.falsetweaks.voxelizer.class_exclusion_list=Class exclusion list
-config.falsetweaks.voxelizer.rail_thickness=Rail thickness
-config.falsetweaks.voxelizer.verbose_log=Verbose logging
+config.falsetweaks.voxelizer=Voxelizer
+config.falsetweaks.voxelizer.tooltip=3D item rendering framework
+config.falsetweaks.voxelizer.forcedLayers=Forced layers
+config.falsetweaks.voxelizer.optimizationStrategy=Mesh optimization strategy
+config.falsetweaks.voxelizer.rails3D=3D rails
+config.falsetweaks.voxelizer.debugMeshCompilation=Debug mesh compilation
+config.falsetweaks.voxelizer.exclusionList=Texture exclusion list
+config.falsetweaks.voxelizer.classExclusionList=Class exclusion list
+config.falsetweaks.voxelizer.railThickness=Rail thickness
+config.falsetweaks.voxelizer.verboseLog=Verbose logging
 
-config.falsetweaks.profiler.category=Profiler
-config.falsetweaks.profiler.category.tooltip=Better than vanilla profiler
-config.falsetweaks.profiler.dump=Dump to file on profile end
+config.falsetweaks.profiler=Profiler
+config.falsetweaks.profiler.tooltip=Better than vanilla profiler
+config.falsetweaks.profiler.dumpOnClose=Dump to file on profile end
 
-config.falsetweaks.translucent_block_layers_fix.category=Translucency Block Layer Fix
-config.falsetweaks.translucent_block_layers_fix.category.tooltip=Fixes an occasional visual bug that happens with overlapping transparent blocks
+config.falsetweaks.translucent_block_layers_fix=Translucency Block Layer Fix
+config.falsetweaks.translucent_block_layers_fix.tooltip=Fixes an occasional visual bug that happens with overlapping transparent blocks
 config.falsetweaks.translucent_block_layers_fix.epsilon=Epsilon
 
-config.falsetweaks.occlusion.category=Occlusion
-config.falsetweaks.occlusion.category.tooltip=Improved chunk rendering scheduler
-config.falsetweaks.occlusion.dynamic=Dynamic chunk updates
-config.falsetweaks.occlusion.updates_per_second=Chunk updates per second
-config.falsetweaks.occlusion.cache_size_target=Cache size target
-config.falsetweaks.occlusion.render_distance=Maximum render distance
-config.falsetweaks.occlusion.aggressive_clipping_helper=Aggressive clipping helper optimizations
+config.falsetweaks.occlusion=Occlusion
+config.falsetweaks.occlusion.tooltip=Improved chunk rendering scheduler
+config.falsetweaks.occlusion.dynamicChunkUpdates=Dynamic chunk updates
+config.falsetweaks.occlusion.chunkUpdatesPerSecond=Chunk updates per second
+config.falsetweaks.occlusion.cacheSizeTarget=Cache size target
+config.falsetweaks.occlusion.renderDistance=Maximum render distance
+config.falsetweaks.occlusion.aggressiveClippingHelperOptimizations=Aggressive clipping helper optimizations
 
-config.falsetweaks.threading.category=Threaded Updates
-config.falsetweaks.threading.category.tooltip=Multi-threaded chunk rendering
+config.falsetweaks.threading=Threaded updates
+config.falsetweaks.threading.tooltip=Multi-threaded chunk rendering
 config.falsetweaks.threading.threads=Chunk update threads
-config.falsetweaks.threading.neodymium=Neodymium threading
-config.falsetweaks.threading.queuesize=Update queue size per thread
-config.falsetweaks.threading.noblock=Disable blocking chunk updates
-config.falsetweaks.threading.tessellatorUseReplacementTargets=Tessellator use replacement targets
-config.falsetweaks.threading.logISBRHErrors=Log renderer registration errors
-config.falsetweaks.threading.threadSafeISBRH=Thread Safe ISBRHs
-config.falsetweaks.threading.debug=Extra debug info
-config.falsetweaks.threading.fastThreadedBlockBounds=Fast threaded block bounds
-config.falsetweaks.threading.fastSafety=Faster safety checks
+config.falsetweaks.threading.fastChecks=Faster safety checks
+config.falsetweaks.threading.neodymiumThreading=Neodymium threading
+config.falsetweaks.threading.extraDebugInfo=Extra debug info
+config.falsetweaks.threading.tessellatorReplacementTargets=Tessellator replacement targets
 config.falsetweaks.threading.tessellatorReplaceEverything=Tessellator replace everything
+config.falsetweaks.threading.threadSafeBlockRenderers=Thread safe block renderers
+config.falsetweaks.threading.logBlockRendererErrors=Log block renderer registration errors
+config.falsetweaks.threading.fastThreadedBlockBounds=Fast threaded block bounds
 
-config.falsetweaks.rendering_safety.category=Rendering Safety
-config.falsetweaks.rendering_safety.category.tooltip=OpenGL state leakage fixes for inventory block renderers and tile entities
+config.falsetweaks.rendering_safety=Rendering Safety
+config.falsetweaks.rendering_safety.tooltip=OpenGL state leakage fixes for inventory block renderers and tile entities
 config.falsetweaks.rendering_safety.block=Enable for inventory blocks
 config.falsetweaks.rendering_safety.tesr=Enable for tile entities
 config.falsetweaks.rendering_safety.item=Enable for items
 
-config.falsetweaks.optispam.category=Optifine log spam fixes
-config.falsetweaks.optispam.category.tooltip=Suppresses a bunch of log spam coming from optifine's shader system. As a bonus, this also makes shader loading faster!
-config.falsetweaks.optispam.ambiguous=Ambiguous shader option
-config.falsetweaks.optispam.block_not_found=Block not found
-config.falsetweaks.optispam.invalid_id=Invalid IDs
-config.falsetweaks.optispam.custom_uniforms=Custom uniforms
+config.falsetweaks.optifine_log_spam_fixes=Optifine log spam fixes
+config.falsetweaks.optifine_log_spam_fixes.tooltip=Suppresses a bunch of log spam coming from optifine's shader system. As a bonus, this also makes shader loading faster!
+config.falsetweaks.optifine_log_spam_fixes.ambiguousShaderOption=Ambiguous shader option
+config.falsetweaks.optifine_log_spam_fixes.blockNotFound=Block not found
+config.falsetweaks.optifine_log_spam_fixes.invalidId=Invalid IDs
+config.falsetweaks.optifine_log_spam_fixes.customUniforms=Custom uniforms
 
 gui.triangulator.calibrationdescription.line0=Click the Toggle button until the
 gui.triangulator.calibrationdescription.line1=yellow and the blue squares look the same,

@@ -27,7 +27,6 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.modules.triangulator.calibration.CalibrationConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
@@ -622,7 +621,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() && CalibrationConfig.FLIP_DIAGONALS) {
+        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() && TriangulatorConfig.Calibration.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
             avgBottomLeft = tmp;

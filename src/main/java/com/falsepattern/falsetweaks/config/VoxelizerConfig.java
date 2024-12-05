@@ -34,8 +34,10 @@ import net.minecraft.launchwrapper.Launch;
 import java.util.HashSet;
 import java.util.Set;
 
+@Config.Comment("Options for the FalseTweaks 3D item renderer framework")
 @Config(modid = Tags.MOD_ID,
         category = "voxelizer")
+@Config.LangKey
 @Config.RequiresMcRestart
 public class VoxelizerConfig {
     @Config.Ignore
@@ -46,6 +48,7 @@ public class VoxelizerConfig {
     private static final Set<Class<?>> knownClassExcludes = new HashSet<>();
     @Config.Ignore
     private static final Set<Class<?>> knownClassIncludes = new HashSet<>();
+
     @Config.Comment({
             "You can use this property to fix any incorrectly detected overlays.",
             "Syntax: texture_name=layer, where layer is the multiplier.",
@@ -54,8 +57,9 @@ public class VoxelizerConfig {
             "For reference: layer 0 is regular rendering, layer 1 is on top layer 0, layer 2 is on top of layer 1, etc.",
             "Also supports negatives, but going below -1 is undefined behaviour. (-1 is used for the liquid inside potions by default)"
     })
+    @Config.LangKey
+    @Config.Name(value = "forcedLayers", migrations = "")
     @Config.DefaultStringList({"potion_overlay=-1"})
-    @Config.LangKey("config.falsetweaks.voxelizer.forced_layers")
     public static String[] FORCED_LAYERS;
 
     @Config.Comment({
@@ -63,15 +67,17 @@ public class VoxelizerConfig {
             "Set this higher if you have a strong cpu and weak gpu, and set this lower if you have a weak cpu and strong gpu.",
             "FPS impact: Depends on setup."
     })
+    @Config.LangKey
+    @Config.Name(value = "optimizationStrategy", migrations = "")
     @Config.DefaultEnum("Best_2")
-    @Config.LangKey("config.falsetweaks.voxelizer.mesh_optimization_strategy")
     public static StrategyPreset MESH_OPTIMIZATION_STRATEGY_PRESET;
 
     @Config.Comment({
             "Makes rails 3-dimensional. Doesn't require game restart.",
             "FPS impact: basically none"
     })
-    @Config.LangKey("config.falsetweaks.voxelizer.3d_rails")
+    @Config.LangKey
+    @Config.Name(value = "rails3D", migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean RAILS_3D;
 
@@ -79,7 +85,8 @@ public class VoxelizerConfig {
             "If set to true, the mesh compiler will print out detailed information when textures are compiled",
             "into meshes."
     })
-    @Config.LangKey("config.falsetweaks.voxelizer.debug_mesh_compilation")
+    @Config.LangKey
+    @Config.Name(value = "debugMeshCompilation", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean DEBUG_MESH_COMPILATION;
 
@@ -89,8 +96,9 @@ public class VoxelizerConfig {
             "Needs a game restart to apply changes (cached for performance).",
             "Syntax: modid:texturename"
     })
+    @Config.LangKey
+    @Config.Name(value = "exclusionList", migrations = "")
     @Config.DefaultStringList({"avaritia:infinity"})
-    @Config.LangKey("config.falsetweaks.voxelizer.exclusion_list")
     public static String[] EXCLUSION_LIST;
 
     @Config.Comment({
@@ -98,15 +106,17 @@ public class VoxelizerConfig {
             "This is an instanceof check, so superclasses are also checked.",
             "Needs a game restart to apply changes (cached for performance)."
     })
+    @Config.LangKey
+    @Config.Name(value = "classExclusionList", migrations = "")
     @Config.DefaultStringList({"cofh.lib.render.IFluidOverlayItem"})
-    @Config.LangKey("config.falsetweaks.voxelizer.class_exclusion_list")
     public static String[] CLASS_EXCLUSION_LIST;
 
     @Config.Comment({
             "The thickness of the 3D rails. Doesn't require game restart. 1 is vanilla thickness.",
             "FPS impact: basically none"
     })
-    @Config.LangKey("config.falsetweaks.voxelizer.rail_thickness")
+    @Config.LangKey
+    @Config.Name(value = "railThickness", migrations = "")
     @Config.DefaultDouble(1)
     public static double RAIL_THICKNESS;
 
@@ -114,7 +124,8 @@ public class VoxelizerConfig {
             "Extremely verbose debug logging. This will spam your log.",
             "Only useful on resource pack reloads."
     })
-    @Config.LangKey("config.falsetweaks.voxelizer.verbose_log")
+    @Config.LangKey
+    @Config.Name(value = "verboseLog", migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean VERBOSE_LOG;
 
