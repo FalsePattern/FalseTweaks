@@ -41,7 +41,7 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
-     dependencies = "required-after:falsepatternlib@[1.4.7,);" +
+     dependencies = "required-after:falsepatternlib@[1.5.1,);" +
                     "after:neodymium@[0.4.0,);" +
                     "after:gtnhlib@[0.5.21,);"
      )
