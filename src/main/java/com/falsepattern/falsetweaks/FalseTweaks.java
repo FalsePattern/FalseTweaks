@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks;
 
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.proxy.CommonProxy;
 
 import cpw.mods.fml.common.Loader;
@@ -66,6 +67,9 @@ public class FalseTweaks {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         proxy.preInit(e);
+        if (Loader.isModLoaded("angelica") && ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            createSidedException("FalseTweaks threaded rendering is not compatible with Angelica.\nPlease disable it in the FalseTweaks config.");
+        }
         if (Loader.isModLoaded("animfix")) {
             builtinMod("animfix");
         }

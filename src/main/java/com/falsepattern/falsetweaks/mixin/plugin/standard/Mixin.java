@@ -162,6 +162,7 @@ public enum Mixin implements IMixin {
     ThreadedUpdates_ForgeHooksClientMixin(Side.CLIENT, THREADING, "threadedupdates.ForgeHooksClientMixin"),
     ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, THREADING, "threadedupdates.RenderBlocksMixin"),
     ThreadedUpdates_RenderGlobalMixin(Side.CLIENT, THREADING, "threadedupdates.RenderGlobalMixin"),
+    ThreadedUpdates_RenderingRegistryMixin(Side.CLIENT, THREADING, "threadedupdates.RenderingRegistryMixin"),
     ThreadedUpdates_TessellatorMixin(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin"),
     ThreadedUpdates_TessellatorMixin_DebugFast(Side.CLIENT, THREADING.and(condition(() -> FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_DebugFast"),
     ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING.and(condition(() -> !FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_Debug"),

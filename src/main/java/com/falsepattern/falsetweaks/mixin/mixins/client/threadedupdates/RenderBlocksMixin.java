@@ -52,7 +52,7 @@ public abstract class RenderBlocksMixin {
         int pass = ForgeHooksClient.getWorldRenderPass();
         boolean mainThread = ThreadedChunkUpdateHelper.isMainThread();
 
-        if (mainThread) {
+        if (mainThread && ThreadedChunkUpdateHelper.renderOffThread(block, renderType)) {
             if (ThreadedChunkUpdateHelper.lastWorldRenderer == null) {
                 return 0;
             }
@@ -77,13 +77,6 @@ public abstract class RenderBlocksMixin {
             at = @At("RETURN"))
     private void popStack(CallbackInfoReturnable<Boolean> cir) {
         ThreadedChunkUpdateHelper.renderBlocksStack.pop();
-    }
-
-    @Redirect(method = "*",
-              at = @At(value = "FIELD",
-                       target = "Lnet/minecraft/client/renderer/Tessellator;instance:Lnet/minecraft/client/renderer/Tessellator;"))
-    private Tessellator modifyTessellatorAccess() {
-        return ThreadedChunkUpdates.getThreadTessellator();
     }
 
 }

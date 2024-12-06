@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalD
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.*;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_BlockMinMax;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_BlockMinMaxRedirector;
+import com.falsepattern.falsetweaks.asm.modules.threadedupdates.compat.Threading_AngelicaCompatFixer;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threading_GameSettings;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threading_GameSettingsRedirector;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -53,6 +54,7 @@ public class FalseTweaksTransformer extends MergeableTurboTransformer {
         if (FMLLaunchHandler.side().isClient()) {
             transformers.add(new RenderGlobalDeOptimizer());
             if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+                transformers.add(new Threading_AngelicaCompatFixer());
                 transformers.add(new Threading_RenderBlocksASM());
                 transformers.add(new Threading_TessellatorUseReplacement());
                 transformers.add(new Threading_ThreadSafeBlockRendererInjector());

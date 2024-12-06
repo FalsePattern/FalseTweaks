@@ -53,14 +53,17 @@ public class ThreadingConfig {
     public static boolean FAST_SAFETY_CHECKS;
 
     @Config.Comment({
-            "This enabled deep integration with Neodymium.",
+            "This enabled even deeper integration with Neodymium.",
             "Needs a game restart to change.",
             "Only effective if Neodymium is installed.",
+            "WARNING: This is known to make blocks like MicroBlocks, ProjectRed wires, and Mekanism pipes flicker!",
+            "It might also break other mods' custom block renderers.",
+            "ONLY ENABLE IF YOU KNOW WHAT YOU'RE DOING, AND TURN THIS OFF BEFORE REPORTING ANY BUGS!",
             "FPS Impact: Huge increase"
     })
     @Config.LangKey
-    @Config.Name(value = "neodymiumThreading", migrations = "UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS")
-    @Config.DefaultBoolean(true)
+    @Config.Name(value = "experimentalNeodymiumThreading", migrations = "UNSTABLE_EXPERIMENTAL_NEODYMIUM_THREADING_DO_NOT_REPORT_BUGS")
+    @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean NEODYMIUM_THREADING;
 

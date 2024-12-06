@@ -39,6 +39,7 @@ import org.spongepowered.asm.service.mojang.MixinServiceLaunchWrapper;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,7 +86,12 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
             FIELD_HACK_TF = new FalseTweaksFieldHackTransformer();
             mixinTweakClasses.add(MixinCompatHackTweaker.class.getName());
         }
-        return new String[]{Tags.ROOT_PKG + ".asm.FalseTweaksTransformer"};
+        val xFormers = new ArrayList<String>();
+        if (FMLLaunchHandler.side().isClient() && ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            xFormers.add(Tags.ROOT_PKG + ".asm.modules.threadedupdates.compat.Threading_AngelicaRemapper");
+        }
+        xFormers.add(Tags.ROOT_PKG + ".asm.FalseTweaksTransformer");
+        return xFormers.toArray(new String[0]);
     }
 
     @Override

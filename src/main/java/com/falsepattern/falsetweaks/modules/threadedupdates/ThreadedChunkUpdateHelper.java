@@ -207,60 +207,61 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     private static int doChunkUpdateForRenderPassBlock(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, RenderBlocks renderblocks, int x, int y, int z, int flags) {
         Block block = chunkcache.getBlock(x, y, z);
+        val rt = block.getRenderType();
 
-        if (block.getMaterial() != Material.air) {
+        if (!(AGGRESSIVE_NEODYMIUM_THREADING || renderOffThread(block, rt))) {
+            return flags;
+        }
 
-            if (AGGRESSIVE_NEODYMIUM_THREADING && pass == 0 && block.hasTileEntity(chunkcache.getBlockMetadata(x, y, z))) {
-                val tileEntity = chunkcache.getTileEntity(x, y, z);
-                if (TileEntityRendererDispatcher.instance.hasSpecialRenderer(tileEntity)) {
-                    task.TESRs.add(tileEntity);
-                }
-            }
+        if (block.getMaterial() == Material.air) {
+            return flags;
+        }
 
-            if (block.getRenderBlockPass() > pass) {
-                flags |= BIT_NextPass;
-            }
-
-            if (!block.canRenderInPass(pass)) {
-                return flags;
-            }
-            if (!hasFlag(flags, BIT_StartedTessellator)) {
-                if (ModuleConfig.TRIANGULATOR()) {
-                    ToggleableTessellatorManager.preRenderBlocks(pass);
-                }
-                flags |= BIT_StartedTessellator;
-                if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                    NeodymiumCompat.beginRenderPass(task, wr, pass);
-                }
-                tess.startDrawingQuads();
-                tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
-            }
-
-            try {
-                flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
-            } catch (Exception e) {
-                synchronized (alreadyWarnedRenderTypes) {
-                    val rt = block.getRenderType();
-                    if (!alreadyWarnedRenderTypes.contains(rt)) {
-                        alreadyWarnedRenderTypes.add(rt);
-                        Share.log.error("Exception while rendering a block!", e);
-                    }
-                }
-            }
-
-            if (block.getRenderType() == 0 && x == playerX && y == playerY && z == playerZ) {
-                renderblocks.setRenderFromInside(true);
-                renderblocks.setRenderAllFaces(true);
-                renderblocks.renderBlockByRenderType(block, x, y, z);
-                renderblocks.setRenderFromInside(false);
-                renderblocks.setRenderAllFaces(false);
+        if (AGGRESSIVE_NEODYMIUM_THREADING && pass == 0 && block.hasTileEntity(chunkcache.getBlockMetadata(x, y, z))) {
+            val tileEntity = chunkcache.getTileEntity(x, y, z);
+            if (TileEntityRendererDispatcher.instance.hasSpecialRenderer(tileEntity)) {
+                task.TESRs.add(tileEntity);
             }
         }
-        return flags;
-    }
 
-    public static boolean canBlockBeRenderedOffThread(Block block, int pass, int renderType) {
-        return renderType < 42 && renderType != 22; // vanilla block
+        if (block.getRenderBlockPass() > pass) {
+            flags |= BIT_NextPass;
+        }
+
+        if (!block.canRenderInPass(pass)) {
+            return flags;
+        }
+        if (!hasFlag(flags, BIT_StartedTessellator)) {
+            if (ModuleConfig.TRIANGULATOR()) {
+                ToggleableTessellatorManager.preRenderBlocks(pass);
+            }
+            flags |= BIT_StartedTessellator;
+            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                NeodymiumCompat.beginRenderPass(task, wr, pass);
+            }
+            tess.startDrawingQuads();
+            tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
+        }
+
+        try {
+            flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
+        } catch (Exception e) {
+            synchronized (alreadyWarnedRenderTypes) {
+                if (!alreadyWarnedRenderTypes.contains(rt)) {
+                    alreadyWarnedRenderTypes.add(rt);
+                    Share.log.error("Exception while rendering a block!", e);
+                }
+            }
+        }
+
+        if (block.getRenderType() == 0 && x == playerX && y == playerY && z == playerZ) {
+            renderblocks.setRenderFromInside(true);
+            renderblocks.setRenderAllFaces(true);
+            renderblocks.renderBlockByRenderType(block, x, y, z);
+            renderblocks.setRenderFromInside(false);
+            renderblocks.setRenderAllFaces(false);
+        }
+        return flags;
     }
 
     public static boolean isMainThread() {
@@ -400,6 +401,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             debugLog(() -> "Renderer " + worldRendererToString(wr) + " is dirty, cancelling task");
             task.cancelled = true;
         }
+    }
+
+    public static boolean renderOffThread(Block block, int renderType) {
+        boolean isVanilla = renderType < 42 && renderType != 22;
+        return isVanilla || ThreadedBlockSafetyRegistry.canBlockRenderOffThread(block);
     }
 
     /**
