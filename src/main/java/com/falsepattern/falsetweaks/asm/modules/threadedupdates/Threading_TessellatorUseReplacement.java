@@ -94,6 +94,7 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
             "mods.natura.client.SaguaroRenderer",
             "mods.railcraft.client.render.RenderFakeBlock",
             "net.malisis.core.renderer.MalisisRenderer",
+            "net.minecraft.client.renderer.RenderBlocks",
             "net.minecraftforge.fluids.RenderBlockFluid",
             "openmods.renderer.FixedRenderBlocks",
             "openmods.renderer.TweakedRenderBlocks",
