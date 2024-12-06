@@ -177,7 +177,7 @@ public class ModuleConfig {
     })
     @Config.LangKey("config.falsetweaks.profiler")
     @Config.Name(value = "advancedProfiler", migrations = "")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean ADVANCED_PROFILER;
 
