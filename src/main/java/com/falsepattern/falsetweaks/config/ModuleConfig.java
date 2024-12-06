@@ -31,7 +31,6 @@ import com.falsepattern.lib.config.ConfigurationManager;
 @Config(modid = Tags.MOD_ID,
         category = "00_modules")
 @Config.LangKey
-@Config.RequiresMcRestart
 public class ModuleConfig {
     @Config.Comment({
             "Optimizes the way forge scans the classpath during launch.",
@@ -41,6 +40,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "startupOptimizations", migrations = "STARTUP_OPTIMIZATIONS_V2")
     @Config.DefaultBoolean(false)
+    @Config.RequiresMcRestart
     public static boolean STARTUP_OPTIMIZATIONS;
 
     @Config.Comment({
@@ -52,6 +52,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "textureOptimizations", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean TEXTURE_OPTIMIZATIONS;
 
     @Config.Comment({
@@ -62,6 +63,7 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.voxelizer")
     @Config.Name(value = "voxelizer", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean VOXELIZER;
 
     @Config.Comment({
@@ -74,6 +76,7 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.triangulator")
     @Config.Name(value = "triangulator", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean TRIANGULATOR;
 
     @Config.Comment({
@@ -84,6 +87,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "bspSorting", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean BSP_SORTING;
 
     @Config.Comment({
@@ -96,12 +100,14 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.item_render_lists")
     @Config.Name(value = "itemRenderLists", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean ITEM_RENDER_LISTS;
 
     @Config.Comment("Disables the Realms button on the main menu.")
     @Config.LangKey
     @Config.Name(value = "noRealmsOnMenu", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean NO_REALMS_ON_MENU;
 
     @Config.Comment({
@@ -112,6 +118,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "beaconOptimization", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean BEACON_OPTIMIZATION;
 
     @Config.Comment({
@@ -122,6 +129,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "tileEntityTransparencyFix", migrations = "")
     @Config.DefaultBoolean(false)
+    @Config.RequiresMcRestart
     public static boolean TE_TRANSPARENCY_FIX;
 
     @Config.Comment({
@@ -133,18 +141,21 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.translucent_block_layers_fix")
     @Config.Name(value = "translucentBlockLayersFix", migrations = "")
     @Config.DefaultBoolean(false)
+    @Config.RequiresMcRestart
     public static boolean BLOCK_LAYER_TRANSPARENCY_FIX;
 
     @Config.Comment("Fixes layering issues with particles always rendering behind water.")
     @Config.LangKey
     @Config.Name(value = "particleTransparencyFix", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean PARTICLE_TRANSPARENCY_FIX;
 
     @Config.Comment("3D block breaking particles")
     @Config.LangKey
     @Config.Name(value = "cubicParticles", migrations = "")
     @Config.DefaultBoolean(false)
+    @Config.RequiresMcRestart
     public static boolean CUBIC_PARTICLES;
 
     @Config.Comment({
@@ -156,6 +167,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "mipmapFix", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean MIPMAP_FIX;
 
     @Config.Comment({
@@ -166,6 +178,7 @@ public class ModuleConfig {
     @Config.LangKey("config.falsetweaks.profiler")
     @Config.Name(value = "advancedProfiler", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean ADVANCED_PROFILER;
 
     @Config.Comment({
@@ -214,6 +227,7 @@ public class ModuleConfig {
     @Config.LangKey
     @Config.Name(value = "minecartEarBlastFix", migrations = "")
     @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
     public static boolean MINECART_EAR_BLAST_FIX;
 
     @Config.Comment({
