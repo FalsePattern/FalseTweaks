@@ -190,7 +190,7 @@ public class ModuleConfig {
     })
     @Config.LangKey("config.falsetweaks.threading")
     @Config.Name(value = "threadedChunkUpdates", migrations = "")
-    @Config.DefaultBoolean(false)
+    @Config.DefaultBoolean(true)
     @Config.RequiresMcRestart
     public static boolean THREADED_CHUNK_UPDATES;
 
