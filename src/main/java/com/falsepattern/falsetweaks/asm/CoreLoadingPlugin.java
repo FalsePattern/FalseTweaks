@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@IFMLLoadingPlugin.TransformerExclusions(Tags.ROOT_PKG + ".asm")
+@IFMLLoadingPlugin.TransformerExclusions({Tags.ROOT_PKG + ".asm", "it.unimi.dsi.fastutil"})
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
