@@ -24,7 +24,8 @@
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates.compat;
 
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_ThreadSafeBlockRendererInjector;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingClassAdapter;
@@ -36,7 +37,7 @@ class AngelicaRemappingAdapter extends RemappingClassAdapter {
 
     private static class AngelicaRemapper extends Remapper {
         public static final AngelicaRemapper INSTANCE = new AngelicaRemapper();
-        private static final Object2ObjectOpenHashMap<String, String> MAPPINGS = new Object2ObjectOpenHashMap<>();
+        private static final Object2ObjectMap<String, String> MAPPINGS = new Object2ObjectArrayMap<>(2);
         static {
             MAPPINGS.put("com/gtnewhorizons/angelica/api/ThreadSafeISBRH", Threading_ThreadSafeBlockRendererInjector.THREAD_SAFE_ANNOTATION_InternalName);
             MAPPINGS.put("com/gtnewhorizons/angelica/api/ThreadSafeISBRHFactory", Threading_ThreadSafeBlockRendererInjector.THREAD_SAFE_FACTORY_InternalName);
