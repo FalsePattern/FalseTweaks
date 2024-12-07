@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version ("0.8.2")
+    id("fpgradle-minecraft") version ("0.8.3")
 }
 
 group = "com.falsepattern"
@@ -68,6 +68,7 @@ repositories {
     exclusive(mega(), "codechicken")
     exclusive(ivy("https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
     exclusive(ivy("https://downloads.gtnewhorizons.com/", "[organisation]/[artifact]-[revision].[ext]"), "Mods_for_Twitch")
+    exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon/"), "com.gtnewhorizons.retrofuturabootstrap")
 }
 
 dependencies {
@@ -79,6 +80,7 @@ dependencies {
 
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
     compileOnly("com.github.GTNewHorizons:GTNHLib:0.5.21:api")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") { excludeDeps() }

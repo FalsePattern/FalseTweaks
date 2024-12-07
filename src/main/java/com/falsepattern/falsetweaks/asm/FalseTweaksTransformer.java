@@ -49,6 +49,11 @@ import java.util.List;
 @Getter
 @Accessors(fluent = true)
 public class FalseTweaksTransformer extends MergeableTurboTransformer {
+    static {
+        try {
+            RFBFixerUtility.removeGTNHLibHook();
+        } catch (Throwable ignored) {}
+    }
     private static List<TurboClassTransformer> transformers() {
         val transformers = new ArrayList<TurboClassTransformer>();
         if (FMLLaunchHandler.side().isClient()) {

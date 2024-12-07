@@ -23,43 +23,20 @@
 
 package com.falsepattern.falsetweaks.asm;
 
-import lombok.SneakyThrows;
 import lombok.val;
 
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.ITweaker;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import java.io.File;
 import java.util.List;
 
-public class MixinCompatHackTweaker implements ITweaker {
-    @Override
-    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-
-    }
-
-    @Override
-    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-
-    }
-
-    @Override
-    public String getLaunchTarget() {
-        return null;
-    }
-
-    @Override
-    @SneakyThrows
-    public String[] getLaunchArguments() {
-        val f = LaunchClassLoader.class.getDeclaredField("transformers");
-        f.setAccessible(true);
-        val transformers = (List<IClassTransformer>) f.get(Launch.classLoader);
-        try {
-            ASMFixerUtility.removeGTNHLibHook(transformers);
-        } catch (Throwable ignored) {}
-        transformers.add(CoreLoadingPlugin.FIELD_HACK_TF);
-        return new String[0];
+public class ASMFixerUtility {
+    public static void removeGTNHLibHook(List<IClassTransformer> transformers) {
+        val iter = transformers.iterator();
+        while (iter.hasNext()) {
+            val transformer = (IClassTransformer) iter.next();
+            if (transformer.getClass().getName().equals("com.gtnewhorizon.gtnhlib.core.transformer.TessellatorRedirectorTransformer")) {
+                iter.remove();
+            }
+        }
     }
 }
