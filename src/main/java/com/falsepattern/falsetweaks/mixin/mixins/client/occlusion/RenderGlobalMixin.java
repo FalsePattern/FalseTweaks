@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionWorker;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import lombok.val;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -89,8 +90,13 @@ public abstract class RenderGlobalMixin implements IRenderGlobalMixin {
             at = @At("RETURN"),
             require = 1)
     private void initBetterLists(Minecraft p_i1249_1_, CallbackInfo ci) {
-        OcclusionHelpers.renderer = new OcclusionRenderer((RenderGlobal) (Object) this);
-        OcclusionHelpers.renderer.initBetterLists();
+        synchronized (OcclusionHelpers.class) {
+            if (OcclusionHelpers.renderer == null) {
+                val r = new OcclusionRenderer((RenderGlobal) (Object) this);
+                OcclusionHelpers.renderer = r;
+                r.initBetterLists();
+            }
+        }
     }
 
     @Redirect(method = "loadRenderers",
