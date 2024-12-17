@@ -52,27 +52,17 @@ minecraft_fp {
 
 repositories {
     cursemavenEX()
-    mavenpattern() {
-        content {
-            includeGroups("com.falsepattern", "makamys")
-        }
-    }
-    mavenLocal {
-        content {
-            includeGroup("com.falsepattern")
-        }
-    }
-    exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon"), "com.github.GTNewHorizons")
-    exclusive(jitpack(), "com.github.basdxz", "com.github.jss2a98aj")
-    exclusive(maven("mega_uploads", "https://mvn.falsepattern.com/gtmega_uploads"), "optifine")
+    exclusive(mavenpattern(), "com.falsepattern", "makamys")
     exclusive(mega(), "codechicken")
+    exclusive(mega_uploads(), "optifine")
+    exclusive(jitpack(), "com.github.basdxz", "com.github.jss2a98aj")
+    exclusive(horizon(), "com.github.GTNewHorizons", "com.gtnewhorizons.retrofuturabootstrap")
     exclusive(ivy("https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
     exclusive(ivy("https://downloads.gtnewhorizons.com/", "[organisation]/[artifact]-[revision].[ext]"), "Mods_for_Twitch")
-    exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon/"), "com.gtnewhorizons.retrofuturabootstrap")
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.1")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.5")
     implementation("org.joml:joml:1.10.5")
     implementation("it.unimi.dsi:fastutil:8.5.13")
 
