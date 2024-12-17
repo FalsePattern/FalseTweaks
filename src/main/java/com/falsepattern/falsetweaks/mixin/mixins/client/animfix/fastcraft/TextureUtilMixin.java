@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix.fastcraft;
 
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,14 +33,15 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 
 //Evil black magic class #4
 //Revert fastcraft ASM changes
-@SuppressWarnings({"UnresolvedMixinReference", "InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
-@Mixin(TextureUtil.class)
+@Mixin(value = TextureUtil.class,
+       priority = 1200)
 public abstract class TextureUtilMixin {
     @Shadow
     private static int func_147943_a(int p_147943_0_, int p_147943_1_, int p_147943_2_, int p_147943_3_, boolean p_147943_4_) {
         return 0;
     }
 
+    @Dynamic
     @Redirect(method = "generateMipmapData",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;p(IIIIZ)I",
@@ -50,6 +52,7 @@ public abstract class TextureUtilMixin {
         return func_147943_a(a, b, c, d, e);
     }
 
+    @Dynamic
     @Redirect(method = "uploadTextureMipmap",
               at = @At(value = "INVOKE",
                        target = "Lfastcraft/HC;i([[IIIIIZZ)Z",
