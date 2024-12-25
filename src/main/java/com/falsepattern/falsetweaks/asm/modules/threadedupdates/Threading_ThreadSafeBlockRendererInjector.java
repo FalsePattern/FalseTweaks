@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -40,15 +41,19 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 
 // TODO ASM Logging
 
@@ -245,23 +250,31 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
             if (!"<clinit>".equals(method.name))
                 continue;
             staticInitializedFound = true;
-            injectThreadLocalCreation(method, internalName, withInitial);
+            injectThreadLocalCreation(method, internalName, withInitial, cn.version);
         }
         if (!staticInitializedFound) {
             val clinit = new MethodNode(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
             clinit.instructions.add(new FrameNode(Opcodes.F_FULL, 0, new Object[0], 0, new Object[0]));
             cn.methods.add(clinit);
-            injectThreadLocalCreation(clinit, internalName, withInitial);
+            injectThreadLocalCreation(clinit, internalName, withInitial, cn.version);
             clinit.instructions.add(new InsnNode(Opcodes.RETURN));
         }
     }
 
-    private void injectThreadLocalCreation(MethodNode method, String internalName, boolean withInitial) {
+    private void injectThreadLocalCreation(MethodNode method, String internalName, boolean withInitial, int version) {
         val insnList = method.instructions.iterator();
         if (withInitial) {
-            insnList.add(
-                    new InvokeDynamicInsnNode("get", "()Ljava/util/function/Supplier;", LAMBDA_META_FACTORY, Type.getType("()Ljava/lang/Object;"), INITIALIZERS.get(internalName),
-                                              Type.getType("()L" + internalName + ";")));
+            if (version >= Opcodes.V1_8) {
+                insnList.add(new InvokeDynamicInsnNode("get", "()Ljava/util/function/Supplier;", LAMBDA_META_FACTORY, Type.getType("()Ljava/lang/Object;"),
+                                                       INITIALIZERS.get(internalName), Type.getType("()L" + internalName + ";")));
+            } else {
+                val initializer = INITIALIZERS.get(internalName);
+                insnList.add(new LdcInsnNode(initializer.getOwner()));
+                insnList.add(new LdcInsnNode(initializer.getName()));
+                insnList.add(new LdcInsnNode(initializer.getDesc()));
+                insnList.add(new LdcInsnNode(initializer.getTag()));
+                insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(LegacyBytecodeSupplierFactory.class), createSupplier.getName(), createSupplier.getDescriptor(), false));
+            }
             insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ThreadLocal", "withInitial", "(Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;", false));
         } else {
             insnList.add(new TypeInsnNode(Opcodes.NEW, "java/lang/ThreadLocal"));
@@ -271,6 +284,79 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
         insnList.add(new FieldInsnNode(Opcodes.PUTSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
         if (method.maxStack == 0) {
             method.maxStack = 1;
+        }
+    }
+
+    private static final Method createSupplier;
+
+    static {
+        try {
+            createSupplier = Method.getMethod(LegacyBytecodeSupplierFactory.class.getDeclaredMethod("createSupplier", String.class, String.class, String.class, int.class));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static class LegacyBytecodeSupplierFactory {
+        public static Supplier<Object> createSupplier(String owner, String name, String desc, int tag) throws ClassNotFoundException {
+            val klass = Class.forName(owner.replace('/', '.'));
+            val methodType = Type.getMethodType(desc);
+            val args = methodType.getArgumentTypes();
+            if (tag == Opcodes.H_INVOKESTATIC) {
+                val methods = klass.getDeclaredMethods();
+                outer:
+                for (val method : methods) {
+                    if (!Objects.equals(name, method.getName())) {
+                        continue;
+                    }
+                    val params = method.getParameters();
+                    if (params.length != args.length) {
+                        continue;
+                    }
+                    if (!Objects.equals(methodType.getReturnType(), Type.getType(method.getReturnType()))) {
+                        continue;
+                    }
+                    for (int i = 0; i < params.length; i++) {
+                        if (!Objects.equals(args[i], Type.getType(params[i].getType()))) {
+                            continue outer;
+                        }
+                    }
+                    method.setAccessible(true);
+                    return () -> {
+                        try {
+                            return method.invoke(null);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    };
+                }
+                throw new IllegalArgumentException("Could not find target method " + owner + ":" + name + ":" + desc);
+            } else if (tag == Opcodes.H_NEWINVOKESPECIAL) {
+                val constructors = klass.getDeclaredConstructors();
+                outer:
+                for (val method : constructors) {
+                    val params = method.getParameters();
+                    if (params.length != args.length) {
+                        continue;
+                    }
+                    for (int i = 0; i < params.length; i++) {
+                        if (!Objects.equals(args[i], Type.getType(params[i].getType()))) {
+                            continue outer;
+                        }
+                    }
+                    method.setAccessible(true);
+                    return () -> {
+                        try {
+                            return method.newInstance();
+                        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                            throw new RuntimeException(e);
+                        }
+                    };
+                }
+                throw new IllegalArgumentException("Could not find target constructor " + owner + ":" + name + ":" + desc);
+            } else {
+                throw new IllegalArgumentException("Unknown call tag: " + tag);
+            }
         }
     }
 }
