@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version ("0.9.0")
+    id("fpgradle-minecraft") version ("0.10.0")
 }
 
 group = "com.falsepattern"
@@ -18,6 +18,7 @@ minecraft_fp {
     mixin {
         pkg = "mixin.mixins"
         pluginClass = "mixin.plugin.standard.MixinPlugin"
+        extraConfigs = listOf("mixins.falsetweaks.init.json")
     }
 
     core {
