@@ -46,6 +46,7 @@ public class Compat {
     private static Boolean OPTIFINE = null;
     private static Boolean DYNLIGHTS = null;
     private static Boolean SHADERS = null;
+    private static Boolean LWJGL3IFY = null;
 
     public static boolean neodymiumInstalled() {
         if (NEODYMIUM != null) {
@@ -113,6 +114,19 @@ public class Compat {
         return SHADERS;
     }
 
+    public static boolean lwjgl3ifyLoaded() {
+        if (LWJGL3IFY != null) {
+            return LWJGL3IFY;
+        }
+        try {
+            LWJGL3IFY = Launch.classLoader.getClassBytes("me.eigenraven.lwjgl3ify.core.Lwjgl3ifyCoremod") != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            LWJGL3IFY = false;
+        }
+        return LWJGL3IFY;
+    }
+
     public static void applyCompatibilityTweaks() {
         ThreadingCompat.init();
         if (Loader.isModLoaded("apparatus")) {
@@ -134,6 +148,15 @@ public class Compat {
 
     public static boolean isShaders() {
         return optiFineHasShaders() && Config.isShaders();
+    }
+
+    public static boolean isSTBIStitcher() {
+        try {
+            return lwjgl3ifyLoaded() && LWJGL3IfyCompat.stbiTextureStitching();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
 
     public static float getAmbientOcclusionLightValue(Block block, int x, int y, int z, IBlockAccess blockAccess) {
@@ -172,6 +195,12 @@ public class Compat {
 
         public static Tessellator threadTessellator() {
             return ThreadedChunkUpdates.getThreadTessellator();
+        }
+    }
+
+    private static class LWJGL3IfyCompat {
+        public static boolean stbiTextureStitching() {
+            return me.eigenraven.lwjgl3ify.core.Config.MIXIN_STBI_TEXTURE_STITCHING;
         }
     }
 

@@ -26,6 +26,7 @@ package com.falsepattern.falsetweaks;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.proxy.CommonProxy;
 
+import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -78,6 +79,12 @@ public class FalseTweaks {
         }
         if (Loader.isModLoaded("DynamicLights")) {
             createSidedException("Remove the DynamicLights mod and restart the game!\nFalseTweaks has built-in dynamic lights support.");
+        }
+        if (ModuleConfig.TEXTURE_OPTIMIZATIONS && Compat.isSTBIStitcher()) {
+            createSidedException("FalseTweaks " +
+                                 EnumChatFormatting.BOLD + "textureOptimizations" + EnumChatFormatting.RESET + " is not compatible with LWJGL3Ify's " +
+                                 EnumChatFormatting.BOLD + "stbiTextureStitching" + EnumChatFormatting.RESET +
+                                 " option.\nDisable stbiTextureStitching in the lwjgl3ify.cfg\nor disable textureOptimizations in FalseTweaks!");
         }
     }
 

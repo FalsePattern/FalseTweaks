@@ -69,6 +69,8 @@ dependencies {
 
     compileOnly("makamys:neodymium-mc1.7.10:0.4.0-unofficial:dev")
 
+    compileOnly("com.github.GTNewHorizons:lwjgl3ify:2.1.5:dev")
+
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
     compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
