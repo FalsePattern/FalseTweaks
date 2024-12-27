@@ -138,6 +138,9 @@ public enum Mixin implements IMixin {
     Occlusion_Optifine_Shaders_FrustrumMixin(Side.CLIENT,
                                              THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
                                              "occlusion.optifine.shaders.FrustrumMixin"),
+    Occlusion_Optifine_Shaders_ShadersMixin(Side.CLIENT,
+                                            THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
+                                            "occlusion.optifine.shaders.ShadersMixin"),
 
 
     //FastCraft

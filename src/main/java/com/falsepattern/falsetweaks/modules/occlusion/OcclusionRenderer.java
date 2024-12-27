@@ -27,6 +27,7 @@ import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
 import com.falsepattern.falsetweaks.modules.occlusion.interfaces.IRenderGlobalMixin;
+import com.falsepattern.falsetweaks.modules.occlusion.shader.ShadowPassOcclusionHelper;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
 import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
@@ -1120,6 +1121,18 @@ public class OcclusionRenderer {
 
         prof.startSection("setup_lists");
         int glListsRendered = 0, allRenderListsLength = 0;
+
+        if (shadowPass) {
+            val renderers = rg.worldRenderers;
+            ShadowPassOcclusionHelper.begin();
+            for (int i = 0; i < renderers.length; i++) {
+                val wr = renderers[i];
+                if (wr != null && wr.isVisible && wr.isInFrustum && !wr.skipAllRenderPasses()) {
+                    ShadowPassOcclusionHelper.addShadowReceiver(wr);
+                }
+            }
+            ShadowPassOcclusionHelper.end();
+        }
         WorldRenderer[] sortedWorldRenderers = shadowPass ? rg.worldRenderers : rg.sortedWorldRenderers;
 
         for (int i = loopStart; i != loopEnd; i += dir) {
@@ -1131,7 +1144,7 @@ public class OcclusionRenderer {
                 isVisible = rend.isVisible;
                 isInFrustum = rend.isInFrustum;
                 rend.isVisible = iwr.ft$isVisibleShadows();
-                rend.isInFrustum = true;
+                rend.isInFrustum = ShadowPassOcclusionHelper.isShadowVisible(rend);
             }
 
             if ((rend.isVisible && rend.isInFrustum) && !rend.skipRenderPass[pass]) {

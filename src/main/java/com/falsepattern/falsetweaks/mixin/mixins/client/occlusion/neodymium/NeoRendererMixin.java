@@ -25,25 +25,32 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.neodymium;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 import com.falsepattern.falsetweaks.modules.occlusion.OcclusionHelpers;
 import com.falsepattern.falsetweaks.modules.occlusion.WorldRendererOcclusion;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
-import makamys.neodymium.renderer.Mesh;
+import com.falsepattern.falsetweaks.modules.occlusion.shader.ShadowPassOcclusionHelper;
+import lombok.val;
+import makamys.neodymium.renderer.ChunkMesh;
+import makamys.neodymium.renderer.GPUMemoryManager;
+import makamys.neodymium.renderer.NeoRegion;
 import makamys.neodymium.renderer.NeoRenderer;
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.renderer.WorldRenderer;
 
+import java.util.List;
+
 @Mixin(value = NeoRenderer.class,
        remap = false)
 public abstract class NeoRendererMixin {
+    @Shadow private List<GPUMemoryManager> mems;
+
+    @Shadow private List<NeoRegion> loadedRegionsList;
+
     @Inject(method = "render",
             at = @At(value = "INVOKE",
                      target = "Lorg/lwjgl/opengl/GL30;glBindVertexArray(I)V",
@@ -60,12 +67,35 @@ public abstract class NeoRendererMixin {
      * @reason Compat
      */
     @Overwrite
-    @Dynamic
     private boolean isRendererVisible(WorldRenderer wr, boolean shadowPass) {
-        if (shadowPass) {
-            return ((WorldRendererOcclusion)wr).ft$isVisibleShadows();
-        } else {
+        if (!shadowPass) {
             return wr.isVisible;
         }
+        if (!((WorldRendererOcclusion) wr).ft$isVisibleShadows()) {
+            return false;
+        }
+        return ShadowPassOcclusionHelper.isShadowVisible(wr);
+    }
+
+    @Inject(method = "initIndexBuffers",
+            at = @At("HEAD"),
+            require = 1)
+    private void initIndexBuffers(boolean shadowPass, CallbackInfo ci) {
+        if (!shadowPass)
+            return;
+        ShadowPassOcclusionHelper.begin();
+        int regionsSize = loadedRegionsList.size();
+        for (val mem: mems) {
+            for (int regionI = 0; regionI < regionsSize; regionI++) {
+                val region = loadedRegionsList.get(regionI).getRenderData(mem);
+                for (val mesh: region.getSentMeshes()) {
+                    val wr = ((ChunkMesh)mesh).wr();
+                    if (wr.isVisible && wr.isInFrustum) {
+                        ShadowPassOcclusionHelper.addShadowReceiver(wr);
+                    }
+                }
+            }
+        }
+        ShadowPassOcclusionHelper.end();
     }
 }

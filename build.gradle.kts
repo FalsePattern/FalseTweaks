@@ -67,7 +67,7 @@ dependencies {
     implementation("org.joml:joml:1.10.5")
     implementation("it.unimi.dsi:fastutil:8.5.13")
 
-    compileOnly("makamys:neodymium-mc1.7.10:0.4.0-unofficial:dev")
+    compileOnly("makamys:neodymium-mc1.7.10:0.4.2-unofficial:dev")
 
     compileOnly("com.github.GTNewHorizons:lwjgl3ify:2.1.5:dev")
 
