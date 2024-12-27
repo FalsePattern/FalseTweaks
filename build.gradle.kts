@@ -98,4 +98,6 @@ dependencies {
     compileOnly(deobfCurse("techguns-244201:2429662"))
     // Malisis Core 0.14.3
     compileOnly(deobfCurse("malisiscore-223896:2283267"))
+    // SecurityCraft 1.8.13
+    compileOnly(deobfCurse("securitycraft-64760:2818228"))
 }

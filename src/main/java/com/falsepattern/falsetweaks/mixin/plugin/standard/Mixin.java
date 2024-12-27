@@ -385,6 +385,13 @@ public enum Mixin implements IMixin {
     OptiSpam_ShaderExpressionResolverMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderExpressionResolverMixin"),
     OptiSpam_ShaderPackParserMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderPackParserMixin"),
     //endregion OptiFine Spam Fix
+
+    //region Misc compat fixes
+    Compat_SC_BlockReinforcedFenceGateMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedFenceGateMixin"),
+    Compat_SC_BlockReinforcedGlassPaneMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedGlassPaneMixin"),
+    Compat_SC_BlockReinforcedIronBarsMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedIronBarsMixin"),
+    Compat_SC_BlockReinforcedStainedGlassPanesMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedStainedGlassPanesMixin"),
+    //endregion
     ;
     // @formatter:on
 
