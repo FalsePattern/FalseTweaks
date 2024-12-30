@@ -67,3 +67,5 @@ Any bug reports concerning the known problems listed in this table will be close
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
 - [UniMixins](https://github.com/LegacyModdingMC/UniMixins)
+
+### Special thanks to [JProfiler](https://www.ej-technologies.com/jprofiler) ![JProfiler](https://www.ej-technologies.com/images/product_banners/jprofiler_small.png) for their free OpenSource license!
