@@ -43,8 +43,8 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
-     dependencies = "required-after:falsepatternlib@[1.5.5,);" +
-                    "after:neodymium@[0.4.2,);" +
+     dependencies = "required-after:falsepatternlib@[1.5.7,);" +
+                    "after:neodymium@[0.4.3,);" +
                     "after:gtnhlib@[0.5.21,);"
      )
 public class FalseTweaks {

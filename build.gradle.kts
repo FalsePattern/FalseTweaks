@@ -63,11 +63,11 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.5")
-    implementation("org.joml:joml:1.10.5")
-    implementation("it.unimi.dsi:fastutil:8.5.13")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.7")
+    implementation("org.joml:joml:1.10.8")
+    implementation("it.unimi.dsi:fastutil:8.5.15")
 
-    compileOnly("makamys:neodymium-mc1.7.10:0.4.2-unofficial:dev")
+    compileOnly("makamys:neodymium-mc1.7.10:0.4.3-unofficial:dev")
 
     compileOnly("com.github.GTNewHorizons:lwjgl3ify:2.1.5:dev")
 
