@@ -46,6 +46,15 @@ public class TranslucentBlockLayersConfig {
     @Config.DefaultDouble(0.001)
     public static double TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON;
 
+    @Config.Comment({
+            "Runtime toggle for enabling the matrix transforms.",
+            "This does not affect the mixin loading, use the toggle in the modules section for that."
+    })
+    @Config.Name(value = "enabled")
+    @Config.LangKey
+    @Config.DefaultBoolean(true)
+    public static boolean ENABLED;
+
     static {
         ConfigurationManager.selfInit();
     }

@@ -23,10 +23,10 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
-import lombok.val;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
+import com.falsepattern.falsetweaks.modules.misc.TranslucentBlockLayers;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -34,9 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.EntityLivingBase;
 
-import java.nio.FloatBuffer;
-
-import static com.falsepattern.falsetweaks.config.TranslucentBlockLayersConfig.TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON;
+import static com.falsepattern.falsetweaks.config.TranslucentBlockLayersConfig.ENABLED;
 
 
 /**
@@ -44,64 +42,85 @@ import static com.falsepattern.falsetweaks.config.TranslucentBlockLayersConfig.T
  */
 @Mixin(RenderGlobal.class)
 public abstract class TranslucentBlockLayers_RenderGlobalMixin {
-    private FloatBuffer fltw$matrixBuffer;
+    private TranslucentBlockLayers ft$tbl;
+
+    private boolean doResetMatrix;
 
     /**
-     * Moves the Z-Clip towards the camera by the {@link com.falsepattern.falsetweaks.config.TranslucentBlockLayersConfig#TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON epsilon} value when rendering translucent blocks.
-     *
-     * @param entityLivingBase Entity
-     * @param renderPass       Render pass
-     * @param partialTick      Partial tick
-     * @param cir              Mixin callback
+     * Vanilla hook
      */
     @Inject(method = "sortAndRender",
             at = @At("HEAD"),
             require = 1)
     private void offsetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
-        if (renderPass != 1) {
-            return;
-        }
-
-        if (fltw$matrixBuffer == null) {
-            fltw$matrixBuffer = BufferUtils.createFloatBuffer(16);
-        }
-
-        val lastMatrixMode = GL11.glGetInteger(GL11.GL_MATRIX_MODE);
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-
-        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, fltw$matrixBuffer);
-
-        GL11.glPushMatrix();
-
-        GL11.glLoadIdentity();
-        GL11.glScalef(1F, 1F, 1F / (1F - (float) TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON));
-        GL11.glTranslatef(0F, 0F, -(float) TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON);
-        GL11.glMultMatrix(fltw$matrixBuffer);
-
-        GL11.glMatrixMode(lastMatrixMode);
+        ft$offsetProjection(renderPass);
     }
 
     /**
-     * Resets the projection after rendering translucent blocks.
-     *
-     * @param entityLivingBase Entity
-     * @param renderPass       Render pass
-     * @param partialTick      Partial tick
-     * @param cir              Mixin callback
+     * OptiFine hook
+     */
+    @Dynamic
+    @Inject(method = "renderAllSortedRenderers",
+            at = @At("HEAD"),
+            remap = false,
+            require = 0,
+            expect = 0)
+    private void offsetProjection(int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+        ft$offsetProjection(renderPass);
+    }
+
+    /**
+     * Vanilla hook
      */
     @Inject(method = "sortAndRender",
             at = @At("RETURN"),
             require = 1)
     private void resetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
-        if (renderPass != 1) {
+        ft$resetProjection();
+    }
+
+    /**
+     * OptiFine hook
+     */
+    @Dynamic
+    @Inject(method = "renderAllSortedRenderers",
+            at = @At("RETURN"),
+            remap = false,
+            require = 0,
+            expect = 0)
+    private void resetProjection(int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+        ft$resetProjection();
+    }
+
+    /**
+     * Moves the Z-Clip towards the camera by the {@link com.falsepattern.falsetweaks.config.TranslucentBlockLayersConfig#TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON epsilon} value when rendering translucent blocks.
+     */
+    @Unique
+    private void ft$offsetProjection(int renderPass) {
+        if (!ENABLED || renderPass != 1) {
+            doResetMatrix = false;
             return;
         }
 
-        val lastMatrixMode = GL11.glGetInteger(GL11.GL_MATRIX_MODE);
+        doResetMatrix = true;
 
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glPopMatrix();
+        if (ft$tbl == null) {
+            ft$tbl = new TranslucentBlockLayers();
+        }
+        ft$tbl.offsetProjection();
+    }
 
-        GL11.glMatrixMode(lastMatrixMode);
+    /**
+     * Resets the projection after rendering translucent blocks.
+     */
+    @Unique
+    private void ft$resetProjection() {
+        if (!doResetMatrix) {
+            return;
+        }
+
+        doResetMatrix = false;
+
+        ft$tbl.resetProjection();
     }
 }
