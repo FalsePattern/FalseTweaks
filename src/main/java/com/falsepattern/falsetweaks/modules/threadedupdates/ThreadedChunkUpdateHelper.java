@@ -176,7 +176,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      */
     private AtomicReference<PendingTaskUpdate> taskQueueUnsorted = null;
     private AtomicBoolean run = null;
-    private PoolWorker currentPoolWorker = null;
     private WorkerThread[] currentThreads = null;
     private WorkSorterThread workSorter = null;
 
@@ -298,14 +297,10 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             return;
         int threads = ThreadingConfig.CHUNK_UPDATE_THREADS;
 
-        threads = Math.max(0, Math.min(threads, 8));
+        threads = Math.max(1, Math.min(threads, 8));
 
         if (run != null) {
             run.set(false);
-        }
-        if (currentPoolWorker != null) {
-            FTWorker.removeTask(currentPoolWorker);
-            currentPoolWorker = null;
         }
         if (currentThreads != null) {
             for (val thread : currentThreads) {
@@ -337,17 +332,12 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         run = new AtomicBoolean(true);
         workSorter = new WorkSorterThread(run, taskQueueUnsorted, taskQueue);
         FTWorker.addTask(workSorter);
-        if (threads > 0) {
-            currentThreads = new WorkerThread[threads];
-            for (int i = 0; i < threads; i++) {
-                val t = new WorkerThread(nameBase + i, run, taskQueue);
-                currentThreads[i] = t;
-                t.setDaemon(true);
-                t.start();
-            }
-        } else {
-            currentPoolWorker = new PoolWorker(run, taskQueue);
-            FTWorker.addTask(currentPoolWorker);
+        currentThreads = new WorkerThread[threads];
+        for (int i = 0; i < threads; i++) {
+            val t = new WorkerThread(nameBase + i, run, taskQueue);
+            currentThreads[i] = t;
+            t.setDaemon(true);
+            t.start();
         }
     }
 
@@ -687,41 +677,6 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
         ((ICapturableTessellator) threadTessellator.get()).discard();
         finishedTasks.add(wr);
-    }
-
-    private class PoolWorker implements ThreadedTask {
-        private final AtomicBoolean myRun;
-        private final CircularTaskQueue taskQueue;
-
-        public PoolWorker(AtomicBoolean run, CircularTaskQueue taskQueue) {
-            myRun = run;
-            this.taskQueue = taskQueue;
-        }
-
-        @Override
-        public boolean alive() {
-            return myRun.get();
-        }
-
-        @Override
-        public boolean lazy() {
-            return false;
-        }
-
-        @Override
-        public boolean doWork() {
-            if (!myRun.get())
-                return false;
-
-            if (Debug.ENABLED && !Debug.chunkRebaking) {
-                return false;
-            }
-            WorldRenderer wr = taskQueue.tryTake();
-            if (wr == null) {
-                return false;
-            }
-            runTask(wr);
-            return true;
         }
     }
 

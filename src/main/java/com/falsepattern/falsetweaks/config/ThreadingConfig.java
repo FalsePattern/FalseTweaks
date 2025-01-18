@@ -35,14 +35,13 @@ import com.falsepattern.lib.config.ConfigurationManager;
 public class ThreadingConfig {
     @Config.Comment({
             "The number of threads to use for chunk building.",
-            "0   - For very low-end CPUs. Makes chunk building run on a throttled thread to avoid freezing your pc",
             "1   - Recommended",
             "2-8 - For higher-end systems, with diminishing results"
     })
     @Config.LangKey
     @Config.Name(value = "threads", migrations = "")
     @Config.DefaultInt(1)
-    @Config.RangeInt(min = 0,
+    @Config.RangeInt(min = 1,
                      max = 8)
     public static int CHUNK_UPDATE_THREADS;
 
