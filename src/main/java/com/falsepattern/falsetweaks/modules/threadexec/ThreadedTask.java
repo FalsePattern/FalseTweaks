@@ -22,8 +22,10 @@
  */
 package com.falsepattern.falsetweaks.modules.threadexec;
 
+import net.minecraft.profiler.Profiler;
+
 public interface ThreadedTask {
     boolean alive();
     boolean lazy();
-    boolean doWork();
+    boolean doWork(Profiler profiler);
 }

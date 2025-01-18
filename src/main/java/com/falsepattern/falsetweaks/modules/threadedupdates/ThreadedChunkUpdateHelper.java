@@ -53,6 +53,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.shader.TesselatorVertexState;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
@@ -404,7 +405,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      * tessellation result. WorldRenderer#updateRenderer will skip over these blocks, and use the result that was
      * produced by the worker thread to fill them in.
      */
-    public void doChunkUpdate(WorldRenderer wr) {
+    public void doChunkUpdate(WorldRenderer wr, Profiler profiler) {
         debugLog(() -> "Starting update of renderer " + worldRendererToString(wr));
 
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
@@ -420,80 +421,104 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
         boolean pass1Only = !wr.needsUpdate && wro.ft$needsSort();
         if (pass1Only && wr.vertexState != null) {
-            if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                NeodymiumCompat.beginRenderPass(task, wr, 1);
-            }
-            tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
-            tess.setVertexState(wr.vertexState);
-            wr.vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
-            if (task.cancelled) {
-                ((ICapturableTessellator)tess).discard();
+            profiler.startSection("sort");
+            try {
                 if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                    NeodymiumCompat.cancelTask(tess, wr);
+                    NeodymiumCompat.beginRenderPass(task, wr, 1);
                 }
-                return;
-            }
-            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
                 tess.setVertexState(wr.vertexState);
-                NeodymiumCompat.beginCapturing(tess, wr, task, 1);
-            }
-            return;
-        }
-        wr.needsUpdate = true;
-        wro.ft$needsSort(false);
-
-        if (chunkcache != null && !chunkcache.extendedLevelsInChunkCache()) {
-            OptiFineCompat.renderStart(chunkcache);
-            RenderBlocks renderblocks = new RenderBlocks(chunkcache);
-
-            for (int pass = 0; pass < 2; pass++) {
-                ((ICapturableTessellator) tess).discard();
-                ThreadedClientHooks.threadRenderPass.set(pass);
-                int flags = doChunkUpdateForRenderPass(wr, task, chunkcache, tess, pass, renderblocks);
+                wr.vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
                 if (task.cancelled) {
                     ((ICapturableTessellator) tess).discard();
                     if (AGGRESSIVE_NEODYMIUM_THREADING) {
                         NeodymiumCompat.cancelTask(tess, wr);
                     }
-                    break;
+                    return;
                 }
-
-                boolean nextPass = hasFlag(flags, BIT_NextPass);
-                boolean renderedSomething = hasFlag(flags, BIT_RenderedSomething);
-                boolean startedTessellator = hasFlag(flags, BIT_StartedTessellator);
-
-                if (startedTessellator) {
-                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                        if (pass == 1) {
-                            //Sort vertices
-                            val verts = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
-                            if (verts != null) {
-                                wr.vertexState = verts;
-                                tess.setVertexState(verts);
-                            }
-                        }
-                        NeodymiumCompat.beginCapturing(tess, wr, task, pass);
-                    } else {
-                        TesselatorVertexState vertexState;
-                        if (pass == 1) {
-                            //Sort vertices
-                            vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
-                        } else {
-                            vertexState = ((ICapturableTessellator) tess).arch$getUnsortedVertexState();
-                        }
-                        task.result[pass].renderedQuads(vertexState);
-                        ((ICapturableTessellator) tess).discard();
-                    }
-                    if (ModuleConfig.TRIANGULATOR()) {
-                        ToggleableTessellatorManager.postRenderBlocks(pass);
-                    }
+                if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                    tess.setVertexState(wr.vertexState);
+                    NeodymiumCompat.beginCapturing(tess, wr, task, 1);
                 }
-                task.result[pass].renderedSomething = renderedSomething;
-                task.result[pass].startedTessellator = startedTessellator;
-                task.result[pass].nextPass = nextPass;
+                return;
+            } finally {
+                profiler.endSection();
             }
-            ThreadedClientHooks.threadRenderPass.set(-1);
-            OptiFineCompat.renderFinish(chunkcache);
+        }
+        wr.needsUpdate = true;
+        wro.ft$needsSort(false);
+        profiler.startSection("checkEmpty");
+        try {
+            if (chunkcache != null && !chunkcache.extendedLevelsInChunkCache()) {
+                profiler.endStartSection("renderStart");
+                OptiFineCompat.renderStart(chunkcache);
+                profiler.endStartSection("initRenderBlocks");
+                RenderBlocks renderblocks = new RenderBlocks(chunkcache);
+
+                for (int pass = 0; pass < 2; pass++) {
+                    profiler.endStartSection("pass" + pass);
+                    ((ICapturableTessellator) tess).discard();
+                    ThreadedClientHooks.threadRenderPass.set(pass);
+                    profiler.startSection("doChunkUpdate");
+                    int flags;
+                    try {
+                        flags = doChunkUpdateForRenderPass(wr, task, chunkcache, tess, pass, renderblocks);
+                    } finally {
+                        profiler.endSection();
+                    }
+                    if (task.cancelled) {
+                        ((ICapturableTessellator) tess).discard();
+                        if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                            NeodymiumCompat.cancelTask(tess, wr);
+                        }
+                        break;
+                    }
+
+                    boolean nextPass = hasFlag(flags, BIT_NextPass);
+                    boolean renderedSomething = hasFlag(flags, BIT_RenderedSomething);
+                    boolean startedTessellator = hasFlag(flags, BIT_StartedTessellator);
+
+                    if (startedTessellator) {
+                        if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                            if (pass == 1) {
+                                //Sort vertices
+                                val verts = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
+                                if (verts != null) {
+                                    wr.vertexState = verts;
+                                    tess.setVertexState(verts);
+                                }
+                            }
+                            NeodymiumCompat.beginCapturing(tess, wr, task, pass);
+                        } else {
+                            TesselatorVertexState vertexState;
+                            if (pass == 1) {
+                                //Sort vertices
+                                profiler.startSection("sort");
+                                try {
+                                    vertexState = tess.getVertexState((float) playerX, (float) playerY, (float) playerZ);
+                                } finally {
+                                    profiler.endSection();
+                                }
+                            } else {
+                                vertexState = ((ICapturableTessellator) tess).arch$getUnsortedVertexState();
+                            }
+                            task.result[pass].renderedQuads(vertexState);
+                            ((ICapturableTessellator) tess).discard();
+                        }
+                        if (ModuleConfig.TRIANGULATOR()) {
+                            ToggleableTessellatorManager.postRenderBlocks(pass);
+                        }
+                    }
+                    task.result[pass].renderedSomething = renderedSomething;
+                    task.result[pass].startedTessellator = startedTessellator;
+                    task.result[pass].nextPass = nextPass;
+                }
+                ThreadedClientHooks.threadRenderPass.set(-1);
+                profiler.endStartSection("renderFinish");
+                OptiFineCompat.renderFinish(chunkcache);
+            }
+        } finally {
+            profiler.endSection();
         }
         debugLog(() -> "Result of updating " + worldRendererToString(wr) + ": " + worldRendererUpdateTaskToString(wr));
     }
@@ -612,7 +637,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
 
         @Override
-        public boolean doWork() {
+        public boolean doWork(Profiler profiler) {
             if (Debug.ENABLED && !Debug.chunkRebaking) {
                 return false;
             }
@@ -630,31 +655,37 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             comp.posY = (float) view.posY;
             comp.posZ = (float) view.posZ;
             val tasks = pending.tasks;
+            profiler.startSection("work_sort");
             try {
-                sorter.interruptableSort(tasks);
-            } catch (InterruptedException ignored) {
-            }
-
-            taskQueue.clear();
-            for (int i = 0, updated = 0; updated < pending.updateLimit && i < tasks.size(); i++) {
-                WorldRenderer wr = tasks.get(i);
-                updated++;
-                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-
-                if (task.isEmpty()) {
-                    // No update in progress; add to task queue
-                    debugLog(() -> "Adding " + worldRendererToString(wr) + " to task queue");
-                    try {
-                        task.chunkCache = getChunkCacheSnapshot(wr);
-                    } catch (Exception ignored) {
-                        updated--;
-                        continue;
-                    }
-
-                    taskQueue.add(wr);
+                try {
+                    sorter.interruptableSort(tasks);
+                } catch (InterruptedException ignored) {
                 }
+
+                profiler.endStartSection("work_updateQueue");
+                taskQueue.clear();
+                for (int i = 0, updated = 0; updated < pending.updateLimit && i < tasks.size(); i++) {
+                    WorldRenderer wr = tasks.get(i);
+                    updated++;
+                    UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+
+                    if (task.isEmpty()) {
+                        // No update in progress; add to task queue
+                        debugLog(() -> "Adding " + worldRendererToString(wr) + " to task queue");
+                        try {
+                            task.chunkCache = getChunkCacheSnapshot(wr);
+                        } catch (Exception ignored) {
+                            updated--;
+                            continue;
+                        }
+
+                        taskQueue.add(wr);
+                    }
+                }
+                return true;
+            } finally {
+                profiler.endSection();
             }
-            return true;
         }
     }
 
@@ -663,11 +694,13 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
 
-    private void runTask(WorldRenderer wr) {
+    private void runTask(WorldRenderer wr, Profiler profiler) {
+        profiler.startSection("update");
+        try {
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
         task.started = true;
         try {
-            doChunkUpdate(wr);
+            doChunkUpdate(wr, profiler);
         } catch (Exception e) {
             ThreadedClientHooks.threadRenderPass.set(-1);
             Share.log.debug("Failed to update chunk " + worldRendererToString(wr), e);
@@ -678,16 +711,21 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
         ((ICapturableTessellator) threadTessellator.get()).discard();
         finishedTasks.add(wr);
+        } finally {
+            profiler.endSection();
         }
     }
 
     private class WorkerThread extends FastThreadLocal.TurboThread {
         private final AtomicBoolean myRun;
         private final CircularTaskQueue taskQueue;
+        private final Profiler profiler;
         public WorkerThread(String name, AtomicBoolean run, CircularTaskQueue taskQueue) {
             super(name);
             this.myRun = run;
             this.taskQueue = taskQueue;
+            this.profiler = new Profiler();
+            profiler.getProfilingData("__MEGATRACE__:wr_");
         }
 
         @Override
@@ -714,7 +752,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                         }
                         continue;
                     }
-                    runTask(wr);
+                    runTask(wr, profiler);
                 }
             } finally {
                 super.onShutdown();

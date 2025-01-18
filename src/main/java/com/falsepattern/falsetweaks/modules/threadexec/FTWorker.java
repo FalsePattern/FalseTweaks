@@ -25,6 +25,8 @@ package com.falsepattern.falsetweaks.modules.threadexec;
 import lombok.val;
 import lombok.var;
 
+import net.minecraft.profiler.Profiler;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +41,11 @@ public class FTWorker {
     private static volatile ThreadedTask[] tasks = null;
     private static final TurboTransferQueue<Runnable> singleRunTasks = new TurboTransferQueue<>(S);
     private static final ExecutorThread theThread = new ExecutorThread();
+    private static final Profiler profiler = new Profiler();
 
     static {
         theThread.start();
+        profiler.getProfilingData("__MEGATRACE__:fw_");
     }
 
     public static boolean isThread(Thread thread) {
@@ -147,7 +151,7 @@ public class FTWorker {
                     dead.add(task);
                     continue;
                 }
-                if (!task.doWork()) {
+                if (!task.doWork(profiler)) {
                     continue;
                 }
                 didWork |= !task.lazy();

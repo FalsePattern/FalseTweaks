@@ -48,6 +48,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.RenderDistanceSorter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -121,7 +122,7 @@ public class OcclusionRenderer {
         }
 
         @Override
-        public boolean doWork() {
+        public boolean doWork(Profiler profiler) {
             val renderers = rg.worldRenderers;
             if (renderers == null) {
                 return false;
@@ -130,23 +131,28 @@ public class OcclusionRenderer {
             if (world == null) {
                 return false;
             }
-            for (int i = 0; i < renderers.length; ++i) {
-                val mod15 = (i + counter & 15) == 0;
-                if (!mod15)
-                    continue;
-                val wr = renderers[i];
-                if (wr == null)
-                    continue;
-                val wro = ((WorldRendererOcclusion)wr);
-                val posX = wr.posX;
-                val posZ = wr.posZ;
-                boolean isNonEmpty = isChunkPresent(world, posX, posZ);
-                int expectedNeighbors = expectedNeighbors();
-                int neighbors = countNeighbors(world, posX, posZ);
-                wro.ft$updateNeighborCheckState(isNonEmpty, expectedNeighbors, neighbors, posX, posZ);
+            profiler.startSection("check");
+            try {
+                for (int i = 0; i < renderers.length; ++i) {
+                    val mod15 = (i + counter & 15) == 0;
+                    if (!mod15)
+                        continue;
+                    val wr = renderers[i];
+                    if (wr == null)
+                        continue;
+                    val wro = ((WorldRendererOcclusion) wr);
+                    val posX = wr.posX;
+                    val posZ = wr.posZ;
+                    boolean isNonEmpty = isChunkPresent(world, posX, posZ);
+                    int expectedNeighbors = expectedNeighbors();
+                    int neighbors = countNeighbors(world, posX, posZ);
+                    wro.ft$updateNeighborCheckState(isNonEmpty, expectedNeighbors, neighbors, posX, posZ);
+                }
+                ++counter;
+                return true;
+            } finally {
+                profiler.endSection();
             }
-            ++counter;
-            return true;
         }
 
         private static final EnumFacing[] facings = new EnumFacing[]{EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
@@ -1300,7 +1306,7 @@ public class OcclusionRenderer {
         }
 
         @Override
-        public boolean doWork() {
+        public boolean doWork(Profiler profiler) {
             if (Debug.ENABLED && !Debug.frustumChecks) {
                 return false;
             }
@@ -1312,26 +1318,31 @@ public class OcclusionRenderer {
             if (camera == null) {
                 return false;
             }
-            int offset = evenOdd & 1;
-            for (int i = offset; i < renderers.length; i += 2) {
-                val mod15 = (i + counter & 15) == 0;
-                WorldRenderer wr = renderers[i];
-                WorldRendererOcclusion iwr = (WorldRendererOcclusion) wr;
-                val ci = iwr.ft$getCullInfo();
-                if (wr.isInFrustum && (!ci.isFrustumCheckPending || mod15)) {
-                    continue;
+            profiler.startSection("clip");
+            try {
+                int offset = evenOdd & 1;
+                for (int i = offset; i < renderers.length; i += 2) {
+                    val mod15 = (i + counter & 15) == 0;
+                    WorldRenderer wr = renderers[i];
+                    WorldRendererOcclusion iwr = (WorldRendererOcclusion) wr;
+                    val ci = iwr.ft$getCullInfo();
+                    if (wr.isInFrustum && (!ci.isFrustumCheckPending || mod15)) {
+                        continue;
+                    }
+                    val next = camera.isBoundingBoxInFrustum(wr.rendererBoundingBox);
+                    iwr.ft$nextIsInFrustum(next);
+                    ci.isFrustumCheckPending = false;
+                    ci.isFrustumStateUpdated = true;
                 }
-                val next = camera.isBoundingBoxInFrustum(wr.rendererBoundingBox);
-                iwr.ft$nextIsInFrustum(next);
-                ci.isFrustumCheckPending = false;
-                ci.isFrustumStateUpdated = true;
+                ++evenOdd;
+                if (evenOdd >= 2) {
+                    evenOdd = 0;
+                    ++counter;
+                }
+                return true;
+            } finally {
+                profiler.endSection();
             }
-            ++evenOdd;
-            if (evenOdd >= 2) {
-                evenOdd = 0;
-                ++counter;
-            }
-            return true;
         }
     }
 

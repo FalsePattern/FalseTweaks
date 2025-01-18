@@ -33,6 +33,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.profiler.Profiler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +83,7 @@ public class OcclusionWorker {
         }
 
         @Override
-        public boolean doWork() {
+        public boolean doWork(Profiler profiler) {
             if (!sortState.compareAndSet(SORT_SIGNALED, SORT_WORKING))
                 return false;
 
@@ -103,31 +104,39 @@ public class OcclusionWorker {
 
             boolean sortedWorldRenderersChanged = false;
 
-            val newSortedWorldRenderers = new WorldRenderer[swr.length];
+            profiler.startSection("presort_init");
+            try {
+                val newSortedWorldRenderers = new WorldRenderer[swr.length];
 
-            int count = 0;
+                int count = 0;
 
-            val toPush = new ArrayList<WorldRenderer>();
+                val toPush = new ArrayList<WorldRenderer>();
 
-            for (int i = 0; i < rwr.length; ++i) {
-                WorldRenderer wr = rwr[i];
-                if (wr == null) {
-                    continue;
+                profiler.endStartSection("presort_mark");
+                for (int i = 0; i < rwr.length; ++i) {
+                    WorldRenderer wr = rwr[i];
+                    if (wr == null) {
+                        continue;
+                    }
+                    val ci = ((WorldRendererOcclusion) wr).ft$getCullInfo();
+                    if (ci == null) {
+                        continue;
+                    }
+                    ci.isFrustumCheckPending = true;
+                    count = markRendererThreaded(wr, ci, view, newSortedWorldRenderers, count, toPush);
+                    sortedWorldRenderersChanged |= markedRendererChanged;
                 }
-                val ci = ((WorldRendererOcclusion) wr).ft$getCullInfo();
-                if (ci == null) {
-                    continue;
-                }
-                ci.isFrustumCheckPending = true;
-                count = markRendererThreaded(wr, ci, view, newSortedWorldRenderers, count, toPush);
-                sortedWorldRenderersChanged |= markedRendererChanged;
+                profiler.endStartSection("presort_clear");
+                Arrays.fill(newSortedWorldRenderers, count, newSortedWorldRenderers.length, null);
+
+                profiler.endStartSection("presort_finish");
+                sortResults = new WorkResults(newSortedWorldRenderers, sortedWorldRenderersChanged, count, toPush);
+
+                sortState.set(SORT_DONE);
+                return true;
+            } finally {
+                profiler.endSection();
             }
-            Arrays.fill(newSortedWorldRenderers, count, newSortedWorldRenderers.length, null);
-
-            sortResults = new WorkResults(newSortedWorldRenderers, sortedWorldRenderersChanged, count, toPush);
-
-            sortState.set(SORT_DONE);
-            return true;
         }
     }
 
