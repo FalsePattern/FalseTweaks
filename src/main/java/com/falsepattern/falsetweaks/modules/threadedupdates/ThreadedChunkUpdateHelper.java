@@ -357,7 +357,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
-
+        if (toUpdateList.isEmpty())
+            return;
         taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateLimit));
     }
 
