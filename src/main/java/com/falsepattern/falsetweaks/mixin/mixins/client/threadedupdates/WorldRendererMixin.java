@@ -193,6 +193,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder,
             require = 1)
     private void notifyDirty(CallbackInfo ci) {
         ThreadedChunkUpdateHelper.instance.onWorldRendererDirty((WorldRenderer) (Object) this);
+        ThreadedChunkUpdateHelper.debugLog(() -> "Renderer: " + ThreadedChunkUpdateHelper.worldRendererToString((WorldRenderer)(Object) this) + " marked dirty");
     }
 
     @Inject(method = "markDirty",

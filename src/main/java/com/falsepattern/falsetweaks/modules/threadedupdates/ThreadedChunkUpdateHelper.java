@@ -44,6 +44,8 @@ import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import mega.trace.service.MEGATraceService;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -271,7 +273,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         return thread == MAIN_THREAD;
     }
 
-    private static String worldRendererToString(WorldRenderer wr) {
+    public static String worldRendererToString(WorldRenderer wr) {
         return wr + "(" + wr.posX + ", " + wr.posY + ", " + wr.posZ + ")";
     }
 
@@ -281,9 +283,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         // TODO + " (" + (task.result[0].renderedQuads == null ? "null" : task.result[0].renderedQuads.getVertexCount()) + ")/" + task.result[1].renderedSomething + " (" + (task.result[1].renderedQuads == null ? "null" : task.result[1].renderedQuads.getVertexCount()) + ")";
     }
 
-    private static void debugLog(Supplier<String> msg) {
+    public static void debugLog(Supplier<String> msg) {
         if (DEBUG_THREADED_UPDATE_FINE_LOG) {
-            Share.log.trace(msg.get());
+            val msgVal = msg.get();
+            Share.log.trace(msgVal);
+            MEGATraceService.INSTANCE.message(msgVal);
         }
     }
 

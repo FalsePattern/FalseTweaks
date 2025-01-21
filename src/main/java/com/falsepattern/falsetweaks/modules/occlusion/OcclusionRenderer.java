@@ -222,6 +222,7 @@ public class OcclusionRenderer {
         if (isInUpdateList) {
             return;
         }
+        ThreadedChunkUpdateHelper.debugLog(() -> "Adding " + ThreadedChunkUpdateHelper.worldRendererToString(wr) + " to priority queue");
 
         worldRenderersToUpdateList.add(wr);
         iwr.ft$setInUpdateList(true);
@@ -294,6 +295,7 @@ public class OcclusionRenderer {
     }
 
     public void internalMarkBlockUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
+        ThreadedChunkUpdateHelper.debugLog(() -> String.format("Marking Area from[x=%d,y=%d,z=%d] to[x=%d,y=%d,z=%d] for update", x1, y1, z1, x2, y2, z2));
         int xStart = MathHelper.bucketInt(x1, 16);
         int yStart = MathHelper.bucketInt(y1, 16);
         int zStart = MathHelper.bucketInt(z1, 16);
