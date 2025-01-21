@@ -331,6 +331,10 @@ public class OcclusionRenderer {
                             eventListeners.get(m).onDirtyRendererChanged(worldrenderer);
                         }
                     }
+
+                    if ((worldrenderer.needsUpdate || !worldrenderer.isInitialized) & ((WorldRendererOcclusion)worldrenderer).ft$isNonEmptyChunk()) {
+                        addRendererToUpdateQueue(worldrenderer);
+                    }
                 }
             }
         }
