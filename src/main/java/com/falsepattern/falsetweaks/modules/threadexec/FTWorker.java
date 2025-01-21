@@ -24,6 +24,7 @@ package com.falsepattern.falsetweaks.modules.threadexec;
 
 import lombok.val;
 import lombok.var;
+import mega.trace.service.MEGATraceService;
 
 import net.minecraft.profiler.Profiler;
 
@@ -45,7 +46,7 @@ public class FTWorker {
 
     static {
         theThread.start();
-        profiler.getProfilingData("__MEGATRACE__:fw_");
+        MEGATraceService.INSTANCE.markProfiler(profiler, "fw_", 0);
     }
 
     public static boolean isThread(Thread thread) {

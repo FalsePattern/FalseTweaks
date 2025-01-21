@@ -54,7 +54,7 @@ minecraft_fp {
 repositories {
     cursemavenEX()
     exclusive(mavenpattern(), "com.falsepattern", "makamys")
-    exclusive(mega(), "codechicken")
+    exclusive(mega(), "codechicken", "mega")
     exclusive(mega_uploads(), "optifine")
     exclusive(jitpack(), "com.github.basdxz", "com.github.jss2a98aj")
     exclusive(horizon(), "com.github.GTNewHorizons", "com.gtnewhorizons.retrofuturabootstrap")
@@ -66,6 +66,7 @@ dependencies {
     implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.7")
     implementation("org.joml:joml:1.10.8")
     implementation("it.unimi.dsi:fastutil:8.5.15")
+    implementation("mega:megatraceservice:1.2.0")
 
     compileOnly("makamys:neodymium-mc1.7.10:0.4.3-unofficial:dev")
 
