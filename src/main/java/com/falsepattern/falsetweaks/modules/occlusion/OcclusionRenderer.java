@@ -325,21 +325,28 @@ public class OcclusionRenderer {
                     z += depth & (z >> 31);
 
                     int k4 = (z * height + y) * width + x;
-                    WorldRenderer worldrenderer = worldRenderers[k4];
+                    val wr = worldRenderers[k4];
+                    val wro = (WorldRendererOcclusion) wr;
 
-                    if (!worldrenderer.needsUpdate || (worldrenderer.isVisible && !((WorldRendererOcclusion) worldrenderer).ft$isInUpdateList())) {
-                        worldrenderer.markDirty();
-                        OcclusionCompat.DragonAPICompat.ChangePacketRenderer$onChunkRerender(x1, y1, z1, x2, y2, z2, worldrenderer);
+                    val needsUpdate = wr.needsUpdate;
+                    val isVisible = wr.isVisible;
+                    val isInitialized = wr.isInitialized;
+                    val isInUpdateList = wro.ft$isInUpdateList();
+                    val isNonEmpty = wro.ft$isNonEmptyChunk();
+
+                    if (!needsUpdate || (isVisible && !isInUpdateList)) {
+                        wr.markDirty();
+                        OcclusionCompat.DragonAPICompat.ChangePacketRenderer$onChunkRerender(x1, y1, z1, x2, y2, z2, wr);
                         OcclusionHelpers.worker.dirty = true;
                     } else {
                         int size = eventListeners.size();
                         for (int m = -1; ++m < size; ) {
-                            eventListeners.get(m).onDirtyRendererChanged(worldrenderer);
+                            eventListeners.get(m).onDirtyRendererChanged(wr);
                         }
                     }
 
-                    if ((worldrenderer.needsUpdate || !worldrenderer.isInitialized) & ((WorldRendererOcclusion)worldrenderer).ft$isNonEmptyChunk()) {
-                        addRendererToUpdateQueue(worldrenderer);
+                    if ((needsUpdate || !isInitialized) && isNonEmpty) {
+                        addRendererToUpdateQueue(wr);
                     }
                 }
             }
