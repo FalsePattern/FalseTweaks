@@ -91,19 +91,30 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     IRendererUpdateOrderProvider rendererUpdateOrderProvider = new IRendererUpdateOrderProvider() {
         /** The renderers updated during the batch */
-        private List<WorldRenderer> worldRenderersToUpdateListInternal = new ArrayList<>();
-        private List<WorldRenderer> updatedRenderersMain = new ArrayList<>();
-        private Set<WorldRenderer> updatedRenderersSetMain = new HashSet<>();
-        private List<WorldRenderer> updatedRenderersCleanup = new ArrayList<>();
-        private Set<WorldRenderer> updatedRenderersSetCleanup = new HashSet<>();
+        private final DoubleBuffered<List<WorldRenderer>> worldRenderersToUpdateListInternal = new DoubleBuffered<>(ArrayList::new);
+        private final DoubleBuffered<List<WorldRenderer>> updatedRenderers = new DoubleBuffered<>(ArrayList::new);
+        private final DoubleBuffered<Set<WorldRenderer>> updatedRenderersSet = new DoubleBuffered<>(HashSet::new);
 
         private WorldRenderer nextRenderer;
 
         @Override
         public void prepare(List<WorldRenderer> worldRenderersToUpdateList, int updateLimit) {
-            worldRenderersToUpdateListInternal.addAll(worldRenderersToUpdateList);
+            val front = worldRenderersToUpdateListInternal.front();
+            val back = worldRenderersToUpdateListInternal.back();
+            worldRenderersToUpdateListInternal.flip();
+            back.clear();
+            val size = front.size();
+            for (int i = 0; i < size; i++) {
+                val wr = front.get(i);
+                val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                if (!task.inFinishedQueue) {
+                    back.add(wr);
+                }
+            }
+            front.clear();
+            back.addAll(worldRenderersToUpdateList);
             worldRenderersToUpdateList.clear();
-            preRendererUpdates(worldRenderersToUpdateListInternal, updateLimit);
+            preRendererUpdates(back, updateLimit);
         }
 
         @Override
@@ -112,6 +123,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
             while ((wr = finishedTasks.poll()) != null) {
                 UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                task.inFinishedQueue = false;
                 if (task.cancelled || (!wr.needsUpdate && !((WorldRendererOcclusion) wr).ft$needsSort())) {
                     if (AGGRESSIVE_NEODYMIUM_THREADING) {
                         NeodymiumCompat.safeDiscardTask(task);
@@ -130,8 +142,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             Preconditions.checkNotNull(nextRenderer);
             WorldRenderer wr = nextRenderer;
             nextRenderer = null;
-            updatedRenderersMain.add(wr);
-            updatedRenderersSetMain.add(wr);
+            updatedRenderers.front().add(wr);
+            updatedRenderersSet.front().add(wr);
 
             debugLog(() -> "Consuming renderer " + worldRendererToString(wr) + " " + worldRendererUpdateTaskToString(wr));
 
@@ -140,13 +152,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
         @Override
         public Future<List<WorldRenderer>> cleanup() {
-            val updatedRenderers = updatedRenderersMain;
-            updatedRenderersMain = updatedRenderersCleanup;
-            updatedRenderersCleanup = updatedRenderers;
-            val updatedRenderersSet = updatedRenderersSetMain;
-            updatedRenderersSetMain = updatedRenderersSetCleanup;
-            updatedRenderersSetCleanup = updatedRenderersSet;
-            val worldRenderersToUpdateList = worldRenderersToUpdateListInternal;
+            val updatedRenderers = this.updatedRenderers.front();
+            this.updatedRenderers.flip();
+            val updatedRenderersSet = this.updatedRenderersSet.front();
+            this.updatedRenderersSet.flip();
+            val worldRenderersToUpdateList = worldRenderersToUpdateListInternal.front();
 
             nextRenderer = null;
             return FTWorker.submit(() -> {
@@ -574,6 +584,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     public static class UpdateTask {
         public boolean started;
         public boolean cancelled;
+        public volatile boolean inFinishedQueue;
         public Result[] result = new Result[]{new Result(), new Result()};
         public List<TileEntity> TESRs = new ArrayList<>();
 
@@ -590,6 +601,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 r.clear();
             }
             cancelled = false;
+            inFinishedQueue = false;
             TESRs.clear();
         }
 
@@ -719,6 +731,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         }
         ((ICapturableTessellator) threadTessellator.get()).discard();
         finishedTasks.add(wr);
+        task.inFinishedQueue = true;
         } finally {
             profiler.endSection();
         }
