@@ -108,7 +108,11 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 val wr = front.get(i);
                 val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
                 if (!task.inFinishedQueue) {
+                    debugLog(() -> "Fresh " + worldRendererToString(wr) + " added to back buffer");
                     back.add(wr);
+                } else {
+                    debugLog(() -> "Finished " + worldRendererToString(wr) + " ignored");
+                    ((WorldRendererOcclusion) wr).ft$setInUpdateList(false);
                 }
             }
             front.clear();
