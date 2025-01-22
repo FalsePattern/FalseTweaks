@@ -37,6 +37,8 @@ public class Debug {
     public static boolean shadowOcclusionMask = true;
     public static boolean translucencySorting = true;
     public static boolean tesrRendering = true;
+    public static boolean fineLog = false;
+    public static boolean fineLogTrace = false;
 
     public static void init() {
         SwingUtilities.invokeLater(Toggler::new);

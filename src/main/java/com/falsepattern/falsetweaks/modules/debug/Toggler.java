@@ -53,6 +53,8 @@ public class Toggler extends JFrame {
             createToggle("Chunk Baking", Debug.chunkRebaking, x -> Debug.chunkRebaking = x);
             createToggle("Translucency sorting", Debug.translucencySorting, x -> Debug.translucencySorting = x);
             createToggle("TESR Rendering (Chests, stolen!)", Debug.tesrRendering, x -> Debug.tesrRendering = x);
+            createToggle("World renderer rebuild logging", Debug.fineLog, x -> Debug.fineLog = x);
+            createToggle("World renderer rebuild logging stacktraces", Debug.fineLogTrace, x -> Debug.fineLogTrace = x);
         }
 
         setSize(300, 200);

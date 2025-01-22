@@ -74,7 +74,6 @@ import static com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadCon
 public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     public static final boolean AGGRESSIVE_NEODYMIUM_THREADING = ThreadingConfig.AGGRESSIVE_NEODYMIUM_THREADING();
     public static final RenderBlocksStack renderBlocksStack = new RenderBlocksStack();
-    private static final boolean DEBUG_THREADED_UPDATE_FINE_LOG = Boolean.parseBoolean(System.getProperty(Tags.MOD_ID + ".debug.enableThreadedUpdateFineLog"));
     private static final int BIT_NextPass = 0b1;
     private static final int BIT_RenderedSomething = 0b10;
     private static final int BIT_StartedTessellator = 0b100;
@@ -284,9 +283,13 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     public static void debugLog(Supplier<String> msg) {
-        if (DEBUG_THREADED_UPDATE_FINE_LOG) {
+        if (Debug.ENABLED && Debug.fineLog) {
             val msgVal = msg.get();
-            Share.log.trace(msgVal);
+            if (Debug.fineLogTrace && Thread.currentThread().getName().toLowerCase().contains("client")) {
+                Share.log.info(msgVal, new Throwable());
+            } else {
+                Share.log.info(msgVal);
+            }
             MEGATraceService.INSTANCE.message(msgVal);
         }
     }
@@ -364,6 +367,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
         if (toUpdateList.isEmpty())
             return;
+        debugLog(() -> "Updating " + toUpdateList.size() + " renderers");
         taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateLimit));
     }
 
