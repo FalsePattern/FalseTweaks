@@ -82,6 +82,7 @@ public class OcclusionRenderer {
     int alphaSortProgress = 0;
     private Thread clientThread;
     private List<WorldRenderer> worldRenderersToUpdateList;
+    private int updateListModificationCounter = 0;
     private double prevRenderX, prevRenderY, prevRenderZ;
     private int cameraStaticTime;
     private int renderersNeedUpdate;
@@ -90,6 +91,8 @@ public class OcclusionRenderer {
     /* Make sure other threads can see changes to this */
     private volatile boolean deferNewRenderUpdates;
     private long lastUpdateTime = System.nanoTime();
+    private long[] frameTimeRollingAvg = new long[128];
+    private int frameTimeRollingAvgNext = 0;
     private int occlusionRecheckCounterRender;
     private int occlusionRecheckCounterShadow;
     private volatile WorldRenderer[] renderersToClip = null;
@@ -225,6 +228,7 @@ public class OcclusionRenderer {
         ThreadedChunkUpdateHelper.debugLog(() -> "Adding " + ThreadedChunkUpdateHelper.worldRendererToString(wr) + " to priority queue");
 
         worldRenderersToUpdateList.add(wr);
+        updateListModificationCounter++;
         iwr.ft$setInUpdateList(true);
     }
 
@@ -371,6 +375,7 @@ public class OcclusionRenderer {
 
     public void initBetterLists() {
         worldRenderersToUpdateList = new ArrayList<>();
+        updateListModificationCounter++;
         /* Make sure any vanilla code modifying the update queue crashes */
         rg.worldRenderersToUpdate = Collections.unmodifiableList(worldRenderersToUpdateList);
         clientThread = Thread.currentThread();
@@ -383,6 +388,7 @@ public class OcclusionRenderer {
                 ((WorldRendererOcclusion) wr).ft$setInUpdateList(false);
             }
             worldRenderersToUpdateList.clear();
+            updateListModificationCounter++;
             if (cleanupTaskFromPreviousFrame != null) {
                 try {
                     val taskList = cleanupTaskFromPreviousFrame.get();
@@ -426,12 +432,18 @@ public class OcclusionRenderer {
             return false;
         }
         val prof = rg.theWorld.theProfiler;
-        int updateLimit;
         long currentFrameTime = System.nanoTime();
-        int updatesPerSec = OcclusionConfig.CHUNK_UPDATES_PER_SECOND * (fastUpdate ? 2 : 1);
-        double frameTimeDeltaSeconds = (currentFrameTime - lastUpdateTime) / (double) NANOS_PER_SEC;
-        updateLimit = (int) (updatesPerSec * frameTimeDeltaSeconds) + 1;
+        long deltaFrameTime = currentFrameTime - lastUpdateTime;
         lastUpdateTime = currentFrameTime;
+        frameTimeRollingAvg[frameTimeRollingAvgNext] = deltaFrameTime;
+        frameTimeRollingAvgNext = (frameTimeRollingAvgNext + 1) % frameTimeRollingAvg.length;
+        int updatesPerSec = OcclusionConfig.CHUNK_UPDATES_PER_SECOND * (fastUpdate ? 2 : 1);
+        long frameTimeSum = 0;
+        for (int i = 0; i < frameTimeRollingAvg.length; i++) {
+            frameTimeSum += frameTimeRollingAvg[i];
+        }
+        double frameTimeAvg = (frameTimeSum / (double) NANOS_PER_SEC) / (double) frameTimeRollingAvg.length;
+        int updateLimit = (int) (updatesPerSec * frameTimeAvg) + 1;
         int updates = 0;
 
         boolean spareTime = true;
