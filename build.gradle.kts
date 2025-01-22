@@ -63,7 +63,7 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.7")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.9")
     implementation("org.joml:joml:1.10.8")
     implementation("it.unimi.dsi:fastutil:8.5.15")
     implementation("mega:megatraceservice:1.2.0")
