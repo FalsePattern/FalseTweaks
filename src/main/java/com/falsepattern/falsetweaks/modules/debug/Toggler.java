@@ -24,7 +24,6 @@ package com.falsepattern.falsetweaks.modules.debug;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.modules.occlusion.OcclusionCompat;
 import lombok.val;
 
 import javax.swing.*;
@@ -53,8 +52,9 @@ public class Toggler extends JFrame {
             createToggle("Chunk Baking", Debug.chunkRebaking, x -> Debug.chunkRebaking = x);
             createToggle("Translucency sorting", Debug.translucencySorting, x -> Debug.translucencySorting = x);
             createToggle("TESR Rendering (Chests, stolen!)", Debug.tesrRendering, x -> Debug.tesrRendering = x);
-            createToggle("World renderer rebuild logging", Debug.fineLog, x -> Debug.fineLog = x);
-            createToggle("World renderer rebuild logging stacktraces", Debug.fineLogTrace, x -> Debug.fineLogTrace = x);
+            createToggle("Java Fine Logging", Debug.fineLogJava, x -> Debug.fineLogJava = x);
+            createToggle("Java Trace Logging", Debug.fineLogJavaTrace, x -> Debug.fineLogJavaTrace = x);
+            createToggle("MEGATrace Fine Logging", Debug.fineLogMegaTrace, x -> Debug.fineLogMegaTrace = x);
         }
 
         setSize(300, 200);

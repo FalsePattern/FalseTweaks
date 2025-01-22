@@ -20,28 +20,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.falsepattern.falsetweaks.modules.debug;
 
-import javax.swing.*;
+import com.falsepattern.falsetweaks.Share;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import lombok.val;
+import mega.trace.service.MEGATraceService;
 
-public class Debug {
-    public static final boolean ENABLED = Boolean.parseBoolean(System.getProperty("falsetweaks.debug", "false"));
+import java.util.function.Supplier;
 
-    public static boolean occlusionChecks = true;
-    public static boolean occlusionMask = true;
-    public static boolean frustumChecks = true;
-    public static boolean shadowPass = true;
-    public static boolean neodymiumGC = true;
-    public static boolean chunkRebaking = true;
-    public static boolean shadowOcclusionChecks = true;
-    public static boolean shadowOcclusionMask = true;
-    public static boolean translucencySorting = true;
-    public static boolean tesrRendering = true;
-    public static boolean fineLogJava = false;
-    public static boolean fineLogJavaTrace = false;
-    public static boolean fineLogMegaTrace = false;
+public class DebugLogging {
+    public static void debugLog(Supplier<String> msg) {
+        if (!(Debug.ENABLED && (Debug.fineLogJava || Debug.fineLogJavaTrace || Debug.fineLogMegaTrace))) {
+            return;
+        }
+        val msgVal = msg.get();
 
-    public static void init() {
-        SwingUtilities.invokeLater(Toggler::new);
+        if (Debug.fineLogJava || Debug.fineLogJavaTrace) {
+            if (Debug.fineLogJavaTrace && ThreadedChunkUpdateHelper.isMainThread()) {
+                Share.log.info(msgVal, new Throwable());
+            } else {
+                Share.log.info(msgVal);
+            }
+        }
+
+        if (Debug.fineLogMegaTrace) {
+            MEGATraceService.INSTANCE.message(msgVal);
+        }
     }
 }

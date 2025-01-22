@@ -24,6 +24,7 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
 import com.falsepattern.falsetweaks.mixin.bridge.occlison.WorldRendererMixinBridge;
+import com.falsepattern.falsetweaks.modules.debug.DebugLogging;
 import com.falsepattern.falsetweaks.modules.occlusion.WorldRendererOcclusion;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ICapturableTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.IRendererUpdateResultHolder;
@@ -31,7 +32,6 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.NeodymiumCompat;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 import com.llamalad7.mixinextras.sugar.Local;
 import lombok.val;
-import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,7 +43,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.shader.TesselatorVertexState;
 import net.minecraft.entity.EntityLivingBase;
@@ -193,7 +192,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateResultHolder,
             require = 1)
     private void notifyDirty(CallbackInfo ci) {
         ThreadedChunkUpdateHelper.instance.onWorldRendererDirty((WorldRenderer) (Object) this);
-        ThreadedChunkUpdateHelper.debugLog(() -> "Renderer: " + ThreadedChunkUpdateHelper.worldRendererToString((WorldRenderer)(Object) this) + " marked dirty");
+        DebugLogging.debugLog(() -> "Renderer: " + this + " marked dirty");
     }
 
     @Inject(method = "markDirty",

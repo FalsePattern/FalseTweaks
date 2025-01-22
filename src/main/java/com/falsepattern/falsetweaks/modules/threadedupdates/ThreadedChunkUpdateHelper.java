@@ -28,6 +28,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
+import com.falsepattern.falsetweaks.modules.debug.DebugLogging;
 import com.falsepattern.falsetweaks.modules.occlusion.*;
 import com.falsepattern.falsetweaks.modules.threadexec.FTWorker;
 import com.falsepattern.falsetweaks.modules.threadexec.ThreadedTask;
@@ -44,7 +45,6 @@ import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import mega.trace.service.MEGATraceService;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -66,7 +66,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 import static com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer.*;
 import static com.falsepattern.falsetweaks.modules.threadedupdates.MainThreadContainer.MAIN_THREAD;
@@ -108,10 +107,10 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
                 val wr = front.get(i);
                 val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
                 if (!task.inFinishedQueue) {
-                    debugLog(() -> "Fresh " + worldRendererToString(wr) + " added to back buffer");
+                    DebugLogging.debugLog(() -> "Fresh " + wr + " added to back buffer");
                     back.add(wr);
                 } else {
-                    debugLog(() -> "Finished " + worldRendererToString(wr) + " ignored");
+                    DebugLogging.debugLog(() -> "Finished " + wr + " ignored");
                     ((WorldRendererOcclusion) wr).ft$setInUpdateList(false);
                 }
             }
@@ -149,7 +148,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             updatedRenderers.front().add(wr);
             updatedRenderersSet.front().add(wr);
 
-            debugLog(() -> "Consuming renderer " + worldRendererToString(wr) + " " + worldRendererUpdateTaskToString(wr));
+            DebugLogging.debugLog(() -> "Consuming renderer " + wr + " " + worldRendererUpdateTaskToString(wr));
 
             return wr;
         }
@@ -207,7 +206,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             for (int z = wr.posZ; z < wr.posZ + 16; ++z) {
                 for (int x = wr.posX; x < wr.posX + 16; ++x) {
                     if (task.cancelled) {
-                        debugLog(() -> "Realized renderer " + worldRendererToString(wr) + " is dirty, aborting update");
+                        DebugLogging.debugLog(() -> "Realized renderer " + wr + " is dirty, aborting update");
                         break BlockLoop;
                     }
                     flags = doChunkUpdateForRenderPassBlock(wr, task, chunkcache, tess, pass, renderblocks, x, y, z, flags);
@@ -286,26 +285,10 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         return thread == MAIN_THREAD;
     }
 
-    public static String worldRendererToString(WorldRenderer wr) {
-        return wr + "(" + wr.posX + ", " + wr.posY + ", " + wr.posZ + ")";
-    }
-
     private static String worldRendererUpdateTaskToString(WorldRenderer wr) {
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
         return task.result[0].renderedSomething + "";
         // TODO + " (" + (task.result[0].renderedQuads == null ? "null" : task.result[0].renderedQuads.getVertexCount()) + ")/" + task.result[1].renderedSomething + " (" + (task.result[1].renderedQuads == null ? "null" : task.result[1].renderedQuads.getVertexCount()) + ")";
-    }
-
-    public static void debugLog(Supplier<String> msg) {
-        if (Debug.ENABLED && Debug.fineLog) {
-            val msgVal = msg.get();
-            if (Debug.fineLogTrace && Thread.currentThread().getName().toLowerCase().contains("client")) {
-                Share.log.info(msgVal, new Throwable());
-            } else {
-                Share.log.info(msgVal);
-            }
-            MEGATraceService.INSTANCE.message(msgVal);
-        }
     }
 
     public void init() {
@@ -381,7 +364,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     private void updateWorkQueue(List<WorldRenderer> toUpdateList, int updateLimit) {
         if (toUpdateList.isEmpty())
             return;
-        debugLog(() -> "Updating " + toUpdateList.size() + " renderers");
+        DebugLogging.debugLog(() -> "Updating " + toUpdateList.size() + " renderers");
         taskQueueUnsorted.getAndSet(new PendingTaskUpdate(new ArrayList<>(toUpdateList), updateLimit));
     }
 
@@ -412,7 +395,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     public void onWorldRendererDirty(WorldRenderer wr) {
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
         if (!task.isEmpty()) {
-            debugLog(() -> "Renderer " + worldRendererToString(wr) + " is dirty, cancelling task");
+            DebugLogging.debugLog(() -> "Renderer " + wr + " is dirty, cancelling task");
             task.cancelled = true;
         }
     }
@@ -428,7 +411,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
      * produced by the worker thread to fill them in.
      */
     public void doChunkUpdate(WorldRenderer wr, Profiler profiler) {
-        debugLog(() -> "Starting update of renderer " + worldRendererToString(wr));
+        DebugLogging.debugLog(() -> "Starting update of renderer " + wr);
 
         UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
         if (AGGRESSIVE_NEODYMIUM_THREADING) {
@@ -542,7 +525,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         } finally {
             profiler.endSection();
         }
-        debugLog(() -> "Result of updating " + worldRendererToString(wr) + ": " + worldRendererUpdateTaskToString(wr));
+        DebugLogging.debugLog(() -> "Result of updating " + wr + ": " + worldRendererUpdateTaskToString(wr));
     }
 
     private ChunkCache getChunkCacheSnapshot(WorldRenderer wr) {
@@ -695,7 +678,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
                     if (task.isEmpty()) {
                         // No update in progress; add to task queue
-                        debugLog(() -> "Adding " + worldRendererToString(wr) + " to task queue");
+                        DebugLogging.debugLog(() -> "Adding " + wr + " to task queue");
                         try {
                             task.chunkCache = getChunkCacheSnapshot(wr);
                         } catch (Exception ignored) {
@@ -727,7 +710,7 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             doChunkUpdate(wr, profiler);
         } catch (Exception e) {
             ThreadedClientHooks.threadRenderPass.set(-1);
-            Share.log.debug("Failed to update chunk " + worldRendererToString(wr), e);
+            Share.log.debug("Failed to update chunk " + wr, e);
             if (AGGRESSIVE_NEODYMIUM_THREADING) {
                 NeodymiumCompat.safeDiscardTask(task);
             }

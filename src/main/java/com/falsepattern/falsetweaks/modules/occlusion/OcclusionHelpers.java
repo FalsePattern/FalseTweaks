@@ -23,8 +23,8 @@
 package com.falsepattern.falsetweaks.modules.occlusion;
 
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.modules.debug.DebugLogging;
 import com.falsepattern.falsetweaks.modules.occlusion.util.IntStack;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
 
 import net.minecraft.util.EnumFacing;
 
@@ -51,7 +51,7 @@ public class OcclusionHelpers {
     }
 
     public static synchronized void updateArea(int x, int y, int z, int x2, int y2, int z2) {
-        ThreadedChunkUpdateHelper.debugLog(() -> String.format("Marking Area from[x=%d,y=%d,z=%d] to[x=%d,y=%d,z=%d] for update (deferred)", x, y, z, x2, y2, z2));
+        DebugLogging.debugLog(() -> String.format("Marking Area from[x=%d,y=%d,z=%d] to[x=%d,y=%d,z=%d] for update (deferred)", x, y, z, x2, y2, z2));
 
         // backwards so it's more logical to extract
         deferredAreas.add(z2);
