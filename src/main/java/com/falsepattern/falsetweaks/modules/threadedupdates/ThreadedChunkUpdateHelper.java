@@ -66,6 +66,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import static com.falsepattern.falsetweaks.modules.occlusion.OcclusionRenderer.*;
@@ -104,12 +105,19 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             worldRenderersToUpdateListInternal.flip();
             back.clear();
             val size = front.size();
-            for (int i = 0; i < size; i++) {
-                val wr = front.get(i);
-                val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-                if (!task.inFinishedQueue) {
-                    back.add(wr);
+            while (!finishedQueueLock.tryLock()) {
+                Thread.yield();
+            }
+            try {
+                for (int i = 0; i < size; i++) {
+                    val wr = front.get(i);
+                    val task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                    if (!task.inFinishedQueue) {
+                        back.add(wr);
+                    }
                 }
+            } finally {
+                finishedQueueLock.unlock();
             }
             front.clear();
             back.addAll(worldRenderersToUpdateList);
@@ -121,18 +129,25 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         public boolean hasNext() {
             WorldRenderer wr;
 
-            while ((wr = finishedTasks.poll()) != null) {
-                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-                task.inFinishedQueue = false;
-                if (task.cancelled || (!wr.needsUpdate && !((WorldRendererOcclusion) wr).ft$needsSort())) {
-                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                        NeodymiumCompat.safeDiscardTask(task);
+            while (!finishedQueueLock.tryLock()) {
+                Thread.yield();
+            }
+            try {
+                while ((wr = finishedTasks.poll()) != null) {
+                    UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                    task.inFinishedQueue = false;
+                    if (task.cancelled || (!wr.needsUpdate && !((WorldRendererOcclusion) wr).ft$needsSort())) {
+                        if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                            NeodymiumCompat.safeDiscardTask(task);
+                        }
+                        task.clear();
+                    } else {
+                        nextRenderer = wr;
+                        return true;
                     }
-                    task.clear();
-                } else {
-                    nextRenderer = wr;
-                    return true;
                 }
+            } finally {
+                finishedQueueLock.unlock();
             }
             return false;
         }
@@ -382,17 +397,24 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
     }
 
     private void removeCancelledResults() {
-        for (Iterator<WorldRenderer> it = finishedTasks.iterator(); it.hasNext(); ) {
-            WorldRenderer wr = it.next();
-            UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
-            if (task.cancelled) {
-                // Discard results and allow re-schedule on worker thread.
-                if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                    NeodymiumCompat.safeDiscardTask(task);
+        while (!finishedQueueLock.tryLock()) {
+            Thread.yield();
+        }
+        try {
+            for (Iterator<WorldRenderer> it = finishedTasks.iterator(); it.hasNext(); ) {
+                WorldRenderer wr = it.next();
+                UpdateTask task = ((IRendererUpdateResultHolder) wr).ft$getRendererUpdateTask();
+                if (task.cancelled) {
+                    // Discard results and allow re-schedule on worker thread.
+                    if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                        NeodymiumCompat.safeDiscardTask(task);
+                    }
+                    task.clear();
+                    it.remove();
                 }
-                task.clear();
-                it.remove();
             }
+        } finally {
+            finishedQueueLock.unlock();
         }
     }
 
@@ -730,12 +752,21 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             task.clear();
         }
         ((ICapturableTessellator) threadTessellator.get()).discard();
-        finishedTasks.add(wr);
-        task.inFinishedQueue = true;
+        while (!finishedQueueLock.tryLock()) {
+            Thread.yield();
+        }
+        try {
+            finishedTasks.add(wr);
+            task.inFinishedQueue = true;
+        } finally {
+            finishedQueueLock.unlock();
+        }
         } finally {
             profiler.endSection();
         }
     }
+
+    private final ReentrantLock finishedQueueLock = new ReentrantLock();
 
     private class WorkerThread extends FastThreadLocal.TurboThread {
         private final AtomicBoolean myRun;
