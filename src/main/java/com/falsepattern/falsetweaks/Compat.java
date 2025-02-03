@@ -107,6 +107,19 @@ public class Compat {
             PRESENT = present;
         }
     }
+    private static class FLUIDLOGGED {
+        private static final boolean PRESENT;
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("mega.fluidlogged.internal.core.CoreLoadingPlugin") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
 
     public static boolean neodymiumInstalled() {
         return NEODYMIUM.PRESENT;
@@ -130,6 +143,10 @@ public class Compat {
 
     public static boolean optiFineHasShaders() {
         return OPTIFINE.PRESENT && SHADERS.PRESENT;
+    }
+
+    public static boolean fluidloggedInstalled() {
+        return FLUIDLOGGED.PRESENT;
     }
 
     public static void applyCompatibilityTweaks() {
@@ -171,7 +188,6 @@ public class Compat {
             return block.getAmbientOcclusionLightValue();
         }
     }
-
     private static class ApparatusCompat {
         @Getter
         private static boolean apparatusPresent = false;

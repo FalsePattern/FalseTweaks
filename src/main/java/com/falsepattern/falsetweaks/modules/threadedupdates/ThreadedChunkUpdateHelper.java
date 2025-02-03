@@ -23,6 +23,7 @@
 
 package com.falsepattern.falsetweaks.modules.threadedupdates;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -45,6 +46,7 @@ import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import mega.fluidlogged.api.FLBlockAccess;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -219,6 +221,33 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
 
     private static final IntSet alreadyWarnedRenderTypes = new IntArraySet();
 
+    private static class FluidLoggedCompat {
+        public static int drawFluidLogged(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, int flags, RenderBlocks renderblocks, int x, int y, int z) {
+            val fluid = ((FLBlockAccess)chunkcache).fl$getFluid(x, y, z);
+            if (fluid == null) {
+                return flags;
+            }
+            val fluidBlock = fluid.getBlock();
+            if (fluidBlock == null) {
+                return flags;
+            }
+
+            if (fluidBlock.getRenderBlockPass() > pass) {
+                flags |= BIT_NextPass;
+            }
+            if (!fluidBlock.canRenderInPass(pass)) {
+                return flags;
+            }
+
+            flags = startTessellator(wr, task, tess, pass, flags);
+
+            try {
+                flags |= renderblocks.renderBlockByRenderType(fluidBlock, x, y, z) ? BIT_RenderedSomething : 0;
+            } catch (Exception ignored) {}
+            return flags;
+        }
+    }
+
     private static int doChunkUpdateForRenderPassBlock(WorldRenderer wr, UpdateTask task, ChunkCache chunkcache, Tessellator tess, int pass, RenderBlocks renderblocks, int x, int y, int z, int flags) {
         Block block = chunkcache.getBlock(x, y, z);
         val rt = block.getRenderType();
@@ -238,6 +267,10 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             }
         }
 
+        if (Compat.fluidloggedInstalled()) {
+            flags = FluidLoggedCompat.drawFluidLogged(wr, task, chunkcache, tess, pass, flags, renderblocks, x, y, z);
+        }
+
         if (block.getRenderBlockPass() > pass) {
             flags |= BIT_NextPass;
         }
@@ -245,17 +278,8 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
         if (!block.canRenderInPass(pass)) {
             return flags;
         }
-        if (!hasFlag(flags, BIT_StartedTessellator)) {
-            if (ModuleConfig.TRIANGULATOR()) {
-                ToggleableTessellatorManager.preRenderBlocks(pass);
-            }
-            flags |= BIT_StartedTessellator;
-            if (AGGRESSIVE_NEODYMIUM_THREADING) {
-                NeodymiumCompat.beginRenderPass(task, wr, pass);
-            }
-            tess.startDrawingQuads();
-            tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
-        }
+
+        flags = startTessellator(wr, task, tess, pass, flags);
 
         try {
             flags |= renderblocks.renderBlockByRenderType(block, x, y, z) ? BIT_RenderedSomething : 0;
@@ -274,6 +298,21 @@ public class ThreadedChunkUpdateHelper implements IRenderGlobalListener {
             renderblocks.renderBlockByRenderType(block, x, y, z);
             renderblocks.setRenderFromInside(false);
             renderblocks.setRenderAllFaces(false);
+        }
+        return flags;
+    }
+
+    private static int startTessellator(WorldRenderer wr, UpdateTask task, Tessellator tess, int pass, int flags) {
+        if (!hasFlag(flags, BIT_StartedTessellator)) {
+            if (ModuleConfig.TRIANGULATOR()) {
+                ToggleableTessellatorManager.preRenderBlocks(pass);
+            }
+            flags |= BIT_StartedTessellator;
+            if (AGGRESSIVE_NEODYMIUM_THREADING) {
+                NeodymiumCompat.beginRenderPass(task, wr, pass);
+            }
+            tess.startDrawingQuads();
+            tess.setTranslation(-wr.posX, -wr.posY, -wr.posZ);
         }
         return flags;
     }
