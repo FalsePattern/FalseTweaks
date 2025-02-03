@@ -38,10 +38,11 @@ public class RenderingSafetyConfig {
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_BLOCK;
 
-    @Config.Comment("Enable safety wrapper for tile entities.")
+    @Config.Comment({"Enable safety wrapper for tile entities.",
+                     "Buggy, don't use."})
     @Config.LangKey
-    @Config.Name(value = "tesr", migrations = "")
-    @Config.DefaultBoolean(true)
+    @Config.Name(value = "tileEntity")
+    @Config.DefaultBoolean(false)
     public static boolean ENABLE_TESR;
 
     @Config.Comment("Enable safety wrapper for items.")

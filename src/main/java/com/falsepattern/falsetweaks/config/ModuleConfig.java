@@ -136,6 +136,7 @@ public class ModuleConfig {
             "Makes translucent geometry of chunks render slightly closer to the camera. (experimental)",
             "This reduces Z-Fighting on blocks which have overlapping opaque and translucent geometry,",
             "at the cost of far away geometry sometimes rendering on top of opaque geometry. (>100~ blocks)",
+            "Don't turn this on unless you absolutely need it.",
             "FPS impact: Unknown"
     })
     @Config.LangKey("config.falsetweaks.translucent_block_layers_fix")
