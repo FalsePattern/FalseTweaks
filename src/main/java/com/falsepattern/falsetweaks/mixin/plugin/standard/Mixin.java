@@ -258,6 +258,38 @@ public enum Mixin implements IMixin {
                                           THREADING.and(require(TargetedMod.NOTFINE)),
                                           "threadedupdates.notfine.CTMUtilsMixin"),
 
+    // Storage Drawers
+    ThreadedUpdates_StorageDrawers_RenderHelperMixin(Side.CLIENT,
+                                                     THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                     "threadedupdates.storagedrawers.RenderHelperMixin"),
+    ThreadedUpdates_StorageDrawers_CommonDrawerRendererMixin(Side.CLIENT,
+                                                             THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                             "threadedupdates.storagedrawers.CommonDrawerRendererMixin"),
+    ThreadedUpdates_StorageDrawers_CommonFramingRendererMixin(Side.CLIENT,
+                                                              THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                              "threadedupdates.storagedrawers.CommonFramingRendererMixin"),
+    ThreadedUpdates_StorageDrawers_CommonTrimRendererMixin(Side.CLIENT,
+                                                           THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                           "threadedupdates.storagedrawers.CommonTrimRendererMixin"),
+    ThreadedUpdates_StorageDrawers_ControllerRendererMixin(Side.CLIENT,
+                                                           THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                           "threadedupdates.storagedrawers.ControllerRendererMixin"),
+    ThreadedUpdates_StorageDrawers_DrawersItemRendererMixin(Side.CLIENT,
+                                                            THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                            "threadedupdates.storagedrawers.DrawersItemRendererMixin"),
+    ThreadedUpdates_StorageDrawers_DrawersRendererMixin(Side.CLIENT,
+                                                        THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                        "threadedupdates.storagedrawers.DrawersRendererMixin"),
+    ThreadedUpdates_StorageDrawers_FramingTableRendererMixin(Side.CLIENT,
+                                                             THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                             "threadedupdates.storagedrawers.FramingTableRendererMixin"),
+    ThreadedUpdates_StorageDrawers_ModularBoxRendererMixin(Side.CLIENT,
+                                                           THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                           "threadedupdates.storagedrawers.ModularBoxRendererMixin"),
+    ThreadedUpdates_StorageDrawers_PanelBoxRendererMixin(Side.CLIENT,
+                                                         THREADING.and(require(TargetedMod.STORAGE_DRAWERS)),
+                                                         "threadedupdates.storagedrawers.PanelBoxRendererMixin"),
+
     //endregion Threaded Chunk Updates
 
     //region Texture Optimizations Module

@@ -101,4 +101,6 @@ dependencies {
     compileOnly(deobfCurse("malisiscore-223896:2283267"))
     // SecurityCraft 1.8.13
     compileOnly(deobfCurse("securitycraft-64760:2818228"))
+    // Storage Drawers 1.7.10-1.10.9
+    compileOnly(deobfCurse("storage-drawers-223852:2469586"))
 }
