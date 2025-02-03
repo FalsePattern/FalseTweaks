@@ -35,7 +35,6 @@ import stubpackage.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.common.Loader;
 
@@ -47,7 +46,7 @@ public class Compat {
         static {
             boolean present;
             try {
-                present = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
+                present = Launch.classLoader.getClassBytes("makamys.neodymium.Neodymium") != null;
             } catch (IOException e) {
                 e.printStackTrace();
                 present = false;
