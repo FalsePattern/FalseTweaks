@@ -105,4 +105,10 @@ dependencies {
     compileOnly(deobfCurse("securitycraft-64760:2818228"))
     // Storage Drawers 1.7.10-1.10.9
     compileOnly(deobfCurse("storage-drawers-223852:2469586"))
+    // CoFH Core [1.7.10]3.1.4-329
+    compileOnly(deobfCurse("cofh-core-69162:2388750"))
+    // Thermal Foundation [1.7.10]1.2.6-118
+    compileOnly(deobfCurse("thermal-foundation-222880:2388752"))
+    // Thermal Expansion [1.7.10]4.1.5-248
+    compileOnly(deobfCurse("thermal-expansion-69163:2388758"))
 }
