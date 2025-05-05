@@ -259,6 +259,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 32),
                     require = 5,
+                    expect = 5,
                     // OptiFine
                     allow = 6)   // Vanilla
     private int extendDrawStride(int constant) {
@@ -268,6 +269,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 8),
                     require = 0,
+                    expect = 0,
                     // OptiFine
                     allow = 2)   // Vanilla
     private int extendDrawOffset(int constant) {

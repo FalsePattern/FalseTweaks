@@ -21,24 +21,10 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.asm.modules.threadedupdates.compat;
+package com.falsepattern.falsetweaks.mixin.bridge.occlison;
 
-import lombok.val;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import java.util.List;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-
-public class Threading_AngelicaRemapper implements IClassTransformer {
-    @Override
-    public byte[] transform(String name, String transformedName, byte[] bytes) {
-        if (bytes == null)
-            return null;
-
-        val reader = new ClassReader(bytes);
-        val writer = new ClassWriter(0);
-        val remapAdapter = new AngelicaRemappingAdapter(writer);
-        reader.accept(remapAdapter, ClassReader.EXPAND_FRAMES);
-        return writer.toByteArray();
-    }
+public interface IRenderGlobalOptiFastcraft {
+    List ft$worldRenderersToUpdate();
 }

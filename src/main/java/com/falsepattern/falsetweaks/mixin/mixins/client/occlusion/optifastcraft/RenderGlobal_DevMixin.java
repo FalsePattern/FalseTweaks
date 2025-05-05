@@ -31,6 +31,7 @@ import lombok.var;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -40,7 +41,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ import java.util.List;
 
 @Mixin(value = RenderGlobal.class,
        priority = -3)
-public abstract class RenderGlobalMixin implements IRenderGlobalOptiFastcraft {
+public abstract class RenderGlobal_DevMixin implements IRenderGlobalOptiFastcraft {
     @Shadow
     public WorldClient theWorld;
 
@@ -94,7 +94,8 @@ public abstract class RenderGlobalMixin implements IRenderGlobalOptiFastcraft {
     @Shadow
     public List tileEntities;
     @SuppressWarnings("MissingUnique")
-    public List field_72767_j;
+    public List worldRenderersToUpdate;
+
     @Shadow
     private boolean occlusionEnabled;
 
@@ -147,11 +148,11 @@ public abstract class RenderGlobalMixin implements IRenderGlobalOptiFastcraft {
             this.maxBlockZ = this.renderChunksDeep;
             int l;
 
-            for (l = 0; l < this.field_72767_j.size(); ++l) {
-                ((WorldRenderer) this.field_72767_j.get(l)).needsUpdate = false;
+            for (l = 0; l < this.worldRenderersToUpdate.size(); ++l) {
+                ((WorldRenderer) this.worldRenderersToUpdate.get(l)).needsUpdate = false;
             }
 
-            this.field_72767_j.clear();
+            this.worldRenderersToUpdate.clear();
             this.tileEntities.clear();
             this.onStaticEntitiesChanged();
 
@@ -172,7 +173,7 @@ public abstract class RenderGlobalMixin implements IRenderGlobalOptiFastcraft {
                         this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l].markDirty();
                         this.sortedWorldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l] =
                                 this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l];
-                        this.field_72767_j.add(this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l]);
+                        this.worldRenderersToUpdate.add(this.worldRenderers[(j1 * this.renderChunksTall + i1) * this.renderChunksWide + l]);
                         j += 3;
                     }
                 }

@@ -36,22 +36,12 @@ public class LazyOptiFineCheck {
         if (detected == null) {
             if (FMLLaunchHandler.side().isClient()) {
                 try {
-                    //We might be too early but let's try the standard way
-                    detected = FMLClientHandler.instance().hasOptifine();
-                } catch (Throwable ignored) {
-                    //Ok, we'll do it manually then
-                    try {
-                        ClassLoader cl;
-                        cl = Loader.instance().getModClassLoader();
-                        if (cl == null) {
-                            cl = Launch.classLoader;
-                        }
-                        Class.forName("Config", false, cl);
-                        detected = true;
-                    } catch (Throwable ignored1) {
-                        //99.9% sure that optifine is not present
-                        detected = false;
-                    }
+                    ClassLoader cl = Launch.classLoader;
+                    Class.forName("Config", false, cl);
+                    detected = true;
+                } catch (Throwable ignored1) {
+                    //99.9% sure that optifine is not present
+                    detected = false;
                 }
             } else {
                 //server shouldn't have OF

@@ -31,6 +31,8 @@ import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import net.minecraft.launchwrapper.Launch;
+
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -153,8 +155,11 @@ public enum Mixin implements IMixin {
 
     //Both of them
     Occlusion_OptiFastCraft_RenderGlobalMixin(Side.CLIENT,
-                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)),
+                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(condition(() -> !(Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment"))),
                                               "occlusion.optifastcraft.RenderGlobalMixin"),
+    Occlusion_OptiFastCraft_RenderGlobal_DevMixin(Side.CLIENT,
+                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(condition(() -> (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment"))),
+                                              "occlusion.optifastcraft.RenderGlobal_DevMixin"),
 
     //endregion Occlusion Tweaks Module
 

@@ -38,10 +38,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
  */
 public class RenderGlobalDeOptimizer implements TurboClassTransformer {
     private static final String OWNER_INTERNAL_NAME = "net/minecraft/client/renderer/RenderGlobal";
-    private static final String BAD_FIELD_NAME = "t";
     private static final String BAD_FIELD_DESC = "LCompactArrayList;";
     private static final String BAD_METHOD_OWNER = "CompactArrayList";
-    private static final String TARGET_FIELD_NAME = "field_72767_j";
     private static final String TARGET_FIELD_DESC = "Ljava/util/List;";
     private static final String TARGET_METHOD_OWNER = "java/util/List";
 
@@ -79,8 +77,7 @@ public class RenderGlobalDeOptimizer implements TurboClassTransformer {
                 val insn = insnList.next();
                 if (insn instanceof FieldInsnNode) {
                     val field = (FieldInsnNode) insn;
-                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_NAME.equals(field.name) && BAD_FIELD_DESC.equals(field.desc)) {
-                        field.name = TARGET_FIELD_NAME;
+                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_DESC.equals(field.desc)) {
                         field.desc = TARGET_FIELD_DESC;
                         modified = true;
                     }
