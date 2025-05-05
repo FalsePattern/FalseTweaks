@@ -44,7 +44,8 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
     @Dynamic
     @Redirect(method = "getLightBrightnessForSkyBlocks",
               at = @At(value = "INVOKE",
-                       target = "LConfig;isDynamicLights()Z"),
+                       target = "LConfig;isDynamicLights()Z",
+                       remap = false),
               require = 2)
     private boolean ftDynamicLights() {
         return DynamicLightsDrivers.frontend.enabled();
@@ -54,19 +55,51 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
     @Redirect(method = "getLightBrightnessForSkyBlocks",
               at = @At(value = "INVOKE",
                        target = "LDynamicLights;getCombinedLight(IIII)I"),
-              require = 2)
-    private int ftCombinedLights(int x, int y, int z, int combinedLight) {
+              expect = 0,
+              require = 0)
+    private int ftCombinedLightsDev(int x, int y, int z, int combinedLight) {
+        return DynamicLightsDrivers.frontend.forWorldMesh().getCombinedLight(x, y, z, combinedLight);
+    }
+
+    @Dynamic
+    @Redirect(method = "func_72802_i",
+              at = @At(value = "INVOKE",
+                       target = "LDynamicLights;getCombinedLight(IIII)I"),
+              expect = 0,
+              require = 0)
+    private int ftCombinedLightsObf(int x, int y, int z, int combinedLight) {
         return DynamicLightsDrivers.frontend.forWorldMesh().getCombinedLight(x, y, z, combinedLight);
     }
 
     @Dynamic
     @Redirect(method = "getLightBrightnessForSkyBlocks",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I",
-                       remap = true),
-              require = 2)
-    private int brightnessFromSuper(IBlockAccess instance, int x, int y, int z, int lightValue) {
+                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I"),
+              expect = 0,
+              require = 0)
+    private int brightnessFromSuperDev(IBlockAccess instance, int x, int y, int z, int lightValue) {
         return super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
+    }
+
+    @Dynamic
+    @Redirect(method = "func_72802_i",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I"),
+              expect = 0,
+              require = 0)
+    private int brightnessFromSuperObf(IBlockAccess instance, int x, int y, int z, int lightValue) {
+        return super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
+    }
+
+    @Dynamic
+    @Redirect(method = "getBlock",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;",
+                       remap = true),
+              expect = 0,
+              require = 0)
+    private Block blockFromSuperDev(IBlockAccess instance, int x, int y, int z) {
+        return super.getBlock(x, y, z);
     }
 
     @Dynamic
@@ -74,9 +107,9 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;",
                        remap = true),
-              remap = true,
-              require = 2)
-    private Block blockFromSuper(IBlockAccess instance, int x, int y, int z) {
+              expect = 0,
+              require = 0)
+    private Block blockFromSuperObf(IBlockAccess instance, int x, int y, int z) {
         return super.getBlock(x, y, z);
     }
 }

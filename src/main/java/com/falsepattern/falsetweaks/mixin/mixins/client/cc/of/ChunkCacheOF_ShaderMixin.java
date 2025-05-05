@@ -44,7 +44,8 @@ public abstract class ChunkCacheOF_ShaderMixin extends ChunkCache {
     @Redirect(method = "getLightBrightnessForSkyBlocksRaw",
               at = @At(value = "INVOKE",
                        target = "LConfig;isDynamicLights()Z"),
-              require = 1)
+              expect = 0,
+              require = 0)
     private boolean ftDynamicLights() {
         return DynamicLightsDrivers.frontend.enabled();
     }
@@ -52,7 +53,9 @@ public abstract class ChunkCacheOF_ShaderMixin extends ChunkCache {
     @Redirect(method = "getLightBrightnessForSkyBlocksRaw",
               at = @At(value = "INVOKE",
                        target = "LDynamicLights;getCombinedLight(IIII)I"),
-              require = 1)
+              remap = false,
+              expect = 0,
+              require = 0)
     private int ftCombinedLights(int x, int y, int z, int combinedLight) {
         return DynamicLightsDrivers.frontend.forWorldMesh().getCombinedLight(x, y, z, combinedLight);
     }
@@ -61,19 +64,29 @@ public abstract class ChunkCacheOF_ShaderMixin extends ChunkCache {
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I",
                        remap = true),
-              require = 1)
+              expect = 0,
+              require = 0)
     private int brightnessFromSuper(IBlockAccess instance, int x, int y, int z, int lightValue) {
         return super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
     }
 
     @Dynamic
+    @Redirect(method = "getBlock",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
+              expect = 0,
+              require = 0)
+    private Block blockFromSuperDev(IBlockAccess instance, int x, int y, int z) {
+        return super.getBlock(x, y, z);
+    }
+
+    @Dynamic
     @Redirect(method = "func_147439_a",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;",
-                       remap = true),
-              remap = true,
-              require = 3)
-    private Block blockFromSuper(IBlockAccess instance, int x, int y, int z) {
+                       target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"),
+              expect = 0,
+              require = 0)
+    private Block blockFromSuperObf(IBlockAccess instance, int x, int y, int z) {
         return super.getBlock(x, y, z);
     }
 }
