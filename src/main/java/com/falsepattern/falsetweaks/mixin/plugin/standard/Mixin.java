@@ -31,8 +31,6 @@ import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import net.minecraft.launchwrapper.Launch;
-
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -46,7 +44,9 @@ import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonCon
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_ANY_OPTIFINE;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_SHADERS;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.DEV_ONLY;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.NEODYMIUM;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.OBF_ONLY;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_ANY_OPTIFINE;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_SHADERS;
@@ -154,11 +154,11 @@ public enum Mixin implements IMixin {
                                             "occlusion.fastcraft.EntityRendererMixin"),
 
     //Both of them
-    Occlusion_OptiFastCraft_RenderGlobalMixin(Side.CLIENT,
-                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(condition(() -> !(Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment"))),
+    Occlusion_OptiFastCraft_RenderGlobal_ObfMixin(Side.CLIENT,
+                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(OBF_ONLY),
                                               "occlusion.optifastcraft.RenderGlobalMixin"),
     Occlusion_OptiFastCraft_RenderGlobal_DevMixin(Side.CLIENT,
-                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(condition(() -> (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment"))),
+                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(DEV_ONLY),
                                               "occlusion.optifastcraft.RenderGlobal_DevMixin"),
 
     //endregion Occlusion Tweaks Module
@@ -416,7 +416,10 @@ public enum Mixin implements IMixin {
     //region Chunk Cache Module
     CC_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS), "cc.WorldRendererMixin"),
     CC_OF_ChunkCacheOF_ShaderMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS, "cc.of.ChunkCacheOF_ShaderMixin"),
-    CC_OF_ChunkCacheOF_NonShaderMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS), "cc.of.ChunkCacheOF_NonShaderMixin"),
+    CC_OF_ChunkCacheOF_Shader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(DEV_ONLY), "cc.of.ChunkCacheOF_ShaderMixin"),
+    CC_OF_ChunkCacheOF_Shader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(OBF_ONLY), "cc.of.ChunkCacheOF_ShaderMixin"),
+    CC_OF_ChunkCacheOF_NonShader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(DEV_ONLY), "cc.of.ChunkCacheOF_NonShaderMixin"),
+    CC_OF_ChunkCacheOF_NonShader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(OBF_ONLY), "cc.of.ChunkCacheOF_NonShaderMixin"),
     //endregion Chunk Cache Module
 
     //region Misc Modules

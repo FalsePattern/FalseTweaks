@@ -24,7 +24,6 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion.optifastcraft;
 
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.falsetweaks.mixin.bridge.occlison.IRenderGlobalOptiFastcraft;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadSafeSettings;
 import lombok.val;
 import lombok.var;
@@ -48,7 +47,7 @@ import java.util.List;
 
 @Mixin(value = RenderGlobal.class,
        priority = -3)
-public abstract class RenderGlobalMixin implements IRenderGlobalOptiFastcraft {
+public abstract class RenderGlobal_ObfMixin {
     @Shadow
     public WorldClient theWorld;
 

@@ -27,12 +27,15 @@ import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import net.minecraft.launchwrapper.Launch;
+
 import java.util.List;
 import java.util.function.Predicate;
 
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Extras.OPTIFINE_DYNAMIC_LIGHTS_VERSIONS;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.Extras.OPTIFINE_SHADERSMOD_VERSIONS;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
+import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
 import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
 import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.contains;
 
@@ -62,13 +65,16 @@ public enum TargetedMod implements ITargetedMod {
     THERMAL_EXPANSION("Thermal Expansion", false, contains("ThermalExpansion-")),
     ;
 
-    public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITHOUT_SHADERS = require(OPTIFINE_WITHOUT_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
-    public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITH_SHADERS = require(OPTIFINE_WITH_SHADERS);
-    public static Predicate<List<ITargetedMod>> AVOID_OPTIFINE_WITH_SHADERS = avoid(OPTIFINE_WITH_SHADERS);
-    public static Predicate<List<ITargetedMod>> AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS = avoid(OPTIFINE_WITH_SHADERS).and(avoid(OPTIFINE_WITH_DYNAMIC_LIGHTS));
-    public static Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS = require(OPTIFINE_WITH_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
-    public static Predicate<List<ITargetedMod>> REQUIRE_ANY_OPTIFINE = require(OPTIFINE_WITH_SHADERS).or(require(OPTIFINE_WITHOUT_SHADERS)).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
-    public static Predicate<List<ITargetedMod>> AVOID_ANY_OPTIFINE = avoid(OPTIFINE_WITH_SHADERS).and(avoid(OPTIFINE_WITHOUT_SHADERS)).and(avoid(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+    public static final Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITHOUT_SHADERS = require(OPTIFINE_WITHOUT_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+    public static final Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITH_SHADERS = require(OPTIFINE_WITH_SHADERS);
+    public static final Predicate<List<ITargetedMod>> AVOID_OPTIFINE_WITH_SHADERS = avoid(OPTIFINE_WITH_SHADERS);
+    public static final Predicate<List<ITargetedMod>> AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS = avoid(OPTIFINE_WITH_SHADERS).and(avoid(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+    public static final Predicate<List<ITargetedMod>> REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS = require(OPTIFINE_WITH_SHADERS).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+    public static final Predicate<List<ITargetedMod>> REQUIRE_ANY_OPTIFINE = require(OPTIFINE_WITH_SHADERS).or(require(OPTIFINE_WITHOUT_SHADERS)).or(require(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+    public static final Predicate<List<ITargetedMod>> AVOID_ANY_OPTIFINE = avoid(OPTIFINE_WITH_SHADERS).and(avoid(OPTIFINE_WITHOUT_SHADERS)).and(avoid(OPTIFINE_WITH_DYNAMIC_LIGHTS));
+
+    public static final Predicate<List<ITargetedMod>> DEV_ONLY = condition(() -> (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment"));
+    public static final Predicate<List<ITargetedMod>> OBF_ONLY = condition(() -> !(Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment"));
 
 
     @Getter

@@ -36,8 +36,8 @@ import net.minecraft.world.World;
 
 @Mixin(targets = "ChunkCacheOF",
        remap = false)
-public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
-    public ChunkCacheOF_NonShaderMixin(World p_i1964_1_, int p_i1964_2_, int p_i1964_3_, int p_i1964_4_, int p_i1964_5_, int p_i1964_6_, int p_i1964_7_, int p_i1964_8_) {
+public abstract class ChunkCacheOF_NonShader_DevMixin extends ChunkCache {
+    public ChunkCacheOF_NonShader_DevMixin(World p_i1964_1_, int p_i1964_2_, int p_i1964_3_, int p_i1964_4_, int p_i1964_5_, int p_i1964_6_, int p_i1964_7_, int p_i1964_8_) {
         super(p_i1964_1_, p_i1964_2_, p_i1964_3_, p_i1964_4_, p_i1964_5_, p_i1964_6_, p_i1964_7_, p_i1964_8_);
     }
 
@@ -46,15 +46,19 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
               at = @At(value = "INVOKE",
                        target = "LConfig;isDynamicLights()Z",
                        remap = false),
-              require = 2)
-    private boolean ftDynamicLights() {
+              remap = false,
+              expect = 0,
+              require = 0)
+    private boolean ftDynamicLightsDev() {
         return DynamicLightsDrivers.frontend.enabled();
     }
 
     @Dynamic
     @Redirect(method = "getLightBrightnessForSkyBlocks",
               at = @At(value = "INVOKE",
-                       target = "LDynamicLights;getCombinedLight(IIII)I"),
+                       target = "LDynamicLights;getCombinedLight(IIII)I",
+                       remap = false),
+              remap = false,
               expect = 0,
               require = 0)
     private int ftCombinedLightsDev(int x, int y, int z, int combinedLight) {
@@ -62,32 +66,14 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
     }
 
     @Dynamic
-    @Redirect(method = "func_72802_i",
-              at = @At(value = "INVOKE",
-                       target = "LDynamicLights;getCombinedLight(IIII)I"),
-              expect = 0,
-              require = 0)
-    private int ftCombinedLightsObf(int x, int y, int z, int combinedLight) {
-        return DynamicLightsDrivers.frontend.forWorldMesh().getCombinedLight(x, y, z, combinedLight);
-    }
-
-    @Dynamic
     @Redirect(method = "getLightBrightnessForSkyBlocks",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I"),
+                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I",
+                       remap = true),
+              remap = false,
               expect = 0,
               require = 0)
     private int brightnessFromSuperDev(IBlockAccess instance, int x, int y, int z, int lightValue) {
-        return super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
-    }
-
-    @Dynamic
-    @Redirect(method = "func_72802_i",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I"),
-              expect = 0,
-              require = 0)
-    private int brightnessFromSuperObf(IBlockAccess instance, int x, int y, int z, int lightValue) {
         return super.getLightBrightnessForSkyBlocks(x, y, z, lightValue);
     }
 
@@ -96,20 +82,10 @@ public abstract class ChunkCacheOF_NonShaderMixin extends ChunkCache {
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;",
                        remap = true),
+              remap = false,
               expect = 0,
               require = 0)
     private Block blockFromSuperDev(IBlockAccess instance, int x, int y, int z) {
-        return super.getBlock(x, y, z);
-    }
-
-    @Dynamic
-    @Redirect(method = "func_147439_a",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;",
-                       remap = true),
-              expect = 0,
-              require = 0)
-    private Block blockFromSuperObf(IBlockAccess instance, int x, int y, int z) {
         return super.getBlock(x, y, z);
     }
 }
