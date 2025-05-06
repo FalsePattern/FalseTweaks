@@ -57,8 +57,8 @@ public class FalseTweaksTransformer extends MergeableTurboTransformer {
     private static List<TurboClassTransformer> transformers() {
         val transformers = new ArrayList<TurboClassTransformer>();
         if (FMLLaunchHandler.side().isClient()) {
-            transformers.add(new RenderGlobalDeOptimizer());
             if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+                transformers.add(new RenderGlobalDeOptimizer());
                 transformers.add(new Threading_AngelicaCompatFixer());
                 transformers.add(new Threading_RenderBlocksASM());
                 transformers.add(new Threading_TessellatorUseReplacement());
