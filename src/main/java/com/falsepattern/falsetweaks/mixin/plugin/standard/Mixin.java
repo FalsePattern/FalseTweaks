@@ -416,10 +416,10 @@ public enum Mixin implements IMixin {
     //region Chunk Cache Module
     CC_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS), "cc.WorldRendererMixin"),
     CC_OF_ChunkCacheOF_ShaderMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS, "cc.of.ChunkCacheOF_ShaderMixin"),
-    CC_OF_ChunkCacheOF_Shader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(DEV_ONLY), "cc.of.ChunkCacheOF_ShaderMixin"),
-    CC_OF_ChunkCacheOF_Shader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(OBF_ONLY), "cc.of.ChunkCacheOF_ShaderMixin"),
-    CC_OF_ChunkCacheOF_NonShader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(DEV_ONLY), "cc.of.ChunkCacheOF_NonShaderMixin"),
-    CC_OF_ChunkCacheOF_NonShader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(OBF_ONLY), "cc.of.ChunkCacheOF_NonShaderMixin"),
+    CC_OF_ChunkCacheOF_Shader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(DEV_ONLY), "cc.of.ChunkCacheOF_Shader_DevMixin"),
+    CC_OF_ChunkCacheOF_Shader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS.and(OBF_ONLY), "cc.of.ChunkCacheOF_Shader_ObfMixin"),
+    CC_OF_ChunkCacheOF_NonShader_DevMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(DEV_ONLY), "cc.of.ChunkCacheOF_NonShader_DevMixin"),
+    CC_OF_ChunkCacheOF_NonShader_ObfMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS).and(OBF_ONLY), "cc.of.ChunkCacheOF_NonShader_ObfMixin"),
     //endregion Chunk Cache Module
 
     //region Misc Modules
