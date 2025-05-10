@@ -369,6 +369,22 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
     }
 
+    private float lerp(float start, float end, float percentage) {
+        return start + percentage * (end - start);
+    }
+
+    // Assuming origin bottom left
+    private float lerpAO(float bottomLeft, float bottomRight, float topLeft, float topRight, float percentageX, float percentageY) {
+        float bottom = lerp(bottomLeft, bottomRight, percentageX);
+        float top = lerp(topLeft, topRight, percentageX);
+        return lerp(bottom, top, percentageY);
+    }
+    private int lerpBrightness(int bottomLeft, int bottomRight, int topLeft, int topRight, float percentageX, float percentageY) {
+        int sky = (int)lerpAO(bottomLeft & 0xFF, bottomRight & 0xFF, topLeft & 0xFF, topRight & 0xFF, percentageX, percentageY);
+        int block = (int)lerpAO((bottomLeft >> 16) & 0xFF, (bottomRight >> 16) & 0xFF, (topLeft >> 16) & 0xFF, (topRight >> 16) & 0xFF, percentageX, percentageY);
+        return (block << 16) | sky;
+    }
+
     private boolean renderFace(Facing facing) {
         Block block = state.block;
         int x = state.x;
@@ -449,10 +465,81 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         float aoTopRight = (aoFront + lightTop + lightRight + lightTopRight) / 4.0F;
         float aoBottomRight = (lightBottom + aoFront + lightBottomRight + lightRight) / 4.0F;
         float aoBottomLeft = (lightBottomLeft + lightLeft + lightBottom + aoFront) / 4.0F;
-        this.brightnessTopLeft = getAoBrightness(brightnessLeft, brightnessTopLeft, brightnessTop, light);
-        this.brightnessBottomLeft = getAoBrightness(brightnessBottomLeft, brightnessLeft, brightnessBottom, light);
-        this.brightnessBottomRight = getAoBrightness(brightnessBottom, brightnessBottomRight, brightnessRight, light);
-        this.brightnessTopRight = getAoBrightness(brightnessTop, brightnessRight, brightnessTopRight, light);
+        int completeBrightnessTopLeft = getAoBrightness(brightnessLeft, brightnessTopLeft, brightnessTop, light);
+        int completeBrightnessBottomLeft = getAoBrightness(brightnessBottomLeft, brightnessLeft, brightnessBottom, light);
+        int completeBrightnessBottomRight = getAoBrightness(brightnessBottom, brightnessBottomRight, brightnessRight, light);
+        int completeBrightnessTopRight = getAoBrightness(brightnessTop, brightnessRight, brightnessTopRight, light);
+
+        float renderLimitTop = 1;
+        float renderLimitBottom = 0;
+        float renderLimitLeft = 0;
+        float renderLimitRight = 1;
+
+        switch (facing)
+        {
+            case XNEG:
+            case XPOS:
+                renderLimitLeft = (float)renderMinY;
+                renderLimitRight = (float)renderMaxY;
+                renderLimitBottom = (float)renderMinZ;
+                renderLimitTop = (float)renderMaxZ;
+                break;
+            case YNEG:
+            case YPOS:
+                renderLimitLeft = (float)renderMinX;
+                renderLimitRight = (float)renderMaxX;
+                renderLimitBottom = (float)renderMinZ;
+                renderLimitTop = (float)renderMaxZ;
+                break;
+            case ZNEG:
+            case ZPOS:
+                renderLimitLeft = (float)renderMinX;
+                renderLimitRight = (float)renderMaxX;
+                renderLimitBottom = (float)renderMinY;
+                renderLimitTop = (float)renderMaxY;
+                break;
+        }
+
+        float aoMixedTopLeft = lerpAO(
+                aoBottomLeft, aoBottomRight,
+                aoTopLeft, aoTopRight,
+                renderLimitLeft, renderLimitTop);
+
+        float aoMixedBottomLeft = lerpAO(
+                aoBottomLeft, aoBottomRight,
+                aoTopLeft, aoTopRight,
+                renderLimitLeft, renderLimitBottom);
+
+        float aoMixedBottomRight = lerpAO(
+                aoBottomLeft, aoBottomRight,
+                aoTopLeft, aoTopRight,
+                renderLimitRight, renderLimitBottom);
+
+        float aoMixedTopRight = lerpAO(
+                aoBottomLeft, aoBottomRight,
+                aoTopLeft, aoTopRight,
+                renderLimitRight, renderLimitTop);
+
+
+        this.brightnessTopLeft = lerpBrightness(
+                completeBrightnessBottomLeft, completeBrightnessBottomRight,
+                completeBrightnessTopLeft, completeBrightnessTopRight,
+                renderLimitLeft, renderLimitTop);
+
+        this.brightnessBottomLeft = lerpBrightness(
+                completeBrightnessBottomLeft, completeBrightnessBottomRight,
+                completeBrightnessTopLeft, completeBrightnessTopRight,
+                renderLimitLeft, renderLimitBottom);
+
+        this.brightnessBottomRight = lerpBrightness(
+                completeBrightnessBottomLeft, completeBrightnessBottomRight,
+                completeBrightnessTopLeft, completeBrightnessTopRight,
+                renderLimitRight, renderLimitBottom);
+
+        this.brightnessTopRight = lerpBrightness(
+                completeBrightnessBottomLeft, completeBrightnessBottomRight,
+                completeBrightnessTopLeft, completeBrightnessTopRight,
+                renderLimitRight, renderLimitTop);
 
         if (facing.worldUp >= 0) {
             Block frontBlock = getBlockOffset(x, y, z, facing.front);
@@ -493,18 +580,18 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
         // @formatter:on
 
-        this.colorRedTopLeft *= aoTopLeft;
-        this.colorGreenTopLeft *= aoTopLeft;
-        this.colorBlueTopLeft *= aoTopLeft;
-        this.colorRedBottomLeft *= aoBottomLeft;
-        this.colorGreenBottomLeft *= aoBottomLeft;
-        this.colorBlueBottomLeft *= aoBottomLeft;
-        this.colorRedBottomRight *= aoBottomRight;
-        this.colorGreenBottomRight *= aoBottomRight;
-        this.colorBlueBottomRight *= aoBottomRight;
-        this.colorRedTopRight *= aoTopRight;
-        this.colorGreenTopRight *= aoTopRight;
-        this.colorBlueTopRight *= aoTopRight;
+        this.colorRedTopLeft *= aoMixedTopLeft;
+        this.colorGreenTopLeft *= aoMixedTopLeft;
+        this.colorBlueTopLeft *= aoMixedTopLeft;
+        this.colorRedBottomLeft *= aoMixedBottomLeft;
+        this.colorGreenBottomLeft *= aoMixedBottomLeft;
+        this.colorBlueBottomLeft *= aoMixedBottomLeft;
+        this.colorRedBottomRight *= aoMixedBottomRight;
+        this.colorGreenBottomRight *= aoMixedBottomRight;
+        this.colorBlueBottomRight *= aoMixedBottomRight;
+        this.colorRedTopRight *= aoMixedTopRight;
+        this.colorGreenTopRight *= aoMixedTopRight;
+        this.colorBlueTopRight *= aoMixedTopRight;
         IIcon icon = getBlockIcon(block, blockAccess, x, y, z, facing.face.ordinal());
         switch (facing) {
             case YNEG:
