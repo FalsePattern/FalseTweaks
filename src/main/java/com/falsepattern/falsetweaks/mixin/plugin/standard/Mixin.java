@@ -156,7 +156,7 @@ public enum Mixin implements IMixin {
     //Both of them
     Occlusion_OptiFastCraft_RenderGlobal_ObfMixin(Side.CLIENT,
                                               THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(OBF_ONLY),
-                                              "occlusion.optifastcraft.RenderGlobalMixin"),
+                                              "occlusion.optifastcraft.RenderGlobal_ObfMixin"),
     Occlusion_OptiFastCraft_RenderGlobal_DevMixin(Side.CLIENT,
                                               THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)).and(DEV_ONLY),
                                               "occlusion.optifastcraft.RenderGlobal_DevMixin"),
