@@ -51,7 +51,8 @@ pub const Impl = struct {
             } else return version;
             if (has(cpu.features, &.{ .avx512f, .avx512bw, .avx512cd, .avx512dq, .avx512vl })) {
                 version = &x86_util.cpu.x86_64_v4;
-            } else return version;
+            }
+            return version;
         }
         for (&x86_util.supported_models) |supp_model| {
             if (supp_model == model) {
