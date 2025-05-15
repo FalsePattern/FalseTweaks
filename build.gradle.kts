@@ -1,5 +1,10 @@
+import com.falsepattern.zigbuild.options.ZigBuildOptions
+import com.falsepattern.zigbuild.tasks.ZigBuildTask
+import com.falsepattern.zigbuild.toolchain.ZigVersion
+
 plugins {
     id("com.falsepattern.fpgradle-mc") version ("0.15.1")
+    id("com.falsepattern.zigbuild") version ("0.1.1")
 }
 
 group = "com.falsepattern"
@@ -48,6 +53,36 @@ minecraft_fp {
                 required("fplib")
             }
         }
+    }
+}
+
+zig {
+    toolchain {
+        version = ZigVersion.of("0.14.0")
+    }
+    defaultCacheDirs = false
+}
+
+val zigPrefix = layout.buildDirectory.dir("zig-build")
+
+val zigBuildTask = tasks.register<ZigBuildTask>("buildNatives") {
+    options {
+        steps.add("install")
+    }
+    workingDirectory = layout.projectDirectory
+    prefixDirectory = zigPrefix
+    clearPrefixDirectory = true
+    sourceFiles.from(layout.projectDirectory.dir("src/main/zig"))
+    sourceFiles.from(layout.projectDirectory.dir("zig-util"))
+    sourceFiles.from(layout.projectDirectory.file("build.zig"))
+    sourceFiles.from(layout.projectDirectory.file("build.zig.zon"))
+}
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(zigBuildTask)
+    into(minecraft_fp.mod.rootPkg.map { "/" + it.replace('.', '/') + "/modules/natives" } ) {
+        from(zigPrefix.map { it.dir("lib") })
+        include("*.pak")
     }
 }
 

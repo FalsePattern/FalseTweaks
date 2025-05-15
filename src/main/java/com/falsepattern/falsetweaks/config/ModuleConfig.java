@@ -258,6 +258,13 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean OPTIFINE_LOGSPAM_FIX;
 
+    @Config.Comment("Enables native optimizations. Windows/Linux and X86_64 only!")
+    @Config.LangKey("config.falsetweaks.natives")
+    @Config.Name("natives")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean NATIVES;
+
     static {
         ConfigurationManager.selfInit();
         ProfilerConfig.init();

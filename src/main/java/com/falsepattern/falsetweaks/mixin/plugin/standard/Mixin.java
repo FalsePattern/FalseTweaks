@@ -25,6 +25,7 @@ package com.falsepattern.falsetweaks.mixin.plugin.standard;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
+import com.falsepattern.falsetweaks.modules.natives.Natives;
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
 import lombok.Getter;
@@ -104,8 +105,11 @@ public enum Mixin implements IMixin {
                                        THREADING.and(AVOID_ANY_OPTIFINE),
                                        "occlusion.GameSettingsOptionsMixin"),
     Occlusion_ClippingHelperMixin(Side.CLIENT,
-                                  THREADING,
-                                       "occlusion.ClippingHelperMixin"),
+                                  THREADING.and(condition(() -> !ModuleConfig.NATIVES || !Natives.isLoaded())),
+                                  "occlusion.ClippingHelperMixin"),
+    Occlusion_ClippingHelper_NativeMixin(Side.CLIENT,
+                                  THREADING.and(condition(() -> ModuleConfig.NATIVES && Natives.isLoaded())),
+                                  "occlusion.ClippingHelper_NativeMixin"),
     Occlusion_ClippingHelperImplMixin(Side.CLIENT,
                                       THREADING,
                                        "occlusion.ClippingHelperImplMixin"),

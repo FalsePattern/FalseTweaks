@@ -22,6 +22,8 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
+import com.falsepattern.falsetweaks.modules.natives.occlusion.Clipping;
+import com.falsepattern.falsetweaks.modules.natives.Natives;
 import com.falsepattern.falsetweaks.proxy.ClientProxy;
 import lombok.val;
 import org.joml.Matrix4f;
@@ -59,6 +61,8 @@ public abstract class ClippingHelperImplMixin extends ClippingHelper {
     private Matrix4f ft$modelViewMatrix;
     @Unique
     private Matrix4f ft$clippingMatrix;
+    @Unique
+    private float[] ft$nativeUploadFrustumArray;
 
     @Redirect(method = "getInstance",
               at = @At(value = "INVOKE",
@@ -139,5 +143,20 @@ public abstract class ClippingHelperImplMixin extends ClippingHelper {
         frustum[5][2] = clippingMatrixArr[11] + clippingMatrixArr[10];
         frustum[5][3] = clippingMatrixArr[15] + clippingMatrixArr[14];
         this.normalize(frustum, 5);
+
+        if (Natives.isLoaded()) {
+            final float[] frust;
+            if (this.ft$nativeUploadFrustumArray == null) {
+                this.ft$nativeUploadFrustumArray = frust = new float[24];
+            } else {
+                frust = this.ft$nativeUploadFrustumArray;
+            }
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 6; j++) {
+                    frust[i * 6 + j] = frustum[j][i];
+                }
+            }
+            Clipping.setFrustum(frust);
+        }
     }
 }
