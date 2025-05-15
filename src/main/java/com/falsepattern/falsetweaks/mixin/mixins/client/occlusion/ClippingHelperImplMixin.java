@@ -23,6 +23,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.occlusion;
 
 import com.falsepattern.falsetweaks.config.OcclusionConfig;
 import com.falsepattern.falsetweaks.proxy.ClientProxy;
+import lombok.val;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -79,52 +80,64 @@ public abstract class ClippingHelperImplMixin extends ClippingHelper {
      */
     @Overwrite
     public void init() {
-        if (ft$projectionMatrix == null) {
-            ft$projectionMatrix = new Matrix4f();
-            ft$modelViewMatrix = new Matrix4f();
-            ft$clippingMatrix = new Matrix4f();
+        final Matrix4f projectionMatrix;
+        final Matrix4f modelViewMatrix;
+        final Matrix4f clippingMatrix;
+        if (this.ft$projectionMatrix == null) {
+            this.ft$projectionMatrix = projectionMatrix = new Matrix4f();
+            this.ft$modelViewMatrix = modelViewMatrix = new Matrix4f();
+            this.ft$clippingMatrix = clippingMatrix = new Matrix4f();
+        } else {
+            projectionMatrix = this.ft$projectionMatrix;
+            modelViewMatrix = this.ft$modelViewMatrix;
+            clippingMatrix = this.ft$clippingMatrix;
         }
+        val projectionMatrixBuffer = this.projectionMatrixBuffer;
+        val modelviewMatrixBuffer = this.modelviewMatrixBuffer;
         projectionMatrixBuffer.clear();
         modelviewMatrixBuffer.clear();
-        field_78564_h.clear();
+        this.field_78564_h.clear();
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projectionMatrixBuffer);
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelviewMatrixBuffer);
         projectionMatrixBuffer.flip().limit(16);
         modelviewMatrixBuffer.flip().limit(16);
-        ft$projectionMatrix.set(projectionMatrixBuffer);
-        ft$modelViewMatrix.set(modelviewMatrixBuffer);
-        ft$projectionMatrix.mul(ft$modelViewMatrix, ft$clippingMatrix);
-        ft$clippingMatrix.get(this.clippingMatrix);
+        projectionMatrix.set(projectionMatrixBuffer);
+        modelViewMatrix.set(modelviewMatrixBuffer);
+        projectionMatrix.mul(modelViewMatrix, clippingMatrix);
 
-        this.frustum[0][0] = this.clippingMatrix[3] - this.clippingMatrix[0];
-        this.frustum[0][1] = this.clippingMatrix[7] - this.clippingMatrix[4];
-        this.frustum[0][2] = this.clippingMatrix[11] - this.clippingMatrix[8];
-        this.frustum[0][3] = this.clippingMatrix[15] - this.clippingMatrix[12];
-        this.normalize(this.frustum, 0);
-        this.frustum[1][0] = this.clippingMatrix[3] + this.clippingMatrix[0];
-        this.frustum[1][1] = this.clippingMatrix[7] + this.clippingMatrix[4];
-        this.frustum[1][2] = this.clippingMatrix[11] + this.clippingMatrix[8];
-        this.frustum[1][3] = this.clippingMatrix[15] + this.clippingMatrix[12];
-        this.normalize(this.frustum, 1);
-        this.frustum[2][0] = this.clippingMatrix[3] + this.clippingMatrix[1];
-        this.frustum[2][1] = this.clippingMatrix[7] + this.clippingMatrix[5];
-        this.frustum[2][2] = this.clippingMatrix[11] + this.clippingMatrix[9];
-        this.frustum[2][3] = this.clippingMatrix[15] + this.clippingMatrix[13];
-        this.normalize(this.frustum, 2);
-        this.frustum[3][0] = this.clippingMatrix[3] - this.clippingMatrix[1];
-        this.frustum[3][1] = this.clippingMatrix[7] - this.clippingMatrix[5];
-        this.frustum[3][2] = this.clippingMatrix[11] - this.clippingMatrix[9];
-        this.frustum[3][3] = this.clippingMatrix[15] - this.clippingMatrix[13];
-        this.normalize(this.frustum, 3);
-        this.frustum[4][0] = this.clippingMatrix[3] - this.clippingMatrix[2];
-        this.frustum[4][1] = this.clippingMatrix[7] - this.clippingMatrix[6];
-        this.frustum[4][2] = this.clippingMatrix[11] - this.clippingMatrix[10];
-        this.frustum[4][3] = this.clippingMatrix[15] - this.clippingMatrix[14];
-        this.normalize(this.frustum, 4);
-        this.frustum[5][0] = this.clippingMatrix[3] + this.clippingMatrix[2];
-        this.frustum[5][1] = this.clippingMatrix[7] + this.clippingMatrix[6];
-        this.frustum[5][2] = this.clippingMatrix[11] + this.clippingMatrix[10];
-        this.frustum[5][3] = this.clippingMatrix[15] + this.clippingMatrix[14];
-        this.normalize(this.frustum, 5);
+        val clippingMatrixArr = this.clippingMatrix;
+        clippingMatrix.get(clippingMatrixArr);
+
+        val frustum = this.frustum;
+        frustum[0][0] = clippingMatrixArr[3] - clippingMatrixArr[0];
+        frustum[0][1] = clippingMatrixArr[7] - clippingMatrixArr[4];
+        frustum[0][2] = clippingMatrixArr[11] - clippingMatrixArr[8];
+        frustum[0][3] = clippingMatrixArr[15] - clippingMatrixArr[12];
+        this.normalize(frustum, 0);
+        frustum[1][0] = clippingMatrixArr[3] + clippingMatrixArr[0];
+        frustum[1][1] = clippingMatrixArr[7] + clippingMatrixArr[4];
+        frustum[1][2] = clippingMatrixArr[11] + clippingMatrixArr[8];
+        frustum[1][3] = clippingMatrixArr[15] + clippingMatrixArr[12];
+        this.normalize(frustum, 1);
+        frustum[2][0] = clippingMatrixArr[3] + clippingMatrixArr[1];
+        frustum[2][1] = clippingMatrixArr[7] + clippingMatrixArr[5];
+        frustum[2][2] = clippingMatrixArr[11] + clippingMatrixArr[9];
+        frustum[2][3] = clippingMatrixArr[15] + clippingMatrixArr[13];
+        this.normalize(frustum, 2);
+        frustum[3][0] = clippingMatrixArr[3] - clippingMatrixArr[1];
+        frustum[3][1] = clippingMatrixArr[7] - clippingMatrixArr[5];
+        frustum[3][2] = clippingMatrixArr[11] - clippingMatrixArr[9];
+        frustum[3][3] = clippingMatrixArr[15] - clippingMatrixArr[13];
+        this.normalize(frustum, 3);
+        frustum[4][0] = clippingMatrixArr[3] - clippingMatrixArr[2];
+        frustum[4][1] = clippingMatrixArr[7] - clippingMatrixArr[6];
+        frustum[4][2] = clippingMatrixArr[11] - clippingMatrixArr[10];
+        frustum[4][3] = clippingMatrixArr[15] - clippingMatrixArr[14];
+        this.normalize(frustum, 4);
+        frustum[5][0] = clippingMatrixArr[3] + clippingMatrixArr[2];
+        frustum[5][1] = clippingMatrixArr[7] + clippingMatrixArr[6];
+        frustum[5][2] = clippingMatrixArr[11] + clippingMatrixArr[10];
+        frustum[5][3] = clippingMatrixArr[15] + clippingMatrixArr[14];
+        this.normalize(frustum, 5);
     }
 }
