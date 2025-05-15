@@ -70,7 +70,7 @@ pub const Impl = struct {
 };
 
 pub const JNI = struct {
-    var getX86Version: *const fn(buf: [*]u8) [*:0]const u8 = undefined;
+    var getX86Version: *const fn (buf: [*]u8) [*:0]const u8 = undefined;
 
     var lib: std.DynLib = undefined;
 

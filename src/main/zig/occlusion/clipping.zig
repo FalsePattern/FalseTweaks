@@ -39,7 +39,7 @@ pub const Impl = struct {
     inline fn fma(T: type, a: T, b: T, c: T) T {
         @setFloatMode(.optimized);
         //@mulAdd on non-fma capable CPUs bundles the compiler runtime
-    if (comptime builtin.cpu.features.isEnabled(@as(std.Target.Cpu.Feature.Set.Index, @intFromEnum(std.Target.x86.Feature.fma)))) {
+        if (comptime builtin.cpu.features.isEnabled(@as(std.Target.Cpu.Feature.Set.Index, @intFromEnum(std.Target.x86.Feature.fma)))) {
             return @mulAdd(T, a, b, c);
         } else {
             return (a * b) + c;
@@ -86,8 +86,8 @@ pub const Impl = struct {
 };
 
 pub const JNI = struct {
-    var setFrustum: *const fn(frust: [*]const f32) callconv(.c) void = undefined;
-    var isBoxInFrustum: *const fn(minX: f32, minY: f32, minZ: f32, maxX: f32, maxY: f32, maxZ: f32) callconv(.c) bool = undefined;
+    var setFrustum: *const fn (frust: [*]const f32) callconv(.c) void = undefined;
+    var isBoxInFrustum: *const fn (minX: f32, minY: f32, minZ: f32, maxX: f32, maxY: f32, maxZ: f32) callconv(.c) bool = undefined;
 
     var lib: std.DynLib = undefined;
 

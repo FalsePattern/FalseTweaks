@@ -21,7 +21,7 @@
 const std = @import("std");
 const x86 = @import("src/main/zig/cpuid/x86_util.zig");
 pub fn build(b: *std.Build) void {
-    for ([_]std.Target.Os.Tag{.windows, .linux}) |os| {
+    for ([_]std.Target.Os.Tag{ .windows, .linux }) |os| {
         const packer = b.addExecutable(.{
             .name = "packer",
             .root_module = b.addModule("packer", .{
@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) void {
             }),
         });
         const run_packer = b.addRunArtifact(packer);
-        const natives_file = std.mem.concat(b.allocator, u8, &.{@tagName(os), ".pak"}) catch @panic("OOM");
+        const natives_file = std.mem.concat(b.allocator, u8, &.{ @tagName(os), ".pak" }) catch @panic("OOM");
         b.getInstallStep().dependOn(&b.addInstallLibFile(run_packer.addOutputFileArg(natives_file), natives_file).step);
         const baseline_target = b.resolveTargetQuery(.{
             .os_tag = os,
@@ -88,7 +88,7 @@ pub fn build(b: *std.Build) void {
                 .optimize = .ReleaseFast,
                 .strip = true,
             });
-            const name = std.mem.concat(b.allocator, u8, &.{"FalseTweaks-", model.name}) catch @panic("OOM");
+            const name = std.mem.concat(b.allocator, u8, &.{ "FalseTweaks-", model.name }) catch @panic("OOM");
             const lib = b.addLibrary(.{
                 .linkage = .dynamic,
                 .name = name,
