@@ -44,6 +44,7 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -55,6 +56,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
+import static com.falsepattern.falsetweaks.FalseTweaks.createSidedException;
+
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
     public static boolean clippingHelperShouldInit = true;
@@ -62,6 +65,15 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        if (Loader.isModLoaded("angelica") && ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            createSidedException("FalseTweaks threaded rendering is not compatible with Angelica.\nPlease disable it in the FalseTweaks config.");
+        }
+        if (ModuleConfig.TEXTURE_OPTIMIZATIONS && Compat.isSTBIStitcher()) {
+            createSidedException("FalseTweaks " +
+                                 EnumChatFormatting.BOLD + "textureOptimizations" + EnumChatFormatting.RESET + " is not compatible with LWJGL3Ify's " +
+                                 EnumChatFormatting.BOLD + "stbiTextureStitching" + EnumChatFormatting.RESET +
+                                 " option.\nDisable stbiTextureStitching in the lwjgl3ify.cfg\nor disable textureOptimizations in FalseTweaks!");
+        }
         FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
             @Override
             public String getLabel() {

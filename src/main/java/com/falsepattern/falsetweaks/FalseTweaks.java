@@ -66,10 +66,6 @@ public class FalseTweaks {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        proxy.preInit(e);
-        if (Loader.isModLoaded("angelica") && ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            createSidedException("FalseTweaks threaded rendering is not compatible with Angelica.\nPlease disable it in the FalseTweaks config.");
-        }
         if (Loader.isModLoaded("animfix")) {
             builtinMod("animfix");
         }
@@ -79,12 +75,7 @@ public class FalseTweaks {
         if (Loader.isModLoaded("DynamicLights")) {
             createSidedException("Remove the DynamicLights mod and restart the game!\nFalseTweaks has built-in dynamic lights support.");
         }
-        if (ModuleConfig.TEXTURE_OPTIMIZATIONS && Compat.isSTBIStitcher()) {
-            createSidedException("FalseTweaks " +
-                                 EnumChatFormatting.BOLD + "textureOptimizations" + EnumChatFormatting.RESET + " is not compatible with LWJGL3Ify's " +
-                                 EnumChatFormatting.BOLD + "stbiTextureStitching" + EnumChatFormatting.RESET +
-                                 " option.\nDisable stbiTextureStitching in the lwjgl3ify.cfg\nor disable textureOptimizations in FalseTweaks!");
-        }
+        proxy.preInit(e);
     }
 
     @Mod.EventHandler
@@ -102,7 +93,7 @@ public class FalseTweaks {
         proxy.loadComplete(e);
     }
 
-    private static void createSidedException(String text) {
+    public static void createSidedException(String text) {
         if (FMLLaunchHandler.side().isClient()) {
             throw ClientHelper.createException(text);
         } else {
