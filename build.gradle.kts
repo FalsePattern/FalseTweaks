@@ -51,6 +51,12 @@ minecraft_fp {
     }
 }
 
+tasks.processResources.configure {
+    from(configurations.runtimeClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
+        into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/")
+    }
+}
+
 repositories {
     cursemavenEX()
     exclusive(mavenpattern(), "com.falsepattern", "makamys")
@@ -63,7 +69,7 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.9")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.6.0")
     implementation("org.joml:joml:1.10.8")
     implementation("it.unimi.dsi:fastutil:8.5.15")
     implementation("mega:megatraceservice:1.2.0")

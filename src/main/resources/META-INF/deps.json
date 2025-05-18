@@ -1,8 +1,7 @@
 {
   "identifier": "falsepatternlib_dependencies",
   "repositories": [
-    "https://repo1.maven.org/maven2/",
-    "https://mvn.falsepattern.com/gtmega_releases/"
+    "https://repo1.maven.org/maven2/"
   ],
   "dependencies": {
     "always": {
