@@ -30,20 +30,35 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 
 @Mixin(RenderItem.class)
 public abstract class RenderItemMixin {
     @Inject(method = "doRender(Lnet/minecraft/entity/Entity;DDDFF)V",
             at = @At("HEAD"),
             require = 1)
-    private void startManagedMode(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
+    private void startManagedMode1(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
         Data.setManagedMode(true);
     }
 
     @Inject(method = "doRender(Lnet/minecraft/entity/Entity;DDDFF)V",
             at = @At("RETURN"),
             require = 1)
-    private void endManagedMode(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
+    private void endManagedMode1(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_, CallbackInfo ci) {
+        Data.setManagedMode(false);
+    }
+
+    @Inject(method = "doRender(Lnet/minecraft/entity/item/EntityItem;DDDFF)V",
+            at = @At("HEAD"),
+            require = 1)
+    private void startManagedMode2(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
+        Data.setManagedMode(true);
+    }
+
+    @Inject(method = "doRender(Lnet/minecraft/entity/item/EntityItem;DDDFF)V",
+            at = @At("RETURN"),
+            require = 1)
+    private void endManagedMode2(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 }
