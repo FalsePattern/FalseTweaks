@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,30 +40,58 @@ public abstract class RenderingRegistryMixin {
     @Inject(method = "renderWorldBlock",
             at = @At("HEAD"),
             require = 1)
-    private void startRenderWorldBlockMark(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId, CallbackInfoReturnable<Boolean> cir) {
-        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(true);
+    private void startRenderWorldBlockMark(RenderBlocks renderer,
+                                           IBlockAccess world,
+                                           int x,
+                                           int y,
+                                           int z,
+                                           Block block,
+                                           int modelId,
+                                           CallbackInfoReturnable<Boolean> cir) {
+        IRenderBlocksMixin.of(renderer)
+                          .ft$enableMultiRenderReuse(true);
     }
 
     @Inject(method = "renderWorldBlock",
             at = @At("RETURN"),
             require = 1)
-    private void endRenderWorldBlockMark(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId, CallbackInfoReturnable<Boolean> cir) {
-        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(false);
-        ((IRenderBlocksMixin) renderer).reusePreviousStates(false);
+    private void endRenderWorldBlockMark(RenderBlocks renderer,
+                                         IBlockAccess world,
+                                         int x,
+                                         int y,
+                                         int z,
+                                         Block block,
+                                         int modelId,
+                                         CallbackInfoReturnable<Boolean> cir) {
+        IRenderBlocksMixin.of(renderer)
+                          .ft$enableMultiRenderReuse(false);
+        IRenderBlocksMixin.of(renderer)
+                          .ft$reusePreviousStates(false);
     }
 
     @Inject(method = "renderInventoryBlock",
             at = @At("HEAD"),
             require = 1)
-    private void startRenderInventoryBlockMark(RenderBlocks renderer, Block block, int metadata, int modelID, CallbackInfo ci) {
-        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(true);
+    private void startRenderInventoryBlockMark(RenderBlocks renderer,
+                                               Block block,
+                                               int metadata,
+                                               int modelID,
+                                               CallbackInfo ci) {
+        IRenderBlocksMixin.of(renderer)
+                          .ft$enableMultiRenderReuse(true);
     }
 
     @Inject(method = "renderInventoryBlock",
             at = @At("RETURN"),
             require = 1)
-    private void endRenderInventoryBlockMark(RenderBlocks renderer, Block block, int metadata, int modelID, CallbackInfo ci) {
-        ((IRenderBlocksMixin) renderer).enableMultiRenderReuse(false);
-        ((IRenderBlocksMixin) renderer).reusePreviousStates(false);
+    private void endRenderInventoryBlockMark(RenderBlocks renderer,
+                                             Block block,
+                                             int metadata,
+                                             int modelID,
+                                             CallbackInfo ci) {
+        IRenderBlocksMixin.of(renderer)
+                          .ft$enableMultiRenderReuse(false);
+        IRenderBlocksMixin.of(renderer)
+                          .ft$reusePreviousStates(false);
     }
 }

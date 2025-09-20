@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,13 +43,11 @@ public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
     /**
      * All classes in net.minecraft.block.* are the block subclasses save for these.
      */
-    private static final List<String> VanillaBlockExclusions = Arrays.asList(
-            "net/minecraft/block/IGrowable",
-            "net/minecraft/block/ITileEntityProvider",
-            "net/minecraft/block/BlockEventData",
-            "net/minecraft/block/BlockSourceImpl",
-            "net/minecraft/block/material/"
-                                                                            );
+    private static final List<String> VanillaBlockExclusions = Arrays.asList("net/minecraft/block/IGrowable",
+                                                                             "net/minecraft/block/ITileEntityProvider",
+                                                                             "net/minecraft/block/BlockEventData",
+                                                                             "net/minecraft/block/BlockSourceImpl",
+                                                                             "net/minecraft/block/material/");
 
     private static final Set<String> moddedBlockSubclasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
     // Block owners we *shouldn't* redirect because they shadow one of our fields
@@ -58,14 +55,18 @@ public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
 
     private boolean isVanillaBlockSubclass(String className) {
         // Special case for the regular "Block.class" if we're in notch mappings for some reason?
-        if ("aji".equals(className))
+        if ("aji".equals(className)) {
             return true;
+        }
 
-        if (!className.startsWith(Threading_BlockMinMax.packageInternal))
+        if (!className.startsWith(Threading_BlockMinMax.packageInternal)) {
             return false;
-        for (String exclusion : VanillaBlockExclusions)
-            if (className.startsWith(exclusion))
+        }
+        for (String exclusion : VanillaBlockExclusions) {
+            if (className.startsWith(exclusion)) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -91,22 +92,26 @@ public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
+        }
 
         // Track subclasses of Block
-        if (!isVanillaBlockSubclass(cn.name) && isBlockSubclass(cn.superName))
+        if (!isVanillaBlockSubclass(cn.name) && isBlockSubclass(cn.superName)) {
             moddedBlockSubclasses.add(cn.name);
+        }
 
         if (moddedBlockSubclasses.contains(cn.name)) {
             var doWeShadow = false;
             if (blockOwnerExclusions.contains(cn.superName)) {
                 doWeShadow = true;
             } else {
-                doWeShadow = cn.fields.stream().anyMatch(Threading_BlockMinMax::shouldRemoveField);
+                doWeShadow = cn.fields.stream()
+                                      .anyMatch(Threading_BlockMinMax::shouldRemoveField);
             }
-            if (doWeShadow)
+            if (doWeShadow) {
                 blockOwnerExclusions.add(cn.name);
+            }
         }
 
         boolean changed = false;
@@ -116,25 +121,30 @@ public class Threading_BlockMinMaxRedirector implements TurboClassTransformer {
                 val node = insnList.next();
 
                 // We're looking for a get/ put field instruction
-                if (!(node instanceof FieldInsnNode))
+                if (!(node instanceof FieldInsnNode)) {
                     continue;
+                }
                 val opcode = node.getOpcode();
-                if (opcode != Opcodes.GETFIELD && opcode != Opcodes.PUTFIELD)
+                if (opcode != Opcodes.GETFIELD && opcode != Opcodes.PUTFIELD) {
                     continue;
+                }
                 val fNode = (FieldInsnNode) node;
 
                 // Ensure that it deals with a primitive double
-                if (!"D".equals(fNode.desc))
+                if (!"D".equals(fNode.desc)) {
                     continue;
+                }
 
                 // And make sure that this is a sub-class of a block which has not been excluded
-                if (!isBlockSubclass(fNode.owner) || blockOwnerExclusions.contains(fNode.owner))
+                if (!isBlockSubclass(fNode.owner) || blockOwnerExclusions.contains(fNode.owner)) {
                     continue;
+                }
 
                 // Now try to find a field to target
                 val fieldToRedirect = Threading_BlockMinMax.tryMapFieldNameToMCP(fNode.name);
-                if (fieldToRedirect == null)
+                if (fieldToRedirect == null) {
                     continue;
+                }
 
                 // Replace the instruction with our redirect
                 val replacementMethod = new MethodInsnNode(Opcodes.INVOKEVIRTUAL,

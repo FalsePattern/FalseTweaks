@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -69,7 +68,9 @@ public class VoxelRenderHelper {
         for (val entry : VoxelizerConfig.FORCED_LAYERS) {
             val parts = entry.split("=");
             if (parts.length != 2) {
-                Share.log.error("Invalid forced layer " + entry + " in overlay config! Format should be: texturename=number");
+                Share.log.error("Invalid forced layer " +
+                                entry +
+                                " in overlay config! Format should be: texturename=number");
                 continue;
             }
             try {
@@ -98,7 +99,8 @@ public class VoxelRenderHelper {
         if (Data.enchantmentGlintTextureBound) {
             GL11.glDepthFunc(GL11.GL_LEQUAL);
         }
-        if (ModuleConfig.ITEM_RENDER_LISTS && VoxelRenderListManager.INSTANCE.pre(mesh, layer, Data.enchantmentGlintTextureBound)) {
+        if (ModuleConfig.ITEM_RENDER_LISTS &&
+            VoxelRenderListManager.INSTANCE.pre(mesh, layer, Data.enchantmentGlintTextureBound)) {
             return;
         }
         val tess = Compat.tessellator();
@@ -120,7 +122,14 @@ public class VoxelRenderHelper {
         }
     }
 
-    public static void renderRail(IBlockAccess blockAccess, BlockRailBase rail, int x, int y, int z, int railDirection, IIcon iicon, boolean mirrored) {
+    public static void renderRail(IBlockAccess blockAccess,
+                                  BlockRailBase rail,
+                                  int x,
+                                  int y,
+                                  int z,
+                                  int railDirection,
+                                  IIcon iicon,
+                                  boolean mirrored) {
         val tess = Compat.tessellator();
         val mesh = VoxelMesh.getMesh((TextureAtlasSprite) iicon);
         tess.setBrightness(rail.getMixedBrightnessForBlock(blockAccess, x, y, z));
@@ -172,9 +181,23 @@ public class VoxelRenderHelper {
                     }
                     switch (railDirection) {
                         case RAIL_FLAT_NORTH_SOUTH:
-                            return isBlockRailWithDirection(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
+                            return isBlockRailWithDirection(blockAccess,
+                                                            x,
+                                                            y,
+                                                            z - 1,
+                                                            RAIL_FLAT_NORTH_SOUTH,
+                                                            RAIL_RAMP_NORTH,
+                                                            RAIL_CORNER_EAST_SOUTH,
+                                                            RAIL_CORNER_WEST_SOUTH);
                         case RAIL_FLAT_WEST_EAST:
-                            return isBlockRailWithDirection(blockAccess, x + 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_EAST, RAIL_CORNER_WEST_SOUTH, RAIL_CORNER_WEST_NORTH);
+                            return isBlockRailWithDirection(blockAccess,
+                                                            x + 1,
+                                                            y,
+                                                            z,
+                                                            RAIL_FLAT_WEST_EAST,
+                                                            RAIL_RAMP_EAST,
+                                                            RAIL_CORNER_WEST_SOUTH,
+                                                            RAIL_CORNER_WEST_NORTH);
                     }
                     break;
                 }
@@ -185,10 +208,24 @@ public class VoxelRenderHelper {
                     switch (railDirection) {
                         case RAIL_FLAT_NORTH_SOUTH:
                             //                        case RAIL_CORNER_EAST_SOUTH:
-                            return isBlockRailWithDirection(blockAccess, x, y, z + 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_SOUTH, RAIL_CORNER_EAST_NORTH, RAIL_CORNER_WEST_NORTH);
+                            return isBlockRailWithDirection(blockAccess,
+                                                            x,
+                                                            y,
+                                                            z + 1,
+                                                            RAIL_FLAT_NORTH_SOUTH,
+                                                            RAIL_RAMP_SOUTH,
+                                                            RAIL_CORNER_EAST_NORTH,
+                                                            RAIL_CORNER_WEST_NORTH);
                         case RAIL_FLAT_WEST_EAST:
                             //                        case RAIL_CORNER_WEST_SOUTH:
-                            return isBlockRailWithDirection(blockAccess, x - 1, y, z, RAIL_FLAT_WEST_EAST, RAIL_RAMP_WEST, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_EAST_NORTH);
+                            return isBlockRailWithDirection(blockAccess,
+                                                            x - 1,
+                                                            y,
+                                                            z,
+                                                            RAIL_FLAT_WEST_EAST,
+                                                            RAIL_RAMP_WEST,
+                                                            RAIL_CORNER_EAST_SOUTH,
+                                                            RAIL_CORNER_EAST_NORTH);
                         //                        case RAIL_CORNER_WEST_NORTH:
                         //                            return isBlockRailWithMetadata(blockAccess, x, y, z - 1, RAIL_FLAT_NORTH_SOUTH, RAIL_RAMP_NORTH, RAIL_CORNER_EAST_SOUTH, RAIL_CORNER_WEST_SOUTH);
                         //                        case RAIL_CORNER_EAST_NORTH:
@@ -217,7 +254,11 @@ public class VoxelRenderHelper {
         }, VoxelType.Solid);
     }
 
-    private static boolean isBlockRailWithDirection(IBlockAccess blockAccess, int x, int y, int z, int... expectedRailDirection) {
+    private static boolean isBlockRailWithDirection(IBlockAccess blockAccess,
+                                                    int x,
+                                                    int y,
+                                                    int z,
+                                                    int... expectedRailDirection) {
         val block = blockAccess.getBlock(x, y, z);
         if (!(block instanceof BlockRailBase)) {
             return false;

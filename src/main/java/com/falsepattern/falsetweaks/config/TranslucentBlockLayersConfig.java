@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,24 +31,21 @@ import com.falsepattern.lib.config.ConfigurationManager;
         category = "translucent_block_layers_fix")
 @Config.LangKey
 public class TranslucentBlockLayersConfig {
-    @Config.Comment({
-            "The \"epsilon\" value used when shifting translucent block geometry closer to the camera.",
-            "Values too low will cause near blocks to suffer from Z-Fighting,",
-            "values too high will cause translucent geometry to leak through far away blocks.",
-            "Advanced setting.",
-            "FPS impact: Unknown"
-    })
-    @Config.Name(value = "epsilon", migrations = "")
+    @Config.Comment({"The \"epsilon\" value used when shifting translucent block geometry closer to the camera.",
+                     "Values too low will cause near blocks to suffer from Z-Fighting,",
+                     "values too high will cause translucent geometry to leak through far away blocks.",
+                     "Advanced setting.",
+                     "FPS impact: Unknown"})
+    @Config.Name(value = "epsilon",
+                 migrations = "")
     @Config.LangKey
     @Config.RangeDouble(min = 0,
                         max = 0.1)
     @Config.DefaultDouble(0.001)
     public static double TRANSLUCENT_BLOCK_LAYERS_FIX_EPSILON;
 
-    @Config.Comment({
-            "Runtime toggle for enabling the matrix transforms.",
-            "This does not affect the mixin loading, use the toggle in the modules section for that."
-    })
+    @Config.Comment({"Runtime toggle for enabling the matrix transforms.",
+                     "This does not affect the mixin loading, use the toggle in the modules section for that."})
     @Config.Name(value = "enabled")
     @Config.LangKey
     @Config.DefaultBoolean(true)

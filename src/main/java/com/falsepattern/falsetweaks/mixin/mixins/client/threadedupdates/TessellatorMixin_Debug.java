@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,8 +22,9 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
 
-import com.falsepattern.falsetweaks.modules.threadedupdates.IllegalThreadingDrawing;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadTessellator;
+import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.IllegalThreadingDrawing;
+import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,8 +39,24 @@ import cpw.mods.fml.common.Loader;
 
 @Mixin(value = Tessellator.class)
 public abstract class TessellatorMixin_Debug {
-    @Inject(method = {"setVertexState", "func_154352_a", "setColorRGBA_F", "setColorRGBA", "startDrawing", "addTranslation", "setTranslation", "addVertexWithUV", "setNormal",
-                      "setColorOpaque", "addVertex", "setColorOpaque_I", "reset", "setBrightness", "startDrawingQuads", "disableColor", "setColorRGBA_I", "setTextureUV",
+    @Inject(method = {"setVertexState",
+                      "func_154352_a",
+                      "setColorRGBA_F",
+                      "setColorRGBA",
+                      "startDrawing",
+                      "addTranslation",
+                      "setTranslation",
+                      "addVertexWithUV",
+                      "setNormal",
+                      "setColorOpaque",
+                      "addVertex",
+                      "setColorOpaque_I",
+                      "reset",
+                      "setBrightness",
+                      "startDrawingQuads",
+                      "disableColor",
+                      "setColorRGBA_I",
+                      "setTextureUV",
                       "setColorOpaque_F"},
             at = @At("HEAD"),
             cancellable = true,
@@ -73,9 +89,10 @@ public abstract class TessellatorMixin_Debug {
 
     @Unique
     private boolean ft$checkThreadIsInvalid() {
-        if (((Object) this) == ThreadedChunkUpdateHelper.mainThreadTessellator()) {
-            if (!ThreadedChunkUpdateHelper.isMainThread()) {
-                val modC = Loader.instance().activeModContainer();
+        if (((Object) this) == ThreadTessellator.mainThreadTessellator()) {
+            if (!MainThreadContainer.isMainThread()) {
+                val modC = Loader.instance()
+                                 .activeModContainer();
                 IllegalThreadingDrawing.logIllegalMan(modC.getName(), modC.getModId());
 
                 //throw new IllegalStateException("Tried to access main tessellator from non-main thread " + Thread.currentThread().getName());

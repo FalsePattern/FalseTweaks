@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version ("0.10.1")
+    id("com.falsepattern.fpgradle-mc") version "2.0.0"
 }
 
 group = "com.falsepattern"
@@ -17,7 +17,6 @@ minecraft_fp {
 
     mixin {
         pkg = "mixin.mixins"
-        pluginClass = "mixin.plugin.standard.MixinPlugin"
         extraConfigs = listOf("mixins.falsetweaks.init.json")
     }
 
@@ -51,24 +50,40 @@ minecraft_fp {
     }
 }
 
+tasks.processResources.configure {
+    from(configurations.runtimeClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
+        into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/")
+    }
+}
+
 repositories {
     cursemavenEX()
-    exclusive(mavenpattern(), "com.falsepattern", "makamys")
+    modrinthEX()
+    exclusive(mavenpattern(), "com.falsepattern", "makamys", "org.embeddedt.celeritas")
     exclusive(mega(), "codechicken", "mega")
     exclusive(mega_uploads(), "optifine")
+    exclusive(venmaven(), "com.ventooth")
     exclusive(jitpack(), "com.github.basdxz", "com.github.jss2a98aj")
     exclusive(horizon(), "com.github.GTNewHorizons", "com.gtnewhorizons.retrofuturabootstrap")
-    exclusive(ivy("https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
-    exclusive(ivy("https://downloads.gtnewhorizons.com/", "[organisation]/[artifact]-[revision].[ext]"), "Mods_for_Twitch")
+    exclusive(ivy("vexatos", "https://files.vexatos.com/", "[module]/[artifact]-[revision].[ext]"), "vexatos")
+    exclusive(ivy("horizon-arr", "https://downloads.gtnewhorizons.com/", "[organisation]/[artifact]-[revision].[ext]"), "Mods_for_Twitch")
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.5.9")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.9.0")
     implementation("org.joml:joml:1.10.8")
-    implementation("it.unimi.dsi:fastutil:8.5.15")
+    implementation("it.unimi.dsi:fastutil:8.5.16")
     implementation("mega:megatraceservice:1.2.0")
+    compileOnly("com.ventooth:swansong-mc1.7.10:1.0.0:dev")
+    compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
 
-    compileOnly("makamys:neodymium-mc1.7.10:0.4.3-unofficial:dev")
+    val beddiumVersion = "1.0.0"
+    val beddiumVersionJ21 = "$beddiumVersion-j21"
+    val beddiumVersionJ8 = "$beddiumVersion-j8"
+    compileOnly("com.ventooth:beddium-mc1.7.10:$beddiumVersionJ8:dev")
+    modernJavaPatchDeps("com.ventooth:beddium-mc1.7.10:$beddiumVersionJ21:dev") {
+        excludeDeps()
+    }
 
     compileOnly("com.github.GTNewHorizons:lwjgl3ify:2.1.5:dev")
 
@@ -101,4 +116,12 @@ dependencies {
     compileOnly(deobfCurse("malisiscore-223896:2283267"))
     // SecurityCraft 1.8.13
     compileOnly(deobfCurse("securitycraft-64760:2818228"))
+    // Storage Drawers 1.7.10-1.10.9
+    compileOnly(deobfCurse("storage-drawers-223852:2469586"))
+    // CoFH Core [1.7.10]3.1.4-329
+    compileOnly(deobfCurse("cofh-core-69162:2388750"))
+    // Thermal Foundation [1.7.10]1.2.6-118
+    compileOnly(deobfCurse("thermal-foundation-222880:2388752"))
+    // Thermal Expansion [1.7.10]4.1.5-248
+    compileOnly(deobfCurse("thermal-expansion-69163:2388758"))
 }

@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,6 +25,7 @@ package com.falsepattern.falsetweaks.config;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
+import lombok.RequiredArgsConstructor;
 
 @Config.Comment("Dynamic hand and entity lights")
 @Config(modid = Tags.MOD_ID,
@@ -36,25 +36,29 @@ public class DynamicLightsConfig {
 
     @Config.Comment("Enable/disable dynamic lights without restarting the game")
     @Config.LangKey
-    @Config.Name(value = "state", migrations = "")
+    @Config.Name(value = "state",
+                 migrations = "")
     @Config.DefaultEnum("Fast")
     public static DynamicLightsState STATE;
 
-    @Config.Comment("Should items/blocks held by the player emit light?")
+    @Config.Comment({"Use this to determine if the player hand and/or dropped items/entities should emit light.",
+                     "Disabling entity light considerable improves performance with a lot of dropped items and mob farms."})
     @Config.LangKey
-    @Config.Name(value = "handLight", migrations = "")
-    @Config.DefaultBoolean(true)
-    public static boolean DYNAMIC_HAND_LIGHT;
+    @Config.Name("lightSources")
+    @Config.DefaultEnum("HandAndEntity")
+    public static LightSources LIGHT_SOURCES;
 
     @Config.Comment("Set this to false if you want to make dynamic lights diamond-shaped, like block lights.")
     @Config.LangKey
-    @Config.Name(value = "circular", migrations = "")
+    @Config.Name(value = "circular",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean CIRCULAR;
 
     static {
         ConfigurationManager.selfInit();
     }
+
     //This is here to make the static initializer run
     public static void init() {
 
@@ -64,5 +68,15 @@ public class DynamicLightsConfig {
         Fast,
         Fancy,
         Disabled
+    }
+
+    @RequiredArgsConstructor
+    public enum LightSources {
+        HandOnly(true, false),
+        EntityOnly(false, true),
+        HandAndEntity(true, true);
+
+        public final boolean hand;
+        public final boolean entity;
     }
 }

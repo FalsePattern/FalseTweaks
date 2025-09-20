@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -119,14 +118,20 @@ public abstract class BeaconFix_TileEntityBeaconRendererMixin extends TileEntity
             at = @At(value = "HEAD"),
             cancellable = true,
             require = 1)
-    private void renderTileEntityAt(TileEntityBeacon beacon, double x, double y, double z, float partialTickTime, CallbackInfo ci) {
+    private void renderTileEntityAt(TileEntityBeacon beacon,
+                                    double x,
+                                    double y,
+                                    double z,
+                                    float partialTickTime,
+                                    CallbackInfo ci) {
         ci.cancel();
         float f1 = beacon.func_146002_i();
 
         if (f1 > 0.0F) {
             bindTexture(field_147523_b);
             val ptt = (double) partialTickTime;
-            val integerTickTime = beacon.getWorldObj().getTotalWorldTime();
+            val integerTickTime = beacon.getWorldObj()
+                                        .getTotalWorldTime();
             val rotation = ((integerTickTime % 180) + ptt) * 2;
             val textureMove = ((integerTickTime % 10) + ptt) / 10;
             GL11.glMatrixMode(GL11.GL_TEXTURE);

@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -97,7 +96,15 @@ public enum Facing {
     public final Vector3ic topLeft;
     public final Vector3ic front;
 
-    Facing(Direction face, int worldUp, ShiftFunc shiftFunc, float brightness, Vector3ic top, Vector3ic right, Vector3ic bottom, Vector3ic left, Vector3ic front) {
+    Facing(Direction face,
+           int worldUp,
+           ShiftFunc shiftFunc,
+           float brightness,
+           Vector3ic top,
+           Vector3ic right,
+           Vector3ic bottom,
+           Vector3ic left,
+           Vector3ic front) {
         this.face = face;
         this.worldUp = worldUp;
         this.shiftFunc = shiftFunc;
@@ -113,7 +120,14 @@ public enum Facing {
         bottomLeft = new Vector3i(bottom).add(left);
     }
 
-    Facing(Direction face, ShiftFunc shiftFunc, float brightness, Vector3ic top, Vector3ic right, Vector3ic bottom, Vector3ic left, Vector3ic front) {
+    Facing(Direction face,
+           ShiftFunc shiftFunc,
+           float brightness,
+           Vector3ic top,
+           Vector3ic right,
+           Vector3ic bottom,
+           Vector3ic left,
+           Vector3ic front) {
         this(face, -1, shiftFunc, brightness, top, right, bottom, left, front);
     }
 

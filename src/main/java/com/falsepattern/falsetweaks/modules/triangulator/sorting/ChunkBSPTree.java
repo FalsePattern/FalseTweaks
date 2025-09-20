@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator.sorting;
 
+import com.falsepattern.falsetweaks.Compat;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import lombok.val;
@@ -35,39 +35,21 @@ import java.util.List;
 //BSP sorter ported from MineTest
 //https://github.com/minetest/minetest/blob/master/src/client/mapblock_mesh.cpp
 public class ChunkBSPTree {
+    private static final ThreadLocal<Scratch> SCRATCH = ThreadLocal.withInitial(Scratch::new);
     public final PolygonHolder polygonHolder;
     public final TIntArrayList polygonList = new TIntArrayList();
     private final List<TreeNode> nodes = new ArrayList<>();
     private int root = -1;
 
-    public ChunkBSPTree(boolean triangleMode, boolean shaderMode) {
-        polygonHolder = new PolygonHolder(triangleMode, shaderMode);
+    public ChunkBSPTree(boolean triangleMode, Compat.ShaderType shaderType) {
+        polygonHolder = new PolygonHolder(triangleMode, shaderType);
     }
 
-    private static final ThreadLocal<Scratch> SCRATCH = ThreadLocal.withInitial(Scratch::new);
-
-    public void buildTree(int[] vertexData) {
-        polygonHolder.setVertexData(vertexData);
-        nodes.clear();
-        val polygonCount = polygonHolder.getPolygonCount();
-        val indexes = new TIntArrayList(polygonCount);
-        for (int i = 0; i < polygonCount; i++) {
-            indexes.add(i);
-        }
-        if (!indexes.isEmpty()) {
-            val scratch = SCRATCH.get();
-            root = buildTree(1, 0, 0, 8, 8, 8, 4, indexes, 0, indexes.size(), scratch.nodeList, scratch.frontList, scratch.backList, 0, scratch.scratchBuffer);
-        } else {
-            root = -1;
-        }
-    }
-
-    public void traverse(Vector3f viewpoint) {
-        polygonList.resetQuick();
-        traverse(root, viewpoint, polygonList);
-    }
-
-    private static int findSplitCandidate(TIntList list, int start, int length, PolygonHolder holder, Vector3f scratchBuffer) {
+    private static int findSplitCandidate(TIntList list,
+                                          int start,
+                                          int length,
+                                          PolygonHolder holder,
+                                          Vector3f scratchBuffer) {
         float centerX = 0;
         float centerY = 0;
         float centerZ = 0;
@@ -97,8 +79,18 @@ public class ChunkBSPTree {
             float polygonMidpointZ = scratchBuffer.z;
             if (polygonArea > candidateArea ||
                 (polygonArea == candidateArea &&
-                 SharedMath.distanceSquared(polygonMidpointX, polygonMidpointY, polygonMidpointZ, centerX, centerY, centerZ)
-                 < SharedMath.distanceSquared(candidateMidpointX, candidateMidpointY, candidateMidpointZ, centerX, centerY, centerZ))) {
+                 SharedMath.distanceSquared(polygonMidpointX,
+                                            polygonMidpointY,
+                                            polygonMidpointZ,
+                                            centerX,
+                                            centerY,
+                                            centerZ) <
+                 SharedMath.distanceSquared(candidateMidpointX,
+                                            candidateMidpointY,
+                                            candidateMidpointZ,
+                                            centerX,
+                                            centerY,
+                                            centerZ))) {
                 candidatePolygon = polygon;
                 candidateArea = polygonArea;
                 candidateMidpointX = polygonMidpointX;
@@ -109,20 +101,56 @@ public class ChunkBSPTree {
         return candidatePolygon;
     }
 
-    private static class Scratch {
-        public final TIntArrayList nodeList = new TIntArrayList();
-        public final TIntArrayList frontList = new TIntArrayList();
-        public final TIntArrayList backList = new TIntArrayList();
-        public final Vector3f scratchBuffer = new Vector3f();
+    public void buildTree(int[] vertexData) {
+        polygonHolder.setVertexData(vertexData);
+        nodes.clear();
+        val polygonCount = polygonHolder.getPolygonCount();
+        val indexes = new TIntArrayList(polygonCount);
+        for (int i = 0; i < polygonCount; i++) {
+            indexes.add(i);
+        }
+        if (!indexes.isEmpty()) {
+            val scratch = SCRATCH.get();
+            root = buildTree(1,
+                             0,
+                             0,
+                             8,
+                             8,
+                             8,
+                             4,
+                             indexes,
+                             0,
+                             indexes.size(),
+                             scratch.nodeList,
+                             scratch.frontList,
+                             scratch.backList,
+                             0,
+                             scratch.scratchBuffer);
+        } else {
+            root = -1;
+        }
     }
 
+    public void traverse(Vector3f viewpoint) {
+        polygonList.resetQuick();
+        traverse(root, viewpoint, polygonList);
+    }
 
-    @SuppressWarnings({"UnnecessaryLocalVariable", "SuspiciousNameCombination"}) //Code ported from MineTest, trying to keep parity
-    private int buildTree(float normalX, float normalY, float normalZ,
-                          float originX, float originY, float originZ,
+    @SuppressWarnings({"UnnecessaryLocalVariable", "SuspiciousNameCombination"})
+    //Code ported from MineTest, trying to keep parity
+    private int buildTree(float normalX,
+                          float normalY,
+                          float normalZ,
+                          float originX,
+                          float originY,
+                          float originZ,
                           float delta,
-                          TIntArrayList list, int start, int length,
-                          TIntArrayList nodeList, TIntArrayList frontList, TIntArrayList backList,
+                          TIntArrayList list,
+                          int start,
+                          int length,
+                          TIntArrayList nodeList,
+                          TIntArrayList frontList,
+                          TIntArrayList backList,
                           int depth,
                           Vector3f scratchBuffer) {
         if (length == 0) {
@@ -140,7 +168,12 @@ public class ChunkBSPTree {
             float midpointX = scratchBuffer.x;
             float midpointY = scratchBuffer.y;
             float midpointZ = scratchBuffer.z;
-            float factor = SharedMath.dot(normalX, normalY, normalZ, midpointX - originX, midpointY - originY, midpointZ - originZ);
+            float factor = SharedMath.dot(normalX,
+                                          normalY,
+                                          normalZ,
+                                          midpointX - originX,
+                                          midpointY - originY,
+                                          midpointZ - originZ);
             if (factor == 0) {
                 nodeList.add(i);
             } else if (factor > 0) {
@@ -199,11 +232,19 @@ public class ChunkBSPTree {
                 nextOriginY = scratchBuffer.y;
                 nextOriginZ = scratchBuffer.z;
             }
-            frontIndex = buildTree(nextNormalX, nextNormalY, nextNormalZ,
-                                   nextOriginX, nextOriginY, nextOriginZ,
+            frontIndex = buildTree(nextNormalX,
+                                   nextNormalY,
+                                   nextNormalZ,
+                                   nextOriginX,
+                                   nextOriginY,
+                                   nextOriginZ,
                                    nextDelta,
-                                   list, frontStart, frontLength,
-                                   nodeList, frontList, backList,
+                                   list,
+                                   frontStart,
+                                   frontLength,
+                                   nodeList,
+                                   frontList,
+                                   backList,
                                    depth + 1,
                                    scratchBuffer);
 
@@ -233,12 +274,21 @@ public class ChunkBSPTree {
                 nextOriginZ = scratchBuffer.z;
             }
 
-            backIndex = buildTree(nextNormalX, nextNormalY, nextNormalZ,
-                                  nextOriginX, nextOriginY, nextOriginZ,
+            backIndex = buildTree(nextNormalX,
+                                  nextNormalY,
+                                  nextNormalZ,
+                                  nextOriginX,
+                                  nextOriginY,
+                                  nextOriginZ,
                                   nextDelta,
-                                  list, backStart, backLength,
-                                  nodeList, frontList, backList,
-                                  depth + 1, scratchBuffer);
+                                  list,
+                                  backStart,
+                                  backLength,
+                                  nodeList,
+                                  frontList,
+                                  backList,
+                                  depth + 1,
+                                  scratchBuffer);
 
             // if there are no other triangles, don't create a new node
             if (frontLength == 0 && nodeLength == 0) {
@@ -246,10 +296,17 @@ public class ChunkBSPTree {
             }
         }
 
-        nodes.add(new TreeNode(normalX, normalY, normalZ,
-                               originX, originY, originZ,
-                               list, nodeStart, nodeLength,
-                               frontIndex, backIndex));
+        nodes.add(new TreeNode(normalX,
+                               normalY,
+                               normalZ,
+                               originX,
+                               originY,
+                               originZ,
+                               list,
+                               nodeStart,
+                               nodeLength,
+                               frontIndex,
+                               backIndex));
 
         return nodes.size() - 1;
     }
@@ -260,7 +317,12 @@ public class ChunkBSPTree {
         }
 
         val n = nodes.get(node);
-        float factor = SharedMath.dot(n.normalX, n.normalY, n.normalZ, viewpoint.x - n.originX, viewpoint.y - n.originY, viewpoint.z - n.originZ);
+        float factor = SharedMath.dot(n.normalX,
+                                      n.normalY,
+                                      n.normalZ,
+                                      viewpoint.x - n.originX,
+                                      viewpoint.y - n.originY,
+                                      viewpoint.z - n.originZ);
         if (factor > 0) {
             traverse(n.backRef, viewpoint, output);
         } else {
@@ -278,5 +340,12 @@ public class ChunkBSPTree {
         } else {
             traverse(n.backRef, viewpoint, output);
         }
+    }
+
+    private static class Scratch {
+        public final TIntArrayList nodeList = new TIntArrayList();
+        public final TIntArrayList frontList = new TIntArrayList();
+        public final TIntArrayList backList = new TIntArrayList();
+        public final Vector3f scratchBuffer = new Vector3f();
     }
 }

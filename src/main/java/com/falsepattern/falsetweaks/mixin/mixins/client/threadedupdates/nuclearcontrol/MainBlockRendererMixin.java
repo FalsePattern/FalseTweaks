@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +21,7 @@
  */
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.nuclearcontrol;
 
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -66,7 +65,14 @@ public abstract class MainBlockRendererMixin {
             at = @At("HEAD"),
             cancellable = true,
             require = 1)
-    private void skipThreadedRendering(IBlockAccess world, int posX, int posY, int posZ, Block block, int model, RenderBlocks renderer, CallbackInfoReturnable<Boolean> cir) {
+    private void skipThreadedRendering(IBlockAccess world,
+                                       int posX,
+                                       int posY,
+                                       int posZ,
+                                       Block block,
+                                       int model,
+                                       RenderBlocks renderer,
+                                       CallbackInfoReturnable<Boolean> cir) {
         val blockMeta = world.getBlockMetadata(posX, posY, posZ);
         switch (blockMeta) {
             case THERMAL_MONITOR_BLOCK_META:
@@ -80,7 +86,7 @@ public abstract class MainBlockRendererMixin {
             default:
         }
 
-        if (!ThreadedChunkUpdateHelper.isMainThread()) {
+        if (!MainThreadContainer.isMainThread()) {
             cir.setReturnValue(false);
         }
     }
@@ -90,7 +96,11 @@ public abstract class MainBlockRendererMixin {
                        target = "Lnet/minecraft/client/renderer/RenderBlocks;renderStandardBlock(Lnet/minecraft/block/Block;III)Z",
                        remap = true),
               require = 3)
-    private boolean renderInfoPanelBlocksWithoutAO(RenderBlocks renderBlocks, Block block, int posX, int posY, int posZ) {
+    private boolean renderInfoPanelBlocksWithoutAO(RenderBlocks renderBlocks,
+                                                   Block block,
+                                                   int posX,
+                                                   int posY,
+                                                   int posZ) {
         val world = renderBlocks.blockAccess;
         val blockMeta = world.getBlockMetadata(posX, posY, posZ);
         switch (blockMeta) {

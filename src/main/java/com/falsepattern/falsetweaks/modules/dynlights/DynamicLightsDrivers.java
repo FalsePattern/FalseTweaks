@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,21 +31,26 @@ import com.falsepattern.falsetweaks.modules.dynlights.base.DynamicLights;
 import stubpackage.Config;
 
 public class DynamicLightsDrivers {
+    public static DynamicLightsDriver frontend = DynamicLightsNoOp.INSTANCE;
     private static int backendPriority = 1000;
     private static DynamicLightsDriver backend;
-    public static DynamicLightsDriver frontend = DynamicLightsNoOp.INSTANCE;
     private static boolean initialized = false;
 
     public static void registerBackend(DynamicLightsDriver backend, int priority) {
         if (initialized) {
-            throw new IllegalStateException("Frontend already initialized! Register dynamic light backends in preInit or init!");
+            throw new IllegalStateException(
+                    "Frontend already initialized! Register dynamic light backends in preInit or init!");
         }
         if (priority < backendPriority) {
             backendPriority = priority;
             DynamicLightsDrivers.backend = backend;
         } else if (priority == backendPriority) {
-            Share.log.warn("Dynamic lights backend with colliding priority registered!\nExisting backend class: {}\nNew backend class: {}",
-                           DynamicLightsDrivers.backend.getClass().getName(), backend.getClass().getName());
+            Share.log.warn(
+                    "Dynamic lights backend with colliding priority registered!\nExisting backend class: {}\nNew backend class: {}",
+                    DynamicLightsDrivers.backend.getClass()
+                                                .getName(),
+                    backend.getClass()
+                           .getName());
             DynamicLightsDrivers.backend = backend;
         }
     }
@@ -63,7 +67,8 @@ public class DynamicLightsDrivers {
         if (Compat.optiFineHasDynamicLights()) {
             return OptiFineCompat.isDynamicLights();
         } else {
-            return ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled;
+            return ModuleConfig.DYNAMIC_LIGHTS &&
+                   DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled;
         }
     }
 
@@ -71,18 +76,32 @@ public class DynamicLightsDrivers {
         if (Compat.optiFineHasDynamicLights()) {
             return OptiFineCompat.isDynamicLightsFast();
         } else {
-            return ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE == DynamicLightsConfig.DynamicLightsState.Fast;
+            return ModuleConfig.DYNAMIC_LIGHTS &&
+                   DynamicLightsConfig.STATE == DynamicLightsConfig.DynamicLightsState.Fast;
         }
     }
-    public static boolean isDynamicHandLight(boolean forWorld) {
+
+    public static boolean isDynamicHandLight() {
         if (Compat.optiFineHasDynamicLights()) {
-            if (Compat.isShaders()) {
+            if (Compat.shaderType() == Compat.ShaderType.Optifine) {
                 return OptiFineCompat.isDynamicHandLight();
             } else {
-                return !(forWorld && Compat.neodymiumActive()) && OptiFineCompat.isDynamicLights();
+                return OptiFineCompat.isDynamicLights();
             }
         } else {
-            return !(forWorld && Compat.neodymiumActive()) && ModuleConfig.DYNAMIC_LIGHTS && DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled && DynamicLightsConfig.DYNAMIC_HAND_LIGHT;
+            return ModuleConfig.DYNAMIC_LIGHTS &&
+                   DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled &&
+                   DynamicLightsConfig.LIGHT_SOURCES.hand;
+        }
+    }
+
+    public static boolean isDynamicEntityLight() {
+        if (Compat.optiFineHasDynamicLights()) {
+            return OptiFineCompat.isDynamicLights();
+        } else {
+            return ModuleConfig.DYNAMIC_LIGHTS &&
+                   DynamicLightsConfig.STATE != DynamicLightsConfig.DynamicLightsState.Disabled &&
+                   DynamicLightsConfig.LIGHT_SOURCES.entity;
         }
     }
 
@@ -94,9 +113,11 @@ public class DynamicLightsDrivers {
         public static boolean isDynamicLights() {
             return Config.isDynamicLights();
         }
+
         public static boolean isDynamicLightsFast() {
             return Config.isDynamicLightsFast();
         }
+
         public static boolean isDynamicHandLight() {
             return Config.isDynamicHandLight();
         }

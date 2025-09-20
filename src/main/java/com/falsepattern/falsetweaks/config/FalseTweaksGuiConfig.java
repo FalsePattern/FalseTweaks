@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,8 +58,10 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
         if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
             result.add(TranslucentBlockLayersConfig.class);
         }
+        if (ModuleConfig.UNLOCK_RENDER_DISTANCE) {
+            result.add(RenderDistanceConfig.class);
+        }
         if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            result.add(OcclusionConfig.class);
             result.add(ThreadingConfig.class);
         }
         if (ModuleConfig.RENDERING_SAFETY) {

@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,7 +81,8 @@ public class VoxelMesh {
         VoxelMesh mesh = texture.getVoxelMesh();
         if (mesh == null) {
             val layers = texture.layers();
-            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy, layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
+            mesh = new VoxelMesh(VoxelizerConfig.MESH_OPTIMIZATION_STRATEGY_PRESET.strategy,
+                                 layers == null ? new Layer[]{new Layer(iicon, 0.0625F)} : layers);
             texture.setVoxelMesh(mesh);
         }
         return mesh;
@@ -110,7 +110,11 @@ public class VoxelMesh {
         }
     }
 
-    private static void addVertexWithUVWithTransform(Tessellator tess, Vector3f pos, float u, float v, Matrix4fc transform) {
+    private static void addVertexWithUVWithTransform(Tessellator tess,
+                                                     Vector3f pos,
+                                                     float u,
+                                                     float v,
+                                                     Matrix4fc transform) {
         transform.transformPosition(pos);
         tess.addVertexWithUV(pos.x, pos.y, pos.z, u, v);
     }
@@ -131,7 +135,13 @@ public class VoxelMesh {
         renderToTessellator(tess, overlayLayer, remapUV, false, IDENTITY, null, type);
     }
 
-    public void renderToTessellator(Tessellator tess, int overlayLayer, boolean remapUV, boolean chunkSpace, Matrix4fc transform, Function<Face, Boolean> trimmingFunction, VoxelType type) {
+    public void renderToTessellator(Tessellator tess,
+                                    int overlayLayer,
+                                    boolean remapUV,
+                                    boolean chunkSpace,
+                                    Matrix4fc transform,
+                                    Function<Face, Boolean> trimmingFunction,
+                                    VoxelType type) {
         compile();
         val vec = workingVector.get();
         for (val face : faceCache.get(type)) {
@@ -226,10 +236,13 @@ public class VoxelMesh {
             result.append("remap_uv!");
         }
         if (overlayLayer > 0) {
-            result.append("overlay").append(overlayLayer).append("!");
+            result.append("overlay")
+                  .append(overlayLayer)
+                  .append("!");
         }
         for (val layer : layers) {
-            result.append(layer.textureIdentity()).append('&');
+            result.append(layer.textureIdentity())
+                  .append('&');
         }
         return result.toString();
     }

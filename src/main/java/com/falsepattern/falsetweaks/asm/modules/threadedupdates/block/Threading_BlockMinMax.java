@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,11 +47,44 @@ public class Threading_BlockMinMax implements TurboClassTransformer {
         try {
             val blockClass = MappingManager.classForName(NameType.Internal, MappingType.MCP, classInternal);
             val mcpFields = Arrays.asList("minX", "minY", "minZ", "maxX", "maxY", "maxZ");
-            for (val mcpField : mcpFields)
+            for (val mcpField : mcpFields) {
                 fieldsToRemove.add(blockClass.getField(MappingType.MCP, mcpField));
+            }
         } catch (ClassNotFoundException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static boolean shouldRemoveField(FieldNode fieldNode) {
+        return tryMapFieldNodeToMCP(fieldNode) != null;
+    }
+
+    static String tryMapFieldNodeToMCP(FieldNode fieldNode) {
+        if (fieldNode == null) {
+            return null;
+        }
+        return tryMapFieldNameToMCP(fieldNode.name);
+    }
+
+    static String tryMapFieldNameToMCP(String fieldName) {
+        if (fieldName == null) {
+            return null;
+        }
+
+        for (val field : fieldsToRemove) {
+            val mcpName = field.getName(MappingType.MCP);
+            if (fieldName.equals(mcpName)) {
+                return mcpName;
+            }
+            if (fieldName.equals(field.getName(MappingType.Notch))) {
+                return mcpName;
+            }
+            if (fieldName.equals(field.getName(MappingType.SRG))) {
+                return mcpName;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -73,8 +105,9 @@ public class Threading_BlockMinMax implements TurboClassTransformer {
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
+        }
         val iter = cn.fields.iterator();
         boolean changed = false;
         while (iter.hasNext()) {
@@ -85,32 +118,5 @@ public class Threading_BlockMinMax implements TurboClassTransformer {
             }
         }
         return changed;
-    }
-
-    static boolean shouldRemoveField(FieldNode fieldNode) {
-        return tryMapFieldNodeToMCP(fieldNode) != null;
-    }
-
-    static String tryMapFieldNodeToMCP(FieldNode fieldNode) {
-        if (fieldNode == null)
-            return null;
-        return tryMapFieldNameToMCP(fieldNode.name);
-    }
-
-    static String tryMapFieldNameToMCP(String fieldName) {
-        if (fieldName == null)
-            return null;
-
-        for (val field : fieldsToRemove) {
-            val mcpName = field.getName(MappingType.MCP);
-            if (fieldName.equals(mcpName))
-                return mcpName;
-            if (fieldName.equals(field.getName(MappingType.Notch)))
-                return mcpName;
-            if (fieldName.equals(field.getName(MappingType.SRG)))
-                return mcpName;
-        }
-
-        return null;
     }
 }

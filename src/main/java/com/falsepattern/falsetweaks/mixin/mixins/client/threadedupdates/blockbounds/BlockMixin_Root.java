@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,17 +22,18 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.blockbounds;
 
-import com.falsepattern.falsetweaks.modules.threadedupdates.FastThreadLocal;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadSafeBlockBounds;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.ThreadSafeBlockBounds;
+import com.falsepattern.falsetweaks.modules.threading.FastThreadLocal;
+import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import lombok.val;
 import lombok.var;
-import net.minecraft.block.Block;
-import net.minecraft.util.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import net.minecraft.block.Block;
+import net.minecraft.util.AxisAlignedBB;
 
 @Unique
 @Mixin(Block.class)
@@ -58,7 +58,7 @@ public abstract class BlockMixin_Root implements ThreadSafeBlockBounds {
     }
 
     @Override
-    public void ft$bounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ)  {
+    public void ft$bounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         val bounds = ft$writeableBounds();
         bounds.minX = minX;
         bounds.minY = minY;
@@ -130,8 +130,9 @@ public abstract class BlockMixin_Root implements ThreadSafeBlockBounds {
 
     @Override
     public AxisAlignedBB ft$writeableBounds() {
-        if (!ft$boundsModified)
+        if (!ft$boundsModified) {
             ft$boundsModified = true;
+        }
         return ft$bounds();
     }
 
@@ -141,10 +142,12 @@ public abstract class BlockMixin_Root implements ThreadSafeBlockBounds {
     }
 
     private AxisAlignedBB ft$bounds() {
-        if (ft$initialBounds == null)
+        if (ft$initialBounds == null) {
             throw new AssertionError("Something something we failed during init!");
-        if (ThreadedChunkUpdateHelper.isMainThread() || !ft$boundsModified)
+        }
+        if (MainThreadContainer.isMainThread() || !ft$boundsModified) {
             return ft$initialBounds;
+        }
 
         var threadBounds = ft$threadBounds.get();
         if (threadBounds == null) {

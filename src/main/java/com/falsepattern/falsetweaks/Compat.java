@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,56 +25,26 @@ package com.falsepattern.falsetweaks;
 import com.falsepattern.falsetweaks.api.ThreadedChunkUpdates;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadTessellator;
 import com.github.basdxz.apparatus.defenition.managed.IParaBlock;
 import lombok.Getter;
-import makamys.neodymium.Neodymium;
 import stubpackage.Config;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.common.Loader;
 
 import java.io.IOException;
 
 public class Compat {
-    private static Boolean NEODYMIUM = null;
-    private static Boolean OPTIFINE = null;
-    private static Boolean DYNLIGHTS = null;
-    private static Boolean SHADERS = null;
-    private static Boolean LWJGL3IFY = null;
-
-    public static boolean neodymiumInstalled() {
-        if (NEODYMIUM != null) {
-            return NEODYMIUM;
-        }
-        try {
-            NEODYMIUM = ((LaunchClassLoader) Compat.class.getClassLoader()).getClassBytes("makamys.neodymium.Neodymium") != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            NEODYMIUM = false;
-        }
-        return NEODYMIUM;
-    }
-
-    public static boolean neodymiumActive() {
-        return neodymiumInstalled() && Neodymium.isActive();
+    public static boolean swanSongInstalled() {
+        return SWANSONG.PRESENT;
     }
 
     public static boolean optiFineInstalled() {
-        if (OPTIFINE != null) {
-            return OPTIFINE;
-        }
-        try {
-            OPTIFINE = Launch.classLoader.getClassBytes("Config") != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            OPTIFINE = false;
-        }
-        return OPTIFINE;
+        return OPTIFINE.PRESENT;
     }
 
     public static boolean dynamicLightsPresent() {
@@ -83,48 +52,15 @@ public class Compat {
     }
 
     public static boolean optiFineHasDynamicLights() {
-        if (!optiFineInstalled()) {
-            return false;
-        }
-        if (DYNLIGHTS != null) {
-            return DYNLIGHTS;
-        }
-        try {
-            DYNLIGHTS = Launch.classLoader.getClassBytes("DynamicLights") != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            DYNLIGHTS = false;
-        }
-        return DYNLIGHTS;
+        return OPTIFINE.PRESENT && DYNLIGHTS.PRESENT;
     }
 
     public static boolean optiFineHasShaders() {
-        if (!optiFineInstalled()) {
-            return false;
-        }
-        if (SHADERS != null) {
-            return SHADERS;
-        }
-        try {
-            SHADERS = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            SHADERS = false;
-        }
-        return SHADERS;
+        return OPTIFINE.PRESENT && SHADERS.PRESENT;
     }
 
-    public static boolean lwjgl3ifyLoaded() {
-        if (LWJGL3IFY != null) {
-            return LWJGL3IFY;
-        }
-        try {
-            LWJGL3IFY = Launch.classLoader.getClassBytes("me.eigenraven.lwjgl3ify.core.Lwjgl3ifyCoremod") != null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            LWJGL3IFY = false;
-        }
-        return LWJGL3IFY;
+    public static boolean beddiumInstalled() {
+        return BEDDIUM.PRESENT;
     }
 
     public static void applyCompatibilityTweaks() {
@@ -135,24 +71,26 @@ public class Compat {
     }
 
     public static boolean enableTriangulation() {
-        //Threaded chunk updates mess up the triangulator, so keep it off for now until the root cause is found.
-        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION;
+        // TODO add triangulator compat in beddium
+        return TriangulatorConfig.ENABLE_QUAD_TRIANGULATION && !beddiumInstalled();
     }
 
     public static Tessellator tessellator() {
         if (ThreadingCompat.isThreadedChunkUpdatingEnabled()) {
-            return ThreadedChunkUpdates.getThreadTessellator();
+            return ThreadTessellator.getThreadTessellator();
         }
-        return ThreadedChunkUpdateHelper.mainThreadTessellator() ;
+        return ThreadTessellator.mainThreadTessellator();
     }
 
-    public static boolean isShaders() {
-        return optiFineHasShaders() && Config.isShaders();
+    public static ShaderType shaderType() {
+        return SWANSONG.PRESENT ? ShaderType.Swansong
+                                : optiFineHasShaders() && OptifineCompat.isShaders() ? ShaderType.Optifine
+                                                                                     : ShaderType.None;
     }
 
     public static boolean isSTBIStitcher() {
         try {
-            return lwjgl3ifyLoaded() && LWJGL3IfyCompat.stbiTextureStitching();
+            return LWJGL3IFY.PRESENT && LWJGL3IfyCompat.stbiTextureStitching();
         } catch (Throwable t) {
             t.printStackTrace();
             return false;
@@ -164,6 +102,102 @@ public class Compat {
             return ApparatusCompat.getAmbientOcclusionLightValue(block, x, y, z, blockAccess);
         } else {
             return block.getAmbientOcclusionLightValue();
+        }
+    }
+
+    public enum ShaderType {
+        None,
+        Optifine,
+        Swansong
+    }
+
+    private static class OPTIFINE {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("Config") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class DYNLIGHTS {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("DynamicLights") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class SHADERS {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("shadersmod.client.Shaders") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class LWJGL3IFY {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("me.eigenraven.lwjgl3ify.core.Lwjgl3ifyCoremod") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class BEDDIUM {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("com.ventooth.beddium.Share") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class SWANSONG {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("com.ventooth.swansong.Share") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
         }
     }
 
@@ -180,7 +214,8 @@ public class Compat {
                 return block.getAmbientOcclusionLightValue();
             }
 
-            return ((IParaBlock) block).paraTile(blockAccess, x, y, z).getAmbientOcclusionLightValue();
+            return ((IParaBlock) block).paraTile(blockAccess, x, y, z)
+                                       .getAmbientOcclusionLightValue();
         }
     }
 
@@ -192,10 +227,6 @@ public class Compat {
         private static void init() {
             isThreadedChunkUpdatingEnabled = ThreadedChunkUpdates.isEnabled();
         }
-
-        public static Tessellator threadTessellator() {
-            return ThreadedChunkUpdates.getThreadTessellator();
-        }
     }
 
     private static class LWJGL3IfyCompat {
@@ -204,9 +235,9 @@ public class Compat {
         }
     }
 
-    private static class NeodymiumCompat {
-        public static boolean isActive() {
-            return Neodymium.isActive();
+    private static class OptifineCompat {
+        public static boolean isShaders() {
+            return Config.isShaders();
         }
     }
 }

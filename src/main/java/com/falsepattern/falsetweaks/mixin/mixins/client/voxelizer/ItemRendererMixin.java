@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,7 +47,15 @@ public abstract class ItemRendererMixin {
             at = @At("HEAD"),
             cancellable = true,
             require = 1)
-    private static void forceVoxelized(Tessellator p_78439_0_, float p_78439_1_, float p_78439_2_, float p_78439_3_, float p_78439_4_, int p_78439_5_, int p_78439_6_, float p_78439_7_, CallbackInfo ci) {
+    private static void forceVoxelized(Tessellator p_78439_0_,
+                                       float p_78439_1_,
+                                       float p_78439_2_,
+                                       float p_78439_3_,
+                                       float p_78439_4_,
+                                       int p_78439_5_,
+                                       int p_78439_6_,
+                                       float p_78439_7_,
+                                       CallbackInfo ci) {
         val lastUsed = Data.getLastUsedSprite();
         if (lastUsed != null && Data.isManagedMode() && !VoxelizerConfig.isExcluded(lastUsed.getIconName())) {
             val glint = Data.enchantmentGlintTextureBound;
@@ -64,7 +71,11 @@ public abstract class ItemRendererMixin {
             at = @At("HEAD"),
             remap = false,
             require = 1)
-    private void startManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void startManagedMode1(EntityLivingBase p_78443_1_,
+                                   ItemStack p_78443_2_,
+                                   int p_78443_3_,
+                                   IItemRenderer.ItemRenderType type,
+                                   CallbackInfo ci) {
         if (p_78443_2_ == null) {
             return;
         }
@@ -113,7 +124,11 @@ public abstract class ItemRendererMixin {
             at = @At("RETURN"),
             remap = false,
             require = 1)
-    private void endManagedMode1(EntityLivingBase p_78443_1_, ItemStack p_78443_2_, int p_78443_3_, IItemRenderer.ItemRenderType type, CallbackInfo ci) {
+    private void endManagedMode1(EntityLivingBase p_78443_1_,
+                                 ItemStack p_78443_2_,
+                                 int p_78443_3_,
+                                 IItemRenderer.ItemRenderType type,
+                                 CallbackInfo ci) {
         Data.setManagedMode(false);
     }
 

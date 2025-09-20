@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -118,7 +117,8 @@ public class VoxelCompiler {
                 //Plus top and bottom faces inlined into the loop
                 {
                     for (int y = 0; y < ySize; y++) {
-                        faceBuilder.minY(y).maxY(y);
+                        faceBuilder.minY(y)
+                                   .maxY(y);
                         Face[] rowFront = front[y];
                         Face[] rowBack = back[y];
                         Arrays.fill(rowFront, null);
@@ -137,18 +137,23 @@ public class VoxelCompiler {
                                        .v1(layer.fetchV(y + 0.01f, ySize))
                                        .v2(layer.fetchV(y + 0.99f, ySize));
                             if (voxels.getFace(x, y, z, Dir.Front)) {
-                                rowFront[x] = faceBuilder.dir(Dir.Front).build();
+                                rowFront[x] = faceBuilder.dir(Dir.Front)
+                                                         .build();
                             }
                             if (voxels.getFace(x, y, z, Dir.Back)) {
-                                rowBack[x] = faceBuilder.dir(Dir.Back).build();
+                                rowBack[x] = faceBuilder.dir(Dir.Back)
+                                                        .build();
                             }
                             //Top and Bottom
-                            faceBuilder.v1(layer.fetchV(y + 0.01f, ySize)).v2(layer.fetchV(y + 0.99f, ySize));
+                            faceBuilder.v1(layer.fetchV(y + 0.01f, ySize))
+                                       .v2(layer.fetchV(y + 0.99f, ySize));
                             if (voxels.getFace(x, y, z, Dir.Up)) {
-                                top[x] = faceBuilder.dir(Dir.Up).build();
+                                top[x] = faceBuilder.dir(Dir.Up)
+                                                    .build();
                             }
                             if (voxels.getFace(x, y, z, Dir.Down)) {
-                                bottom[x] = faceBuilder.dir(Dir.Down).build();
+                                bottom[x] = faceBuilder.dir(Dir.Down)
+                                                       .build();
                             }
                         }
                         strategy.mergeSide(top);
@@ -165,7 +170,8 @@ public class VoxelCompiler {
                 for (int x = 0; x < xSize; x++) {
                     Arrays.fill(left, null);
                     Arrays.fill(right, null);
-                    faceBuilder.minX(x).maxX(x);
+                    faceBuilder.minX(x)
+                               .maxX(x);
                     for (int y = 0; y < ySize; y++) {
                         if (voxels.getType(x, y, z) != type) {
                             continue;
@@ -178,10 +184,12 @@ public class VoxelCompiler {
                                    .v2(layer.fetchV(y + 0.99f, ySize));
 
                         if (voxels.getFace(x, y, z, Dir.Left)) {
-                            left[y] = faceBuilder.dir(Dir.Left).build();
+                            left[y] = faceBuilder.dir(Dir.Left)
+                                                 .build();
                         }
                         if (voxels.getFace(x, y, z, Dir.Right)) {
-                            right[y] = faceBuilder.dir(Dir.Right).build();
+                            right[y] = faceBuilder.dir(Dir.Right)
+                                                  .build();
                         }
                     }
                     strategy.mergeSide(left);

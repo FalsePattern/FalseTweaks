@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,7 +23,7 @@
 package com.falsepattern.falsetweaks.modules.debug;
 
 import com.falsepattern.falsetweaks.Share;
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import lombok.val;
 import mega.trace.service.MEGATraceService;
 
@@ -38,7 +37,7 @@ public class DebugLogging {
         val msgVal = msg.get();
 
         if (Debug.fineLogJava || Debug.fineLogJavaTrace) {
-            if (Debug.fineLogJavaTrace && ThreadedChunkUpdateHelper.isMainThread()) {
+            if (Debug.fineLogJavaTrace && MainThreadContainer.isMainThread()) {
                 Share.log.info(msgVal, new Throwable());
             } else {
                 Share.log.info(msgVal);

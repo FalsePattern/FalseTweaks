@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,13 +43,24 @@ public abstract class TextureUtil_ProfiledMixin {
             at = @At(value = "HEAD"),
             cancellable = true,
             require = 1)
-    private static void uploadTextureBatchable(int[][] texture, int width, int height, int xOffset, int yOffset, boolean ignored1, boolean ignored2, CallbackInfo ci) {
+    private static void uploadTextureBatchable(int[][] texture,
+                                               int width,
+                                               int height,
+                                               int xOffset,
+                                               int yOffset,
+                                               boolean ignored1,
+                                               boolean ignored2,
+                                               CallbackInfo ci) {
         if (theProfiler == null) {
             theProfiler = Minecraft.getMinecraft().mcProfiler;
         }
         if (AnimationUpdateBatcherRegistry.batcher != null) {
             theProfiler.startSection("copyToBatch");
-            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture, width, height, xOffset, yOffset);
+            boolean ended = AnimationUpdateBatcherRegistry.batcher.scheduleUpload(texture,
+                                                                                  width,
+                                                                                  height,
+                                                                                  xOffset,
+                                                                                  yOffset);
             theProfiler.endSection();
             if (ended) {
                 ci.cancel();

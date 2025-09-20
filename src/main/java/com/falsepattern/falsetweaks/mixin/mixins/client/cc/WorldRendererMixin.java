@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,9 +43,17 @@ public abstract class WorldRendererMixin {
               at = @At(value = "NEW",
                        target = "(Lnet/minecraft/world/World;IIIIIII)Lnet/minecraft/world/ChunkCache;"),
               require = 1)
-    private ChunkCache customChunkCache(World world, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, int subIn) {
+    private ChunkCache customChunkCache(World world,
+                                        int xMin,
+                                        int yMin,
+                                        int zMin,
+                                        int xMax,
+                                        int yMax,
+                                        int zMax,
+                                        int subIn) {
         return new ChunkCacheFT(world, xMin, yMin, zMin, xMax, yMax, zMax, subIn);
     }
+
     @Redirect(method = "updateRenderer",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/ChunkCache;extendedLevelsInChunkCache()Z"),
@@ -56,12 +63,13 @@ public abstract class WorldRendererMixin {
             return true;
         }
         if (instance instanceof ChunkCacheFT) {
-            val i = ((ChunkCacheFT)instance);
+            val i = ((ChunkCacheFT) instance);
             cc.set(i);
             i.renderStart();
         }
         return false;
     }
+
     @Inject(method = "updateRenderer",
             at = @At("RETURN"),
             require = 1)

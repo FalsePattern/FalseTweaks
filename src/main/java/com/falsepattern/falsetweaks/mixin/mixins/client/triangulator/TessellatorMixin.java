@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
@@ -54,10 +54,6 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @Shadow
     @Final
     public static Tessellator instance;
-    // This field has an odd name because of optifine compat (cAnNoT aLiAs NoN-pRiVaTe MeMbEr -- SpongePowered Mixins)
-    @Shadow(aliases = {"rawBufferSize"},
-            remap = false)
-    public int field_78388_E;
     @Shadow
     private int drawMode;
     @Shadow
@@ -73,7 +69,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @Setter
     private boolean alternativeTriangulation = false;
     private boolean quadTriangulationTemporarilySuspended = false;
-    private boolean shaderOn = false;
+    private Compat.ShaderType shaderOn = Compat.ShaderType.None;
     private int forceQuadRendering = 0;
     private int quadVerticesPutIntoBuffer = 0;
     @Getter
@@ -123,7 +119,8 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     public void suspendQuadTriangulation() {
         quadTriangulationTemporarilySuspended = true;
         if (quadVerticesPutIntoBuffer != 0) {
-            Share.log.error(new RuntimeException("Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
+            Share.log.error(new RuntimeException(
+                    "Someone suspended triangulation while the tessellator had a partially rendered quad! Stacktrace: "));
             quadVerticesPutIntoBuffer = 0;
         }
     }
@@ -139,14 +136,14 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
 
     private void ensureRawBufferHasExtraSpaceFor(int numberOfInts) {
         int newIndex = rawBufferIndex + numberOfInts;
-        if (newIndex >= field_78388_E) {
-            if (field_78388_E < 0x10000) {
-                field_78388_E = 0x10000;
+        if (newIndex >= ft$rawBufferSize()) {
+            if (ft$rawBufferSize() < 0x10000) {
+                ft$rawBufferSize(0x10000);
             }
-            while (newIndex >= field_78388_E) {
-                field_78388_E *= 2;
+            while (newIndex >= ft$rawBufferSize()) {
+                ft$rawBufferSize(ft$rawBufferSize() * 2);
             }
-            rawBuffer = Arrays.copyOf(rawBuffer, field_78388_E);
+            rawBuffer = Arrays.copyOf(rawBuffer, ft$rawBufferSize());
         }
     }
 
@@ -156,19 +153,31 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
         }
         quadVerticesPutIntoBuffer++;
         if (quadVerticesPutIntoBuffer == 4) {
-            int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
+            int vertexSize = VertexInfo.getVertexInfo(shaderOn(), 1);
             ensureRawBufferHasExtraSpaceFor(2 * vertexSize);
             quadVerticesPutIntoBuffer = 0;
             //Current vertex layout: ABCD
             if (alternativeTriangulation) {
                 //Target vertex layout: ABD DBC
-                System.arraycopy(rawBuffer, rawBufferIndex - (3 * vertexSize), rawBuffer, rawBufferIndex, 2 * vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - vertexSize, rawBuffer, rawBufferIndex - (2 * vertexSize), vertexSize);
+                System.arraycopy(rawBuffer,
+                                 rawBufferIndex - (3 * vertexSize),
+                                 rawBuffer,
+                                 rawBufferIndex,
+                                 2 * vertexSize);
+                System.arraycopy(rawBuffer,
+                                 rawBufferIndex - vertexSize,
+                                 rawBuffer,
+                                 rawBufferIndex - (2 * vertexSize),
+                                 vertexSize);
                 alternativeTriangulation = false;
             } else {
                 //Target vertex layout: ABC DAC
                 System.arraycopy(rawBuffer, rawBufferIndex - (4 * vertexSize), rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - (2 * vertexSize), rawBuffer, rawBufferIndex + vertexSize, vertexSize);
+                System.arraycopy(rawBuffer,
+                                 rawBufferIndex - (2 * vertexSize),
+                                 rawBuffer,
+                                 rawBufferIndex + vertexSize,
+                                 vertexSize);
             }
             vertexCount += 2;
             rawBufferIndex += 2 * vertexSize;
@@ -181,10 +190,14 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
             //Target vertex layout: BCDA
             quadVerticesPutIntoBuffer++;
             if (quadVerticesPutIntoBuffer == 4) {
-                int vertexSize = VertexInfo.recomputeVertexInfo(shaderOn() ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
-                ensureRawBufferHasExtraSpaceFor(vertexSize);
+                int vertexSize = VertexInfo.getVertexInfo(shaderOn(), 1);
+                ensureRawBufferHasExtraSpaceFor(vertexSize * 2);
                 System.arraycopy(rawBuffer, rawBufferIndex - 4 * vertexSize, rawBuffer, rawBufferIndex, vertexSize);
-                System.arraycopy(rawBuffer, rawBufferIndex - 3 * vertexSize, rawBuffer, rawBufferIndex - 4 * vertexSize, 3 * vertexSize);
+                System.arraycopy(rawBuffer,
+                                 rawBufferIndex - 3 * vertexSize,
+                                 rawBuffer,
+                                 rawBufferIndex - 4 * vertexSize,
+                                 3 * vertexSize);
                 System.arraycopy(rawBuffer, rawBufferIndex, rawBuffer, rawBufferIndex - vertexSize, vertexSize);
                 quadVerticesPutIntoBuffer = 0;
                 alternativeTriangulation = false;
@@ -233,12 +246,12 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     }
 
     @Override
-    public boolean shaderOn() {
+    public Compat.ShaderType shaderOn() {
         return shaderOn;
     }
 
     @Override
-    public void shaderOn(boolean state) {
+    public void shaderOn(Compat.ShaderType state) {
         shaderOn = state;
     }
 
@@ -246,7 +259,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
                     constant = @Constant(intValue = 32),
                     require = 1)
     private int extendAddVertexCap(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant >>> 2, drawingTris ? 3 : 4);
+        return VertexInfo.recomputeVertexInfo(constant >>> 2, 4) + 128;
     }
 
     @ModifyConstant(method = "addVertex",
@@ -259,6 +272,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 32),
                     require = 5,
+                    expect = 5,
                     // OptiFine
                     allow = 6)   // Vanilla
     private int extendDrawStride(int constant) {
@@ -268,6 +282,7 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @ModifyConstant(method = "draw",
                     constant = @Constant(intValue = 8),
                     require = 0,
+                    expect = 0,
                     // OptiFine
                     allow = 2)   // Vanilla
     private int extendDrawOffset(int constant) {

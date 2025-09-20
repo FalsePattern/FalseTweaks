@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,16 +31,15 @@ import com.falsepattern.lib.config.ConfigurationManager;
         category = "item_render_lists")
 @Config.LangKey
 public class RenderListConfig {
-    @Config.Comment({
-            "The total amount of renderlists FalseTweaks may allocate for optimized item rendering.",
-            "When the limit is exceeded, the render list that was used the longest time ago gets released.",
-            "Bigger buffer sizes use more VRAM, but also get a higher average performance.",
-            "256 should be good enough for most modded games, and going above 1024 is not recommended unless",
-            "you have a lot of VRAM.",
-            "FPS impact: zero when tuned right"
-    })
+    @Config.Comment({"The total amount of renderlists FalseTweaks may allocate for optimized item rendering.",
+                     "When the limit is exceeded, the render list that was used the longest time ago gets released.",
+                     "Bigger buffer sizes use more VRAM, but also get a higher average performance.",
+                     "256 should be good enough for most modded games, and going above 1024 is not recommended unless",
+                     "you have a lot of VRAM.",
+                     "FPS impact: zero when tuned right"})
     @Config.LangKey
-    @Config.Name(value = "maxBufferSize", migrations = "")
+    @Config.Name(value = "maxBufferSize",
+                 migrations = "")
     @Config.RangeInt(min = 64)
     @Config.DefaultInt(256)
     public static int MAX_BUFFER_SIZE;

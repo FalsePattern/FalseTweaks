@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,61 +22,79 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin.init;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
-import com.falsepattern.lib.mixin.IMixin;
-import com.falsepattern.lib.mixin.ITargetedMod;
+import com.falsepattern.lib.mixin.v2.MixinHelper;
+import com.falsepattern.lib.mixin.v2.SidedMixins;
+import com.falsepattern.lib.mixin.v2.TaggedMod;
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
+import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.intellij.lang.annotations.Language;
 
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BooleanSupplier;
 
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
+import static com.falsepattern.lib.mixin.v2.MixinHelper.builder;
 
+@SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
-public enum Mixin implements IMixin {
+public enum Mixin implements IMixins {
     // @formatter:off
-    //region Startup Optimizations Module
-
-    ASMDataTableMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ASMDataTableMixin"),
-
-    DirectoryDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.DirectoryDiscovererMixin"),
-    JarDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.JarDiscovererMixin"),
-    ModContainerFactoryMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModContainerFactoryMixin"),
-    ModDiscovererMixin(Side.COMMON, condition(() -> ModuleConfig.STARTUP_OPTIMIZATIONS), "startup.ModDiscovererMixin"),
-
-    //endregion Startup Optimizations Module
+    StartupOptimizations(() -> ModuleConfig.STARTUP_OPTIMIZATIONS,
+                         common("startup.ASMDataTableMixin",
+                                "startup.DirectoryDiscovererMixin",
+                                "startup.JarDiscovererMixin",
+                                "startup.ModContainerFactoryMixin",
+                                "startup.ModDiscovererMixin")),
     // @formatter:on
+
+    //region boilerplate
     ;
-
     @Getter
-    private final Side side;
-    @Getter
-    private final Predicate<List<ITargetedMod>> filter;
-    @Getter
-    private final String mixin;
+    private final MixinBuilder builder;
 
-    private static class Detections {
-        private static final int JAVA_VERSION = getVersion();
-        private static final Predicate<List<ITargetedMod>> JAVA8 = condition(() -> JAVA_VERSION == 8);
-
-        private static int getVersion() {
-            String version = System.getProperty("java.version");
-            if (version.startsWith("1.")) {
-                version = version.substring(2, 3);
-            } else {
-                int dot = version.indexOf(".");
-                if (dot != -1) {
-                    version = version.substring(0, dot);
-                }
-            }
-            try {
-                return Integer.parseInt(version);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                return -1;
-            }
-        }
+    Mixin(SidedMixins... mixins) {
+        this(builder(mixins));
     }
+
+    Mixin(BooleanSupplier cond, SidedMixins... mixins) {
+        this(builder(cond, mixins));
+    }
+
+    Mixin(TaggedMod mod, SidedMixins... mixins) {
+        this(builder(mod, mixins));
+    }
+
+    Mixin(TaggedMod[] mods, SidedMixins... mixins) {
+        this(builder(mods, mixins));
+    }
+
+    Mixin(BooleanSupplier cond, TaggedMod mod, SidedMixins... mixins) {
+        this(builder(cond, mod, mixins));
+    }
+
+    Mixin(BooleanSupplier cond, TaggedMod[] mods, SidedMixins... mixins) {
+        this(builder(cond, mods, mixins));
+    }
+
+    private static SidedMixins common(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.common.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.common(mixins);
+    }
+
+    private static SidedMixins client(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.client.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.client(mixins);
+    }
+
+    private static SidedMixins server(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.server.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.server(mixins);
+    }
+    //endregion
 }
 

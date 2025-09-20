@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,392 +22,426 @@
 
 package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
+import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
+import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
-import com.falsepattern.lib.mixin.IMixin;
-import com.falsepattern.lib.mixin.ITargetedMod;
+import com.falsepattern.lib.mixin.v2.MixinHelper;
+import com.falsepattern.lib.mixin.v2.SidedMixins;
+import com.falsepattern.lib.mixin.v2.TaggedMod;
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
+import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.intellij.lang.annotations.Language;
 
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BooleanSupplier;
 
-import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_SAFETY_CHECKS;
-import static com.falsepattern.falsetweaks.config.ThreadingConfig.FAST_THREADED_BLOCK_BOUNDS;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.BSP;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.DYNLIGHTS_NONOF;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.THREADING;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.TRIANGULATOR;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin.CommonConfigs.VOXELIZER;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_ANY_OPTIFINE;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.AVOID_OPTIFINE_WITH_SHADERS;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.NEODYMIUM;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_ANY_OPTIFINE;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS;
-import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetedMod.REQUIRE_OPTIFINE_WITH_SHADERS;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.avoid;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.condition;
-import static com.falsepattern.lib.mixin.IMixin.PredicateHelpers.require;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Automagy;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Computronics;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.CoreTweaks;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.DragonAPI;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.ExtraCells;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.FastCraft;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.FoamFix;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis_NH;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.NotFine;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.NuclearControl;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OpenComputers;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OptiFine;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OptiFineDynamicLights;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OptiFineShadersMod;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.RailCraft;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.RedstonePaste;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.SecurityCraft;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.StorageDrawers;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.StorageDrawers_ThreadSafe;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.SwanSong;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Techguns;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.ThermalExpansion;
+import static com.falsepattern.lib.mixin.v2.MixinHelper.avoid;
+import static com.falsepattern.lib.mixin.v2.MixinHelper.builder;
+import static com.falsepattern.lib.mixin.v2.MixinHelper.mods;
+import static com.falsepattern.lib.mixin.v2.MixinHelper.require;
 
+@SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
-public enum Mixin implements IMixin {
+public enum Mixin implements IMixins {
     // @formatter:off
-    //region Triangulator Module
-    Tri_RenderBlocksMixin(Side.CLIENT, TRIANGULATOR, "triangulator.RenderBlocksUltraMixin"),
-    Tri_RenderBlocksCompatMixin(Side.CLIENT, TRIANGULATOR.and(condition(() -> TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)
-                                                                      .or(require(TargetedMod.APPARATUS))),
-                                "triangulator.RenderBlocksCompatMixin"),
-    Tri_RenderBlocksPerformanceMixin(Side.CLIENT, TRIANGULATOR.and(condition(() -> !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE)
-                                                                           .and(avoid(TargetedMod.APPARATUS))),
-                                     "triangulator.RenderBlocksPerformanceMixin"),
-    Tri_RenderGlobalMixin(Side.CLIENT, TRIANGULATOR, "triangulator.RenderGlobalMixin"),
-    Tri_RenderingRegistryMixin(Side.CLIENT, TRIANGULATOR, "triangulator.RenderingRegistryMixin"),
-    Tri_TessellatorMixin(Side.CLIENT, TRIANGULATOR, "triangulator.TessellatorMixin"),
-    Tri_WorldRendererMixin(Side.CLIENT, TRIANGULATOR, "triangulator.WorldRendererMixin"),
+    Triangulator(Phase.EARLY,
+                 ModuleConfig::TRIANGULATOR,
+                 client("triangulator.RenderBlocksUltraMixin",
+                        "triangulator.RenderGlobalMixin",
+                        "triangulator.RenderingRegistryMixin",
+                        "triangulator.TessellatorMixin",
+                        "triangulator.WorldRendererMixin")),
+    Triangulator_Performance(Phase.EARLY,
+                             () -> ModuleConfig.TRIANGULATOR() && !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE,
+                             client("triangulator.RenderBlocksPerformanceMixin")),
+    Triangulator_Compat(Phase.EARLY,
+                        () -> ModuleConfig.TRIANGULATOR() && TriangulatorConfig.RENDER_HOOK_COMPAT_MODE,
+                        client("triangulator.RenderBlocksCompatMixin")),
+    Triangulator_NoOptiFine(Phase.EARLY,
+                            ModuleConfig::TRIANGULATOR,
+                            mods(avoid(OptiFine), avoid(SwanSong)),
+                            client("triangulator.optifine.TessellatorVanillaMixin")),
+    Triangulator_NoShader(Phase.EARLY,
+                          ModuleConfig::TRIANGULATOR,
+                          mods(avoid(OptiFineShadersMod), avoid(SwanSong)),
+                          client("triangulator.optifine.TessellatorVanillaOrOldOptifineMixin")),
+    Triangulator_OptiFineShaders(Phase.EARLY,
+                                 ModuleConfig::TRIANGULATOR,
+                                 require(OptiFineShadersMod),
+                                 client("triangulator.optifine.TessellatorOptiFineMixin")),
+    Triangulator_NoOptiFineHook(Phase.EARLY,
+                                ModuleConfig::TRIANGULATOR,
+                                avoid(OptiFine),
+                                client("triangulator.optifine.TessellatorVanillaHookMixin")),
+    Triangulator_OptiFineHook(Phase.EARLY,
+                              ModuleConfig::TRIANGULATOR,
+                              require(OptiFine),
+                              client("triangulator.optifine.TessellatorOptiFineHookMixin")),
+    Triangulator_RedstonePaste(Phase.LATE,
+                               ModuleConfig::TRIANGULATOR,
+                               require(RedstonePaste),
+                               client("triangulator.redstonepaste.RedstonePasteHighlighterMixin")),
+    Triangulator_Swansong(Phase.EARLY,
+                          ModuleConfig::TRIANGULATOR,
+                          require(SwanSong),
+                          client("triangulator.swansong.ShaderTessMixin")),
 
-    //OptiFine
-    Tri_OFTessellatorVanillaMixin(Side.CLIENT,
-                                  TRIANGULATOR.and(AVOID_ANY_OPTIFINE),
-                                  "triangulator.optifine.TessellatorVanillaMixin"),
-    Tri_OFTessellatorVanillaOrOldOptifineMixin(Side.CLIENT,
-                                               TRIANGULATOR.and(AVOID_OPTIFINE_WITH_SHADERS),
-                                               "triangulator.optifine.TessellatorVanillaOrOldOptifineMixin"),
-    Tri_OFTessellatorOptiFineMixin(Side.CLIENT,
-                                   TRIANGULATOR.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                   "triangulator.optifine.TessellatorOptiFineMixin"),
+    ClippingHelper(Phase.EARLY,
+                   () -> ModuleConfig.CLIPPING_HELPER_OPTS,
+                   client("camera.Perf_ClippingHelperMixin")),
+    ClippingHelper_NoFastCraft(Phase.EARLY,
+                               () -> ModuleConfig.CLIPPING_HELPER_OPTS,
+                               avoid(FastCraft),
+                               client("camera.Perf_ClippingHelperImplMixin_NoFastCraft")),
+    ClippingHelper_Multi(Phase.EARLY,
+                         () -> ModuleConfig.CLIPPING_HELPER_ONCE_PER_FRAME,
+                         client("camera.Multi_ClippingHelperImplMixin")),
+    ClippingHelper_Multi_SwanSong(Phase.EARLY,
+                                  ModuleConfig::THREADED_CHUNK_UPDATES,
+                                  require(SwanSong),
+                                  client("camera.swansong.Multi_ShaderEngineMixin")),
 
-    //RedstonePaste
-    Tri_RedstonePasteHighlighterMixin(Side.CLIENT,
-                                      TRIANGULATOR.and(require(TargetedMod.REDSTONEPASTE)),
-                                      "triangulator.redstonepaste.RedstonePasteHighlighterMixin"),
+    RenderDistance(Phase.EARLY,
+                   () -> ModuleConfig.UNLOCK_RENDER_DISTANCE,
+                   client("camera.UnlockRD_GameSettingsMixin",
+                          "camera.UnlockRD_GameSettingsOptionsMixin")),
 
-    //endregion Triangulator Module
+    ThreadedUpdates(Phase.EARLY,
+                    ModuleConfig::THREADED_CHUNK_UPDATES,
+                    client("threadedupdates.GameSettingsMixin",
+                           "threadedupdates.OpenGLHelperMixin",
+                           "threadedupdates.ChunkProviderClientMixin",
+                           "threadedupdates.ForgeHooksClientMixin",
+                           "threadedupdates.RenderingRegistryMixin",
+                           "threadedupdates.TessellatorMixin",
+                           "threadedupdates.ChunkCacheMixin",
+                           "threadedupdates.blockbounds.BlockMixin_Root",
+                           "threadedupdates.blockbounds.BlockMixin_Impl")),
+    ThreadedUpdates_blockBounds(Phase.EARLY,
+                                () -> ModuleConfig.THREADED_CHUNK_UPDATES() && ThreadingConfig.FAST_THREADED_BLOCK_BOUNDS,
+                                client("threadedupdates.blockbounds.BlockMixin_FastImpl")),
+    ThreadedUpdates_debug(Phase.EARLY,
+                          () -> ModuleConfig.THREADED_CHUNK_UPDATES() && !ThreadingConfig.FAST_SAFETY_CHECKS,
+                          client("threadedupdates.TessellatorMixin_Debug")),
+    ThreadedUpdates_debugFast(Phase.EARLY,
+                              () -> ModuleConfig.THREADED_CHUNK_UPDATES() && ThreadingConfig.FAST_SAFETY_CHECKS,
+                              client("threadedupdates.TessellatorMixin_DebugFast")),
+    ThreadedUpdates_NuclearControl(Phase.LATE,
+                                   ModuleConfig::THREADED_CHUNK_UPDATES,
+                                   require(NuclearControl),
+                                   client("threadedupdates.nuclearcontrol.MainBlockRendererMixin",
+                                          "threadedupdates.nuclearcontrol.TileEntityInfoPanelRendererMixin",
+                                          "threadedupdates.nuclearcontrol.TileEntityAdvancedInfoPanelMixin")),
+    ThreadedUpdates_OpenComputers(Phase.EARLY,
+                                  ModuleConfig::THREADED_CHUNK_UPDATES,
+                                  require(OpenComputers),
+                                  client("threadedupdates.opencomputers.RenderStateMixin")),
 
-    //region Occlusion Tweaks Module
+    ThreadedUpdates_Computronics(Phase.LATE,
+                                 ModuleConfig::THREADED_CHUNK_UPDATES,
+                                 require(Computronics),
+                                 client("threadedupdates.computronics.LampRenderMixin")),
+    ThreadedUpdates_ExtraCells(Phase.LATE,
+                               ModuleConfig::THREADED_CHUNK_UPDATES,
+                               require(ExtraCells),
+                               client("threadedupdates.extracells.RendererHardMEDriveMixin")),
+    ThreadedUpdates_Automagy(Phase.LATE,
+                             ModuleConfig::THREADED_CHUNK_UPDATES,
+                             require(Automagy),
+                             client("threadedupdates.automagy.RenderBlockGlowOverlayMixin")),
+    ThreadedUpdates_Techguns(Phase.LATE,
+                             ModuleConfig::THREADED_CHUNK_UPDATES,
+                             require(Techguns),
+                             client("threadedupdates.techguns.RenderLadderMixin")),
+    ThreadedUpdates_Malisis(Phase.EARLY,
+                            ModuleConfig::THREADED_CHUNK_UPDATES,
+                            require(Malisis),
+                            client("threadedupdates.malisis.MalisisRendererMixin",
+                                   "threadedupdates.malisis.ParameterMixin")),
+    ThreadedUpdates_Malisis_NH(Phase.EARLY,
+                               ModuleConfig::THREADED_CHUNK_UPDATES,
+                               require(Malisis_NH),
+                               client("threadedupdates.malisis.nh.ParameterMixin")),
+    ThreadedUpdates_NotFine(Phase.EARLY,
+                            ModuleConfig::THREADED_CHUNK_UPDATES,
+                            require(NotFine),
+                            client("threadedupdates.notfine.CTMUtilsMixin")),
+    ThreadedUpdates_StorageDrawers(Phase.LATE,
+                                   ModuleConfig::THREADED_CHUNK_UPDATES,
+                                   mods(require(StorageDrawers), avoid(StorageDrawers_ThreadSafe)),
+                                   client("threadedupdates.storagedrawers.RenderHelperMixin",
+                                          "threadedupdates.storagedrawers.CommonDrawerRendererMixin",
+                                          "threadedupdates.storagedrawers.CommonFramingRendererMixin",
+                                          "threadedupdates.storagedrawers.CommonTrimRendererMixin",
+                                          "threadedupdates.storagedrawers.ControllerRendererMixin",
+                                          "threadedupdates.storagedrawers.DrawersItemRendererMixin",
+                                          "threadedupdates.storagedrawers.DrawersRendererMixin",
+                                          "threadedupdates.storagedrawers.FramingTableRendererMixin",
+                                          "threadedupdates.storagedrawers.ModularBoxRendererMixin",
+                                          "threadedupdates.storagedrawers.PanelBoxRendererMixin")),
+    ThreadedUpdates_ThermalExpansion(Phase.LATE,
+                                     ModuleConfig::THREADED_CHUNK_UPDATES,
+                                     require(ThermalExpansion),
+                                     client("threadedupdates.thermalexpansion.BlockCacheMixin",
+                                            "threadedupdates.thermalexpansion.BlockCellMixin",
+                                            "threadedupdates.thermalexpansion.BlockDeviceMixin",
+                                            "threadedupdates.thermalexpansion.BlockEnderMixin",
+                                            "threadedupdates.thermalexpansion.BlockFrameMixin",
+                                            "threadedupdates.thermalexpansion.BlockLightMixin",
+                                            "threadedupdates.thermalexpansion.BlockMachineMixin",
+                                            "threadedupdates.thermalexpansion.BlockSpongeMixin",
+                                            "threadedupdates.thermalexpansion.BlockTankMixin",
+                                            "threadedupdates.thermalexpansion.RenderCellMixin",
+                                            "threadedupdates.thermalexpansion.RenderFrameMixin",
+                                            "threadedupdates.thermalexpansion.RenderLightMixin",
+                                            "threadedupdates.thermalexpansion.RenderTankMixin",
+                                            "threadedupdates.thermalexpansion.RenderTesseractMixin")),
 
-    //For 32chunk render distance without optifine
-    Occlusion_PlayerManagerMixin(Side.COMMON, THREADING, "occlusion.PlayerManagerMixin"),
+    AnimFix(Phase.EARLY,
+            () -> ModuleConfig.TEXTURE_OPTIMIZATIONS,
+            client("animfix.TextureMap_CommonMixin",
+                   "animfix.StitcherMixin",
+                   "animfix.StitcherSlotMixin")),
+    AnimFix_Unprofiled(Phase.EARLY,
+                       () -> ModuleConfig.TEXTURE_OPTIMIZATIONS && !ModuleConfig.ADVANCED_PROFILER,
+                       client("animfix.TextureMap_UnprofiledMixin",
+                              "animfix.TextureUtil_UnprofiledMixin")),
+    AnimFix_Profiled(Phase.EARLY,
+                     () -> ModuleConfig.TEXTURE_OPTIMIZATIONS && ModuleConfig.ADVANCED_PROFILER,
+                     client("animfix.TextureMap_ProfiledMixin",
+                            "animfix.TextureUtil_ProfiledMixin")),
+    AnimFix_FastCraft(Phase.EARLY,
+                      () -> ModuleConfig.TEXTURE_OPTIMIZATIONS,
+                      require(FastCraft),
+                      client("animfix.fastcraft.AbstractTextureMixin",
+                             "animfix.fastcraft.DynamicTextureMixin",
+                             "animfix.fastcraft.TextureMapMixin",
+                             "animfix.fastcraft.TextureUtilMixin")),
 
-    Occlusion_EntityRendererMixin(Side.CLIENT, THREADING, "occlusion.EntityRendererMixin"),
-    Occlusion_GuiVideoSettingsMixin(Side.CLIENT, THREADING, "occlusion.GuiVideoSettingsMixin"),
-    Occlusion_RenderGlobalMixin(Side.CLIENT, THREADING, "occlusion.RenderGlobalMixin"),
-    Occlusion_WorldRendererMixin(Side.CLIENT, THREADING, "occlusion.WorldRendererMixin"),
-    Occlusion_MinecraftMixin(Side.CLIENT, THREADING, "occlusion.MinecraftMixin"),
-    Occlusion_GameSettingsMixin(Side.CLIENT,
-                                THREADING.and(AVOID_ANY_OPTIFINE),
-                                "occlusion.GameSettingsMixin"),
-    Occlusion_GameSettingsOptionsMixin(Side.CLIENT,
-                                       THREADING.and(AVOID_ANY_OPTIFINE),
-                                       "occlusion.GameSettingsOptionsMixin"),
-    Occlusion_ClippingHelperMixin(Side.CLIENT,
-                                  THREADING,
-                                       "occlusion.ClippingHelperMixin"),
-    Occlusion_ClippingHelperImplMixin(Side.CLIENT,
-                                      THREADING,
-                                       "occlusion.ClippingHelperImplMixin"),
+    Voxelizer(Phase.EARLY,
+              () -> ModuleConfig.VOXELIZER,
+              client("voxelizer.ItemRendererMixin",
+                     "voxelizer.RenderBlocksMixin",
+                     "voxelizer.RenderItemMixin",
+                     "voxelizer.TextureAtlasSpriteMixin",
+                     "voxelizer.TextureManagerMixin",
+                     "voxelizer.TextureMapMixin")),
+    Voxelizer_OptiFine(Phase.EARLY,
+                       () -> ModuleConfig.VOXELIZER,
+                       require(OptiFine),
+                       client("voxelizer.OFItemRendererMixin")),
+    Voxelizer_RailCraft(Phase.LATE,
+                        () -> ModuleConfig.VOXELIZER,
+                        require(RailCraft),
+                        client("voxelizer.railcraft.RenderTrackMixin")),
 
-    //Neodymium
-    Occlusion_Neodymium_NeoRendererMixin(Side.CLIENT,
-                                         THREADING.and(require(NEODYMIUM)),
-                                         "occlusion.neodymium.NeoRendererMixin"),
+    MipMapFix(Phase.EARLY,
+              () -> ModuleConfig.MIPMAP_FIX,
+              client("mipmapfix.TextureMapMixin")),
+    MipMapFix_NotOptiFine(Phase.EARLY,
+                          () -> ModuleConfig.MIPMAP_FIX,
+                          avoid(OptiFine),
+                          client("mipmapfix.TextureUtilMixin")),
 
-    //OptiFine
-    Occlusion_Optifine_RenderGlobalMixin(Side.CLIENT,
-                                         THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                         "occlusion.optifine.RenderGlobalMixin"),
-    Occlusion_Optifine_OFGameSettingsOptifineMixin(Side.CLIENT,
-                                                   THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                                   "occlusion.optifine.GameSettingsOptifineMixin"),
-    Occlusion_Optifine_OFGuiVideoSettingsOptifineMixin(Side.CLIENT,
-                                                       THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                                       "occlusion.optifine.GuiVideoSettingsOptifineMixin"),
-    Occlusion_Optifine_WorldRenderer_VanillaMixin(Side.CLIENT,
-                                                  THREADING.and(AVOID_ANY_OPTIFINE),
-                                                  "occlusion.optifine.WorldRenderer_VanillaMixin"),
-    Occlusion_Optifine_WorldRenderer_OFMixin(Side.CLIENT,
-                                             THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                             "occlusion.optifine.WorldRenderer_OFMixin"),
+    Profiler(Phase.EARLY,
+             () -> ModuleConfig.ADVANCED_PROFILER,
+             client("profiler.MinecraftMixin",
+                    "profiler.ProfilerMixin")),
 
-    //OptiFine with shaders
-    Occlusion_Optifine_Shaders_ShadersRendererMixin(Side.CLIENT,
-                                                    THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                                    "occlusion.optifine.shaders.ShadersRendererMixin"),
-    Occlusion_Optifine_Shaders_FrustrumMixin(Side.CLIENT,
-                                             THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                             "occlusion.optifine.shaders.FrustrumMixin"),
-    Occlusion_Optifine_Shaders_ShadersMixin(Side.CLIENT,
-                                            THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                            "occlusion.optifine.shaders.ShadersMixin"),
+    BSPSorting(Phase.EARLY,
+               ModuleConfig::BSP_SORTING,
+               client("bsp.TessellatorMixin")),
+    BSPSorting_NotFoamFix(Phase.EARLY,
+                          ModuleConfig::BSP_SORTING,
+                          avoid(FoamFix),
+                          client("bsp.TessellatorBSPSortingMixin")),
+    BSPSorting_FoamFix(Phase.EARLY,
+                       ModuleConfig::BSP_SORTING,
+                       require(FoamFix),
+                       client("bsp.foamfix.TessellatorBSPSortingMixin")),
 
+    DynamicLights_Standalone(Phase.EARLY,
+                             () -> ModuleConfig.DYNAMIC_LIGHTS,
+                             avoid(OptiFineDynamicLights),
+                             client("dynlights.ItemRendererMixin",
+                                    "dynlights.RenderGlobalMixin",
+                                    "dynlights.WorldClientMixin")),
+    DynamicLights_Standalone_NonThread(Phase.EARLY,
+                                       () -> ModuleConfig.DYNAMIC_LIGHTS && !ModuleConfig.THREADED_CHUNK_UPDATES(),
+                                       avoid(OptiFineDynamicLights),
+                                       client("dynlights.nonthread.WorldClientMixin")),
+    DynamicLights_Standalone_Thread(Phase.EARLY,
+                                    () -> ModuleConfig.DYNAMIC_LIGHTS && ModuleConfig.THREADED_CHUNK_UPDATES(),
+                                       avoid(OptiFineDynamicLights),
+                                       client("dynlights.thread.WorldClientMixin")),
+    DynamicLights_OptiFine(Phase.EARLY,
+                           () -> ModuleConfig.DYNAMIC_LIGHTS,
+                           require(OptiFineDynamicLights),
+                           client("dynlights.of.DynamicLightsMixin")),
 
-    //FastCraft
-    Occlusion_FastCraft_GLAllocationMixin(Side.CLIENT,
-                                          THREADING.and(require(TargetedMod.FASTCRAFT)),
-                                          "occlusion.fastcraft.GLAllocationMixin"),
-    Occlusion_FastCraft_EntityRendererMixin(Side.CLIENT,
-                                            THREADING.and(require(TargetedMod.FASTCRAFT)).and(AVOID_ANY_OPTIFINE),
-                                            "occlusion.fastcraft.EntityRendererMixin"),
+    ChunkCache(Phase.EARLY,
+               () -> ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE,
+               avoid(OptiFineDynamicLights),
+               client("cc.WorldRendererMixin")),
+    ChunkCache_OptiFine_Shaders(Phase.EARLY,
+                                require(OptiFineShadersMod),
+                                client("cc.of.ChunkCacheOF_ShaderMixin")),
+    ChunkCache_OptiFine_NonShaders(Phase.EARLY,
+                                   mods(require(OptiFineDynamicLights), avoid(OptiFineShadersMod)),
+                                   client("cc.of.ChunkCacheOF_NonShaderMixin")),
 
-    //Both of them
-    Occlusion_OptiFastCraft_RenderGlobalMixin(Side.CLIENT,
-                                              THREADING.and(require(TargetedMod.FASTCRAFT).or(REQUIRE_ANY_OPTIFINE)),
-                                              "occlusion.optifastcraft.RenderGlobalMixin"),
+    ItemRenderList(Phase.EARLY,
+                   () -> ModuleConfig.ITEM_RENDER_LISTS,
+                   client("misc.ItemRenderList_ItemRendererMixin")),
+    FastItemTexturing(Phase.EARLY,
+                      () -> ModuleConfig.FAST_ITEM_ENTITY_TEXTURE_SWITCHING,
+                      client("misc.FastItemTexturing_RenderGlobalMixin",
+                             "misc.FastItemTexturing_RenderItemMixin")),
+    FastItemPhysics(Phase.EARLY,
+                    () -> ModuleConfig.FAST_ITEM_ENTITY_PHYSICS,
+                    common("misc.FastItemPhysics_WorldMixin")),
+    MinecartEarBlast(Phase.EARLY,
+                     () -> ModuleConfig.MINECART_EAR_BLAST_FIX,
+                     client("misc.MinecartEarBlast_WorldClientMixin")),
+    BeaconFix(Phase.EARLY,
+              () -> ModuleConfig.BEACON_OPTIMIZATION,
+              client("misc.BeaconFix_TileEntityBeaconMixin",
+                     "misc.BeaconFix_TileEntityBeaconRendererMixin")),
+    TileEntitySorting(Phase.EARLY,
+                      () -> ModuleConfig.TE_TRANSPARENCY_FIX,
+                      client("misc.TileEntitySorting_RenderGlobalMixin")),
+    TranslucentBlockLayers(Phase.EARLY,
+                           () -> ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX,
+                           client("misc.TranslucentBlockLayers_RenderGlobalMixin")),
+    SkyFix(Phase.EARLY,
+           () -> ModuleConfig.SKY_MESH_OPTIMIZATION,
+           client("misc.SkyFix_RenderGlobalMixin")),
+    RealmShutUp(Phase.EARLY,
+                () -> ModuleConfig.NO_REALMS_ON_MENU,
+                client("misc.RealmShutUp_GuiMainMenuMixin",
+                       "misc.RealmShutUp_RealmsBridgeMixin")),
+    OverlayCrashFix(Phase.EARLY,
+                    () -> ModuleConfig.OVERLAY_CRASH_FIX,
+                    client("misc.OverlayCrashFix_ItemRendererMixin")),
+    ParticleTransparency(Phase.EARLY,
+                         () -> ModuleConfig.PARTICLE_TRANSPARENCY_FIX,
+                         client("misc.ParticleTransparency_EffectRendererMixin")),
+    PendingBlockUpdates(Phase.EARLY,
+                        () -> ModuleConfig.PARTICLE_TRANSPARENCY_FIX,
+                        avoid(CoreTweaks),
+                        common("misc.PendingBlockUpdates_WorldServerMixin")),
 
-    //endregion Occlusion Tweaks Module
+    CubicParticles(Phase.EARLY,
+                   () -> ModuleConfig.CUBIC_PARTICLES,
+                   client("cubicparticles.EntityDiggingFXMixin")),
 
-    //region Threaded Chunk Updates
-    ThreadedUpdates_GameSettings(Side.CLIENT, THREADING, "threadedupdates.GameSettingsMixin"),
-    ThreadedUpdates_OpenGLHelperMixin(Side.CLIENT, THREADING, "threadedupdates.OpenGLHelperMixin"),
-    ThreadedUpdates_ChunkProviderClientMixin(Side.CLIENT, THREADING, "threadedupdates.ChunkProviderClientMixin"),
-    ThreadedUpdates_ForgeHooksClientMixin(Side.CLIENT, THREADING, "threadedupdates.ForgeHooksClientMixin"),
-    ThreadedUpdates_RenderBlocksMixin(Side.CLIENT, THREADING, "threadedupdates.RenderBlocksMixin"),
-    ThreadedUpdates_RenderGlobalMixin(Side.CLIENT, THREADING, "threadedupdates.RenderGlobalMixin"),
-    ThreadedUpdates_RenderingRegistryMixin(Side.CLIENT, THREADING, "threadedupdates.RenderingRegistryMixin"),
-    ThreadedUpdates_TessellatorMixin(Side.CLIENT, THREADING, "threadedupdates.TessellatorMixin"),
-    ThreadedUpdates_TessellatorMixin_DebugFast(Side.CLIENT, THREADING.and(condition(() -> FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_DebugFast"),
-    ThreadedUpdates_TessellatorMixin_Debug(Side.CLIENT, THREADING.and(condition(() -> !FAST_SAFETY_CHECKS)), "threadedupdates.TessellatorMixin_Debug"),
-    ThreadedUpdates_WorldRenderer_NonOptiFineMixin(Side.CLIENT, THREADING.and(AVOID_ANY_OPTIFINE), "threadedupdates.WorldRenderer_NonOptiFineMixin"),
-    ThreadedUpdates_WorldRendererMixin(Side.CLIENT, THREADING, "threadedupdates.WorldRendererMixin"),
+    DebugPatches(Phase.EARLY,
+                 () -> Debug.ENABLED,
+                 client("debug.TileEntityRendererDispatcherMixin",
+                        "debug.WorldRendererMixin")),
 
-    ThreadedUpdates_BlockBounds_BlockMixin_Root(Side.CLIENT, THREADING, "threadedupdates.blockbounds.BlockMixin_Root"),
-    ThreadedUpdates_BlockBounds_BlockMixin_Impl(Side.CLIENT, THREADING, "threadedupdates.blockbounds.BlockMixin_Impl"),
-    ThreadedUpdates_BlockBounds_BlockMixin_FastImpl(Side.CLIENT, THREADING.and(condition(() -> FAST_THREADED_BLOCK_BOUNDS)), "threadedupdates.blockbounds.BlockMixin_FastImpl"),
+    RenderingSafety(Phase.EARLY,
+                    () -> ModuleConfig.RENDERING_SAFETY,
+                    client("rendersafety.ForgeHooksClientMixin",
+                           "rendersafety.ItemRendererMixin",
+                           "rendersafety.RenderHelperMixin",
+                           "rendersafety.RenderingRegistryMixin")),
+    RenderingSafety_NoDragonAPI(Phase.EARLY,
+                                () -> ModuleConfig.RENDERING_SAFETY,
+                                avoid(DragonAPI),
+                                client("rendersafety.TileEntityRendererDispatcherMixin")),
+    RenderingSafety_DragonAPI(Phase.EARLY,
+                              () -> ModuleConfig.RENDERING_SAFETY,
+                              require(DragonAPI),
+                              client("rendersafety.dragonapi.TileEntityRenderEventMixin")),
 
-    //Neodymium
-    ThreadedUpdates_Neodymium_WorldRendererMixin(Side.CLIENT, THREADING.and(require(TargetedMod.NEODYMIUM)), "threadedupdates.neodymium.WorldRendererMixin"),
+    OptiSpam(Phase.EARLY,
+             () -> ModuleConfig.OPTIFINE_LOGSPAM_FIX,
+             require(OptiFineShadersMod),
+             client("optispam.BlockAliasesMixin",
+                    "optispam.ConnectedParserMixin",
+                    "optispam.ShaderExpressionResolverMixin",
+                    "optispam.ShaderPackParserMixin")),
 
-    //DragonAPI
-    ThreadedUpdates_DragonAPI_WorldRenderer_VanillaMixin(Side.CLIENT,
-                                                         THREADING.and(avoid(TargetedMod.DRAGONAPI)),
-                                                         "threadedupdates.dragonapi.WorldRenderer_VanillaMixin"),
-    ThreadedUpdates_DragonAPI_WorldRenderer_DAPIMixin(Side.CLIENT,
-                                                      THREADING.and(require(TargetedMod.DRAGONAPI)),
-                                                      "threadedupdates.dragonapi.WorldRenderer_DAPIMixin"),
-
-    //OptiFine
-    ThreadedUpdates_OptiFine_GameSettingsMixin(Side.CLIENT,
-                                               THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                               "threadedupdates.optifine.GameSettingsMixin"),
-    ThreadedUpdates_OptiFine_GuiPerformanceSettingsOFMixin(Side.CLIENT,
-                                                           THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                                           "threadedupdates.optifine.GuiPerformanceSettingsOFMixin"),
-    ThreadedUpdates_OptiFine_MinecraftMixin(Side.CLIENT,
-                                            THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                            "threadedupdates.optifine.MinecraftMixin"),
-    ThreadedUpdates_Optifine_ShadersMixin(Side.CLIENT,
-                                          THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS),
-                                          "threadedupdates.optifine.ShadersMixin"),
-    ThreadedUpdates_OptiFine_TessellatorMixin(Side.CLIENT,
-                                              THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                              "threadedupdates.optifine.TessellatorMixin"),
-    ThreadedUpdates_OptiFine_WorldClientMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS),
-                                              "threadedupdates.optifine.WorldClientMixin"),
-    ThreadedUpdates_OptiFine_WorldRendererMixin(Side.CLIENT,
-                                                THREADING.and(REQUIRE_ANY_OPTIFINE),
-                                                "threadedupdates.optifine.WorldRendererMixin"),
-
-    // Nuclear Control 2
-    ThreadedUpdates_Nuclear_Control_MainBlockRendererMixin(Side.CLIENT,
-                                                           THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
-                                                           "threadedupdates.nuclearcontrol.MainBlockRendererMixin"),
-    ThreadedUpdates_Nuclear_Control_TileEntityInfoPanelRendererMixin(Side.CLIENT,
-                                                                     THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
-                                                                     "threadedupdates.nuclearcontrol.TileEntityInfoPanelRendererMixin"),
-    ThreadedUpdates_Nuclear_Control_TileEntityAdvancedInfoPanelMixin(Side.CLIENT,
-                                                                     THREADING.and(require(TargetedMod.NUCLEAR_CONTROL)),
-                                                                     "threadedupdates.nuclearcontrol.TileEntityAdvancedInfoPanelMixin"),
-
-    // OpenComputers
-    ThreadedUpdates_Open_Computers_TileEntityAdvancedInfoPanelMixin(Side.CLIENT,
-                                                                    THREADING.and(require(TargetedMod.OPEN_COMPUTERS)),
-                                                                    "threadedupdates.opencomputers.RenderStateMixin"),
-    // Computronics
-    ThreadedUpdates_Computronics_LampRenderMixin(Side.CLIENT,
-                                                 THREADING.and(require(TargetedMod.COMPUTRONICS)),
-                                                 "threadedupdates.computronics.LampRenderMixin"),
-    // Extra Cells 2
-    ThreadedUpdates_Extra_Cells_RendererHardMEDriveMixin(Side.CLIENT,
-                                                         THREADING.and(require(TargetedMod.EXTRA_CELLS)),
-                                                         "threadedupdates.extracells.RendererHardMEDriveMixin"),
-    // Automagy
-    ThreadedUpdates_Automagy_RenderBlockGlowOverlayMixin(Side.CLIENT,
-                                                         THREADING.and(require(TargetedMod.AUTOMAGY)),
-                                                         "threadedupdates.automagy.RenderBlockGlowOverlayMixin"),
-
-    // Techguns
-    ThreadedUpdates_Techguns_RenderLadderMixin(Side.CLIENT,
-                                               THREADING.and(require(TargetedMod.TECHGUNS)),
-                                               "threadedupdates.techguns.RenderLadderMixin"),
-
-    // Malisis Mods
-    ThreadedUpdates_Malisis_MalisisRendererMixin(Side.CLIENT,
-                                                 THREADING.and(require(TargetedMod.MALISIS)),
-                                                 "threadedupdates.malisis.MalisisRendererMixin"),
-    ThreadedUpdates_Malisis_ParameterMixin(Side.CLIENT,
-                                           THREADING.and(require(TargetedMod.MALISIS)),
-                                           "threadedupdates.malisis.ParameterMixin"),
-    ThreadedUpdates_Malisis_NH_ParameterMixin(Side.CLIENT,
-                                           THREADING.and(require(TargetedMod.MALISIS_NH)),
-                                           "threadedupdates.malisis.nh.ParameterMixin"),
-
-    // NotFine
-    ThreadedUpdates_NotFine_CTMUtilsMixin(Side.CLIENT,
-                                          THREADING.and(require(TargetedMod.NOTFINE)),
-                                          "threadedupdates.notfine.CTMUtilsMixin"),
-
-    //endregion Threaded Chunk Updates
-
-    //region Texture Optimizations Module
-    AnimFix_TextureMap_UnprofiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && !ModuleConfig.ADVANCED_PROFILER), "animfix.TextureMap_UnprofiledMixin"),
-    AnimFix_TextureMap_ProfiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && ModuleConfig.ADVANCED_PROFILER), "animfix.TextureMap_ProfiledMixin"),
-    AnimFix_TextureMap_CommonMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.TextureMap_CommonMixin"),
-    AnimFix_TextureUtil_UnprofiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && !ModuleConfig.ADVANCED_PROFILER), "animfix.TextureUtil_UnprofiledMixin"),
-    AnimFix_TextureUtil_ProfiledMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS && ModuleConfig.ADVANCED_PROFILER), "animfix.TextureUtil_ProfiledMixin"),
-    AnimFix_StitcherMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.StitcherMixin"),
-    AnimFix_StitcherSlotMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS), "animfix.StitcherSlotMixin"),
-
-    //FastCraft
-    AnimFix_FCAbstractTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.AbstractTextureMixin"),
-    AnimFix_FCDynamicTextureMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.DynamicTextureMixin"),
-    AnimFix_FCTextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureMapMixin"),
-    AnimFix_FCTextureUtilMixin(Side.CLIENT, condition(() -> ModuleConfig.TEXTURE_OPTIMIZATIONS).and(require(TargetedMod.FASTCRAFT)), "animfix.fastcraft.TextureUtilMixin"),
-
-    //endregion Texture Optimizations Module
-
-    //region Voxelizer Module
-    Voxelizer_ItemRendererMixin(Side.CLIENT, VOXELIZER, "voxelizer.ItemRendererMixin"),
-    Voxelizer_Optifine_ItemRendererMixin(Side.CLIENT,
-                                         VOXELIZER.and(REQUIRE_ANY_OPTIFINE),
-                                         "voxelizer.OFItemRendererMixin"),
-    Voxelizer_RenderBlocksMixin(Side.CLIENT, VOXELIZER, "voxelizer.RenderBlocksMixin"),
-    Voxelizer_RenderItemMixin(Side.CLIENT, VOXELIZER, "voxelizer.RenderItemMixin"),
-    Voxelizer_TextureAtlasSpriteMixin(Side.CLIENT, VOXELIZER, "voxelizer.TextureAtlasSpriteMixin"),
-    Voxelizer_TextureManagerMixin(Side.CLIENT, VOXELIZER, "voxelizer.TextureManagerMixin"),
-    Voxelizer_TextureMapMixin(Side.CLIENT, VOXELIZER, "voxelizer.TextureMapMixin"),
-
-    //Railcraft
-    Voxelizer_RCRenderTrackMixin(Side.CLIENT,
-                                 VOXELIZER.and(require(TargetedMod.RAILCRAFT)),
-                                 "voxelizer.railcraft.RenderTrackMixin"),
-    //endregion Voxelizer Module
-
-    //region MipMap Fix Module
-    MipMapFix_TextureAtlasSpriteMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureAtlasSpriteMixin"),
-    MipMapFix_TextureMapMixin(Side.CLIENT, condition(() -> ModuleConfig.MIPMAP_FIX), "mipmapfix.TextureMapMixin"),
-    MipMapFix_TextureUtilMixin(Side.CLIENT,
-                               condition(() -> ModuleConfig.MIPMAP_FIX)
-                                       .and(AVOID_ANY_OPTIFINE),
-                               "mipmapfix.TextureUtilMixin"),
-    //endregion MipMap Fix Module
-
-    //region Profiler Module
-    Profiler_MinecraftMixin(Side.CLIENT, condition(() -> ModuleConfig.ADVANCED_PROFILER), "profiler.MinecraftMixin"),
-    Profiler_ProfilerMixin(Side.CLIENT, condition(() -> ModuleConfig.ADVANCED_PROFILER), "profiler.ProfilerMixin"),
-    //endregion Profiler Module
-
-    //region BSP Sorting Module
-    BSP_TessellatorMixin(Side.CLIENT,
-                         BSP,
-                         "bsp.TessellatorMixin"),
-
-    BSP_TessellatorBSPSortingMixin(Side.CLIENT,
-                                   BSP.and(avoid(TargetedMod.FOAMFIX)),
-                                   "bsp.TessellatorBSPSortingMixin"),
-
-    //FoamFix
-    BSP_foamfix_TessellatorBSPSortingMixin(Side.CLIENT,
-                                           BSP.and(require(TargetedMod.FOAMFIX)),
-                                           "bsp.foamfix.TessellatorBSPSortingMixin"),
-
-    //endregion
-
-    //region Dynamic Lights Module
-
-    DynLights_ItemRendererMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.ItemRendererMixin"),
-    DynLights_RenderGlobalMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.RenderGlobalMixin"),
-    DynLights_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF, "dynlights.WorldClientMixin"),
-    DynLights_NonThread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING.negate()), "dynlights.nonthread.WorldClientMixin"),
-    DynLights_Thread_WorldClientMixin(Side.CLIENT, DYNLIGHTS_NONOF.and(THREADING), "dynlights.thread.WorldClientMixin"),
-    DynLights_OF_DynamicLightsMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS, "dynlights.of.DynamicLightsMixin"),
-    //endregion Dynamic Lights Module
-
-    //region Chunk Cache Module
-    CC_WorldRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.DYNAMIC_LIGHTS || ModuleConfig.FASTER_CHUNK_CACHE).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS), "cc.WorldRendererMixin"),
-    CC_OF_ChunkCacheOF_ShaderMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_SHADERS, "cc.of.ChunkCacheOF_ShaderMixin"),
-    CC_OF_ChunkCacheOF_NonShaderMixin(Side.CLIENT, REQUIRE_OPTIFINE_WITH_DYNAMIC_LIGHTS.and(AVOID_OPTIFINE_WITH_SHADERS), "cc.of.ChunkCacheOF_NonShaderMixin"),
-    //endregion Chunk Cache Module
-
-    //region Misc Modules
-    ItemRenderList_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.ITEM_RENDER_LISTS), "misc.ItemRenderList_ItemRendererMixin"),
-
-    MinecartEarBlast_WorldclientMixin(Side.CLIENT, condition(() -> ModuleConfig.MINECART_EAR_BLAST_FIX), "misc.MinecartEarBlast_WorldClientMixin"),
-
-    BeaconFix_TileEntityBeaconRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconRendererMixin"),
-    BeaconFix_TileEntityBeaconMixin(Side.CLIENT, condition(() -> ModuleConfig.BEACON_OPTIMIZATION), "misc.BeaconFix_TileEntityBeaconMixin"),
-
-    TileEntitySorting_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.TE_TRANSPARENCY_FIX), "misc.TileEntitySorting_RenderGlobalMixin"),
-
-    TranslucentBlockLayers_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX), "misc.TranslucentBlockLayers_RenderGlobalMixin"),
-
-    SkyFix_RenderGlobalMixin(Side.CLIENT, condition(() -> ModuleConfig.SKY_MESH_OPTIMIZATION), "misc.SkyFix_RenderGlobalMixin"),
-
-    RealmShutUp_GuiMainMenuMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_GuiMainMenuMixin"),
-    RealmShutUp_RealmsBridgeMixin(Side.CLIENT, condition(() -> ModuleConfig.NO_REALMS_ON_MENU), "misc.RealmShutUp_RealmsBridgeMixin"),
-    OverlayCrashFix_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.OVERLAY_CRASH_FIX), "misc.OverlayCrashFix_ItemRendererMixin"),
-    ParticleTransparency_EffectRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.PARTICLE_TRANSPARENCY_FIX), "misc.ParticleTransparency_EffectRendererMixin"),
-    //endregion Misc Modules
-
-    //region Cubic Particles
-    Particles_EntityDiggingFXMixin(Side.CLIENT, condition(() -> ModuleConfig.CUBIC_PARTICLES), "cubicparticles.EntityDiggingFXMixin"),
-    //endregion Cubic Particles
-
-    //region Debug
-    Debug_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> Debug.ENABLED), "debug.TileEntityRendererDispatcherMixin"),
-    Debug_WorldRendererMixin(Side.CLIENT, condition(() -> Debug.ENABLED), "debug.WorldRendererMixin"),
-    Debug_Occlusion_Neodymium_NeoRendererMixin(Side.CLIENT, THREADING.and(REQUIRE_OPTIFINE_WITH_SHADERS).and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.NeoRendererMixin"),
-    Debug_Occlusion_Neodymium_GPUMemoryManagerMixin(Side.CLIENT, THREADING.and(require(NEODYMIUM)).and(condition(() -> Debug.ENABLED)), "debug.occlusion.neodymium.GPUMemoryManagerMixin"),
-    //endregion Debug
-
-    //region Render Safety
-    RenderingSafety_ForgeHooksClientMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.ForgeHooksClientMixin"),
-    RenderingSafety_ItemRendererMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.ItemRendererMixin"),
-    RenderingSafety_RenderHelperMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderHelperMixin"),
-    RenderingSafety_RenderingRegistryMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY), "rendersafety.RenderingRegistryMixin"),
-    RenderingSafety_TileEntityRendererDispatcherMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(avoid(TargetedMod.DRAGONAPI)), "rendersafety.TileEntityRendererDispatcherMixin"),
-    RenderingSafety_DragonAPI_TileEntityRenderEventMixin(Side.CLIENT, condition(() -> ModuleConfig.RENDERING_SAFETY).and(require(TargetedMod.DRAGONAPI)), "rendersafety.dragonapi.TileEntityRenderEventMixin"),
-    //endregion Render Safety
-
-    //region OptiFine Spam Fix
-    OptiSpam_BlockAliasesMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.BlockAliasesMixin"),
-    OptiSpam_ConnectedParserMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ConnectedParserMixin"),
-    OptiSpam_ShaderExpressionResolverMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderExpressionResolverMixin"),
-    OptiSpam_ShaderPackParserMixin(Side.CLIENT, condition(() -> ModuleConfig.OPTIFINE_LOGSPAM_FIX).and(REQUIRE_OPTIFINE_WITH_SHADERS), "optispam.ShaderPackParserMixin"),
-    //endregion OptiFine Spam Fix
-
-    //region Misc compat fixes
-    Compat_SC_BlockReinforcedFenceGateMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedFenceGateMixin"),
-    Compat_SC_BlockReinforcedGlassPaneMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedGlassPaneMixin"),
-    Compat_SC_BlockReinforcedIronBarsMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedIronBarsMixin"),
-    Compat_SC_BlockReinforcedStainedGlassPanesMixin(Side.COMMON, require(TargetedMod.SECURITYCRAFT), "compat.sc.BlockReinforcedStainedGlassPanesMixin"),
-    //endregion
-    ;
+    Compat_SecurityCraft(Phase.LATE,
+                         require(SecurityCraft),
+                         common("compat.sc.BlockReinforcedFenceGateMixin",
+                                "compat.sc.BlockReinforcedGlassPaneMixin",
+                                "compat.sc.BlockReinforcedIronBarsMixin",
+                                "compat.sc.BlockReinforcedStainedGlassPanesMixin"))
     // @formatter:on
 
+    //region boilerplate
+    ;
     @Getter
-    private final Side side;
-    @Getter
-    private final Predicate<List<ITargetedMod>> filter;
-    @Getter
-    private final String mixin;
+    private final MixinBuilder builder;
 
-    public static class CommonConfigs {
-        public static final Predicate<List<ITargetedMod>> TRIANGULATOR = condition(ModuleConfig::TRIANGULATOR);
-        public static final Predicate<List<ITargetedMod>> THREADING = condition(ModuleConfig::THREADED_CHUNK_UPDATES);
-        public static final Predicate<List<ITargetedMod>> BSP = condition(ModuleConfig::BSP_SORTING);
-        public static final Predicate<List<ITargetedMod>> VOXELIZER = condition(() -> ModuleConfig.VOXELIZER);
-        public static final Predicate<List<ITargetedMod>> DYNLIGHTS_NONOF = condition(() -> ModuleConfig.DYNAMIC_LIGHTS).and(AVOID_OPTIFINE_WITH_DYNAMIC_LIGHTS);
+    Mixin(Phase phase, SidedMixins... mixins) {
+        this(builder(mixins).setPhase(phase));
     }
-}
 
+    Mixin(Phase phase, BooleanSupplier cond, SidedMixins... mixins) {
+        this(builder(cond, mixins).setPhase(phase));
+    }
+
+    Mixin(Phase phase, TaggedMod mod, SidedMixins... mixins) {
+        this(builder(mod, mixins).setPhase(phase));
+    }
+
+    Mixin(Phase phase, TaggedMod[] mods, SidedMixins... mixins) {
+        this(builder(mods, mixins).setPhase(phase));
+    }
+
+    Mixin(Phase phase, BooleanSupplier cond, TaggedMod mod, SidedMixins... mixins) {
+        this(builder(cond, mod, mixins).setPhase(phase));
+    }
+
+    Mixin(Phase phase, BooleanSupplier cond, TaggedMod[] mods, SidedMixins... mixins) {
+        this(builder(cond, mods, mixins).setPhase(phase));
+    }
+
+    private static SidedMixins common(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.common.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.common(mixins);
+    }
+
+    private static SidedMixins client(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.client.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.client(mixins);
+    }
+
+    private static SidedMixins server(@Language(value = "JAVA",
+                                                prefix = "import " + Tags.ROOT_PKG + ".mixin.mixins.server.",
+                                                suffix = ";") String... mixins) {
+        return MixinHelper.server(mixins);
+    }
+    //endregion
+}

@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.modules.triangulator.sorting;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.NormalAreaComputer;
 import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.QuadAreaComputer;
@@ -44,9 +44,9 @@ public class PolygonHolder {
     @Getter
     private int polygonCount = 0;
 
-    public PolygonHolder(boolean triangleMode, boolean shaderMode) {
+    public PolygonHolder(boolean triangleMode, Compat.ShaderType shaderType) {
         this.polygonSize = triangleMode ? 3 : 4;
-        vertexSize = VertexInfo.recomputeVertexInfo(shaderMode ? VertexInfo.OPTIFINE_SIZE : VertexInfo.VANILLA_SIZE, 1);
+        vertexSize = VertexInfo.getVertexInfo(shaderType, 1);
         midpointComputer = triangleMode ? TriangleMidpointComputer.INSTANCE : QuadMidpointComputer.INSTANCE;
         areaComputer = triangleMode ? TriangleAreaComputer.INSTANCE : QuadAreaComputer.INSTANCE;
         vertexStride = polygonSize * vertexSize;

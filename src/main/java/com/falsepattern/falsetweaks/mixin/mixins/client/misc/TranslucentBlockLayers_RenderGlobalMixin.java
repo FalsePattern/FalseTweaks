@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -52,7 +51,10 @@ public abstract class TranslucentBlockLayers_RenderGlobalMixin {
     @Inject(method = "sortAndRender",
             at = @At("HEAD"),
             require = 1)
-    private void offsetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+    private void offsetProjection(EntityLivingBase entityLivingBase,
+                                  int renderPass,
+                                  double partialTick,
+                                  CallbackInfoReturnable<Integer> cir) {
         ft$offsetProjection(renderPass);
     }
 
@@ -75,7 +77,10 @@ public abstract class TranslucentBlockLayers_RenderGlobalMixin {
     @Inject(method = "sortAndRender",
             at = @At("RETURN"),
             require = 1)
-    private void resetProjection(EntityLivingBase entityLivingBase, int renderPass, double partialTick, CallbackInfoReturnable<Integer> cir) {
+    private void resetProjection(EntityLivingBase entityLivingBase,
+                                 int renderPass,
+                                 double partialTick,
+                                 CallbackInfoReturnable<Integer> cir) {
         ft$resetProjection();
     }
 

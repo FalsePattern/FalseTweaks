@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,10 +37,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
  */
 public class RenderGlobalDeOptimizer implements TurboClassTransformer {
     private static final String OWNER_INTERNAL_NAME = "net/minecraft/client/renderer/RenderGlobal";
-    private static final String BAD_FIELD_NAME = "t";
     private static final String BAD_FIELD_DESC = "LCompactArrayList;";
     private static final String BAD_METHOD_OWNER = "CompactArrayList";
-    private static final String TARGET_FIELD_NAME = "field_72767_j";
     private static final String TARGET_FIELD_DESC = "Ljava/util/List;";
     private static final String TARGET_METHOD_OWNER = "java/util/List";
 
@@ -67,8 +64,9 @@ public class RenderGlobalDeOptimizer implements TurboClassTransformer {
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
+        }
         boolean modified = false;
         for (val method : cn.methods) {
             if (method.name.equals("<init>") || method.name.equals("<clinit>")) {
@@ -79,8 +77,7 @@ public class RenderGlobalDeOptimizer implements TurboClassTransformer {
                 val insn = insnList.next();
                 if (insn instanceof FieldInsnNode) {
                     val field = (FieldInsnNode) insn;
-                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_NAME.equals(field.name) && BAD_FIELD_DESC.equals(field.desc)) {
-                        field.name = TARGET_FIELD_NAME;
+                    if (OWNER_INTERNAL_NAME.equals(field.owner) && BAD_FIELD_DESC.equals(field.desc)) {
                         field.desc = TARGET_FIELD_DESC;
                         modified = true;
                     }

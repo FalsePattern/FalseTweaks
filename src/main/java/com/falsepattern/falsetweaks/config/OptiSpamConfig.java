@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,25 +33,29 @@ import com.falsepattern.lib.config.ConfigurationManager;
 public class OptiSpamConfig {
     @Config.Comment("Suppresses \"Ambiguous shader option: ...\" warnings.")
     @Config.LangKey
-    @Config.Name(value = "ambiguousShaderOption", migrations = "")
+    @Config.Name(value = "ambiguousShaderOption",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean AMBIGUOUS_SHADER_OPTION;
 
     @Config.Comment("Suppresses \"Block not found for name: ...\" warnings.")
     @Config.LangKey
-    @Config.Name(value = "blockNotFound", migrations = "")
+    @Config.Name(value = "blockNotFound",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean BLOCK_NOT_FOUND;
 
     @Config.Comment("Suppresses \"Invalid block metadata: ...\" and \"Invalid block ID mapping: ...\" warnings.")
     @Config.LangKey
-    @Config.Name(value = "invalidId", migrations = "")
+    @Config.Name(value = "invalidId",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean INVALID_ID;
 
     @Config.Comment("Suppresses \"Expression already defined: ...\" and \"Custom uniform/variable: ...\" logs.")
     @Config.LangKey
-    @Config.Name(value = "customUniforms", migrations = "")
+    @Config.Name(value = "customUniforms",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean CUSTOM_UNIFORMS;
 

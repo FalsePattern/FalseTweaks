@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,6 +41,7 @@ public class TranslucentBlockLayers {
     private final FloatBuffer matrixBufferOut = BufferUtils.createFloatBuffer(16);
     private final Matrix4f matrixA = new Matrix4f();
     private final Matrix4f matrixB = new Matrix4f();
+
     public void offsetProjection() {
         val bufIn = matrixBufferIn;
         val bufOut = matrixBufferOut;
@@ -54,7 +54,7 @@ public class TranslucentBlockLayers {
         bufOut.position(0);
         GL11.glLoadMatrix(bufOut);
         GL11.glMatrixMode(lastMatrixMode);
-        if (Compat.isShaders()) {
+        if (Compat.shaderType() == Compat.ShaderType.Optifine) {
             ShadersCompat.fetchFromShaders(bufIn);
             transform();
             ShadersCompat.setToShaders(bufOut);
@@ -77,7 +77,7 @@ public class TranslucentBlockLayers {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glPopMatrix();
         GL11.glMatrixMode(lastMatrixMode);
-        if (Compat.isShaders()) {
+        if (Compat.shaderType() == Compat.ShaderType.Optifine) {
             ShadersCompat.setToShaders(matrixBufferIn);
         }
     }
@@ -88,13 +88,18 @@ public class TranslucentBlockLayers {
         private static final float[] faProjection;
         private static final float[] faProjectionInverse;
         private static final Method invertMat4FBFA;
+
         static {
             try {
                 val fProjection = Shaders.class.getDeclaredField("projection");
                 val fProjectionInverse = Shaders.class.getDeclaredField("projectionInverse");
                 val ffaProjection = Shaders.class.getDeclaredField("faProjection");
                 val ffaProjectionInverse = Shaders.class.getDeclaredField("faProjectionInverse");
-                invertMat4FBFA = SMath.class.getDeclaredMethod("invertMat4FBFA", FloatBuffer.class, FloatBuffer.class, float[].class, float[].class);
+                invertMat4FBFA = SMath.class.getDeclaredMethod("invertMat4FBFA",
+                                                               FloatBuffer.class,
+                                                               FloatBuffer.class,
+                                                               float[].class,
+                                                               float[].class);
                 invertMat4FBFA.setAccessible(true);
                 fProjection.setAccessible(true);
                 fProjectionInverse.setAccessible(true);
@@ -108,6 +113,7 @@ public class TranslucentBlockLayers {
                 throw new RuntimeException(e);
             }
         }
+
         private static void fetchFromShaders(FloatBuffer buf) {
             buf.position(0);
             projection.position(0);
@@ -123,7 +129,11 @@ public class TranslucentBlockLayers {
             buf.position(0);
             projection.position(0);
             try {
-                invertMat4FBFA.invoke(null, (FloatBuffer)projectionInverse.position(0), (FloatBuffer)projection.position(0), faProjectionInverse, faProjection);
+                invertMat4FBFA.invoke(null,
+                                      (FloatBuffer) projectionInverse.position(0),
+                                      (FloatBuffer) projection.position(0),
+                                      faProjectionInverse,
+                                      faProjection);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }

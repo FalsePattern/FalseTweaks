@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,9 +23,7 @@
 package com.falsepattern.falsetweaks.modules.triangulator.sorting;
 
 import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import lombok.Data;
-import org.joml.Vector3f;
 
 @Data
 public class TreeNode {
@@ -42,10 +39,17 @@ public class TreeNode {
     public int frontRef;
     public int backRef;
 
-    public TreeNode(float normalX, float normalY, float normalZ,
-                    float originX, float originY, float originZ,
-                    TIntList triangleRefs, int start, int length,
-                    int frontRef, int backRef) {
+    public TreeNode(float normalX,
+                    float normalY,
+                    float normalZ,
+                    float originX,
+                    float originY,
+                    float originZ,
+                    TIntList triangleRefs,
+                    int start,
+                    int length,
+                    int frontRef,
+                    int backRef) {
         this.normalX = normalX;
         this.normalY = normalY;
         this.normalZ = normalZ;

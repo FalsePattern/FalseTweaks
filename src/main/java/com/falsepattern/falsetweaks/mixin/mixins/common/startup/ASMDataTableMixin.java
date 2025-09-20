@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -92,8 +91,11 @@ public abstract class ASMDataTableMixin implements ThreadSafeASMDataTable {
                 val mapBuilder = new HashMap<ModContainer, SetMultimap<String, ASMDataTable.ASMData>>();
                 val containersMap = Multimaps.index(containers, ModContainer::getSource);
                 for (val entry : globalAnnotationData.entries()) {
-                    for (ModContainer modContainer : containersMap.get(entry.getValue().getCandidate().getModContainer())) {
-                        mapBuilder.computeIfAbsent(modContainer, map -> HashMultimap.create()).put(entry.getKey(), entry.getValue());
+                    for (ModContainer modContainer : containersMap.get(entry.getValue()
+                                                                            .getCandidate()
+                                                                            .getModContainer())) {
+                        mapBuilder.computeIfAbsent(modContainer, map -> HashMultimap.create())
+                                  .put(entry.getKey(), entry.getValue());
                     }
                 }
                 containerAnnotationData = mapBuilder;
@@ -123,10 +125,19 @@ public abstract class ASMDataTableMixin implements ThreadSafeASMDataTable {
      * @reason Thread safe
      */
     @Overwrite(remap = false)
-    public void addASMData(ModCandidate candidate, String annotation, String className, String objectName, Map<String, Object> annotationInfo) {
+    public void addASMData(ModCandidate candidate,
+                           String annotation,
+                           String className,
+                           String objectName,
+                           Map<String, Object> annotationInfo) {
         lock();
         try {
-            globalAnnotationData.put(annotation, new ASMDataTable.ASMData(candidate, annotation, className, objectName, annotationInfo));
+            globalAnnotationData.put(annotation,
+                                     new ASMDataTable.ASMData(candidate,
+                                                              annotation,
+                                                              className,
+                                                              objectName,
+                                                              annotationInfo));
         } finally {
             unlock();
         }

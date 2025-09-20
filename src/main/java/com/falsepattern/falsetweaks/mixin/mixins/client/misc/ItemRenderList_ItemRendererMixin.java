@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,7 +40,15 @@ public abstract class ItemRenderList_ItemRendererMixin {
             at = @At("HEAD"),
             cancellable = true,
             require = 1)
-    private static void leFunnyRenderListStart(Tessellator tess, float a, float b, float c, float d, int e, int f, float g, CallbackInfo ci) {
+    private static void leFunnyRenderListStart(Tessellator tess,
+                                               float a,
+                                               float b,
+                                               float c,
+                                               float d,
+                                               int e,
+                                               int f,
+                                               float g,
+                                               CallbackInfo ci) {
         if (ItemRenderListManager.INSTANCE.pre(a, b, c, d, e, f, g)) {
             ci.cancel();
         }
@@ -50,7 +57,15 @@ public abstract class ItemRenderList_ItemRendererMixin {
     @Inject(method = "renderItemIn2D",
             at = @At("RETURN"),
             require = 1)
-    private static void leFunnyRenderListEnd(Tessellator tess, float a, float b, float c, float d, int e, int f, float g, CallbackInfo ci) {
+    private static void leFunnyRenderListEnd(Tessellator tess,
+                                             float a,
+                                             float b,
+                                             float c,
+                                             float d,
+                                             int e,
+                                             int f,
+                                             float g,
+                                             CallbackInfo ci) {
         ItemRenderListManager.INSTANCE.post();
     }
 

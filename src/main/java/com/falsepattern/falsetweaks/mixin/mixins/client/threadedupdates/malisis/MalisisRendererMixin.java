@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -39,10 +38,8 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
-
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,6 +52,24 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
     private static final ReentrantLock ft$lock = new ReentrantLock();
     @Unique
     private static final AtomicInteger ft$lockCounter = new AtomicInteger(0);
+
+    @Unique
+    private static void ft$lock() {
+        if (!ft$lock.isHeldByCurrentThread()) {
+            while (!ft$lock.tryLock()) {
+                Thread.yield();
+            }
+        }
+        ft$lockCounter.incrementAndGet();
+    }
+
+    @Unique
+    private static void ft$unlock() {
+        if (ft$lockCounter.decrementAndGet() == 0) {
+            ft$lock.unlock();
+        }
+    }
+
     @Inject(method = "renderInventoryBlock",
             at = @At("HEAD"),
             remap = false,
@@ -67,7 +82,14 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
             at = @At("HEAD"),
             remap = false,
             require = 1)
-    private void beginRWB(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer, CallbackInfoReturnable<Boolean> cir) {
+    private void beginRWB(IBlockAccess world,
+                          int x,
+                          int y,
+                          int z,
+                          Block block,
+                          int modelId,
+                          RenderBlocks renderer,
+                          CallbackInfoReturnable<Boolean> cir) {
         ft$lock();
     }
 
@@ -106,7 +128,14 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
             at = @At("RETURN"),
             remap = false,
             require = 1)
-    private void endRWB(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer, CallbackInfoReturnable<Boolean> cir) {
+    private void endRWB(IBlockAccess world,
+                        int x,
+                        int y,
+                        int z,
+                        Block block,
+                        int modelId,
+                        RenderBlocks renderer,
+                        CallbackInfoReturnable<Boolean> cir) {
         ft$unlock();
     }
 
@@ -131,23 +160,6 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
             require = 1)
     private void endRWLE(RenderWorldLastEvent event, IBlockAccess world, CallbackInfo ci) {
         ft$unlock();
-    }
-
-    @Unique
-    private static void ft$lock() {
-        if (!ft$lock.isHeldByCurrentThread()) {
-            while (!ft$lock.tryLock()) {
-                Thread.yield();
-            }
-        }
-        ft$lockCounter.incrementAndGet();
-    }
-
-    @Unique
-    private static void ft$unlock() {
-        if (ft$lockCounter.decrementAndGet() == 0) {
-            ft$lock.unlock();
-        }
     }
 
     @Override

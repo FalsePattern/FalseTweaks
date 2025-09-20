@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,14 +28,10 @@ import com.falsepattern.falsetweaks.api.dynlights.DynamicLightsDriver;
 import com.falsepattern.falsetweaks.api.dynlights.FTDynamicLights;
 import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import com.falsepattern.lib.util.MathUtil;
-
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.val;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -56,15 +51,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DynamicLights implements DynamicLightsDriver {
-    public static final DynamicLights INSTANCE = new DynamicLights(false);
-    private static final DynamicLights FOR_WORLD = new DynamicLights(true);
+    public static final DynamicLights INSTANCE = new DynamicLights();
 
     private static final Int2ObjectMap<DynamicLight> mapDynamicLights = new Int2ObjectArrayMap<>(1024);
     private static final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-
-    private static long timeUpdateMs = 0L;
     private static final double MAX_DIST = 16.0;
     private static final double MAX_DIST_SQ = MAX_DIST * MAX_DIST;
     private static final int LIGHT_LEVEL_MAX = 15;
@@ -73,7 +68,15 @@ public class DynamicLights implements DynamicLightsDriver {
     private static final int LIGHT_LEVEL_MAGMA_CUBE = 8;
     private static final int LIGHT_LEVEL_MAGMA_CUBE_CORE = 13;
     private static final int LIGHT_LEVEL_GLOWSTONE_DUST = 8;
-    private final boolean forWorld;
+    private static long timeUpdateMs = 0L;
+
+    private DynamicLights() {
+        if (!Compat.optiFineHasDynamicLights()) {
+            FMLCommonHandler.instance()
+                            .bus()
+                            .register(this);
+        }
+    }
 
     private static ReentrantReadWriteLock.WriteLock busyWaitWriteLock() {
         val lock = rwLock.writeLock();
@@ -91,11 +94,50 @@ public class DynamicLights implements DynamicLightsDriver {
         return lock;
     }
 
-    private DynamicLights(boolean forWorld) {
-        this.forWorld = forWorld;
-        if (!forWorld && !Compat.optiFineHasDynamicLights()) {
-            FMLCommonHandler.instance().bus().register(this);
+    private static int getCombinedLight(double lightPlayer, int combinedLight) {
+        if (lightPlayer > 0.0) {
+            int lightPlayerFF = (int) (lightPlayer * 16.0);
+            int lightBlockFF = combinedLight & 0xFF;
+            if (lightPlayerFF > lightBlockFF) {
+                combinedLight &= -256;
+                combinedLight |= lightPlayerFF;
+            }
         }
+
+        return combinedLight;
+    }
+
+    // Note: Public for easier compat with https://github.com/Tesseract4D/OffhandLights, do not refactor.
+    public static int getLightLevel(ItemStack itemStack) {
+        if (itemStack == null) {
+            return 0;
+        } else {
+            Item item = itemStack.getItem();
+            if (item instanceof ItemBlock) {
+                ItemBlock itemBlock = (ItemBlock) item;
+                Block block = itemBlock.field_150939_a;
+                if (block != null) {
+                    return block.getLightValue();
+                }
+            }
+
+            if (item == Items.lava_bucket) {
+                return Blocks.lava.getLightValue();
+            } else if (item == Items.blaze_rod || item == Items.blaze_powder) {
+                return LIGHT_LEVEL_BLAZE;
+            } else if (item == Items.glowstone_dust) {
+                return LIGHT_LEVEL_GLOWSTONE_DUST;
+            } else if (item == Items.magma_cream) {
+                return LIGHT_LEVEL_MAGMA_CUBE;
+            } else {
+                return item == Items.nether_star ? Blocks.beacon.getLightValue() / 2 : 0;
+            }
+        }
+    }
+
+    private static ItemStack getItemStack(EntityItem entityItem) {
+        return entityItem.getDataWatcher()
+                         .getWatchableObjectItemStack(10);
     }
 
     @SubscribeEvent
@@ -103,11 +145,6 @@ public class DynamicLights implements DynamicLightsDriver {
         if (e.modID.equals(Tags.MOD_ID)) {
             removeLights(Minecraft.getMinecraft().renderGlobal);
         }
-    }
-
-    @Override
-    public DynamicLightsDriver forWorldMesh() {
-        return FOR_WORLD;
     }
 
     @Override
@@ -153,23 +190,47 @@ public class DynamicLights implements DynamicLightsDriver {
 
     private void updateMapDynamicLights(RenderGlobal renderGlobal) {
         World world = renderGlobal.theWorld;
-        if (world != null) {
-            for(Entity entity : world.getLoadedEntityList()) {
-                int lightLevel = getLightLevel(entity);
-                if (lightLevel > 0) {
-                    int key = entity.getEntityId();
-                    DynamicLight dynamicLight = mapDynamicLights.get(key);
-                    if (dynamicLight == null) {
-                        dynamicLight = new DynamicLight(entity);
-                        mapDynamicLights.put(key, dynamicLight);
-                    }
-                } else {
-                    int key = entity.getEntityId();
-                    DynamicLight dynamicLight = mapDynamicLights.remove(key);
-                    if (dynamicLight != null) {
-                        dynamicLight.updateLitChunks(renderGlobal);
-                    }
+        if (world == null) {
+            removeLights(renderGlobal);
+        }
+        if (world == null) {
+            return;
+        }
+        val lightEntity = DynamicLightsDrivers.isDynamicEntityLight();
+        val lightHand = DynamicLightsDrivers.isDynamicHandLight();
+        if (lightEntity && lightHand) {
+            for (Entity entity : world.getLoadedEntityList()) {
+                updateMapDynamicLightsEntity(renderGlobal, entity);
+            }
+        } else if (lightHand) {
+            val player = Minecraft.getMinecraft().renderViewEntity;
+            if (player != null) {
+                updateMapDynamicLightsEntity(renderGlobal, player);
+            }
+        } else {
+            val player = Minecraft.getMinecraft().renderViewEntity;
+            for (Entity entity : world.getLoadedEntityList()) {
+                if (entity != player) {
+                    updateMapDynamicLightsEntity(renderGlobal, entity);
                 }
+            }
+        }
+    }
+
+    private void updateMapDynamicLightsEntity(RenderGlobal renderGlobal, Entity entity) {
+        int lightLevel = getLightLevel(entity);
+        if (lightLevel > 0) {
+            int key = entity.getEntityId();
+            DynamicLight dynamicLight = mapDynamicLights.get(key);
+            if (dynamicLight == null) {
+                dynamicLight = new DynamicLight(entity);
+                mapDynamicLights.put(key, dynamicLight);
+            }
+        } else {
+            int key = entity.getEntityId();
+            DynamicLight dynamicLight = mapDynamicLights.remove(key);
+            if (dynamicLight != null) {
+                dynamicLight.updateLitChunks(renderGlobal);
             }
         }
     }
@@ -182,21 +243,8 @@ public class DynamicLights implements DynamicLightsDriver {
 
     @Override
     public int getCombinedLight(Entity entity, int combinedLight) {
-        double lightPlayer = (double)getLightLevel(entity);
+        double lightPlayer = getLightLevel(entity);
         return getCombinedLight(lightPlayer, combinedLight);
-    }
-
-    private static int getCombinedLight(double lightPlayer, int combinedLight) {
-        if (lightPlayer > 0.0) {
-            int lightPlayerFF = (int)(lightPlayer * 16.0);
-            int lightBlockFF = combinedLight & 0xFF;
-            if (lightPlayerFF > lightBlockFF) {
-                combinedLight &= -256;
-                combinedLight |= lightPlayerFF;
-            }
-        }
-
-        return combinedLight;
     }
 
     private double getLightLevel(int x, int y, int z) {
@@ -205,8 +253,9 @@ public class DynamicLights implements DynamicLightsDriver {
         double lightLevelMax = 0.0;
         val lock = busyWaitReadLock();
         try {
-            for (val dynamicLight: mapDynamicLights.values()) {
-                if (!DynamicLightsDrivers.isDynamicHandLight(forWorld) && dynamicLight.getEntity() == rve) {
+            for (val dynamicLight : mapDynamicLights.values()) {
+                val isHand = dynamicLight.getEntity() == rve;
+                if ((isHand && !DynamicLightsDrivers.isDynamicHandLight()) || (!isHand && !DynamicLightsDrivers.isDynamicEntityLight())) {
                     continue;
                 }
                 int dynamicLightLevel = dynamicLight.getLastLightLevel();
@@ -214,9 +263,9 @@ public class DynamicLights implements DynamicLightsDriver {
                     double px = dynamicLight.getLastPosX();
                     double py = dynamicLight.getLastPosY();
                     double pz = dynamicLight.getLastPosZ();
-                    double dx = (double)x - px;
-                    double dy = (double)y - py;
-                    double dz = (double)z - pz;
+                    double dx = (double) x - px;
+                    double dy = (double) y - py;
+                    double dz = (double) z - pz;
                     if (dynamicLight.isUnderwater()) {
                         dynamicLightLevel = MathUtil.clamp(dynamicLightLevel - 2, 0, LIGHT_LEVEL_MAX);
                         dx *= 2.0;
@@ -252,36 +301,9 @@ public class DynamicLights implements DynamicLightsDriver {
         return MathUtil.clamp(lightLevelMax, 0.0, 15.0);
     }
 
-    // Note: Public for easier compat with https://github.com/Tesseract4D/OffhandLights, do not refactor.
-    public static int getLightLevel(ItemStack itemStack) {
-        if (itemStack == null) {
-            return 0;
-        } else {
-            Item item = itemStack.getItem();
-            if (item instanceof ItemBlock) {
-                ItemBlock itemBlock = (ItemBlock)item;
-                Block block = itemBlock.field_150939_a;
-                if (block != null) {
-                    return block.getLightValue();
-                }
-            }
-
-            if (item == Items.lava_bucket) {
-                return Blocks.lava.getLightValue();
-            } else if (item == Items.blaze_rod || item == Items.blaze_powder) {
-                return LIGHT_LEVEL_BLAZE;
-            } else if (item == Items.glowstone_dust) {
-                return LIGHT_LEVEL_GLOWSTONE_DUST;
-            } else if (item == Items.magma_cream) {
-                return LIGHT_LEVEL_MAGMA_CUBE;
-            } else {
-                return item == Items.nether_star ? Blocks.beacon.getLightValue() / 2 : 0;
-            }
-        }
-    }
-
     public int getLightLevel(Entity entity) {
-        if (entity == Minecraft.getMinecraft().renderViewEntity && !DynamicLightsDrivers.isDynamicHandLight(forWorld)) {
+        val isHand = entity == Minecraft.getMinecraft().renderViewEntity;
+        if ((isHand && !DynamicLightsDrivers.isDynamicHandLight()) || (!isHand && !DynamicLightsDrivers.isDynamicEntityLight())) {
             return 0;
         } else if (entity.isBurning()) {
             return LIGHT_LEVEL_FIRE;
@@ -290,28 +312,28 @@ public class DynamicLights implements DynamicLightsDriver {
         } else if (entity instanceof EntityTNTPrimed) {
             return LIGHT_LEVEL_FIRE;
         } else if (entity instanceof EntityBlaze) {
-            EntityBlaze entityBlaze = (EntityBlaze)entity;
+            EntityBlaze entityBlaze = (EntityBlaze) entity;
             return entityBlaze.func_70845_n() ? LIGHT_LEVEL_FIRE : LIGHT_LEVEL_BLAZE;
         } else if (entity instanceof EntityMagmaCube) {
-            EntityMagmaCube emc = (EntityMagmaCube)entity;
-            return (double)emc.squishFactor > 0.6 ? LIGHT_LEVEL_MAGMA_CUBE_CORE : LIGHT_LEVEL_MAGMA_CUBE;
+            EntityMagmaCube emc = (EntityMagmaCube) entity;
+            return (double) emc.squishFactor > 0.6 ? LIGHT_LEVEL_MAGMA_CUBE_CORE : LIGHT_LEVEL_MAGMA_CUBE;
         } else {
             if (entity instanceof EntityCreeper) {
-                EntityCreeper entityCreeper = (EntityCreeper)entity;
+                EntityCreeper entityCreeper = (EntityCreeper) entity;
                 if (entityCreeper.getCreeperState() > 0) {
                     return LIGHT_LEVEL_FIRE;
                 }
             }
 
             if (entity instanceof EntityLivingBase) {
-                EntityLivingBase player = (EntityLivingBase)entity;
+                EntityLivingBase player = (EntityLivingBase) entity;
                 ItemStack stackMain = player.getHeldItem();
                 int levelMain = getLightLevel(stackMain);
                 ItemStack stackHead = player.getEquipmentInSlot(4);
                 int levelHead = getLightLevel(stackHead);
                 return Math.max(levelMain, levelHead);
             } else if (entity instanceof EntityItem) {
-                EntityItem entityItem = (EntityItem)entity;
+                EntityItem entityItem = (EntityItem) entity;
                 ItemStack itemStack = getItemStack(entityItem);
                 return getLightLevel(itemStack);
             } else {
@@ -324,7 +346,7 @@ public class DynamicLights implements DynamicLightsDriver {
     public void removeLights(RenderGlobal renderGlobal) {
         val lock = busyWaitWriteLock();
         try {
-            for (val dynamicLight: mapDynamicLights.values()) {
+            for (val dynamicLight : mapDynamicLights.values()) {
                 dynamicLight.updateLitChunks(renderGlobal);
             }
 
@@ -352,9 +374,5 @@ public class DynamicLights implements DynamicLightsDriver {
         } finally {
             lock.unlock();
         }
-    }
-
-    private static ItemStack getItemStack(EntityItem entityItem) {
-        return entityItem.getDataWatcher().getWatchableObjectItemStack(10);
     }
 }

@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +42,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MulticoreMipMapEngine {
     private static final ThreadLocal<MulticoreMipMapEngine> engine = new ThreadLocal<>();
-    private final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), r -> {
+    private final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime()
+                                                                                .availableProcessors(), r -> {
         val thread = new Thread(r);
         thread.setName("MipMap");
         return thread;
@@ -53,7 +53,8 @@ public class MulticoreMipMapEngine {
     private final ProgressManager.ProgressBar progressBar;
 
     private static IllegalStateException fatalError() {
-        return new IllegalStateException("Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
+        return new IllegalStateException(
+                "Multicore mipmap engine broken! Most likely an incompatibility with some other mod, PLEASE report this on the FalseTweaks github repo!");
     }
 
     public static void initWorkers(ProgressManager.ProgressBar bar) {
@@ -89,7 +90,10 @@ public class MulticoreMipMapEngine {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
                 crashreportcategory.addCrashSectionCallable("Sprite name", sprite::getIconName);
-                crashreportcategory.addCrashSectionCallable("Sprite size", () -> sprite.getIconWidth() + " x " + sprite.getIconHeight());
+                crashreportcategory.addCrashSectionCallable("Sprite size",
+                                                            () -> sprite.getIconWidth() +
+                                                                  " x " +
+                                                                  sprite.getIconHeight());
                 crashreportcategory.addCrashSectionCallable("Sprite frames", () -> sprite.getFrameCount() + " frames");
                 crashreportcategory.addCrashSection("Mipmap levels", mipMapLevels);
                 exceptions.add(new ReportedException(crashreport));

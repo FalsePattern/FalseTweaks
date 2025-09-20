@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -113,7 +112,15 @@ public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
         }
         for (int i = 0; i <= mipLevels; i++) {
             memory.position(offsets[i]);
-            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, i, xOffset >>> i, yOffset >>> i, width >>> i, height >>> i, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, memory);
+            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D,
+                                 i,
+                                 xOffset >>> i,
+                                 yOffset >>> i,
+                                 width >>> i,
+                                 height >>> i,
+                                 GL12.GL_BGRA,
+                                 GL12.GL_UNSIGNED_INT_8_8_8_8_REV,
+                                 memory);
         }
         batchingSemaphore.release();
         while (!uploadingSemaphore.tryAcquire()) {

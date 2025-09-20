@@ -2,7 +2,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -10,8 +10,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,6 +53,53 @@ public final class Threading_GameSettings implements TurboClassTransformer {
         }
     }
 
+    static boolean isTargetOwner(FieldInsnNode fieldInst) {
+        if (fieldInst == null) {
+            return false;
+        }
+        val owner = fieldInst.owner;
+        if (owner == null) {
+            return false;
+        }
+
+        if (owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.Notch))) {
+            return true;
+        }
+        if (owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.SRG))) {
+            return true;
+        }
+        return owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.MCP));
+    }
+
+    static boolean shouldRemoveField(FieldNode fieldNode) {
+        return tryMapFieldNodeToMCP(fieldNode) != null;
+    }
+
+    static String tryMapFieldNodeToMCP(FieldNode fieldNode) {
+        if (fieldNode == null) {
+            return null;
+        }
+        return tryMapFieldNameToMCP(fieldNode.name);
+    }
+
+    static String tryMapFieldNameToMCP(String fieldName) {
+        if (fieldName == null) {
+            return null;
+        }
+
+        val mcpName = FANCY_GRAPHICS_FIELD.getName(MappingType.MCP);
+        if (fieldName.equals(mcpName)) {
+            return mcpName;
+        }
+        if (fieldName.equals(FANCY_GRAPHICS_FIELD.getName(MappingType.Notch))) {
+            return mcpName;
+        }
+        if (fieldName.equals(FANCY_GRAPHICS_FIELD.getName(MappingType.SRG))) {
+            return mcpName;
+        }
+
+        return null;
+    }
 
     @Override
     public String owner() {
@@ -73,8 +119,9 @@ public final class Threading_GameSettings implements TurboClassTransformer {
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
+        }
         val iter = cn.fields.iterator();
         boolean changed = false;
         while (iter.hasNext()) {
@@ -85,44 +132,5 @@ public final class Threading_GameSettings implements TurboClassTransformer {
             }
         }
         return changed;
-    }
-
-    static boolean isTargetOwner(FieldInsnNode fieldInst) {
-        if (fieldInst == null)
-            return false;
-        val owner = fieldInst.owner;
-        if (owner == null)
-            return false;
-
-        if (owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.Notch)))
-            return true;
-        if (owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.SRG)))
-            return true;
-        return owner.equals(GAME_SETTINGS_CLASS.getName(NameType.Internal, MappingType.MCP));
-    }
-
-    static boolean shouldRemoveField(FieldNode fieldNode) {
-        return tryMapFieldNodeToMCP(fieldNode) != null;
-    }
-
-    static String tryMapFieldNodeToMCP(FieldNode fieldNode) {
-        if (fieldNode == null)
-            return null;
-        return tryMapFieldNameToMCP(fieldNode.name);
-    }
-
-    static String tryMapFieldNameToMCP(String fieldName) {
-        if (fieldName == null)
-            return null;
-
-        val mcpName = FANCY_GRAPHICS_FIELD.getName(MappingType.MCP);
-        if (fieldName.equals(mcpName))
-            return mcpName;
-        if (fieldName.equals(FANCY_GRAPHICS_FIELD.getName(MappingType.Notch)))
-            return mcpName;
-        if (fieldName.equals(FANCY_GRAPHICS_FIELD.getName(MappingType.SRG)))
-            return mcpName;
-
-        return null;
     }
 }

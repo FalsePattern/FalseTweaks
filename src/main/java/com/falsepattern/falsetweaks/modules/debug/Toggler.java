@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,8 +25,9 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import lombok.val;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.util.function.Consumer;
 
@@ -44,10 +44,9 @@ public class Toggler extends JFrame {
             if (Compat.optiFineHasShaders()) {
                 createToggle("Shadow Pass", Debug.shadowPass, x -> Debug.shadowPass = x);
                 createToggle("Shadow Occlusion", Debug.shadowOcclusionChecks, x -> Debug.shadowOcclusionChecks = x);
-                createToggle("Shadow Occlusion Mask (SEIZURE WARNING)", Debug.shadowOcclusionMask, x -> Debug.shadowOcclusionMask = x);
-            }
-            if (Compat.neodymiumInstalled()) {
-                createToggle("Neodymium GC", Debug.neodymiumGC, x -> Debug.neodymiumGC = x);
+                createToggle("Shadow Occlusion Mask (SEIZURE WARNING)",
+                             Debug.shadowOcclusionMask,
+                             x -> Debug.shadowOcclusionMask = x);
             }
             createToggle("Chunk Baking", Debug.chunkRebaking, x -> Debug.chunkRebaking = x);
             createToggle("Translucency sorting", Debug.translucencySorting, x -> Debug.translucencySorting = x);

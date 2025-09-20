@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -122,7 +121,11 @@ public abstract class ProfilerMixin {
             }
             long delta = current.end();
             if (delta > 100_000_000L) {
-                logger.warn("Something's taking too long! '" + current.fullName() + "' took approx " + delta / 1_000_000.0D + " ms");
+                logger.warn("Something's taking too long! '" +
+                            current.fullName() +
+                            "' took approx " +
+                            delta / 1_000_000.0D +
+                            " ms");
             }
 
             current = current.parent;
@@ -142,9 +145,16 @@ public abstract class ProfilerMixin {
         }
         beginNextSnapshot();
         val route = entry.split("\\.");
-        val nodes = history.stream().map((node) -> node.findChild(route, 0)).filter(Objects::nonNull).collect(Collectors.toList());
-        val rootTime = history.stream().mapToLong((node) -> node.totalTime).sum();
-        var nodeTime = nodes.stream().mapToLong((node) -> node.totalTime).sum();
+        val nodes = history.stream()
+                           .map((node) -> node.findChild(route, 0))
+                           .filter(Objects::nonNull)
+                           .collect(Collectors.toList());
+        val rootTime = history.stream()
+                              .mapToLong((node) -> node.totalTime)
+                              .sum();
+        var nodeTime = nodes.stream()
+                            .mapToLong((node) -> node.totalTime)
+                            .sum();
         val childTimes = new HashMap<String, Long>();
         val totalChildTime = new AtomicLong(0L);
         nodes.forEach((node) -> {
@@ -158,7 +168,9 @@ public abstract class ProfilerMixin {
         val globalAverageMultiplier = 1.00f / (float) history.size();
         val unspecTime = nodeTime - totalChildTime.get();
         if (unspecTime > 0) {
-            result.add(new Profiler.Result("unspecified", unspecTime * localPercentMultiplier, unspecTime * globalAverageMultiplier));
+            result.add(new Profiler.Result("unspecified",
+                                           unspecTime * localPercentMultiplier,
+                                           unspecTime * globalAverageMultiplier));
         }
         childTimes.forEach((key, value) -> {
             result.add(new Profiler.Result(key, value * localPercentMultiplier, value * globalAverageMultiplier));
@@ -200,11 +212,15 @@ public abstract class ProfilerMixin {
                     @Cleanup val json = new JsonWriter(stream);
                     long sumNanos = 0;
                     for (val node : oldHistory) {
-                        sumNanos += node.childrenMap.values().stream().mapToLong((elem) -> elem.totalTime).sum();
+                        sumNanos += node.childrenMap.values()
+                                                    .stream()
+                                                    .mapToLong((elem) -> elem.totalTime)
+                                                    .sum();
                     }
                     json.setIndent("  ");
                     json.beginObject();
-                    json.name("timeNs").value(sumNanos);
+                    json.name("timeNs")
+                        .value(sumNanos);
                     json.name("results");
                     json.beginArray();
                     for (val node : oldHistory) {

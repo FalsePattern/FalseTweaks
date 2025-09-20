@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +22,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 
-import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedChunkUpdateHelper;
+import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadTessellator;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -79,7 +78,8 @@ public abstract class SkyFix_RenderGlobalMixin {
               require = 1)
     private void bigDraw1Start(int list, int mode) {
         GL11.glNewList(list, mode);
-        ThreadedChunkUpdateHelper.mainThreadTessellator().startDrawingQuads();
+        ThreadTessellator.mainThreadTessellator()
+                         .startDrawingQuads();
     }
 
     @Redirect(method = "<init>",
@@ -91,7 +91,8 @@ public abstract class SkyFix_RenderGlobalMixin {
                        ordinal = 0),
               require = 1)
     private void bigDraw1End() {
-        ThreadedChunkUpdateHelper.mainThreadTessellator().draw();
+        ThreadTessellator.mainThreadTessellator()
+                         .draw();
         GL11.glEndList();
     }
 }

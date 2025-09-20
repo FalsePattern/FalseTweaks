@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -140,27 +139,45 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
             }
         };
         val builder = builder();
-        builder.inverseExpansion(false).horizontalExpander(expandRight).verticalExpander(expandDown);
-        NoFlipNoInvRD = builder.flipIteration(false).build();
-        NoFlipYesInvRD = builder.inverseExpansion(true).build();
-        YesFlipYesInvRD = builder.flipIteration(true).build();
-        YesFlipNoInvRD = builder.inverseExpansion(false).build();
+        builder.inverseExpansion(false)
+               .horizontalExpander(expandRight)
+               .verticalExpander(expandDown);
+        NoFlipNoInvRD = builder.flipIteration(false)
+                               .build();
+        NoFlipYesInvRD = builder.inverseExpansion(true)
+                                .build();
+        YesFlipYesInvRD = builder.flipIteration(true)
+                                 .build();
+        YesFlipNoInvRD = builder.inverseExpansion(false)
+                                .build();
         builder.verticalExpander(expandUp);
-        NoFlipNoInvRU = builder.flipIteration(false).build();
-        NoFlipYesInvRU = builder.inverseExpansion(true).build();
-        YesFlipYesInvRU = builder.flipIteration(true).build();
-        YesFlipNoInvRU = builder.inverseExpansion(false).build();
+        NoFlipNoInvRU = builder.flipIteration(false)
+                               .build();
+        NoFlipYesInvRU = builder.inverseExpansion(true)
+                                .build();
+        YesFlipYesInvRU = builder.flipIteration(true)
+                                 .build();
+        YesFlipNoInvRU = builder.inverseExpansion(false)
+                                .build();
         builder.horizontalExpander(expandLeft);
         builder.verticalExpander(expandDown);
-        NoFlipNoInvLD = builder.flipIteration(false).build();
-        NoFlipYesInvLD = builder.inverseExpansion(true).build();
-        YesFlipYesInvLD = builder.flipIteration(true).build();
-        YesFlipNoInvLD = builder.inverseExpansion(false).build();
+        NoFlipNoInvLD = builder.flipIteration(false)
+                               .build();
+        NoFlipYesInvLD = builder.inverseExpansion(true)
+                                .build();
+        YesFlipYesInvLD = builder.flipIteration(true)
+                                 .build();
+        YesFlipNoInvLD = builder.inverseExpansion(false)
+                                .build();
         builder.verticalExpander(expandUp);
-        NoFlipNoInvLU = builder.flipIteration(false).build();
-        NoFlipYesInvLU = builder.inverseExpansion(true).build();
-        YesFlipYesInvLU = builder.flipIteration(true).build();
-        YesFlipNoInvLU = builder.inverseExpansion(false).build();
+        NoFlipNoInvLU = builder.flipIteration(false)
+                               .build();
+        NoFlipYesInvLU = builder.inverseExpansion(true)
+                                .build();
+        YesFlipYesInvLU = builder.flipIteration(true)
+                                 .build();
+        YesFlipNoInvLU = builder.inverseExpansion(false)
+                                .build();
     }
 
     private final Expander horizontalExpander;
@@ -169,10 +186,22 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
     private final boolean inverseExpansion;
 
     public static List<ExpandingRectMergingStrategy> all() {
-        return Arrays.asList(NoFlipNoInvRD, NoFlipYesInvRD, YesFlipNoInvRD, YesFlipYesInvRD,
-                             NoFlipNoInvRU, NoFlipYesInvRU, YesFlipNoInvRU, YesFlipYesInvRU,
-                             NoFlipNoInvLD, NoFlipYesInvLD, YesFlipNoInvLD, YesFlipYesInvLD,
-                             NoFlipNoInvLU, NoFlipYesInvLU, YesFlipNoInvLU, YesFlipYesInvLU);
+        return Arrays.asList(NoFlipNoInvRD,
+                             NoFlipYesInvRD,
+                             YesFlipNoInvRD,
+                             YesFlipYesInvRD,
+                             NoFlipNoInvRU,
+                             NoFlipYesInvRU,
+                             YesFlipNoInvRU,
+                             YesFlipYesInvRU,
+                             NoFlipNoInvLD,
+                             NoFlipYesInvLD,
+                             YesFlipNoInvLD,
+                             YesFlipYesInvLD,
+                             NoFlipNoInvLU,
+                             NoFlipYesInvLU,
+                             YesFlipNoInvLU,
+                             YesFlipYesInvLU);
     }
 
     private static boolean tryExpandRight(Face[][] faces, Face root) {
@@ -260,21 +289,17 @@ public class ExpandingRectMergingStrategy implements MergingStrategy {
     @Override
     public void merge(Face[][] faces) {
         if (flipIteration) {
-            for (int x = horizontalExpander.startIndex(faces);
-                 horizontalExpander.shouldContinue(faces, x);
+            for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x);
                  x = horizontalExpander.modifyValue(x)) {
-                for (int y = verticalExpander.startIndex(faces);
-                     verticalExpander.shouldContinue(faces, y);
+                for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y);
                      y = verticalExpander.modifyValue(y)) {
                     tryExpand(faces, x, y);
                 }
             }
         } else {
-            for (int y = verticalExpander.startIndex(faces);
-                 verticalExpander.shouldContinue(faces, y);
+            for (int y = verticalExpander.startIndex(faces); verticalExpander.shouldContinue(faces, y);
                  y = verticalExpander.modifyValue(y)) {
-                for (int x = horizontalExpander.startIndex(faces);
-                     horizontalExpander.shouldContinue(faces, x);
+                for (int x = horizontalExpander.startIndex(faces); horizontalExpander.shouldContinue(faces, x);
                      x = horizontalExpander.modifyValue(x)) {
                     tryExpand(faces, x, y);
                 }

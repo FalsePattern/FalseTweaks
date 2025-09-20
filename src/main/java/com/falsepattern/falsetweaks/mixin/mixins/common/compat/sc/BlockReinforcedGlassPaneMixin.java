@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,20 +22,20 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.common.compat.sc;
 
-import net.geforcemods.securitycraft.blocks.reinforced.BlockReinforcedFenceGate;
 import net.geforcemods.securitycraft.blocks.reinforced.BlockReinforcedGlassPane;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.material.Material;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 @Mixin(BlockReinforcedGlassPane.class)
 public abstract class BlockReinforcedGlassPaneMixin extends BlockPane {
-    protected BlockReinforcedGlassPaneMixin(String p_i45432_1_, String p_i45432_2_, Material p_i45432_3_, boolean p_i45432_4_) {
+    protected BlockReinforcedGlassPaneMixin(String p_i45432_1_,
+                                            String p_i45432_2_,
+                                            Material p_i45432_3_,
+                                            boolean p_i45432_4_) {
         super(p_i45432_1_, p_i45432_2_, p_i45432_3_, p_i45432_4_);
     }
 

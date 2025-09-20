@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,13 +23,8 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.mipmapfix;
 
 import com.falsepattern.falsetweaks.modules.mipmapfix.Mipmaps;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.texture.TextureUtil;
 
@@ -78,12 +72,11 @@ public abstract class TextureUtilMixin {
                     for (int x = 0; x < width; ++x) {
                         for (int y = 0; y < height; ++y) {
                             int prevPos = 2 * (x + y * prevWidth);
-                            mipmap[x + y * width] = func_147943_a(
-                                    prevLevel[prevPos],
-                                    prevLevel[prevPos + 1],
-                                    prevLevel[prevPos + prevWidth],
-                                    prevLevel[prevPos + 1 + prevWidth],
-                                    transparent);
+                            mipmap[x + y * width] = func_147943_a(prevLevel[prevPos],
+                                                                  prevLevel[prevPos + 1],
+                                                                  prevLevel[prevPos + prevWidth],
+                                                                  prevLevel[prevPos + 1 + prevWidth],
+                                                                  transparent);
                         }
                     }
 

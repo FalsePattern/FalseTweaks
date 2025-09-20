@@ -8,7 +8,7 @@ Nightly (most likely broken) builds available [here](https://nightly.link/FalseP
 This mod completely replaces Triangulator and AnimFix. Make sure you delete these two mods before installing FalseTweaks.
 
 ## List of major features:
-- Multithreaded chunk rendering (compatible with OptiFine and FastCraft)
+- Multithreaded chunk rendering (requires Beddium)
 - Dynamic Lights
 - Replaced minecraft's quad-based rendering with triangle-based rendering
 - Fixed ambient occlusion and smooth lighting (vanilla bugs MC-138211 and MC-43968)

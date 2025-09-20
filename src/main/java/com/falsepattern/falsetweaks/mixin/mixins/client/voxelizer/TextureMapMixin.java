@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -89,7 +88,10 @@ public abstract class TextureMapMixin {
                         Share.log.info("__VOXELIZER__ Layer count: " + thicknesses.length);
                     }
                     for (int i = 0; i < thicknesses.length; i++) {
-                        layers[thicknesses.length - 1 - i] = new Layer((TextureAtlasSprite) registerIcon(name + "_" + i), thicknesses[i] * BASE_THICKNESS);
+                        layers[thicknesses.length - 1 - i] = new Layer((TextureAtlasSprite) registerIcon(name +
+                                                                                                         "_" +
+                                                                                                         i),
+                                                                       thicknesses[i] * BASE_THICKNESS);
                         registerIcon(name + "_" + i);
                     }
                     tex.layers(layers);
@@ -100,9 +102,11 @@ public abstract class TextureMapMixin {
                     tex.layers(new Layer(iicon, BASE_THICKNESS));
                 }
             } catch (RuntimeException runtimeexception) {
-                cpw.mods.fml.client.FMLClientHandler.instance().trackBrokenTexture(complete, runtimeexception.getMessage());
+                cpw.mods.fml.client.FMLClientHandler.instance()
+                                                    .trackBrokenTexture(complete, runtimeexception.getMessage());
             } catch (IOException ioexception1) {
-                cpw.mods.fml.client.FMLClientHandler.instance().trackMissingTexture(complete);
+                cpw.mods.fml.client.FMLClientHandler.instance()
+                                                    .trackMissingTexture(complete);
             }
         }
     }

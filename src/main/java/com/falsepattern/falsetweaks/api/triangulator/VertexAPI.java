@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,13 +34,13 @@ public class VertexAPI {
      * Allocates extra usable space in vertex data.
      * Only usable during preInit, and only if the Triangulator module is enabled. Otherwise, it's a hard crash.
      *
-     * @param count           The amount of integers to allocate (1 count = 4 bytes).
-     * @param indices         The indices of the allocated vertex slots. Size must be equal to count.
-     * @param optiFineIndices The indices of the allocated vertex slots when OptiFine shaders are active. Size must be equal to count.
+     * @param count         The amount of integers to allocate (1 count = 4 bytes).
+     * @param indices       The indices of the allocated vertex slots. Size must be equal to count.
+     * @param shaderIndices The indices of the allocated vertex slots when shaders are active. Size must be equal to count.
      */
     @StableAPI.Expose
-    public static void allocateExtraVertexSlots(int count, int[] indices, int[] optiFineIndices) {
-        VertexInfo.allocateExtraVertexSlots(count, indices, optiFineIndices);
+    public static void allocateExtraVertexSlots(int count, int[] indices, int[] shaderIndices) {
+        VertexInfo.allocateExtraVertexSlots(count, indices, shaderIndices);
     }
 
     /**

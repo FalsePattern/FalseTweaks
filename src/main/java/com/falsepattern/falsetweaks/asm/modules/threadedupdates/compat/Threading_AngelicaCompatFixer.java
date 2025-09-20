@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,9 +36,31 @@ public class Threading_AngelicaCompatFixer implements TurboClassTransformer {
     private static final String OPTIONAL_INTERFACE_ANN_DESC = "Lcpw/mods/fml/common/Optional$Interface;";
     private static final String OPTIONAL_METHOD_ANN_DESC = "Lcpw/mods/fml/common/Optional$Method;";
     private static final String ANGELICA_THREAD_SAFE_FACTORY_InternalName = "com/gtnewhorizons/angelica/api/ThreadSafeISBRHFactory";
-    private static final String ANGELICA_THREAD_SAFE_FACTORY_ClassName = ANGELICA_THREAD_SAFE_FACTORY_InternalName.replace('/', '.');
+    private static final String ANGELICA_THREAD_SAFE_FACTORY_ClassName = ANGELICA_THREAD_SAFE_FACTORY_InternalName.replace(
+            '/',
+            '.');
     private static final String ANGELICA_FACTORY_METHOD_DESC = "()L" + ANGELICA_THREAD_SAFE_FACTORY_InternalName + ";";
-    private static final String THREAD_SAFE_FACTORY_ClassName = Threading_ThreadSafeBlockRendererInjector.THREAD_SAFE_FACTORY_InternalName.replace('/', '.');
+    private static final String THREAD_SAFE_FACTORY_ClassName = Threading_ThreadSafeBlockRendererInjector.THREAD_SAFE_FACTORY_InternalName.replace(
+            '/',
+            '.');
+
+    private static @NotNull ArrayList<Object> constructNewValues(String modid, Boolean stripRefs) {
+        val newValues = new ArrayList<>();
+        newValues.add("iface");
+        newValues.add(THREAD_SAFE_FACTORY_ClassName);
+        newValues.add("modid");
+        if ("angelica".equals(modid)) {
+            newValues.add(Tags.MOD_ID);
+        } else {
+            newValues.add(modid);
+        }
+        if (stripRefs != null) {
+            newValues.add("striprefs");
+            newValues.add(stripRefs);
+        }
+        return newValues;
+    }
+
     @Override
     public String owner() {
         return Tags.MOD_ID;
@@ -58,21 +79,24 @@ public class Threading_AngelicaCompatFixer implements TurboClassTransformer {
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val node = classNode.getNode();
-        if (node == null)
+        if (node == null) {
             return false;
+        }
         boolean found = false;
         {
             val anns = node.visibleAnnotations;
-            if (anns == null)
+            if (anns == null) {
                 return false;
+            }
             for (val ann : anns) {
                 if (ann.desc.equals(OPTIONAL_INTERFACE_ANN_DESC)) {
                     boolean isFactory = false;
                     String modid = null;
                     Boolean stripRefs = null;
                     val values = ann.values;
-                    if (values == null)
+                    if (values == null) {
                         continue;
+                    }
                     val iter = values.iterator();
                     while (iter.hasNext()) {
                         val name = (String) iter.next();
@@ -106,23 +130,25 @@ public class Threading_AngelicaCompatFixer implements TurboClassTransformer {
         if (!found) {
             return false;
         }
-        for (val method: node.methods) {
+        for (val method : node.methods) {
             if (!(Threading_ThreadSafeBlockRendererInjector.FACTORY_METHOD_NAME.equals(method.name) &&
                   Threading_ThreadSafeBlockRendererInjector.FACTORY_METHOD_DESC.equals(method.desc))) {
                 continue;
             }
             val anns = method.visibleAnnotations;
-            if (anns == null)
+            if (anns == null) {
                 continue;
-            for (val ann: anns) {
+            }
+            for (val ann : anns) {
                 if (ann.desc.equals(OPTIONAL_METHOD_ANN_DESC)) {
                     String modid = null;
                     val values = ann.values;
-                    if (values == null)
+                    if (values == null) {
                         continue;
+                    }
                     val iter = values.iterator();
                     while (iter.hasNext()) {
-                        val name = (String)iter.next();
+                        val name = (String) iter.next();
                         val value = iter.next();
                         if ("modid".equals(name)) {
                             modid = (String) value;
@@ -136,22 +162,5 @@ public class Threading_AngelicaCompatFixer implements TurboClassTransformer {
             }
         }
         return true;
-    }
-
-    private static @NotNull ArrayList<Object> constructNewValues(String modid, Boolean stripRefs) {
-        val newValues = new ArrayList<>();
-        newValues.add("iface");
-        newValues.add(THREAD_SAFE_FACTORY_ClassName);
-        newValues.add("modid");
-        if ("angelica".equals(modid)) {
-            newValues.add(Tags.MOD_ID);
-        } else {
-            newValues.add(modid);
-        }
-        if (stripRefs != null) {
-            newValues.add("striprefs");
-            newValues.add(stripRefs);
-        }
-        return newValues;
     }
 }

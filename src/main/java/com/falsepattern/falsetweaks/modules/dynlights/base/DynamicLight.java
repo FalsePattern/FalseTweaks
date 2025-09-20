@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,13 +36,20 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 
 public class DynamicLight {
-    @Getter private final Entity entity;
-    @Getter private final double offsetY;
-    @Getter private double lastPosX = -2.14748365E9F;
-    @Getter private double lastPosY = -2.14748365E9F;
-    @Getter private double lastPosZ = -2.14748365E9F;
-    @Getter private int lastLightLevel = 0;
-    @Getter private boolean underwater = false;
+    @Getter
+    private final Entity entity;
+    @Getter
+    private final double offsetY;
+    @Getter
+    private double lastPosX = -2.14748365E9F;
+    @Getter
+    private double lastPosY = -2.14748365E9F;
+    @Getter
+    private double lastPosZ = -2.14748365E9F;
+    @Getter
+    private int lastLightLevel = 0;
+    @Getter
+    private boolean underwater = false;
     private long timeCheckMs = 0L;
 
     public DynamicLight(Entity entity) {
@@ -52,7 +58,8 @@ public class DynamicLight {
     }
 
     public void update(RenderGlobal renderGlobal) {
-        val isHandLight = entity == Minecraft.getMinecraft().renderViewEntity && Compat.neodymiumActive() && !Compat.isShaders();
+        val isHandLight = entity == Minecraft.getMinecraft().renderViewEntity &&
+                          Compat.shaderType() != Compat.ShaderType.Optifine;
         if (!isHandLight && DynamicLightsDrivers.isDynamicLightsFast()) {
             long timeNowMs = System.currentTimeMillis();
             if (timeNowMs < this.timeCheckMs + 500L) {
@@ -70,7 +77,10 @@ public class DynamicLight {
         double dy = posY - this.lastPosY;
         double dz = posZ - this.lastPosZ;
         double delta = 0.1;
-        if (!(Math.abs(dx) <= delta) || !(Math.abs(dy) <= delta) || !(Math.abs(dz) <= delta) || this.lastLightLevel != lightLevel) {
+        if (!(Math.abs(dx) <= delta) ||
+            !(Math.abs(dy) <= delta) ||
+            !(Math.abs(dz) <= delta) ||
+            this.lastLightLevel != lightLevel) {
             this.underwater = false;
             World world = renderGlobal.theWorld;
             if (world != null) {
@@ -78,15 +88,19 @@ public class DynamicLight {
                 this.underwater = block == Blocks.water;
             }
 
-            if (!isHandLight) {
-                if (lightLevel > 0) {
-                    int distance = lightLevel + 1;
-                    renderGlobal.markBlockRangeForRenderUpdate((int) (posX - distance), (int) (posY - distance), (int) (posZ - distance),
-                                                               (int) (posX + distance), (int) (posY + distance), (int) (posZ + distance));
-                }
-
-                this.updateLitChunks(renderGlobal);
+            //            if (!isHandLight) {
+            if (lightLevel > 0) {
+                int distance = lightLevel + 1;
+                renderGlobal.markBlockRangeForRenderUpdate((int) (posX - distance),
+                                                           (int) (posY - distance),
+                                                           (int) (posZ - distance),
+                                                           (int) (posX + distance),
+                                                           (int) (posY + distance),
+                                                           (int) (posZ + distance));
             }
+
+            this.updateLitChunks(renderGlobal);
+            //            }
             this.lastPosX = posX;
             this.lastPosY = posY;
             this.lastPosZ = posZ;
@@ -96,8 +110,12 @@ public class DynamicLight {
 
     public void updateLitChunks(RenderGlobal renderGlobal) {
         int distance = lastLightLevel + 1;
-        renderGlobal.markBlockRangeForRenderUpdate((int) (lastPosX - distance), (int) (lastPosY - distance), (int) (lastPosZ - distance),
-                                                   (int) (lastPosX + distance), (int) (lastPosY + distance), (int) (lastPosZ + distance));
+        renderGlobal.markBlockRangeForRenderUpdate((int) (lastPosX - distance),
+                                                   (int) (lastPosY - distance),
+                                                   (int) (lastPosZ - distance),
+                                                   (int) (lastPosX + distance),
+                                                   (int) (lastPosY + distance),
+                                                   (int) (lastPosZ + distance));
     }
 
     public String toString() {

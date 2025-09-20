@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,6 +58,7 @@ import java.util.Objects;
 @Mixin(RenderBlocks.class)
 @Accessors(fluent = true,
            chain = false)
+// TODO: Something about this mixin is forcing us onto compat level JAVA_11?
 public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Shadow
     public static boolean fancyGrass;
@@ -114,6 +114,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public int brightnessBottomRight;
     @Shadow
     public int brightnessTopRight;
+    @Shadow
+    public IIcon overrideBlockTexture;
     private int countS;
     private int countB;
     private float lightSky;
@@ -123,14 +125,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private boolean[] states;
     private double[] bounds;
     private boolean[] reusePreviousStates;
-
-    @Override
-    public void reusePreviousStates(boolean state) {
-        Arrays.fill(reusePreviousStates, state);
-    }
-
     @Setter
-    private boolean enableMultiRenderReuse;
+    private boolean ft$enableMultiRenderReuse;
     private boolean disableCrackFix;
 
     private static float avg(final float a, final float b) {
@@ -161,16 +157,26 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     private static Class<?>[] getCrackFixBlacklist() {
         if (currentCrackFixBlacklistArr != TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST) {
             currentCrackFixBlacklistArr = TriangulatorConfig.BLOCK_CRACK_FIX_BLACKLIST;
-            currentCrackFixBlacklistClasses = Arrays.stream(currentCrackFixBlacklistArr).map((name) -> {
-                try {
-                    return Class.forName(name);
-                } catch (ClassNotFoundException e) {
-                    Share.log.info("Could not find class " + name + " for crack fix blacklist!");
-                    return null;
-                }
-            }).filter(Objects::nonNull).toArray(Class<?>[]::new);
+            currentCrackFixBlacklistClasses = Arrays.stream(currentCrackFixBlacklistArr)
+                                                    .map((name) -> {
+                                                        try {
+                                                            return Class.forName(name);
+                                                        } catch (ClassNotFoundException e) {
+                                                            Share.log.info("Could not find class " +
+                                                                           name +
+                                                                           " for crack fix blacklist!");
+                                                            return null;
+                                                        }
+                                                    })
+                                                    .filter(Objects::nonNull)
+                                                    .toArray(Class<?>[]::new);
         }
         return currentCrackFixBlacklistClasses;
+    }
+
+    @Override
+    public void ft$reusePreviousStates(boolean state) {
+        Arrays.fill(reusePreviousStates, state);
     }
 
     private boolean crackFixOff() {
@@ -178,7 +184,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     }
 
     @Shadow
-    public abstract IIcon getBlockIcon(Block p_147793_1_, IBlockAccess p_147793_2_, int p_147793_3_, int p_147793_4_, int p_147793_5_, int p_147793_6_);
+    public abstract IIcon getBlockIcon(Block p_147793_1_,
+                                       IBlockAccess p_147793_2_,
+                                       int p_147793_3_,
+                                       int p_147793_4_,
+                                       int p_147793_5_,
+                                       int p_147793_6_);
 
     @Shadow
     public abstract IIcon getBlockIcon(Block p_147745_1_);
@@ -187,22 +198,46 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     public abstract boolean hasOverrideBlockTexture();
 
     @Shadow
-    public abstract void renderFaceYNeg(Block p_147768_1_, double p_147768_2_, double p_147768_4_, double p_147768_6_, IIcon p_147768_8_);
+    public abstract void renderFaceYNeg(Block p_147768_1_,
+                                        double p_147768_2_,
+                                        double p_147768_4_,
+                                        double p_147768_6_,
+                                        IIcon p_147768_8_);
 
     @Shadow
-    public abstract void renderFaceYPos(Block p_147806_1_, double p_147806_2_, double p_147806_4_, double p_147806_6_, IIcon p_147806_8_);
+    public abstract void renderFaceYPos(Block p_147806_1_,
+                                        double p_147806_2_,
+                                        double p_147806_4_,
+                                        double p_147806_6_,
+                                        IIcon p_147806_8_);
 
     @Shadow
-    public abstract void renderFaceZNeg(Block p_147761_1_, double p_147761_2_, double p_147761_4_, double p_147761_6_, IIcon p_147761_8_);
+    public abstract void renderFaceZNeg(Block p_147761_1_,
+                                        double p_147761_2_,
+                                        double p_147761_4_,
+                                        double p_147761_6_,
+                                        IIcon p_147761_8_);
 
     @Shadow
-    public abstract void renderFaceZPos(Block p_147734_1_, double p_147734_2_, double p_147734_4_, double p_147734_6_, IIcon p_147734_8_);
+    public abstract void renderFaceZPos(Block p_147734_1_,
+                                        double p_147734_2_,
+                                        double p_147734_4_,
+                                        double p_147734_6_,
+                                        IIcon p_147734_8_);
 
     @Shadow
-    public abstract void renderFaceXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_);
+    public abstract void renderFaceXNeg(Block p_147798_1_,
+                                        double p_147798_2_,
+                                        double p_147798_4_,
+                                        double p_147798_6_,
+                                        IIcon p_147798_8_);
 
     @Shadow
-    public abstract void renderFaceXPos(Block p_147764_1_, double p_147764_2_, double p_147764_4_, double p_147764_6_, IIcon p_147764_8_);
+    public abstract void renderFaceXPos(Block p_147764_1_,
+                                        double p_147764_2_,
+                                        double p_147764_4_,
+                                        double p_147764_6_,
+                                        IIcon p_147764_8_);
 
     private void addLight(int light) {
         int S = light & 0xff;
@@ -251,7 +286,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         return getMixedBrightnessForBlockOffset(x, y, z, offset, false, face);
     }
 
-    private int getMixedBrightnessForBlockOffset(int x, int y, int z, Vector3ic offset, boolean front, Facing.Direction face) {
+    private int getMixedBrightnessForBlockOffset(int x,
+                                                 int y,
+                                                 int z,
+                                                 Vector3ic offset,
+                                                 boolean front,
+                                                 Facing.Direction face) {
         x += offset.x();
         y += offset.y();
         z += offset.z();
@@ -363,7 +403,11 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
 
     private boolean shouldSideBeRenderedQuick(Block block, int x, int y, int z, Facing facing) {
         try {
-            return block.shouldSideBeRendered(blockAccess, x + facing.front.x(), y + facing.front.y(), z + facing.front.z(), facing.face.ordinal());
+            return block.shouldSideBeRendered(blockAccess,
+                                              x + facing.front.x(),
+                                              y + facing.front.y(),
+                                              z + facing.front.z(),
+                                              facing.face.ordinal());
         } catch (Throwable ignored) {
             return true;
         }
@@ -506,6 +550,36 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         this.colorGreenTopRight *= aoTopRight;
         this.colorBlueTopRight *= aoTopRight;
         IIcon icon = getBlockIcon(block, blockAccess, x, y, z, facing.face.ordinal());
+        doRenderFace(block, x, y, z, facing, icon);
+        if (facing.face != Facing.Direction.FACE_YNEG && facing.face != Facing.Direction.FACE_YPOS) {
+            if (fancyGrass &&
+                icon.getIconName()
+                    .equals("grass_side") &&
+                !this.hasOverrideBlockTexture()) {
+                float r = state.r;
+                float g = state.g;
+                float b = state.b;
+                this.colorRedTopLeft *= r;
+                this.colorRedBottomLeft *= r;
+                this.colorRedBottomRight *= r;
+                this.colorRedTopRight *= r;
+                this.colorGreenTopLeft *= g;
+                this.colorGreenBottomLeft *= g;
+                this.colorGreenBottomRight *= g;
+                this.colorGreenTopRight *= g;
+                this.colorBlueTopLeft *= b;
+                this.colorBlueBottomLeft *= b;
+                this.colorBlueBottomRight *= b;
+                this.colorBlueTopRight *= b;
+                val sideIcon = BlockGrass.getIconSideOverlay();
+                doRenderFace(block, x, y, z, facing, sideIcon);
+            }
+        }
+
+        return true;
+    }
+
+    private void doRenderFace(Block block, int x, int y, int z, Facing facing, IIcon icon) {
         switch (facing) {
             case YNEG:
                 renderFaceYNeg(block, x, y, z, icon);
@@ -526,56 +600,16 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
                 renderFaceXPos(block, x, y, z, icon);
                 break;
         }
-        if (facing.face != Facing.Direction.FACE_YNEG && facing.face != Facing.Direction.FACE_YPOS) {
-            if (fancyGrass && icon.getIconName().equals("grass_side") && !this.hasOverrideBlockTexture()) {
-                float r = state.r;
-                float g = state.g;
-                float b = state.b;
-                this.colorRedTopLeft *= r;
-                this.colorRedBottomLeft *= r;
-                this.colorRedBottomRight *= r;
-                this.colorRedTopRight *= r;
-                this.colorGreenTopLeft *= g;
-                this.colorGreenBottomLeft *= g;
-                this.colorGreenBottomRight *= g;
-                this.colorGreenTopRight *= g;
-                this.colorBlueTopLeft *= b;
-                this.colorBlueBottomLeft *= b;
-                this.colorBlueBottomRight *= b;
-                this.colorBlueTopRight *= b;
-                val sideIcon = BlockGrass.getIconSideOverlay();
-                switch (facing) {
-                    case YNEG:
-                        renderFaceYNeg(block, x, y, z, sideIcon);
-                        break;
-                    case YPOS:
-                        renderFaceYPos(block, x, y, z, sideIcon);
-                        break;
-                    case ZNEG:
-                        renderFaceZNeg(block, x, y, z, sideIcon);
-                        break;
-                    case ZPOS:
-                        renderFaceZPos(block, x, y, z, sideIcon);
-                        break;
-                    case XNEG:
-                        renderFaceXNeg(block, x, y, z, sideIcon);
-                        break;
-                    case XPOS:
-                        renderFaceXPos(block, x, y, z, sideIcon);
-                        break;
-                }
-            }
-        }
-
-        return true;
     }
 
-    public boolean renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
+    public boolean ft$renderWithAO(Block block, int x, int y, int z, float r, float g, float b) {
         this.enableAO = true;
         int light = block.getMixedBrightnessForBlock(this.blockAccess, x, y, z);
-        Compat.tessellator().setBrightness(0x000f000f);
+        Compat.tessellator()
+              .setBrightness(0x000f000f);
 
-        boolean useColor = !(getBlockIcon(block).getIconName().equals("grass_top") || hasOverrideBlockTexture());
+        boolean useColor = !(getBlockIcon(block).getIconName()
+                                                .equals("grass_top") || hasOverrideBlockTexture());
 
         if (state == null) {
             state = new RenderState();
@@ -608,7 +642,7 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         } else {
             states[dir.ordinal()] = ((ITriangulatorTessellator) Compat.tessellator()).alternativeTriangulation();
         }
-        if (enableMultiRenderReuse) {
+        if (ft$enableMultiRenderReuse) {
             reusePreviousStates[ord] = true;
         }
     }
@@ -621,7 +655,8 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         var avgBottomLeft = avg(colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft);
         var avgBottomRight = avg(colorRedBottomRight, colorGreenBottomRight, colorBlueBottomRight);
         var avgTopRight = avg(colorRedTopRight, colorGreenTopRight, colorBlueTopRight);
-        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() && TriangulatorConfig.Calibration.FLIP_DIAGONALS) {
+        if (((ToggleableTessellator) Compat.tessellator()).isTriangulatorDisabled() &&
+            TriangulatorConfig.Calibration.FLIP_DIAGONALS) {
             var tmp = avgTopLeft;
             avgTopLeft = avgBottomLeft;
             avgBottomLeft = tmp;
@@ -648,7 +683,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceXNeg"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseXNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseXNeg(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_XNEG);
         reuse(Facing.Direction.FACE_XNEG);
     }
@@ -666,7 +706,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceXPos"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseXPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseXPos(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_XPOS);
         reuse(Facing.Direction.FACE_XPOS);
     }
@@ -684,7 +729,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceYNeg"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseYNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseYNeg(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_YNEG);
         reuse(Facing.Direction.FACE_YNEG);
     }
@@ -703,7 +753,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceYPos"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseYPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseYPos(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_YPOS);
         reuse(Facing.Direction.FACE_YPOS);
     }
@@ -722,7 +777,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceZNeg"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseZNeg(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseZNeg(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_ZNEG);
         reuse(Facing.Direction.FACE_ZNEG);
     }
@@ -740,7 +800,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = {"renderFaceZPos"},
             at = @At(value = "HEAD"),
             require = 1)
-    private void reuseZPos(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void reuseZPos(Block p_147798_1_,
+                           double p_147798_2_,
+                           double p_147798_4_,
+                           double p_147798_6_,
+                           IIcon p_147798_8_,
+                           CallbackInfo ci) {
         aoFix(Facing.Direction.FACE_ZPOS);
         reuse(Facing.Direction.FACE_ZPOS);
     }
@@ -774,7 +839,12 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
             return;
         }
 
-        if (renderMinX != 0 || renderMinY != 0 || renderMinZ != 0 || renderMaxX != 1 || renderMaxY != 1 || renderMaxZ != 1) {
+        if (renderMinX != 0 ||
+            renderMinY != 0 ||
+            renderMinZ != 0 ||
+            renderMaxX != 1 ||
+            renderMaxY != 1 ||
+            renderMaxZ != 1) {
             return;
         }
         val EPSILON = TriangulatorConfig.BLOCK_CRACK_FIX_EPSILON;
@@ -796,10 +866,20 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
         }
     }
 
-    @Inject(method = {"renderFaceXNeg", "renderFaceXPos", "renderFaceYNeg", "renderFaceYPos", "renderFaceZNeg", "renderFaceZPos"},
+    @Inject(method = {"renderFaceXNeg",
+                      "renderFaceXPos",
+                      "renderFaceYNeg",
+                      "renderFaceYPos",
+                      "renderFaceZNeg",
+                      "renderFaceZPos"},
             at = @At(value = "RETURN"),
             require = 6)
-    private void postBounds(Block p_147798_1_, double p_147798_2_, double p_147798_4_, double p_147798_6_, IIcon p_147798_8_, CallbackInfo ci) {
+    private void postBounds(Block p_147798_1_,
+                            double p_147798_2_,
+                            double p_147798_4_,
+                            double p_147798_6_,
+                            IIcon p_147798_8_,
+                            CallbackInfo ci) {
         if (crackFixOff() || bounds == null) {
             return;
         }
@@ -821,7 +901,11 @@ public abstract class RenderBlocksUltraMixin implements IRenderBlocksMixin {
     @Inject(method = "renderBlockByRenderType",
             at = @At("RETURN"),
             require = 1)
-    private void endExclusion(Block p_147805_1_, int p_147805_2_, int p_147805_3_, int p_147805_4_, CallbackInfoReturnable<Boolean> cir) {
+    private void endExclusion(Block p_147805_1_,
+                              int p_147805_2_,
+                              int p_147805_3_,
+                              int p_147805_4_,
+                              CallbackInfoReturnable<Boolean> cir) {
         disableCrackFix = false;
     }
 }

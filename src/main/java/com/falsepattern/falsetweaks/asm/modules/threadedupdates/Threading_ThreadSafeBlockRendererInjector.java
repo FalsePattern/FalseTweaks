@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -58,6 +57,11 @@ import java.util.function.Supplier;
 // TODO ASM Logging
 
 public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTransformer {
+    public static final String THREAD_SAFE_ANNOTATION_InternalName = "com/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRH";
+    public static final String THREAD_SAFE_ANNOTATION_DESC = "Lcom/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRH;";
+    public static final String THREAD_SAFE_FACTORY_InternalName = "com/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRHFactory";
+    public static final String FACTORY_METHOD_DESC = "()L" + THREAD_SAFE_FACTORY_InternalName + ";";
+    public static final String FACTORY_METHOD_NAME = "newInstance";
     private static final Set<String> CLASS_NAMES = new HashSet<>();
     private static final Set<String> INTERNAL_NAMES = new HashSet<>();
     private static final Map<String, Handle> INITIALIZERS = new HashMap<>();
@@ -65,17 +69,11 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
     private static final Set<String> FACTORIES = new HashSet<>();
     private static final String TSBR_InternalName = "com/falsepattern/falsetweaks/api/threading/ThreadSafeBlockRenderer";
     private static final String ISBR_InternalName = "cpw/mods/fml/client/registry/ISimpleBlockRenderingHandler";
-    private static final Handle LAMBDA_META_FACTORY = new Handle(Opcodes.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
+    private static final Handle LAMBDA_META_FACTORY = new Handle(Opcodes.H_INVOKESTATIC,
+                                                                 "java/lang/invoke/LambdaMetafactory",
+                                                                 "metafactory",
                                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
-
-    public static final String THREAD_SAFE_ANNOTATION_InternalName = "com/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRH";
-    public static final String THREAD_SAFE_ANNOTATION_DESC = "Lcom/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRH;";
-    public static final String THREAD_SAFE_FACTORY_InternalName = "com/falsepattern/falsetweaks/modules/threadedupdates/interop/ThreadSafeISBRHFactory";
-
-    public static final String FACTORY_METHOD_DESC = "()L" + THREAD_SAFE_FACTORY_InternalName + ";";
-    public static final String FACTORY_METHOD_NAME = "newInstance";
-
-    private static final String[] HARDCODED = new String[] {
+    private static final String[] HARDCODED = new String[]{
             "com.carpentersblocks.renderer.BlockHandlerCarpentersBarrier:default!",
             "com.carpentersblocks.renderer.BlockHandlerCarpentersBed:default!",
             "com.carpentersblocks.renderer.BlockHandlerCarpentersBlock:default!",
@@ -100,8 +98,25 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
             "com.jaquadro.minecraft.storagedrawers.client.renderer.DrawersRenderer:default!",
             "com.jaquadro.minecraft.storagedrawers.client.renderer.FramingTableRenderer:default!",
             "com.jaquadro.minecraft.storagedrawers.client.renderer.TrimCustomRenderer:default!",
-            "net.minecraftforge.fluids.RenderBlockFluid:safe",
-    };
+            "net.minecraftforge.fluids.RenderBlockFluid:safe",};
+    private static final Method createSupplier;
+
+    static {
+        addAll(HARDCODED);
+        addAll(ThreadingConfig.THREAD_SAFE_ISBRHS);
+    }
+
+    static {
+        try {
+            createSupplier = Method.getMethod(LegacyBytecodeSupplierFactory.class.getDeclaredMethod("createSupplier",
+                                                                                                    String.class,
+                                                                                                    String.class,
+                                                                                                    String.class,
+                                                                                                    int.class));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void addAll(String... entries) {
         for (val entry : entries) {
@@ -111,8 +126,9 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
             CLASS_NAMES.add(className);
             INTERNAL_NAMES.add(internalName);
             val generator = parts[1];
-            if ("safe".equals(generator))
+            if ("safe".equals(generator)) {
                 continue;
+            }
             if (generator.contains("!")) {
                 Handle creatorHandle;
                 if ("default!".equals(generator)) {
@@ -121,17 +137,16 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
                     val genParts = generator.split("!");
                     val genInternalName = genParts[0].replace('.', '/');
                     val genMethodName = genParts[1];
-                    creatorHandle = new Handle(Opcodes.H_INVOKESTATIC, genInternalName, genMethodName, "()L" + internalName + ";");
+                    creatorHandle = new Handle(Opcodes.H_INVOKESTATIC,
+                                               genInternalName,
+                                               genMethodName,
+                                               "()L" + internalName + ";");
                 }
                 INITIALIZERS.put(internalName, creatorHandle);
             } else {
                 SUPPLIERS.put(internalName, generator);
             }
         }
-    }
-    static {
-        addAll(HARDCODED);
-        addAll(ThreadingConfig.THREAD_SAFE_ISBRHS);
     }
 
     @Override
@@ -150,13 +165,15 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
             return true;
         } else {
             val node = classNode.getNode();
-            if (node == null)
+            if (node == null) {
                 return false;
+            }
             val anns = node.visibleAnnotations;
-            if (anns == null)
+            if (anns == null) {
                 return false;
+            }
             val internalName = className.replace('.', '/');
-            for (val ann: anns) {
+            for (val ann : anns) {
                 if (THREAD_SAFE_ANNOTATION_DESC.equals(ann.desc)) {
                     boolean perThread = false;
                     val values = ann.values;
@@ -171,15 +188,17 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
                         }
                     }
                     if (perThread) {
-                        INITIALIZERS.put(internalName, new Handle(Opcodes.H_NEWINVOKESPECIAL, internalName, "<init>", "()V"));
+                        INITIALIZERS.put(internalName,
+                                         new Handle(Opcodes.H_NEWINVOKESPECIAL, internalName, "<init>", "()V"));
                     }
                     return true;
                 }
             }
             val ifcs = node.interfaces;
-            if (ifcs == null)
+            if (ifcs == null) {
                 return false;
-            for (val ifc: ifcs) {
+            }
+            for (val ifc : ifcs) {
                 if (THREAD_SAFE_FACTORY_InternalName.equals(ifc)) {
                     FACTORIES.add(className.replace('.', '/'));
                     return true;
@@ -192,36 +211,67 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
-        if (cn.interfaces.contains(TSBR_InternalName))
+        }
+        if (cn.interfaces.contains(TSBR_InternalName)) {
             return false; // Already implemented, skip
+        }
 
         val internalName = className.replace('.', '/');
         cn.interfaces.add(TSBR_InternalName);
-        val getter = new MethodNode(Opcodes.ACC_PUBLIC, "forCurrentThread", "()L" + ISBR_InternalName + ";", null, null);
+        val getter = new MethodNode(Opcodes.ACC_PUBLIC,
+                                    "forCurrentThread",
+                                    "()L" + ISBR_InternalName + ";",
+                                    null,
+                                    null);
         cn.methods.add(getter);
         val insnList = getter.instructions;
         if (INITIALIZERS.containsKey(internalName)) {
             injectThreadLocal(cn, internalName, true);
-            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
-            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false));
+            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC,
+                                           internalName,
+                                           "ft$tlInjected",
+                                           "Ljava/lang/ThreadLocal;"));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                                            "java/lang/ThreadLocal",
+                                            "get",
+                                            "()Ljava/lang/Object;",
+                                            false));
             insnList.add(new TypeInsnNode(Opcodes.CHECKCAST, ISBR_InternalName));
             getter.maxStack = 1;
         } else if (FACTORIES.contains(internalName)) {
             injectThreadLocal(cn, internalName, false);
-            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
-            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false));
+            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC,
+                                           internalName,
+                                           "ft$tlInjected",
+                                           "Ljava/lang/ThreadLocal;"));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                                            "java/lang/ThreadLocal",
+                                            "get",
+                                            "()Ljava/lang/Object;",
+                                            false));
             insnList.add(new InsnNode(Opcodes.DUP));
             val nonNull = new LabelNode();
             insnList.add(new JumpInsnNode(Opcodes.IFNONNULL, nonNull));
             insnList.add(new InsnNode(Opcodes.POP));
-            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC, internalName, "ft$tlInjected", "Ljava/lang/ThreadLocal;"));
+            insnList.add(new FieldInsnNode(Opcodes.GETSTATIC,
+                                           internalName,
+                                           "ft$tlInjected",
+                                           "Ljava/lang/ThreadLocal;"));
             insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
             insnList.add(new TypeInsnNode(Opcodes.CHECKCAST, THREAD_SAFE_FACTORY_InternalName));
-            insnList.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, THREAD_SAFE_FACTORY_InternalName, FACTORY_METHOD_NAME, FACTORY_METHOD_DESC, true));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE,
+                                            THREAD_SAFE_FACTORY_InternalName,
+                                            FACTORY_METHOD_NAME,
+                                            FACTORY_METHOD_DESC,
+                                            true));
             insnList.add(new InsnNode(Opcodes.DUP_X1));
-            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                                            "java/lang/ThreadLocal",
+                                            "set",
+                                            "(Ljava/lang/Object;)V",
+                                            false));
             insnList.add(nonNull);
             insnList.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Object"}));
             insnList.add(new TypeInsnNode(Opcodes.CHECKCAST, ISBR_InternalName));
@@ -229,7 +279,11 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
         } else if (SUPPLIERS.containsKey(internalName)) {
             val supplier = SUPPLIERS.get(internalName);
             val parts = supplier.split("\\?");
-            insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, parts[0], parts[1], "()L" + internalName + ";", false));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                            parts[0],
+                                            parts[1],
+                                            "()L" + internalName + ";",
+                                            false));
             getter.maxStack = 1;
         } else {
             insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -242,13 +296,21 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
 
     private void injectThreadLocal(ClassNode cn, String internalName, boolean withInitial) {
         if (withInitial) {
-            cn.innerClasses.add(new InnerClassNode("java/lang/invoke/MethodHandles$Lookup", "java/lang/invoke/MethodHandles", "Lookup", Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL));
+            cn.innerClasses.add(new InnerClassNode("java/lang/invoke/MethodHandles$Lookup",
+                                                   "java/lang/invoke/MethodHandles",
+                                                   "Lookup",
+                                                   Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL));
         }
-        cn.fields.add(new FieldNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "ft$tlInjected", "Ljava/lang/ThreadLocal;", null, null));
+        cn.fields.add(new FieldNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
+                                    "ft$tlInjected",
+                                    "Ljava/lang/ThreadLocal;",
+                                    null,
+                                    null));
         boolean staticInitializedFound = false;
         for (val method : cn.methods) {
-            if (!"<clinit>".equals(method.name))
+            if (!"<clinit>".equals(method.name)) {
                 continue;
+            }
             staticInitializedFound = true;
             injectThreadLocalCreation(method, internalName, withInitial, cn.version);
         }
@@ -265,17 +327,29 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
         val insnList = method.instructions.iterator();
         if (withInitial) {
             if (version >= Opcodes.V1_8) {
-                insnList.add(new InvokeDynamicInsnNode("get", "()Ljava/util/function/Supplier;", LAMBDA_META_FACTORY, Type.getType("()Ljava/lang/Object;"),
-                                                       INITIALIZERS.get(internalName), Type.getType("()L" + internalName + ";")));
+                insnList.add(new InvokeDynamicInsnNode("get",
+                                                       "()Ljava/util/function/Supplier;",
+                                                       LAMBDA_META_FACTORY,
+                                                       Type.getType("()Ljava/lang/Object;"),
+                                                       INITIALIZERS.get(internalName),
+                                                       Type.getType("()L" + internalName + ";")));
             } else {
                 val initializer = INITIALIZERS.get(internalName);
                 insnList.add(new LdcInsnNode(initializer.getOwner()));
                 insnList.add(new LdcInsnNode(initializer.getName()));
                 insnList.add(new LdcInsnNode(initializer.getDesc()));
                 insnList.add(new LdcInsnNode(initializer.getTag()));
-                insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(LegacyBytecodeSupplierFactory.class), createSupplier.getName(), createSupplier.getDescriptor(), false));
+                insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                                Type.getInternalName(LegacyBytecodeSupplierFactory.class),
+                                                createSupplier.getName(),
+                                                createSupplier.getDescriptor(),
+                                                false));
             }
-            insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ThreadLocal", "withInitial", "(Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;", false));
+            insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                            "java/lang/ThreadLocal",
+                                            "withInitial",
+                                            "(Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;",
+                                            false));
         } else {
             insnList.add(new TypeInsnNode(Opcodes.NEW, "java/lang/ThreadLocal"));
             insnList.add(new InsnNode(Opcodes.DUP));
@@ -287,18 +361,9 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
         }
     }
 
-    private static final Method createSupplier;
-
-    static {
-        try {
-            createSupplier = Method.getMethod(LegacyBytecodeSupplierFactory.class.getDeclaredMethod("createSupplier", String.class, String.class, String.class, int.class));
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static class LegacyBytecodeSupplierFactory {
-        public static Supplier<Object> createSupplier(String owner, String name, String desc, int tag) throws ClassNotFoundException {
+        public static Supplier<Object> createSupplier(String owner, String name, String desc, int tag)
+                throws ClassNotFoundException {
             val klass = Class.forName(owner.replace('/', '.'));
             val methodType = Type.getMethodType(desc);
             val args = methodType.getArgumentTypes();
@@ -353,7 +418,12 @@ public class Threading_ThreadSafeBlockRendererInjector implements TurboClassTran
                         }
                     };
                 }
-                throw new IllegalArgumentException("Could not find target constructor " + owner + ":" + name + ":" + desc);
+                throw new IllegalArgumentException("Could not find target constructor " +
+                                                   owner +
+                                                   ":" +
+                                                   name +
+                                                   ":" +
+                                                   desc);
             } else {
                 throw new IllegalArgumentException("Unknown call tag: " + tag);
             }

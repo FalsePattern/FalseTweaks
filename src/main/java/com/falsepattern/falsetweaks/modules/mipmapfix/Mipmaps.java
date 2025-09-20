@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,10 +22,15 @@
 
 package com.falsepattern.falsetweaks.modules.mipmapfix;
 
-// Merged from Hodgepodge Copyright (C) GTNH Team
 public class Mipmaps {
 
     private static final float[] VALS = new float[256];
+
+    static {
+        for (int i = 0; i < VALS.length; ++i) {
+            VALS[i] = (float) Math.pow((float) i / 255.0F, 2.2);
+        }
+    }
 
     public static float get(int i) {
         return VALS[i & 0xFF];
@@ -39,11 +43,5 @@ public class Mipmaps {
         float i = Mipmaps.get(four >> bits);
         float j = (float) Math.pow((f + g + h + i) * 0.25, 0.45454545454545453);
         return (int) (j * 255.0);
-    }
-
-    static {
-        for (int i = 0; i < VALS.length; ++i) {
-            VALS[i] = (float) Math.pow((float) i / 255.0F, 2.2);
-        }
     }
 }

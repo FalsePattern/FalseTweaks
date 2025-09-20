@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,12 +39,14 @@ public class LayerMetadataSerializer extends BaseMetadataSectionSerializer {
     }
 
     @Override
-    public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
         val obj = JsonUtils.getJsonElementAsJsonObject(json, "layer metadata");
         val layers = obj.getAsJsonArray("layers");
         val thicknesses = new float[layers.size()];
         for (int i = 0; i < layers.size(); i++) {
-            thicknesses[i] = layers.get(i).getAsFloat();
+            thicknesses[i] = layers.get(i)
+                                   .getAsFloat();
         }
         return new LayerMetadataSection(thicknesses);
     }

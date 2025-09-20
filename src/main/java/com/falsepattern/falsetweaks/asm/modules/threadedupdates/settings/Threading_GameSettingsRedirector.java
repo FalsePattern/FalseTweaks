@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,8 +55,9 @@ public final class Threading_GameSettingsRedirector implements TurboClassTransfo
     @Override
     public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
-        if (cn == null)
+        if (cn == null) {
             return false;
+        }
 
         boolean didWork = false;
         for (val mn : cn.methods) {
@@ -66,25 +66,30 @@ public final class Threading_GameSettingsRedirector implements TurboClassTransfo
                 val node = insnList.next();
 
                 // We're looking for a get/ put field instruction
-                if (!(node instanceof FieldInsnNode))
+                if (!(node instanceof FieldInsnNode)) {
                     continue;
+                }
                 val opcode = node.getOpcode();
-                if (opcode != Opcodes.GETFIELD && opcode != Opcodes.PUTFIELD)
+                if (opcode != Opcodes.GETFIELD && opcode != Opcodes.PUTFIELD) {
                     continue;
+                }
                 val fNode = (FieldInsnNode) node;
 
                 // Ensure that it deals with a primitive boolean
-                if (!"Z".equals(fNode.desc))
+                if (!"Z".equals(fNode.desc)) {
                     continue;
+                }
 
                 // And make sure that this is owned by the settings class
-                if (!Threading_GameSettings.isTargetOwner(fNode))
+                if (!Threading_GameSettings.isTargetOwner(fNode)) {
                     continue;
+                }
 
                 // Now try to find a field to target
                 val fieldToRedirect = Threading_GameSettings.tryMapFieldNameToMCP(fNode.name);
-                if (fieldToRedirect == null)
+                if (fieldToRedirect == null) {
                     continue;
+                }
 
                 // Replace the instruction with our redirect
                 val replacementMethod = new MethodInsnNode(Opcodes.INVOKEVIRTUAL,

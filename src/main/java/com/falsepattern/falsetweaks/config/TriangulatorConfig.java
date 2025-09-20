@@ -1,7 +1,7 @@
 /*
  * This file is part of FalseTweaks.
  *
- * Copyright (C) 2022-2024 FalsePattern
+ * Copyright (C) 2022-2025 FalsePattern
  * All Rights Reserved
  *
  * The above copyright notice and this permission notice shall be included
@@ -9,8 +9,7 @@
  *
  * FalseTweaks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, only version 3 of the License.
  *
  * FalseTweaks is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,53 +31,50 @@ import com.falsepattern.lib.config.ConfigurationManager;
         category = "triangulator")
 @Config.LangKey
 public class TriangulatorConfig {
-    @Config.Comment({
-            "Used to toggle the namesake feature of this mod: quad triangulation.",
-            "If you turn this off, the triangulation will not execute, but you will still have the AO and the",
-            "smooth lighting fixes.",
-            "Triangulation fixes an issue with incorrectly-aligned quads causing a minor visual bug, however,",
-            "on weaker systems, it may noticeably decrease render performance (integrated graphics).",
-            "By sacrificing a bit of visual quality, you might get back a few extra FPS depending on your system.",
-            "FPS impact: System-dependent. Intel iGPUs struggle when this is enabled."
-    })
+    @Config.Comment({"Used to toggle the namesake feature of this mod: quad triangulation.",
+                     "If you turn this off, the triangulation will not execute, but you will still have the AO and the",
+                     "smooth lighting fixes.",
+                     "Triangulation fixes an issue with incorrectly-aligned quads causing a minor visual bug, however,",
+                     "on weaker systems, it may noticeably decrease render performance (integrated graphics).",
+                     "By sacrificing a bit of visual quality, you might get back a few extra FPS depending on your system.",
+                     "FPS impact: System-dependent. Intel iGPUs struggle when this is enabled."})
     @Config.LangKey
-    @Config.Name(value = "quadTriangulation", migrations = "")
+    @Config.Name(value = "quadTriangulation",
+                 migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean ENABLE_QUAD_TRIANGULATION;
 
-    @Config.Comment({
-            "Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.",
-            "FPS impact: None"
-    })
+    @Config.Comment({"Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.",
+                     "FPS impact: None"})
     @Config.LangKey
-    @Config.Name(value = "fixBlockCrack", migrations = "")
+    @Config.Name(value = "fixBlockCrack",
+                 migrations = "")
     @Config.DefaultBoolean(true)
     public static boolean FIX_BLOCK_CRACK;
 
-    @Config.Comment({
-            "Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.",
-            "FPS impact: Minor decrease"
-    })
+    @Config.Comment({"Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.",
+                     "FPS impact: Minor decrease"})
     @Config.LangKey
-    @Config.Name(value = "renderHookCompatMode", migrations = "")
+    @Config.Name(value = "renderHookCompatMode",
+                 migrations = "")
     @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean RENDER_HOOK_COMPAT_MODE;
 
     @Config.Comment("Disable the calibration chat prompt")
     @Config.LangKey
-    @Config.Name(value = "hideCalibrationPrompt", migrations = "")
+    @Config.Name(value = "hideCalibrationPrompt",
+                 migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean SUPPRESS_CALIBRATION;
 
-    @Config.Comment({
-            "The \"epsilon\" value for the block crack fix inside chunks. Set this a bit higher if you can",
-            "still see light leaking between solid blocks in dark areas.",
-            "Advanced setting.",
-            "FPS impact: None"
-    })
+    @Config.Comment({"The \"epsilon\" value for the block crack fix inside chunks. Set this a bit higher if you can",
+                     "still see light leaking between solid blocks in dark areas.",
+                     "Advanced setting.",
+                     "FPS impact: None"})
     @Config.LangKey
-    @Config.Name(value = "blockCrackFixEpsilon", migrations = "")
+    @Config.Name(value = "blockCrackFixEpsilon",
+                 migrations = "")
     @Config.RangeDouble(min = 0,
                         max = 0.005)
     @Config.DefaultDouble(0.0005)
@@ -86,11 +82,9 @@ public class TriangulatorConfig {
 
     @Config.Comment("Block classes that have bugs when rendering with the crack fix can be put here to avoid manipulating them\n.")
     @Config.LangKey
-    @Config.Name(value = "blockCrackFixBlacklist", migrations = "")
-    @Config.DefaultStringList({
-            "net.minecraft.block.BlockCauldron",
-            "net.minecraft.block.BlockStairs"
-    })
+    @Config.Name(value = "blockCrackFixBlacklist",
+                 migrations = "")
+    @Config.DefaultStringList({"net.minecraft.block.BlockCauldron", "net.minecraft.block.BlockStairs"})
     public static String[] BLOCK_CRACK_FIX_BLACKLIST;
 
     static {
