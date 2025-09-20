@@ -36,9 +36,8 @@ public class ModuleConfig {
                      "Not compatible with some badly-written mods.",
                      "FPS impact: None, but makes startup a bit faster"})
     @Config.LangKey
-    @Config.Name(value = "startupOptimizations",
-                 migrations = "STARTUP_OPTIMIZATIONS_V2")
-    @Config.DefaultBoolean(true)
+    @Config.Name(value = "startupOptimizations")
+    @Config.DefaultBoolean(false)
     @Config.RequiresMcRestart
     public static boolean STARTUP_OPTIMIZATIONS;
 
