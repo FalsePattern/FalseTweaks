@@ -39,12 +39,20 @@ minecraft_fp {
             projectId = "665744"
             dependencies {
                 required("fplib")
+                optional("mcpatcher")
+                optional("swansong")
+                optional("beddium")
+                optional("rple")
             }
         }
         modrinth {
             projectId = "VTGi3upD"
             dependencies {
                 required("fplib")
+                optional("mcpatcher")
+                optional("swansong")
+                optional("beddium")
+                optional("rple")
             }
         }
     }
