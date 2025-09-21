@@ -20,7 +20,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.common.occlusion;
+package com.falsepattern.falsetweaks.mixin.mixins.common.camera;
 
 import com.falsepattern.falsetweaks.config.RenderDistanceConfig;
 import org.spongepowered.asm.mixin.Dynamic;
@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import net.minecraft.server.management.PlayerManager;
 
 @Mixin(PlayerManager.class)
-public abstract class PlayerManagerMixin {
+public abstract class UnlockRD_PlayerManagerMixin {
     @Dynamic
     @ModifyConstant(method = "func_152622_a",
                     constant = {@Constant(intValue = 20,

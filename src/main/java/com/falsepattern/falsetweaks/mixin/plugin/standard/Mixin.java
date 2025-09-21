@@ -130,7 +130,8 @@ public enum Mixin implements IMixins {
     RenderDistance(Phase.EARLY,
                    () -> ModuleConfig.UNLOCK_RENDER_DISTANCE,
                    client("camera.UnlockRD_GameSettingsMixin",
-                          "camera.UnlockRD_GameSettingsOptionsMixin")),
+                          "camera.UnlockRD_GameSettingsOptionsMixin"),
+                   common("camera.UnlockRD_PlayerManagerMixin")),
 
     ThreadedUpdates(Phase.EARLY,
                     ModuleConfig::THREADED_CHUNK_UPDATES,
