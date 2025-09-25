@@ -43,6 +43,7 @@ minecraft_fp {
                 optional("swansong")
                 optional("beddium")
                 optional("rple")
+                optional("lumi")
             }
         }
         modrinth {
@@ -53,6 +54,7 @@ minecraft_fp {
                 optional("swansong")
                 optional("beddium")
                 optional("rple")
+                optional("lumi1710")
             }
         }
     }
