@@ -123,7 +123,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String getMixinConfig() {
-        return "mixins.falsetweaks.json";
+        return "mixins.falsetweaks.early.json";
     }
 
     @Override

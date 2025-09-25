@@ -34,7 +34,7 @@ import java.util.Set;
 public class LateMixins implements ILateMixinLoader {
     @Override
     public String getMixinConfig() {
-        return "mixins.falsetweaks.json";
+        return "mixins.falsetweaks.late.json";
     }
 
     @Override
