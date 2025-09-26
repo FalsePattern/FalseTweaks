@@ -41,7 +41,9 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -50,8 +52,11 @@ import java.security.MessageDigest;
 public class Calibration {
     private static final Calibration INSTANCE = new Calibration();
 
+    private static boolean calibrateRequest = false;
+
     public static void registerBus() {
         MinecraftForge.EVENT_BUS.register(INSTANCE);
+        FMLCommonHandler.instance().bus().register(INSTANCE);
     }
 
     @SneakyThrows
@@ -102,12 +107,21 @@ public class Calibration {
             val alert = FormattedText.parse(EnumChatFormatting.RED +
                                             I18n.format("chat.triangulator.calibration.message"));
             val text = alert.toChatText();
-            val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "triangulator_calibrate");
+            val ce = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/triangulator_calibrate");
             for (val t : text) {
                 t.getChatStyle()
                  .setChatClickEvent(ce);
                 ((EntityPlayerSP) e.entity).addChatMessage(t);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent e) {
+        if (calibrateRequest) {
+            calibrateRequest = false;
+            Minecraft.getMinecraft()
+                     .displayGuiScreen(new CalibrationGUI());
         }
     }
 
@@ -129,8 +143,7 @@ public class Calibration {
 
         @Override
         public void processCommand(ICommandSender sender, String[] args) {
-            Minecraft.getMinecraft()
-                     .displayGuiScreen(new CalibrationGUI());
+            calibrateRequest = true;
         }
     }
 }
