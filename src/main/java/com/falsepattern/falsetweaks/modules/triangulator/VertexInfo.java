@@ -40,8 +40,8 @@ public class VertexInfo {
         }
         shaderInitialized = true;
         if (Compat.swanSongInstalled()) {
-            SHADER_SIZE = SwansongCompat.getVertexStrideInts(1);
-            shaderOffset = SHADER_SIZE;
+            SHADER_SIZE = 20;
+            shaderOffset = 20;
         } else {
             SHADER_SIZE = 18;
             shaderOffset = 18;
