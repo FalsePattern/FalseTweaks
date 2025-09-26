@@ -95,4 +95,4 @@ gui.triangulator.calibrationdescription.line3=END
 gui.triangulator.calibration.toggle=Toggle
 gui.triangulator.calibration.apply=Apply
 chat.triangulator.calibration.message=The FalseTweaks Triangulator module is not yet calibrated. Click this message to calibrate it.
-chat.triangulator.calibrated.message=Triangulator module successfully calibrated.
+chat.triangulator.calibrated.message=Triangulator module successfully calibrated. Use /triangulator_calibrate if you want to calibrate again.
