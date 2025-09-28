@@ -61,7 +61,7 @@ minecraft_fp {
 }
 
 tasks.processResources.configure {
-    from(configurations.runtimeClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
+    from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
         into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/")
     }
 }
@@ -81,9 +81,9 @@ repositories {
 
 dependencies {
     implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.9.0")
-    implementation("org.joml:joml:1.10.8")
-    implementation("it.unimi.dsi:fastutil:8.5.16")
-    implementation("mega:megatraceservice:1.2.0")
+    compileOnly("org.joml:joml:1.10.8")
+    compileOnly("it.unimi.dsi:fastutil:8.5.16")
+    compileOnly("mega:megatraceservice:1.2.0")
     compileOnly("com.ventooth:swansong-mc1.7.10:1.0.0:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
 
