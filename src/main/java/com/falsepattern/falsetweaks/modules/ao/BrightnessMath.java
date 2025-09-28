@@ -24,15 +24,18 @@ package com.falsepattern.falsetweaks.modules.ao;
 
 import lombok.val;
 
+//Mixined by RPLE
 public final class BrightnessMath {
     private BrightnessMath() {}
 
+    //Overwrite by RPLE
     public static int lerpBrightness(int a, int b, double fract) {
         int sky = lerpBrightnessChannel(brightnessSky(a), brightnessSky(b), fract);
         int block = lerpBrightnessChannel(brightnessBlock(a), brightnessBlock(b), fract);
         return brightnessPack(sky, block);
     }
 
+    //Overwrite by RPLE
     public static int biLerpBrightness(int q00, int q10, int q01, int q11, double tx, double ty) {
         int sky = biLerpBrightnessChannel(brightnessSky(q00),
                                           brightnessSky(q10),
@@ -47,6 +50,7 @@ public final class BrightnessMath {
         return brightnessPack(sky, block);
     }
 
+    //Overwrite by RPLE
     public static int averageBrightness(int a, int b) {
         int sky = averageBrightnessChannel(brightnessSky(a),
                                            brightnessSky(b));
@@ -57,6 +61,7 @@ public final class BrightnessMath {
         return brightnessPack(sky, block);
     }
 
+    //Overwrite by RPLE
     public static int averageBrightness(int a, int b, int c, int d) {
         int sky = averageBrightnessChannel(brightnessSky(a),
                                            brightnessSky(b),
