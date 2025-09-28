@@ -271,12 +271,14 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean UNLOCK_RENDER_DISTANCE;
 
-    @Config.Comment("Slightly improves item entity rendering performance. Disable if you get any texture weirdness!")
+    @Config.Comment({"Slightly improves item entity rendering performance. Disable if you get any texture weirdness!",
+                     "Fast - Standard performance improvements",
+                     "Faster - More aggressive performance improvements, some dropped items might look odd"})
     @Config.LangKey
     @Config.Name("fastItemEntityTextureSwitching")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultEnum("Faster")
     @Config.RequiresMcRestart
-    public static boolean FAST_ITEM_ENTITY_TEXTURE_SWITCHING;
+    public static ItemTexturing FAST_ITEM_ENTITY_TEXTURE_SWITCHING;
 
     @Config.Comment({
             "Improves the performance of items significantly by not checking collisions against other entities for them.",
@@ -318,6 +320,12 @@ public class ModuleConfig {
     //This is here to make the static initializer run
     public static void init() {
 
+    }
+
+    public enum ItemTexturing {
+        Disabled,
+        Fast,
+        Faster
     }
 
 }
