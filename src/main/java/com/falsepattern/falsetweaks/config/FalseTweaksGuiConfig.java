@@ -40,35 +40,41 @@ public class FalseTweaksGuiConfig extends SimpleGuiConfig {
     private static Class<?>[] getConfigClasses() {
         val result = new ArrayList<Class<?>>();
         result.add(ModuleConfig.class);
+        if (ModuleConfig.aoFix) {
+            result.add(AOFixConfig.class);
+        }
+        if (ModuleConfig.blockCrackFix) {
+            result.add(CrackFixConfig.class);
+        }
         if (Compat.dynamicLightsPresent()) {
             result.add(DynamicLightsConfig.class);
         }
-        if (ModuleConfig.TRIANGULATOR()) {
-            result.add(TriangulatorConfig.class);
-        }
-        if (ModuleConfig.ITEM_RENDER_LISTS) {
-            result.add(RenderListConfig.class);
-        }
-        if (ModuleConfig.VOXELIZER) {
-            result.add(VoxelizerConfig.class);
+        if (ModuleConfig.OPTIFINE_LOGSPAM_FIX && Compat.optiFineHasShaders()) {
+            result.add(OptiSpamConfig.class);
         }
         if (ModuleConfig.ADVANCED_PROFILER) {
             result.add(ProfilerConfig.class);
         }
-        if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
-            result.add(TranslucentBlockLayersConfig.class);
-        }
         if (ModuleConfig.UNLOCK_RENDER_DISTANCE) {
             result.add(RenderDistanceConfig.class);
-        }
-        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-            result.add(ThreadingConfig.class);
         }
         if (ModuleConfig.RENDERING_SAFETY) {
             result.add(RenderingSafetyConfig.class);
         }
-        if (ModuleConfig.OPTIFINE_LOGSPAM_FIX && Compat.optiFineHasShaders()) {
-            result.add(OptiSpamConfig.class);
+        if (ModuleConfig.ITEM_RENDER_LISTS) {
+            result.add(RenderListConfig.class);
+        }
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            result.add(ThreadingConfig.class);
+        }
+        if (ModuleConfig.BLOCK_LAYER_TRANSPARENCY_FIX) {
+            result.add(TranslucentBlockLayersConfig.class);
+        }
+        if (ModuleConfig.TRIANGULATOR) {
+            result.add(TriangulatorConfig.class);
+        }
+        if (ModuleConfig.VOXELIZER) {
+            result.add(VoxelizerConfig.class);
         }
         return result.toArray(new Class<?>[0]);
     }

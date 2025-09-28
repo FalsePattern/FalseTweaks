@@ -20,17 +20,26 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.mixin.mixins.client.core;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
+import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.api.PassTrackingTessellator;
+import lombok.val;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public interface IRenderBlocksMixin {
-    static IRenderBlocksMixin of(RenderBlocks thiz) {
-        return (IRenderBlocksMixin) thiz;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.EntityLivingBase;
+
+@Mixin(WorldRenderer.class)
+public abstract class WorldRendererMixin {
+    @Inject(method = "preRenderBlocks",
+            at = @At("HEAD"),
+            require = 1)
+    private void noTriOnPass1Pre(int pass, CallbackInfo ci) {
+        val tess = (PassTrackingTessellator) Compat.tessellator();
+        tess.pass(pass);
     }
-
-    void ft$reusePreviousStates(boolean state);
-
-    void ft$enableMultiRenderReuse(boolean state);
 }

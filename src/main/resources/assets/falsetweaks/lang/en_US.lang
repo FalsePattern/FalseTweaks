@@ -30,13 +30,19 @@ config.falsetweaks.dynamic_lights.lightSources=Light Sources
 config.falsetweaks.dynamic_lights.circular=Circular
 
 config.falsetweaks.triangulator=Triangulator
-config.falsetweaks.triangulator.tooltip=Miscellaneous block rendering bug fixes
+config.falsetweaks.triangulator.tooltip=Enables the Triangulator module, which fixes the smooth lighting along block diagonals.
 config.falsetweaks.triangulator.quadTriangulation=Enable quad triangulation
-config.falsetweaks.triangulator.fixBlockCrack=Block edge crack fix
-config.falsetweaks.triangulator.renderHookCompatMode=Render hook compatibility mode
 config.falsetweaks.triangulator.hideCalibrationPrompt=Hide calibration prompt
-config.falsetweaks.triangulator.blockCrackFixEpsilon=Block crack fix epsilon
-config.falsetweaks.triangulator.blockCrackFixBlacklist=Block crack fix blacklist
+
+config.falsetweaks.ao_fix=Ambient Occlusion Fix
+config.falsetweaks.ao_fix.tooltip=Improves ambient occlusion and smooth lighting on blocks.
+config.falsetweaks.ao_fix.renderHookCompatMode=Render hook compatibility mode
+config.falsetweaks.ao_fix.universalPatch=Universal patch
+
+config.falsetweaks.crack_fix=Block Crack Fix
+config.falsetweaks.crack_fix.tooltip=Block corners and edges between chunks might have "cracks" in them. This option fixes it.
+config.falsetweaks.crack_fix.epsilon=Epsilon
+config.falsetweaks.crack_fix.blacklist=Blacklist
 
 config.falsetweaks.item_render_lists=Item Render Lists
 config.falsetweaks.item_render_lists.tooltip=Optimizations for items in your hand or in the world

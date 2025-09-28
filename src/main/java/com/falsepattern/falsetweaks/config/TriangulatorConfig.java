@@ -44,48 +44,12 @@ public class TriangulatorConfig {
     @Config.DefaultBoolean(false)
     public static boolean ENABLE_QUAD_TRIANGULATION;
 
-    @Config.Comment({"Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.",
-                     "FPS impact: None"})
-    @Config.LangKey
-    @Config.Name(value = "fixBlockCrack",
-                 migrations = "")
-    @Config.DefaultBoolean(true)
-    public static boolean FIX_BLOCK_CRACK;
-
-    @Config.Comment({"Try setting this to true if the game crashes with a mixin conflict inside RenderBlocks.",
-                     "FPS impact: Minor decrease"})
-    @Config.LangKey
-    @Config.Name(value = "renderHookCompatMode",
-                 migrations = "")
-    @Config.DefaultBoolean(false)
-    @Config.RequiresMcRestart
-    public static boolean RENDER_HOOK_COMPAT_MODE;
-
     @Config.Comment("Disable the calibration chat prompt")
     @Config.LangKey
     @Config.Name(value = "hideCalibrationPrompt",
                  migrations = "")
     @Config.DefaultBoolean(false)
     public static boolean SUPPRESS_CALIBRATION;
-
-    @Config.Comment({"The \"epsilon\" value for the block crack fix inside chunks. Set this a bit higher if you can",
-                     "still see light leaking between solid blocks in dark areas.",
-                     "Advanced setting.",
-                     "FPS impact: None"})
-    @Config.LangKey
-    @Config.Name(value = "blockCrackFixEpsilon",
-                 migrations = "")
-    @Config.RangeDouble(min = 0,
-                        max = 0.005)
-    @Config.DefaultDouble(0.0005)
-    public static double BLOCK_CRACK_FIX_EPSILON;
-
-    @Config.Comment("Block classes that have bugs when rendering with the crack fix can be put here to avoid manipulating them\n.")
-    @Config.LangKey
-    @Config.Name(value = "blockCrackFixBlacklist",
-                 migrations = "")
-    @Config.DefaultStringList({"net.minecraft.block.BlockCauldron", "net.minecraft.block.BlockStairs"})
-    public static String[] BLOCK_CRACK_FIX_BLACKLIST;
 
     static {
         ConfigurationManager.selfInit();
@@ -102,8 +66,7 @@ public class TriangulatorConfig {
     public static class Calibration {
         @Config.Comment("Modifies the way ambient occlusion alignment is calculated. Used for compatibility purposes,\n" +
                         "because different graphics cards have different ways of processing quads.\n" +
-                        "This is useful when quad triangulation is disabled, or if the triangulator gets disabled internally\n" +
-                        "for compatibility reasons.")
+                        "This is useful when quad triangulation is disabled for compatibility reasons.")
         @Config.DefaultBoolean(false)
         public static boolean FLIP_DIAGONALS;
 

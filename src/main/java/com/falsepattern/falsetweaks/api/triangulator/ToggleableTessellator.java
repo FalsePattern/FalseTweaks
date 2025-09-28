@@ -22,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.api.triangulator;
 
+import com.falsepattern.falsetweaks.api.PassTrackingTessellator;
 import com.falsepattern.lib.StableAPI;
 
 import cpw.mods.fml.relauncher.Side;
@@ -29,7 +30,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "2.0.0")
-public interface ToggleableTessellator {
+public interface ToggleableTessellator extends PassTrackingTessellator {
     /**
      * Temporarily disables triangulation mode <em>when already rendering</em>. This is useful for rendering triangle-based meshes
      * into the chunk, which is quad based.
@@ -73,16 +74,10 @@ public interface ToggleableTessellator {
     @StableAPI.Expose
     void enableTriangulatorLocal();
 
-    /**
-     * Utility for keeping track of current render pass.
-     */
-    @StableAPI.Expose
+    @Override
     void pass(int pass);
 
-    /**
-     * Utility for keeping track of current render pass.
-     */
-    @StableAPI.Expose
+    @Override
     int pass();
 
     @StableAPI.Expose

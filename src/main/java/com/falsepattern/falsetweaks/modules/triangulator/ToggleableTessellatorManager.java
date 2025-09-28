@@ -23,7 +23,6 @@
 package com.falsepattern.falsetweaks.modules.triangulator;
 
 import com.falsepattern.falsetweaks.Compat;
-import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -37,8 +36,6 @@ public class ToggleableTessellatorManager {
     private int forceQuadRendering = 0;
 
     public static void preRenderBlocks(int pass) {
-        val tess = (ToggleableTessellator) Compat.tessellator();
-        tess.pass(pass);
         if (pass != 0) {
             //            tess.disableTriangulatorLocal();
         }

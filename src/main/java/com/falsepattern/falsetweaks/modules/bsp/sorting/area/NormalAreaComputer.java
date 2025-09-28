@@ -20,17 +20,12 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.bsp.sorting.area;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
+import org.joml.Vector3f;
 
-public interface IRenderBlocksMixin {
-    static IRenderBlocksMixin of(RenderBlocks thiz) {
-        return (IRenderBlocksMixin) thiz;
-    }
+public interface NormalAreaComputer {
+    float getArea(int[] vertexData, int i, int vertexSize, Vector3f buf);
 
-    void ft$reusePreviousStates(boolean state);
-
-    void ft$enableMultiRenderReuse(boolean state);
+    void getNormal(int[] vertexData, int i, int vertexSize, Vector3f output);
 }

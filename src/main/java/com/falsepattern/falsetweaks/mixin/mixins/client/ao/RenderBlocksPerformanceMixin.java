@@ -20,18 +20,20 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
+package com.falsepattern.falsetweaks.mixin.mixins.client.ao;
 
-import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
+import com.falsepattern.falsetweaks.modules.ao.AORenderer;
+import com.falsepattern.falsetweaks.modules.ao.AmbientOcclusionRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 
 @Mixin(value = RenderBlocks.class,
        priority = 900) // Notfine compat
-public abstract class RenderBlocksPerformanceMixin implements IRenderBlocksMixin {
+public abstract class RenderBlocksPerformanceMixin {
     /**
      * @author FalsePattern
      * @reason Reimplement
@@ -44,7 +46,7 @@ public abstract class RenderBlocksPerformanceMixin implements IRenderBlocksMixin
                                                            float r,
                                                            float g,
                                                            float b) {
-        return ft$renderWithAO(block, x, y, z, r, g, b);
+        return ft$ao$render(block, x, y, z, r, g, b);
     }
 
     /**
@@ -59,6 +61,17 @@ public abstract class RenderBlocksPerformanceMixin implements IRenderBlocksMixin
                                                                   float r,
                                                                   float g,
                                                                   float b) {
-        return ft$renderWithAO(block, x, y, z, r, g, b);
+        return ft$ao$render(block, x, y, z, r, g, b);
+    }
+
+    @Unique
+    private AORenderer ft$ao$renderer;
+
+    @Unique
+    private boolean ft$ao$render(Block block, int x, int y, int z, float r, float g, float b) {
+        if (ft$ao$renderer == null) {
+            ft$ao$renderer = new AmbientOcclusionRenderer();
+        }
+        return ft$ao$renderer.renderWithAO((RenderBlocks) (Object) this, block, x, y, z, r, g, b);
     }
 }

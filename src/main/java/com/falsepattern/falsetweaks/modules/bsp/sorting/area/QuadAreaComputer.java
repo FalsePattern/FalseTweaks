@@ -20,9 +20,9 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.area;
+package com.falsepattern.falsetweaks.modules.bsp.sorting.area;
 
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.SharedMath;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.SharedMath;
 import lombok.val;
 import lombok.var;
 import org.joml.Vector3f;

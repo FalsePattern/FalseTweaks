@@ -20,17 +20,23 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.api;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public interface IRenderBlocksMixin {
-    static IRenderBlocksMixin of(RenderBlocks thiz) {
-        return (IRenderBlocksMixin) thiz;
-    }
+/**
+ * @since 4.1.0
+ */
+@SideOnly(Side.CLIENT)
+public interface PassTrackingTessellator {
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    void pass(int pass);
 
-    void ft$reusePreviousStates(boolean state);
-
-    void ft$enableMultiRenderReuse(boolean state);
+    /**
+     * Utility for keeping track of current render pass.
+     */
+    int pass();
 }

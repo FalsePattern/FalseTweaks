@@ -87,7 +87,7 @@ dependencies {
     compileOnly("com.ventooth:swansong-mc1.7.10:1.0.0:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
 
-    val beddiumVersion = "1.0.0"
+    val beddiumVersion = "1.0.4"
     val beddiumVersionJ21 = "$beddiumVersion-j21"
     val beddiumVersionJ8 = "$beddiumVersion-j8"
     compileOnly("com.ventooth:beddium-mc1.7.10:$beddiumVersionJ8:dev")

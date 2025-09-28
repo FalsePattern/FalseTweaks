@@ -26,7 +26,7 @@ import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
 import com.falsepattern.falsetweaks.modules.triangulator.ToggleableTessellatorManager;
-import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
+import com.falsepattern.falsetweaks.modules.vertexapi.VertexInfo;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
 import lombok.Getter;
 import lombok.Setter;
@@ -72,9 +72,6 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     private Compat.ShaderType shaderOn = Compat.ShaderType.None;
     private int forceQuadRendering = 0;
     private int quadVerticesPutIntoBuffer = 0;
-    @Getter
-    @Setter
-    private int pass;
 
     @Inject(method = "reset",
             at = @At(value = "HEAD"),
@@ -253,39 +250,5 @@ public abstract class TessellatorMixin implements ITriangulatorTessellator, Togg
     @Override
     public void shaderOn(Compat.ShaderType state) {
         shaderOn = state;
-    }
-
-    @ModifyConstant(method = "addVertex",
-                    constant = @Constant(intValue = 32),
-                    require = 1)
-    private int extendAddVertexCap(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant >>> 2, 4) + 128;
-    }
-
-    @ModifyConstant(method = "addVertex",
-                    constant = @Constant(intValue = 8),
-                    require = 1)
-    private int extendAddVertexStep(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant, 1);
-    }
-
-    @ModifyConstant(method = "draw",
-                    constant = @Constant(intValue = 32),
-                    require = 5,
-                    expect = 5,
-                    // OptiFine
-                    allow = 6)   // Vanilla
-    private int extendDrawStride(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant >>> 2, 4);
-    }
-
-    @ModifyConstant(method = "draw",
-                    constant = @Constant(intValue = 8),
-                    require = 0,
-                    expect = 0,
-                    // OptiFine
-                    allow = 2)   // Vanilla
-    private int extendDrawOffset(int constant) {
-        return VertexInfo.recomputeVertexInfo(constant, 1);
     }
 }

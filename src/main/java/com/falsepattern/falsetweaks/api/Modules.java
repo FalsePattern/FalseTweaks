@@ -46,7 +46,7 @@ public final class Modules {
 
     @StableAPI.Expose
     public static boolean triangulatorActive() {
-        return ModuleConfig.TRIANGULATOR();
+        return ModuleConfig.TRIANGULATOR;
     }
 
     @StableAPI.Expose
@@ -76,7 +76,7 @@ public final class Modules {
 
     @StableAPI.Expose
     public static boolean bspSortingActive() {
-        return ModuleConfig.BSP_SORTING();
+        return ModuleConfig.BSP_SORTING;
     }
 
     @StableAPI.Expose

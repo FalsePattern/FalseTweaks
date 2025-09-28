@@ -20,7 +20,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator;
+package com.falsepattern.falsetweaks.modules.vertexapi;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -50,10 +50,6 @@ public class VertexInfo {
 
     public static synchronized void allocateExtraVertexSlots(int count, int[] indices, int[] shaderIndices) {
         initShaderCompat();
-        if (!ModuleConfig.TRIANGULATOR()) {
-            throw new IllegalStateException(
-                    "Could not allocate vertex slots. Please enable the Triangulator module inside falsetweaks.cfg");
-        }
         if (count <= 0) {
             throw new IllegalArgumentException("Count must be > 0");
         }

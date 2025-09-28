@@ -22,7 +22,7 @@
 
 package com.falsepattern.falsetweaks.modules.beddium;
 
-import com.falsepattern.falsetweaks.api.triangulator.ToggleableTessellator;
+import com.falsepattern.falsetweaks.api.PassTrackingTessellator;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedUpdateHooks;
@@ -54,8 +54,8 @@ public abstract class FTChunkBuilderMeshingTask extends SimpleChunkBuilderMeshin
 
     @SuppressWarnings("CastToIncompatibleInterface")
     protected void setTriangulatorRenderPass(int pass) {
-        if (ModuleConfig.TRIANGULATOR()) {
-            ((ToggleableTessellator) getTessellator()).pass(pass);
+        if (ModuleConfig.TRIANGULATOR) {
+            ((PassTrackingTessellator) getTessellator()).pass(pass);
         }
     }
 

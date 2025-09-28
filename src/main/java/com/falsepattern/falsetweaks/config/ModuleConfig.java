@@ -63,12 +63,8 @@ public class ModuleConfig {
     public static boolean VOXELIZER;
 
     @Config.Comment({
-            "Enables the Triangulator module. This also includes the ambient occlusion and smooth lighting fix,",
-            "along with the block crack fix. Also provides the VertexAPI used by the BSP sorter and the threading system.",
-            "If you want to use those fixes without having triangulated meshes, set the ENABLE_QUAD_TRIANGULATION",
-            "property to false in the triangulator category.",
-            "Force-enabled if bspSorting is enabled.",
-            "FPS impact: Tiny performance decrease, but smooth lighting will look way better."})
+            "Enables the Triangulator module, which fixes the smooth lighting along block diagonals.",
+            "FPS impact: Minimal."})
     @Config.LangKey("config.falsetweaks.triangulator")
     @Config.Name(value = "triangulator",
                  migrations = "")
@@ -77,7 +73,6 @@ public class ModuleConfig {
     public static boolean TRIANGULATOR;
 
     @Config.Comment({"Enable an optimized, BSP-tree based vertex sorting algorithm for transparent blocks.",
-                     "Force-enables TRIANGULATOR.",
                      "FPS impact: A little bit less stuttering when moving around with a lot of stained glass-like blocks around"})
     @Config.LangKey
     @Config.Name(value = "bspSorting",
@@ -291,6 +286,23 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean FAST_ITEM_ENTITY_PHYSICS;
 
+
+    @Config.Comment({"Block corners and edges between chunks might have \"cracks\" in them. This option fixes it.",
+                     "FPS impact: None"})
+    @Config.LangKey("config.falsetweaks.crack_fix")
+    @Config.Name(value = "blockCrackFix",
+                 migrations = "")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean blockCrackFix;
+
+    @Config.Comment({"Improves ambient occlusion and smooth lighting on blocks.",
+                     "FPS impact: None"})
+    @Config.LangKey("config.falsetweaks.ao_fix")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean aoFix;
+
     static {
         ConfigurationManager.selfInit();
         ProfilerConfig.init();
@@ -303,18 +315,12 @@ public class ModuleConfig {
         DynamicLightsConfig.init();
         RenderingSafetyConfig.init();
         OptiSpamConfig.init();
-    }
-
-    public static boolean TRIANGULATOR() {
-        return TRIANGULATOR || BSP_SORTING();
+        CrackFixConfig.init();
+        AOFixConfig.init();
     }
 
     public static boolean THREADED_CHUNK_UPDATES() {
         return Compat.beddiumInstalled() && THREADED_CHUNK_UPDATES;
-    }
-
-    public static boolean BSP_SORTING() {
-        return BSP_SORTING || THREADED_CHUNK_UPDATES();
     }
 
     //This is here to make the static initializer run

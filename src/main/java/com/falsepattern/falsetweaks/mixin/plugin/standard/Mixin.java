@@ -23,9 +23,9 @@
 package com.falsepattern.falsetweaks.mixin.plugin.standard;
 
 import com.falsepattern.falsetweaks.Tags;
+import com.falsepattern.falsetweaks.config.AOFixConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
-import com.falsepattern.falsetweaks.config.TriangulatorConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
 import com.falsepattern.lib.mixin.v2.MixinHelper;
 import com.falsepattern.lib.mixin.v2.SidedMixins;
@@ -70,47 +70,70 @@ import static com.falsepattern.lib.mixin.v2.MixinHelper.require;
 @RequiredArgsConstructor
 public enum Mixin implements IMixins {
     // @formatter:off
+    Core(Phase.EARLY,
+         client("core.TessellatorMixin",
+                "core.WorldRendererMixin")),
+
+    VertexAPI(Phase.EARLY,
+              client("vertexapi.TessellatorMixin")),
+    VertexAPI_NoFoamFix(Phase.EARLY,
+                        () -> !ModuleConfig.BSP_SORTING,
+                        mods(avoid(FoamFix), avoid(SwanSong)),
+                        client("vertexapi.TessellatorMixin_AvoidFoamFix")),
+    VertexAPI_FoamFix(Phase.EARLY,
+                      () -> !ModuleConfig.BSP_SORTING,
+                      mods(require(FoamFix), avoid(SwanSong)),
+                      client("vertexapi.TessellatorMixin_RequireFoamFix")),
+
     Triangulator(Phase.EARLY,
-                 ModuleConfig::TRIANGULATOR,
-                 client("triangulator.RenderBlocksUltraMixin",
+                 () -> ModuleConfig.TRIANGULATOR,
+                 client("triangulator.RenderBlocksMixin",
                         "triangulator.RenderGlobalMixin",
                         "triangulator.RenderingRegistryMixin",
                         "triangulator.TessellatorMixin",
                         "triangulator.WorldRendererMixin")),
-    Triangulator_Performance(Phase.EARLY,
-                             () -> ModuleConfig.TRIANGULATOR() && !TriangulatorConfig.RENDER_HOOK_COMPAT_MODE,
-                             client("triangulator.RenderBlocksPerformanceMixin")),
-    Triangulator_Compat(Phase.EARLY,
-                        () -> ModuleConfig.TRIANGULATOR() && TriangulatorConfig.RENDER_HOOK_COMPAT_MODE,
-                        client("triangulator.RenderBlocksCompatMixin")),
     Triangulator_NoOptiFine(Phase.EARLY,
-                            ModuleConfig::TRIANGULATOR,
+                            () -> ModuleConfig.TRIANGULATOR,
                             mods(avoid(OptiFine), avoid(SwanSong)),
                             client("triangulator.optifine.TessellatorVanillaMixin")),
     Triangulator_NoShader(Phase.EARLY,
-                          ModuleConfig::TRIANGULATOR,
+                          () -> ModuleConfig.TRIANGULATOR,
                           mods(avoid(OptiFineShadersMod), avoid(SwanSong)),
                           client("triangulator.optifine.TessellatorVanillaOrOldOptifineMixin")),
     Triangulator_OptiFineShaders(Phase.EARLY,
-                                 ModuleConfig::TRIANGULATOR,
+                                 () -> ModuleConfig.TRIANGULATOR,
                                  require(OptiFineShadersMod),
                                  client("triangulator.optifine.TessellatorOptiFineMixin")),
     Triangulator_NoOptiFineHook(Phase.EARLY,
-                                ModuleConfig::TRIANGULATOR,
+                                () -> ModuleConfig.TRIANGULATOR,
                                 avoid(OptiFine),
                                 client("triangulator.optifine.TessellatorVanillaHookMixin")),
     Triangulator_OptiFineHook(Phase.EARLY,
-                              ModuleConfig::TRIANGULATOR,
+                              () -> ModuleConfig.TRIANGULATOR,
                               require(OptiFine),
                               client("triangulator.optifine.TessellatorOptiFineHookMixin")),
     Triangulator_RedstonePaste(Phase.LATE,
-                               ModuleConfig::TRIANGULATOR,
+                               () -> ModuleConfig.TRIANGULATOR,
                                require(RedstonePaste),
                                client("triangulator.redstonepaste.RedstonePasteHighlighterMixin")),
     Triangulator_Swansong(Phase.EARLY,
-                          ModuleConfig::TRIANGULATOR,
+                          () -> ModuleConfig.TRIANGULATOR,
                           require(SwanSong),
                           client("triangulator.swansong.ShaderTessMixin")),
+
+    CrackFix(Phase.EARLY,
+             () -> ModuleConfig.blockCrackFix,
+             client("crackfix.RenderBlocksMixin")),
+
+    AOFix_Universal(Phase.EARLY,
+                    () -> ModuleConfig.aoFix && AOFixConfig.universalPatch,
+                    client("ao.RenderBlocksUniversalMixin")),
+    AOFix_Compat(Phase.EARLY,
+                 () -> ModuleConfig.aoFix && AOFixConfig.renderHookCompatMode,
+                 client("ao.RenderBlocksCompatMixin")),
+    AOFix_Perf(Phase.EARLY,
+               () -> ModuleConfig.aoFix && !AOFixConfig.renderHookCompatMode,
+               client("ao.RenderBlocksPerformanceMixin")),
 
     ClippingHelper(Phase.EARLY,
                    () -> ModuleConfig.CLIPPING_HELPER_OPTS,
@@ -276,14 +299,14 @@ public enum Mixin implements IMixins {
                     "profiler.ProfilerMixin")),
 
     BSPSorting(Phase.EARLY,
-               ModuleConfig::BSP_SORTING,
+               () -> ModuleConfig.BSP_SORTING,
                client("bsp.TessellatorMixin")),
     BSPSorting_NotFoamFix(Phase.EARLY,
-                          ModuleConfig::BSP_SORTING,
+                          () -> ModuleConfig.BSP_SORTING,
                           avoid(FoamFix),
                           client("bsp.TessellatorBSPSortingMixin")),
     BSPSorting_FoamFix(Phase.EARLY,
-                       ModuleConfig::BSP_SORTING,
+                       () -> ModuleConfig.BSP_SORTING,
                        require(FoamFix),
                        client("bsp.foamfix.TessellatorBSPSortingMixin")),
 
@@ -398,7 +421,7 @@ public enum Mixin implements IMixins {
                          common("compat.sc.BlockReinforcedFenceGateMixin",
                                 "compat.sc.BlockReinforcedGlassPaneMixin",
                                 "compat.sc.BlockReinforcedIronBarsMixin",
-                                "compat.sc.BlockReinforcedStainedGlassPanesMixin"))
+                                "compat.sc.BlockReinforcedStainedGlassPanesMixin")),
     // @formatter:on
 
     //region boilerplate

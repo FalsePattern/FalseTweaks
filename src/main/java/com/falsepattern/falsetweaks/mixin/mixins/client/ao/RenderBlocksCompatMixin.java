@@ -20,10 +20,13 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator;
+package com.falsepattern.falsetweaks.mixin.mixins.client.ao;
 
+import com.falsepattern.falsetweaks.modules.ao.AORenderer;
+import com.falsepattern.falsetweaks.modules.ao.AmbientOcclusionRenderer;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.IRenderBlocksMixin;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -45,6 +48,17 @@ public abstract class RenderBlocksCompatMixin implements IRenderBlocksMixin {
                                  float g,
                                  float b,
                                  CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(ft$renderWithAO(block, x, y, z, r, g, b));
+        cir.setReturnValue(ft$ao$render(block, x, y, z, r, g, b));
+    }
+
+    @Unique
+    private AORenderer ft$ao$renderer;
+
+    @Unique
+    private boolean ft$ao$render(Block block, int x, int y, int z, float r, float g, float b) {
+        if (ft$ao$renderer == null) {
+            ft$ao$renderer = new AmbientOcclusionRenderer();
+        }
+        return ft$ao$renderer.renderWithAO((RenderBlocks) (Object) this, block, x, y, z, r, g, b);
     }
 }

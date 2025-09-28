@@ -20,16 +20,16 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting;
+package com.falsepattern.falsetweaks.modules.bsp.sorting;
 
 import com.falsepattern.falsetweaks.Compat;
-import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.NormalAreaComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.QuadAreaComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.area.TriangleAreaComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.MidpointComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.QuadMidpointComputer;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint.TriangleMidpointComputer;
+import com.falsepattern.falsetweaks.modules.vertexapi.VertexInfo;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.area.NormalAreaComputer;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.area.QuadAreaComputer;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.area.TriangleAreaComputer;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.midpoint.MidpointComputer;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.midpoint.QuadMidpointComputer;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.midpoint.TriangleMidpointComputer;
 import lombok.Getter;
 import org.joml.Vector3f;
 

@@ -20,17 +20,11 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.interfaces;
+package com.falsepattern.falsetweaks.modules.ao;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 
-public interface IRenderBlocksMixin {
-    static IRenderBlocksMixin of(RenderBlocks thiz) {
-        return (IRenderBlocksMixin) thiz;
-    }
-
-    void ft$reusePreviousStates(boolean state);
-
-    void ft$enableMultiRenderReuse(boolean state);
+public interface AORenderer {
+    boolean renderWithAO(RenderBlocks rb, Block block, int x, int y, int z, float r, float g, float b);
 }

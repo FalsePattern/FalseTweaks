@@ -22,12 +22,14 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.bsp;
 
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.bsp.IBSPTessellator;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.BSPTessellatorVertexState;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.ChunkBSPTree;
 import com.falsepattern.falsetweaks.modules.triangulator.interfaces.ITriangulatorTessellator;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.BSPTessellatorVertexState;
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.ChunkBSPTree;
 import lombok.val;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -65,6 +67,8 @@ public abstract class TessellatorMixin implements IBSPTessellator {
     @Shadow
     private int vertexCount;
 
+    @Shadow public int drawMode;
+
     @Override
     public TesselatorVertexState ft$getVertexStateBSP(float viewX, float viewY, float viewZ) {
         if (this.rawBufferIndex <= 0) {
@@ -76,7 +80,11 @@ public abstract class TessellatorMixin implements IBSPTessellator {
         if (this.ft$bspTree == null) {
             val originalSnapshot = new int[this.rawBufferIndex];
             System.arraycopy(rawBuffer, 0, originalSnapshot, 0, originalSnapshot.length);
-            bspTree = new ChunkBSPTree(((ITriangulatorTessellator) this).drawingTris(), Compat.shaderType());
+            if (ModuleConfig.TRIANGULATOR) {
+                bspTree = new ChunkBSPTree(((ITriangulatorTessellator) this).drawingTris(), Compat.shaderType());
+            } else {
+                bspTree = new ChunkBSPTree(this.drawMode == GL11.GL_TRIANGLES, Compat.shaderType());
+            }
             bspTree.buildTree(originalSnapshot);
             srcBuf = originalSnapshot;
         } else {

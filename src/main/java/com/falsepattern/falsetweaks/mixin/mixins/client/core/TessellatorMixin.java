@@ -20,10 +20,26 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.midpoint;
+package com.falsepattern.falsetweaks.mixin.mixins.client.core;
 
-import org.joml.Vector3f;
+import com.falsepattern.falsetweaks.api.PassTrackingTessellator;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
-public interface MidpointComputer {
-    void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output);
+import net.minecraft.client.renderer.Tessellator;
+
+@Mixin(Tessellator.class)
+public abstract class TessellatorMixin implements PassTrackingTessellator {
+    @Unique
+    private int ft$pass;
+
+    @Override
+    public void pass(int pass) {
+        this.ft$pass = pass;
+    }
+
+    @Override
+    public int pass() {
+        return ft$pass;
+    }
 }

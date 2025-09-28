@@ -22,7 +22,7 @@
 
 package com.falsepattern.falsetweaks.api.triangulator;
 
-import com.falsepattern.falsetweaks.modules.triangulator.VertexInfo;
+import com.falsepattern.falsetweaks.modules.vertexapi.VertexInfo;
 import com.falsepattern.lib.StableAPI;
 
 /**

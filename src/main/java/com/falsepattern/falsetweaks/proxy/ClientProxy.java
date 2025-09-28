@@ -97,7 +97,7 @@ public class ClientProxy extends CommonProxy {
                             }
                         });
         Share.LEAKFIX_CLASS_INITIALIZED = true;
-        if (ModuleConfig.TRIANGULATOR()) {
+        if (ModuleConfig.TRIANGULATOR) {
             Calibration.registerBus();
         }
         if (ModuleConfig.VOXELIZER) {
@@ -148,7 +148,7 @@ public class ClientProxy extends CommonProxy {
             }
         }
 
-        if (ModuleConfig.TRIANGULATOR()) {
+        if (ModuleConfig.TRIANGULATOR) {
             ClientCommandHandler.instance.registerCommand(new Calibration.CalibrationCommand());
         }
 

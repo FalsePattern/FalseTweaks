@@ -103,7 +103,7 @@ public class Calibration {
         if (gpuHash().equals(TriangulatorConfig.Calibration.GPU_HASH)) {
             return;
         }
-        if (ModuleConfig.TRIANGULATOR()) {
+        if (ModuleConfig.TRIANGULATOR) {
             val alert = FormattedText.parse(EnumChatFormatting.RED +
                                             I18n.format("chat.triangulator.calibration.message"));
             val text = alert.toChatText();

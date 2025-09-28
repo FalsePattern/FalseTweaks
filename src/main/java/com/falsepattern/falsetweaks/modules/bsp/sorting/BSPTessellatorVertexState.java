@@ -20,7 +20,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting;
+package com.falsepattern.falsetweaks.modules.bsp.sorting;
 
 import net.minecraft.client.shader.TesselatorVertexState;
 

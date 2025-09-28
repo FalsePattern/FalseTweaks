@@ -20,12 +20,28 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.area;
+package com.falsepattern.falsetweaks.modules.ao;
 
-import org.joml.Vector3f;
+import lombok.val;
 
-public interface NormalAreaComputer {
-    float getArea(int[] vertexData, int i, int vertexSize, Vector3f buf);
+public final class AOMath {
+    private AOMath() {}
 
-    void getNormal(int[] vertexData, int i, int vertexSize, Vector3f output);
+    public static float biLerpAO(float q00, float q10, float q01, float q11, float tx, float ty) {
+        val x1 = lerpAO(q00, q10, tx);
+        val x2 = lerpAO(q01, q11, tx);
+        return lerpAO(x1, x2, ty);
+    }
+
+    public static float averageAO(float a, float b) {
+        return (a + b) / 2.0f;
+    }
+
+    public static float averageAO(float a, float b, float c, float d) {
+        return (a + b + c + d) / 4.0f;
+    }
+
+    public static float lerpAO(float a, float b, float fract) {
+        return a + (b - a) * fract;
+    }
 }

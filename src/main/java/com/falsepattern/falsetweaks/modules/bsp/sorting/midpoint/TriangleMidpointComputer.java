@@ -20,28 +20,17 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.triangulator.sorting.area;
+package com.falsepattern.falsetweaks.modules.bsp.sorting.midpoint;
 
-import com.falsepattern.falsetweaks.modules.triangulator.sorting.SharedMath;
+import com.falsepattern.falsetweaks.modules.bsp.sorting.SharedMath;
 import lombok.val;
 import org.joml.Vector3f;
 
-public class TriangleAreaComputer implements NormalAreaComputer {
-    public static final TriangleAreaComputer INSTANCE = new TriangleAreaComputer();
+public class TriangleMidpointComputer implements MidpointComputer {
+    public static final TriangleMidpointComputer INSTANCE = new TriangleMidpointComputer();
 
     @Override
-    public float getArea(int[] vertexData, int i, int vertexSize, Vector3f buf) {
-        getNormalUnscaled(vertexData, i, vertexSize, buf);
-        return SharedMath.unscaledNormalToArea(buf);
-    }
-
-    @Override
-    public void getNormal(int[] vertexData, int i, int vertexSize, Vector3f output) {
-        getNormalUnscaled(vertexData, i, vertexSize, output);
-        output.normalize();
-    }
-
-    private void getNormalUnscaled(int[] vertexData, int i, int vertexSize, Vector3f output) {
+    public void getMidpoint(int[] vertexData, int i, int vertexSize, Vector3f output) {
         val ax = Float.intBitsToFloat(vertexData[i]);
         val ay = Float.intBitsToFloat(vertexData[i + 1]);
         val az = Float.intBitsToFloat(vertexData[i + 2]);
@@ -51,7 +40,15 @@ public class TriangleAreaComputer implements NormalAreaComputer {
         val cx = Float.intBitsToFloat(vertexData[i + vertexSize * 2]);
         val cy = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 1]);
         val cz = Float.intBitsToFloat(vertexData[i + vertexSize * 2 + 2]);
-        SharedMath.getTriangleNormalUnscaled(ax, ay, az, bx, by, bz, cx, cy, cz, output);
-    }
 
+        val xMin = Math.min(Math.min(ax, bx), cx);
+        val yMin = Math.min(Math.min(ay, by), cy);
+        val zMin = Math.min(Math.min(az, bz), cz);
+
+        val xMax = Math.max(Math.max(ax, bx), cx);
+        val yMax = Math.max(Math.max(ay, by), cy);
+        val zMax = Math.max(Math.max(az, bz), cz);
+
+        SharedMath.getMidpoint(xMin, yMin, zMin, xMax, yMax, zMax, output);
+    }
 }
