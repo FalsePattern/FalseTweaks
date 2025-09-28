@@ -45,6 +45,7 @@ import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Drago
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.ExtraCells;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.FastCraft;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.FoamFix;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.LittleTiles;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis_NH;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.NotFine;
@@ -134,6 +135,10 @@ public enum Mixin implements IMixins {
     AOFix_Perf(Phase.EARLY,
                () -> ModuleConfig.aoFix && !AOFixConfig.renderHookCompatMode,
                client("ao.RenderBlocksPerformanceMixin")),
+    AOFix_LittleTiles(Phase.LATE,
+                      () -> ModuleConfig.aoFix && AOFixConfig.patchLittleTiles,
+                      require(LittleTiles),
+                      client("ao.littletiles.LittleBlockRenderHelperMixin")),
 
     ClippingHelper(Phase.EARLY,
                    () -> ModuleConfig.CLIPPING_HELPER_OPTS,

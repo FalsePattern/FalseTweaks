@@ -53,6 +53,7 @@ public enum TargetMod implements ITargetMod {
     Automagy("tuhljin.automagy.Automagy"),
     Computronics("pl.asie.computronics.Computronics"),
     ExtraCells("extracells.Extracells"),
+    LittleTiles("com.creativemd.littletiles.LittleTiles"),
     NuclearControl("shedar.mods.ic2.nuclearcontrol.IC2NuclearControl"),
     RailCraft("mods.railcraft.common.core.Railcraft"),
     RedstonePaste("fyber.redstonepastemod.RedstonePasteMod"),

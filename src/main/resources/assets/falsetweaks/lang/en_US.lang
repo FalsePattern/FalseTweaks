@@ -38,6 +38,7 @@ config.falsetweaks.ao_fix=Ambient Occlusion Fix
 config.falsetweaks.ao_fix.tooltip=Improves ambient occlusion and smooth lighting on blocks.
 config.falsetweaks.ao_fix.renderHookCompatMode=Render hook compatibility mode
 config.falsetweaks.ao_fix.universalPatch=Universal patch
+config.falsetweaks.ao_fix.patchLittleTiles=Patch LittleTiles
 
 config.falsetweaks.crack_fix=Block Crack Fix
 config.falsetweaks.crack_fix.tooltip=Block corners and edges between chunks might have "cracks" in them. This option fixes it.

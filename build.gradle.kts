@@ -134,4 +134,7 @@ dependencies {
     compileOnly(deobfCurse("thermal-foundation-222880:2388752"))
     // Thermal Expansion [1.7.10]4.1.5-248
     compileOnly(deobfCurse("thermal-expansion-69163:2388758"))
+    // LittleTiles 1.2.0
+    compileOnly(deobfCurse("littletiles-257818:2462370"))
+//    runtimeOnlyNonPublishable(deobfCurse("creativecore-257814:2462369"))
 }

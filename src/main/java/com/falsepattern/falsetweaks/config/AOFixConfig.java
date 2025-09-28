@@ -43,6 +43,12 @@ public class AOFixConfig {
     @Config.RequiresMcRestart
     public static boolean universalPatch;
 
+    @Config.Comment("Modifies the LittleTiles renderer to use the FalseTweaks AO system")
+    @Config.LangKey
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean patchLittleTiles;
+
     static {
         ConfigurationManager.selfInit();
     }
