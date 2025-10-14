@@ -76,7 +76,8 @@ public enum Mixin implements IMixins {
                 "core.WorldRendererMixin")),
 
     VertexAPI(Phase.EARLY,
-              client("vertexapi.TessellatorMixin")),
+              client("vertexapi.TessellatorMixin",
+                     "vertexapi.QuadComparatorMixin")),
     VertexAPI_NoFoamFix(Phase.EARLY,
                         () -> !ModuleConfig.BSP_SORTING,
                         mods(avoid(FoamFix), avoid(SwanSong)),
