@@ -20,7 +20,7 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.triangulator.swansong;
+package com.falsepattern.falsetweaks.mixin.mixins.client.vertexapi.swansong;
 
 import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.triangulator.VertexAPI;

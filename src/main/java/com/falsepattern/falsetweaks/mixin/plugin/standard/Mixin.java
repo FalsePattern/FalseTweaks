@@ -85,6 +85,9 @@ public enum Mixin implements IMixins {
                       () -> !ModuleConfig.BSP_SORTING,
                       mods(require(FoamFix), avoid(SwanSong)),
                       client("vertexapi.TessellatorMixin_RequireFoamFix")),
+    VertexAPI_Swansong(Phase.EARLY,
+                       require(SwanSong),
+                       client("vertexapi.swansong.ShaderTessMixin")),
 
     Triangulator(Phase.EARLY,
                  () -> ModuleConfig.TRIANGULATOR,
@@ -117,10 +120,6 @@ public enum Mixin implements IMixins {
                                () -> ModuleConfig.TRIANGULATOR,
                                require(RedstonePaste),
                                client("triangulator.redstonepaste.RedstonePasteHighlighterMixin")),
-    Triangulator_Swansong(Phase.EARLY,
-                          () -> ModuleConfig.TRIANGULATOR,
-                          require(SwanSong),
-                          client("triangulator.swansong.ShaderTessMixin")),
 
     CrackFix(Phase.EARLY,
              () -> ModuleConfig.blockCrackFix,
