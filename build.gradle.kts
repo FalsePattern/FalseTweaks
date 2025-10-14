@@ -80,11 +80,11 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.9.0")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.9.1")
     compileOnly("org.joml:joml:1.10.8")
     compileOnly("it.unimi.dsi:fastutil:8.5.16")
     compileOnly("mega:megatraceservice:1.2.0")
-    compileOnly("com.ventooth:swansong-mc1.7.10:1.0.0:dev")
+    compileOnly("com.ventooth:swansong-mc1.7.10:1.2.1:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
 
     val beddiumVersion = "1.0.4"

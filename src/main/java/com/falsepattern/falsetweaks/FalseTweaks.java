@@ -46,7 +46,7 @@ import javax.swing.JOptionPane;
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
-     dependencies = "required-after:falsepatternlib@[1.9.0,);" +
+     dependencies = "required-after:falsepatternlib@[1.9.1,);" +
                     "after:gtnhlib@[0.5.21,);")
 public class FalseTweaks {
 
