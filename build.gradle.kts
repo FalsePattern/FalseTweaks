@@ -3,7 +3,7 @@ import com.falsepattern.zigbuild.tasks.ZigBuildTask
 import com.falsepattern.zigbuild.toolchain.ZigVersion
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "2.0.0"
+    id("com.falsepattern.fpgradle-mc") version "2.1.0"
     id("com.falsepattern.zigbuild") version "0.1.1"
 }
 
