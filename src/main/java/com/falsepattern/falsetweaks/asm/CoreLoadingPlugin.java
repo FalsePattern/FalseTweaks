@@ -22,10 +22,13 @@
 
 package com.falsepattern.falsetweaks.asm;
 
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.mixin.plugin.standard.Mixin;
 import com.falsepattern.falsetweaks.modules.animfix.AnimFixCompat;
+import com.falsepattern.falsetweaks.modules.natives.Natives;
+import com.falsepattern.falsetweaks.modules.natives.UnsupportedPlatformException;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadingCompat;
 import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
@@ -66,6 +69,14 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
             if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
                 AnimFixCompat.executeConfigFixes();
+            }
+
+            if (ModuleConfig.natives) {
+                try {
+                    Natives.load();
+                } catch (UnsupportedPlatformException e) {
+                    Share.log.error("Failed to load natives", e);
+                }
             }
         }
     }

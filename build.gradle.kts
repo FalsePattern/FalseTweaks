@@ -1,5 +1,10 @@
+import com.falsepattern.zigbuild.options.ZigBuildOptions
+import com.falsepattern.zigbuild.tasks.ZigBuildTask
+import com.falsepattern.zigbuild.toolchain.ZigVersion
+
 plugins {
     id("com.falsepattern.fpgradle-mc") version "2.0.0"
+    id("com.falsepattern.zigbuild") version "0.1.1"
 }
 
 group = "com.falsepattern"
@@ -60,9 +65,37 @@ minecraft_fp {
     }
 }
 
+zig {
+    toolchain {
+        version = ZigVersion.of("0.15.1")
+    }
+    defaultCacheDirs = false
+}
+
+val zigPrefix = layout.buildDirectory.dir("zig-build")
+
+val zigBuildTask = tasks.register<ZigBuildTask>("buildNatives") {
+    options {
+        steps.add("install")
+    }
+    workingDirectory = layout.projectDirectory
+    prefixDirectory = zigPrefix
+    clearPrefixDirectory = true
+    sourceFiles.from(layout.projectDirectory.dir("src/main/zig"))
+    sourceFiles.from(layout.projectDirectory.dir("zig-util"))
+    sourceFiles.from(layout.projectDirectory.file("build.zig"))
+    sourceFiles.from(layout.projectDirectory.file("build.zig.zon"))
+}
+
 tasks.processResources.configure {
+    dependsOn(zigBuildTask)
     from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
         into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/")
+    }
+    from(zigPrefix.map { it.dir("lib") }) {
+        into(minecraft_fp.mod.rootPkg.map { "/" + it.replace('.', '/') + "/modules/natives" } ) {
+            include("*.pak")
+        }
     }
 }
 

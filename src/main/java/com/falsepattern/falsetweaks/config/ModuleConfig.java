@@ -303,6 +303,12 @@ public class ModuleConfig {
     @Config.RequiresMcRestart
     public static boolean aoFix;
 
+    @Config.Comment("Enables native optimizations. Windows/Linux and X86_64 only!")
+    @Config.LangKey("config.falsetweaks.natives")
+    @Config.DefaultBoolean(true)
+    @Config.RequiresMcRestart
+    public static boolean natives;
+
     static {
         ConfigurationManager.selfInit();
         ProfilerConfig.init();

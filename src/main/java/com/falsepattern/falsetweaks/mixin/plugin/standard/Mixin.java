@@ -27,6 +27,7 @@ import com.falsepattern.falsetweaks.config.AOFixConfig;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.falsetweaks.modules.debug.Debug;
+import com.falsepattern.falsetweaks.modules.natives.Natives;
 import com.falsepattern.lib.mixin.v2.MixinHelper;
 import com.falsepattern.lib.mixin.v2.SidedMixins;
 import com.falsepattern.lib.mixin.v2.TaggedMod;
@@ -149,7 +150,7 @@ public enum Mixin implements IMixins {
                       client("ao.littletiles.LittleBlockRenderHelperMixin")),
 
     ClippingHelper(Phase.EARLY,
-                   () -> ModuleConfig.CLIPPING_HELPER_OPTS,
+                   () -> ModuleConfig.CLIPPING_HELPER_OPTS && !(ModuleConfig.natives && Natives.isLoaded()),
                    client("camera.Perf_ClippingHelperMixin")),
     ClippingHelper_NoFastCraft(Phase.EARLY,
                                () -> ModuleConfig.CLIPPING_HELPER_OPTS,
@@ -162,6 +163,10 @@ public enum Mixin implements IMixins {
                                   ModuleConfig::THREADED_CHUNK_UPDATES,
                                   require(SwanSong),
                                   client("camera.swansong.Multi_ShaderEngineMixin")),
+    ClippingHelper_Native(Phase.EARLY,
+                           () -> ModuleConfig.CLIPPING_HELPER_OPTS && ModuleConfig.natives && Natives.isLoaded(),
+                           client("camera.Native_ClippingHelperMixin",
+                                  "camera.Native_ClippingHelperImplMixin")),
 
     RenderDistance(Phase.EARLY,
                    () -> ModuleConfig.UNLOCK_RENDER_DISTANCE,

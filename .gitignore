@@ -166,3 +166,5 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/gradle,forgegradle,kotlin,java,scala,intellij+all
 
 !.idea/copyright
+zig-out/
+.zig-cache/
