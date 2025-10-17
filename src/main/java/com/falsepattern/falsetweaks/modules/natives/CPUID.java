@@ -24,5 +24,5 @@ package com.falsepattern.falsetweaks.modules.natives;
 
 public class CPUID {
     public static native boolean link(String libPath);
-    public static native String getX86Version();
+    public static native String getCpuModel();
 }

@@ -72,36 +72,6 @@ public class NativeLoader {
         }
     }
 
-    public String unpackNativeOS(String libName) throws UnsupportedPlatformException {
-        val libNameSys = currentTriple.toLibName(libName, null);
-        val libNameArchive = libName + "-" + currentTriple.os.getName();
-        val libFile = nativesDir.resolve(libNameSys);
-        try {
-            unpacker.unpack(libNameArchive, libFile);
-        } catch (IOException e) {
-            throw new UnsupportedPlatformException(e);
-        }
-        return libNameArchive;
-    }
-
-    public String loadNativeOS(String libName) throws UnsupportedPlatformException {
-        val libNameSys = currentTriple.toLibName(libName, null);
-        val libNameArchive = libName + "-" + currentTriple.os.getName();
-        val libFile = nativesDir.resolve(libNameSys);
-        try {
-            unpacker.unpack(libNameArchive, libFile);
-        } catch (IOException e) {
-            throw new UnsupportedPlatformException(e);
-        }
-        val absolutePath = libFile.toAbsolutePath().toString();
-        try {
-            System.load(absolutePath);
-        } catch (UnsatisfiedLinkError e) {
-            throw new UnsupportedPlatformException(e);
-        }
-        return absolutePath;
-    }
-
     public String unpackNative(String libName, String cpu) throws UnsupportedPlatformException {
         val libNameSys = currentTriple.toLibName(libName, cpu);
         val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
@@ -140,16 +110,17 @@ public class NativeLoader {
 
         public String toLibName(String libName, String cpu) {
             val nameBuilder = new StringBuilder();
+            cpu = cpu == null ? arch.baselineModel : cpu;
             switch (os) {
                 case Linux:
                 case MacOS:
                     nameBuilder.append("lib");
             }
             nameBuilder.append(libName);
-            nameBuilder.append('-').append(arch.getName()).append('-').append(os.getName()).append('-').append(libc.getName());
-            if (cpu != null) {
-                nameBuilder.append('-').append(cpu);
-            }
+            nameBuilder.append('-').append(arch.getName())
+                       .append('-').append(os.getName())
+                       .append('-').append(libc.getName())
+                       .append('-').append(cpu);
             switch (os) {
                 case Windows: {
                     nameBuilder.append(".dll");
@@ -215,36 +186,32 @@ public class NativeLoader {
 
     @RequiredArgsConstructor
     private enum Arch {
-        X64(true),
-        X86(false),
-        ARM64(true),
-        ARM32(false);
+        X64("x86_64"),
+        ARM64("generic");
 
-        final boolean is64Bit;
+        public final String baselineModel;
 
         static Arch getCurrent() throws UnsupportedPlatformException {
             String osArch = System.getProperty("os.arch");
-            boolean is64Bit = osArch.contains("64") || osArch.startsWith("armv8");
-
+            boolean is64Bit = osArch.contains("64") || osArch.startsWith("armv8") || osArch.startsWith("aarch64");
+            if (!is64Bit) {
+                throw new UnsupportedPlatformException("Natives only support 64-bit systems");
+            }
             boolean isArm = osArch.startsWith("arm") || osArch.startsWith("aarch64");
             boolean isX86 = osArch.startsWith("x86") || osArch.startsWith("amd64");
             if (isArm) {
-                return is64Bit ? ARM64 : ARM32;
+                return ARM64;
             }
             if (isX86) {
-                return is64Bit ? X64 : X86;
+                return X64;
             }
             throw new UnsupportedPlatformException("Unsupported CPU architecture " + osArch);
         }
 
         public String getName() {
             switch (this) {
-                case X86:
-                    return "x86";
                 case X64:
                     return "x86_64";
-                case ARM32:
-                    return "arm";
                 case ARM64:
                     return "aarch64";
                 default:

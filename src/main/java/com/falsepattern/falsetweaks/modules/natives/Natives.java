@@ -52,13 +52,13 @@ public class Natives {
         log.info("Initializing natives (JNI)");
         val loader = new NativeLoader(CPUID.class);
         log.info("Loading JNI stubs");
-        loader.loadNativeOS("jni");
+        loader.loadNative("jni", "x86_64");
         log.info("Loading CPUID natives");
         val libCPUID = loader.loadNative("cpuid", "x86_64");
         log.info("Linking CPUID natives");
         CPUID.link(libCPUID);
         log.info("Fetching CPU arch");
-        val arch = CPUID.getX86Version();
+        val arch = CPUID.getCpuModel();
         log.info("CPU arch: {}", arch);
         String libFT = null;
         if (ModuleConfig.CLIPPING_HELPER_OPTS) {

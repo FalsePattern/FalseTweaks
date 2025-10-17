@@ -19,8 +19,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const std = @import("std");
-const x86 = @import("src/main/zig/cpuid/x86_util.zig");
+const cpu_util = @import("src/main/zig/cpuid/cpu_util.zig");
 const zanama = @import("zanama");
+const TargetCombination = struct {
+    os: std.Target.Os.Tag,
+    cpu_arch: std.Target.Cpu.Arch,
+    baseline_model: *const std.Target.Cpu.Model,
+};
 pub fn build(b: *std.Build) void {
     const zanama_dep = b.dependency("zanama", .{});
     const zb = zanama.Build.init(b, .ReleaseFast, zanama_dep);
@@ -36,13 +41,19 @@ pub fn build(b: *std.Build) void {
     const natives_file = "natives.pak";
     const install_step = b.getInstallStep();
     install_step.dependOn(&b.addInstallLibFile(run_packer.addOutputFileArg(natives_file), natives_file).step);
-    for ([_]std.Target.Os.Tag{.windows, .linux}) |os| {
+    const target_combos = [_]TargetCombination{
+        .{.os = .linux, .cpu_arch = .x86_64, .baseline_model = &std.Target.x86.cpu.x86_64},
+        .{.os = .windows, .cpu_arch = .x86_64, .baseline_model = &std.Target.x86.cpu.x86_64},
+        .{.os = .linux, .cpu_arch = .aarch64, .baseline_model = &std.Target.aarch64.cpu.generic}
+    };
+    for (target_combos) |combo| {
         const baseline_target = b.resolveTargetQuery(.{
-            .os_tag = os,
-            .cpu_arch = .x86_64,
-            .cpu_model = .{ .explicit = &std.Target.x86.cpu.x86_64 },
+            .os_tag = combo.os,
+            .cpu_arch = combo.cpu_arch,
+            .cpu_model = .{ .explicit = combo.baseline_model },
             .abi = .gnu,
         });
+        const baseline_triple = baseline_target.query.zigTriple(b.allocator) catch @panic("OOM");
         {
             const jni_dep = b.dependency("jni", .{
                 .target = baseline_target,
@@ -56,7 +67,7 @@ pub fn build(b: *std.Build) void {
                 .optimize = .ReleaseFast,
                 .strip = true,
             });
-            const name = std.mem.concat(b.allocator, u8, &.{"jni-", @tagName(os)}) catch @panic("OOM");
+            const name = std.mem.concat(b.allocator, u8, &.{"jni-", baseline_triple, "-", baseline_target.query.cpu_model.explicit.name}) catch @panic("OOM");
             libjni_mod.addImport("jni", jni_module);
             const libjni = b.addLibrary(.{
                 .linkage = .dynamic,
@@ -86,11 +97,18 @@ pub fn build(b: *std.Build) void {
             install_step.dependOn(&install_json.step);
         }
         {
-            var targets: [x86.supported_models.len]std.Build.ResolvedTarget = undefined;
-            for (x86.supported_models, 0..) |model, i| {
+            const supported_models = switch (combo.cpu_arch) {
+                .aarch64 => cpu_util.supported_models_aarch64,
+                .x86_64 => cpu_util.supported_models_x86,
+                else => @panic(std.mem.concat(b.allocator, u8, &.{"Unsupported CPU arch ", @tagName(combo.cpu_arch)}) catch @panic("OOM")),
+            };
+            const targets = b.allocator.alloc(std.Build.ResolvedTarget, supported_models.len) catch @panic("OOM");
+            defer b.allocator.free(targets);
+            
+            for (supported_models, 0..) |model, i| {
                 targets[i] = b.resolveTargetQuery(.{
-                    .os_tag = os,
-                    .cpu_arch = .x86_64,
+                    .os_tag = combo.os,
+                    .cpu_arch = combo.cpu_arch,
                     .cpu_model = .{ .explicit = model },
                     .abi = .gnu,
                 });
@@ -104,7 +122,7 @@ pub fn build(b: *std.Build) void {
                 }
             });
 
-            const libs = zb.createZanamaLibsResolved("FalseTweaks", lib_mod, &targets);
+            const libs = zb.createZanamaLibsResolved("FalseTweaks", lib_mod, targets);
 
             for (libs.artifacts) |artifact| {
                 run_packer.addArg(artifact.name);

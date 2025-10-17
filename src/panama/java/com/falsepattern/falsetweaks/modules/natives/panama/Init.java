@@ -55,8 +55,8 @@ public class Init {
         log.info("Fetching CPU arch");
         String arch;
         try (val arena = Arena.ofConfined()) {
-            val buf = arena.allocate(256);
-            CpuID.getX86Version(buf);
+            val buf = arena.allocate(CpuID.maxNameLength());
+            CpuID.getCpuModel(buf);
             arch = buf.getString(0);
         }
         log.info("CPU arch: {}", arch);
