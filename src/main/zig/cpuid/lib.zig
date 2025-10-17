@@ -18,6 +18,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+const zanama = @import("zanama");
 comptime {
-    _ = @import("cpuid.zig").Impl;
+    zanama.genBindings(&.{
+        .{ .name = "falsetweaks.CpuID", .Struct = @import("cpuid.zig").Impl },
+    }) catch unreachable;
 }

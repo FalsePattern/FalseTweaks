@@ -20,18 +20,23 @@
 
 const std = @import("std");
 const x86 = @import("src/main/zig/cpuid/x86_util.zig");
+const zanama = @import("zanama");
 pub fn build(b: *std.Build) void {
+    const zanama_dep = b.dependency("zanama", .{});
+    const zb = zanama.Build.init(b, .ReleaseFast, zanama_dep);
+
+    const packer = b.addExecutable(.{
+        .name = "packer",
+        .root_module = b.addModule("packer", .{
+            .root_source_file = b.path("zig-util/packer.zig"),
+            .target = b.graph.host,
+        }),
+    });
+    const run_packer = b.addRunArtifact(packer);
+    const natives_file = "natives.pak";
+    const install_step = b.getInstallStep();
+    install_step.dependOn(&b.addInstallLibFile(run_packer.addOutputFileArg(natives_file), natives_file).step);
     for ([_]std.Target.Os.Tag{.windows, .linux}) |os| {
-        const packer = b.addExecutable(.{
-            .name = "packer",
-            .root_module = b.addModule("packer", .{
-                .root_source_file = b.path("zig-util/packer.zig"),
-                .target = b.graph.host,
-            }),
-        });
-        const run_packer = b.addRunArtifact(packer);
-        const natives_file = std.mem.concat(b.allocator, u8, &.{@tagName(os), ".pak"}) catch @panic("OOM");
-        b.getInstallStep().dependOn(&b.addInstallLibFile(run_packer.addOutputFileArg(natives_file), natives_file).step);
         const baseline_target = b.resolveTargetQuery(.{
             .os_tag = os,
             .cpu_arch = .x86_64,
@@ -51,13 +56,14 @@ pub fn build(b: *std.Build) void {
                 .optimize = .ReleaseFast,
                 .strip = true,
             });
+            const name = std.mem.concat(b.allocator, u8, &.{"jni-", @tagName(os)}) catch @panic("OOM");
             libjni_mod.addImport("jni", jni_module);
             const libjni = b.addLibrary(.{
                 .linkage = .dynamic,
-                .name = "jni",
+                .name = name,
                 .root_module = libjni_mod,
             });
-            run_packer.addArg("jni");
+            run_packer.addArg(name);
             run_packer.addFileArg(libjni.getEmittedBin());
         }
         {
@@ -66,37 +72,47 @@ pub fn build(b: *std.Build) void {
                 .target = baseline_target,
                 .optimize = .ReleaseSmall,
                 .strip = true,
+                .imports = &.{
+                    .{ .name = "zanama", .module = zanama_dep.module("api") },
+                }
             });
-            const libcpuid = b.addLibrary(.{
-                .linkage = .dynamic,
-                .name = "cpuid",
-                .root_module = libcpuid_mod,
-            });
-            run_packer.addArg("cpuid");
-            run_packer.addFileArg(libcpuid.getEmittedBin());
+            const libs = zb.createZanamaLibsResolved("cpuid", libcpuid_mod, &.{baseline_target});
+            for (libs.artifacts) |artifact| {
+                run_packer.addArg(artifact.name);
+                run_packer.addFileArg(artifact.getEmittedBin());
+            }
+            const install_json = b.addInstallFile(libs.json, "cpuid.json");
+            install_json.step.dependOn(libs.json_step);
+            install_step.dependOn(&install_json.step);
         }
-        for (x86.supported_models) |model| {
-            const target = b.resolveTargetQuery(.{
-                .os_tag = os,
-                .cpu_arch = .x86_64,
-                .cpu_model = .{ .explicit = model },
-                .abi = .gnu,
-            });
+        {
+            var targets: [x86.supported_models.len]std.Build.ResolvedTarget = undefined;
+            for (x86.supported_models, 0..) |model, i| {
+                targets[i] = b.resolveTargetQuery(.{
+                    .os_tag = os,
+                    .cpu_arch = .x86_64,
+                    .cpu_model = .{ .explicit = model },
+                    .abi = .gnu,
+                });
+            }
             const lib_mod = b.createModule(.{
                 .root_source_file = b.path("src/main/zig/lib.zig"),
-                .target = target,
                 .optimize = .ReleaseFast,
                 .strip = true,
+                .imports = &.{
+                    .{ .name = "zanama", .module = zanama_dep.module("api") },
+                }
             });
-            const name = std.mem.concat(b.allocator, u8, &.{"FalseTweaks-", model.name}) catch @panic("OOM");
-            const lib = b.addLibrary(.{
-                .linkage = .dynamic,
-                .name = name,
-                .root_module = lib_mod,
-            });
-            run_packer.addFileInput(lib_mod.root_source_file.?);
-            run_packer.addArg(name);
-            run_packer.addFileArg(lib.getEmittedBin());
+
+            const libs = zb.createZanamaLibsResolved("FalseTweaks", lib_mod, &targets);
+
+            for (libs.artifacts) |artifact| {
+                run_packer.addArg(artifact.name);
+                run_packer.addFileArg(artifact.getEmittedBin());
+            }
+            const install_json = b.addInstallFile(libs.json, "FalseTweaks.json");
+            install_json.step.dependOn(libs.json_step);
+            install_step.dependOn(&install_json.step);
         }
     }
 }

@@ -18,6 +18,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+const zanama = @import("zanama");
 comptime {
-    _ = @import("occlusion/clipping.zig").Impl;
+    zanama.genBindings(&.{
+        .{ .name = "falsetweaks.Clipping", .Struct = @import("occlusion/clipping.zig").Impl },
+    }) catch unreachable;
 }

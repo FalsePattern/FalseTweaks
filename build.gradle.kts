@@ -1,15 +1,20 @@
+import com.falsepattern.zanama.tasks.ZanamaTranslate
 import com.falsepattern.zigbuild.options.ZigBuildOptions
 import com.falsepattern.zigbuild.tasks.ZigBuildTask
 import com.falsepattern.zigbuild.toolchain.ZigVersion
 
 plugins {
     id("com.falsepattern.fpgradle-mc") version "2.1.0"
+    id("com.falsepattern.zanama") version "0.2.0"
     id("com.falsepattern.zigbuild") version "0.1.1"
 }
 
 group = "com.falsepattern"
 
 minecraft_fp {
+    java {
+        modernRuntimeVersion = JavaVersion.VERSION_25
+    }
     mod {
         modid = "falsetweaks"
         name = "FalseTweaks"
@@ -85,15 +90,50 @@ val zigBuildTask = tasks.register<ZigBuildTask>("buildNatives") {
     sourceFiles.from(layout.projectDirectory.dir("zig-util"))
     sourceFiles.from(layout.projectDirectory.file("build.zig"))
     sourceFiles.from(layout.projectDirectory.file("build.zig.zon"))
+
+    dependsOn("extractZanama")
 }
+
+val translateJavaSourcesCpuID = layout.buildDirectory.dir("generated/sources/zanama/cpuid")
+val translateJavaSourcesFalseTweaks = layout.buildDirectory.dir("generated/sources/zanama/falsetweaks")
+
+val zigTranslateCpuID = tasks.register<ZanamaTranslate>("zigTranslateCpuID") {
+    from = zigPrefix.map { it.file("cpuid.json") }
+    into = translateJavaSourcesCpuID
+    rootPkg = "com.falsepattern.falsetweaks.modules.natives.panama"
+    bindRoot = "falsetweaks"
+    className = "CpuID_z"
+    dependsOn(zigBuildTask)
+}
+val zigTranslateFalseTweaks = tasks.register<ZanamaTranslate>("zigTranslateFalseTweaks") {
+    from = zigPrefix.map { it.file("FalseTweaks.json") }
+    into = translateJavaSourcesFalseTweaks
+    rootPkg = "com.falsepattern.falsetweaks.modules.natives.panama"
+    bindRoot = "falsetweaks"
+    className = "FalseTweaks_z"
+    dependsOn(zigBuildTask)
+}
+
+
+val panamaNatives = jarInJar_fp("panama") {
+    this.javaCompatibility = modern
+    this.javaVersion = JavaVersion.VERSION_25
+    this.artifactName = "falsetweaks-panama"
+    this.artifactVersion = "1.0.0"
+}
+tasks.named<JavaCompile>(panamaNatives.compileJavaTaskName) {
+    dependsOn(zigTranslateCpuID, zigTranslateFalseTweaks)
+}
+
+panamaNatives.java.srcDirs(translateJavaSourcesCpuID, translateJavaSourcesFalseTweaks)
 
 tasks.processResources.configure {
     dependsOn(zigBuildTask)
-    from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } }) {
-        into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/")
+    into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/") {
+        from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } })
     }
-    from(zigPrefix.map { it.dir("lib") }) {
-        into(minecraft_fp.mod.rootPkg.map { "/" + it.replace('.', '/') + "/modules/natives" } ) {
+    into(minecraft_fp.mod.rootPkg.map { "/" + it.replace('.', '/') + "/modules/natives" } ) {
+        from(zigPrefix.map { it.dir("lib") }) {
             include("*.pak")
         }
     }
@@ -102,7 +142,9 @@ tasks.processResources.configure {
 repositories {
     cursemavenEX()
     modrinthEX()
-    exclusive(mavenpattern(), "com.falsepattern", "makamys", "org.embeddedt.celeritas")
+    exclusive(mavenpattern(), "makamys", "org.embeddedt.celeritas") {
+        includeModule("com.falsepattern", "falsepatternlib-mc1.7.10")
+    }
     exclusive(mega(), "codechicken", "mega")
     exclusive(mega_uploads(), "optifine")
     exclusive(venmaven(), "com.ventooth")
@@ -119,6 +161,7 @@ dependencies {
     compileOnly("mega:megatraceservice:1.2.0")
     compileOnly("com.ventooth:swansong-mc1.7.10:1.2.1:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
+    add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.2.0")
 
     val beddiumVersion = "1.0.4"
     val beddiumVersionJ21 = "$beddiumVersion-j21"

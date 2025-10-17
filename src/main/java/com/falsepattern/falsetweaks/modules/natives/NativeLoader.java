@@ -36,7 +36,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class NativeLoader {
-    private final Path nativesDir;
+    public final Path nativesDir;
     private final Triple currentTriple;
     private final Unpacker unpacker;
 
@@ -60,16 +60,9 @@ public class NativeLoader {
         val os = OS.getCurrent();
         val libc = os.libc();
         currentTriple = new Triple(arch, os, libc);
-        final String pak;
-        switch(OS.getCurrent()) {
-            case Windows: pak = "windows.pak"; break;
-            case Linux: pak = "linux.pak"; break;
-            case MacOS: pak = "macos.pak"; break;
-            default: throw new IllegalStateException();
-        }
-        val res = root.getResource(pak);
+        val res = root.getResource("natives.pak");
         if (res == null) {
-            throw new UnsupportedPlatformException("No resource package for OS " + os.getName());
+            throw new UnsupportedPlatformException("No resource package found!");
         }
         unpacker = new Unpacker(res);
         try {
@@ -79,11 +72,54 @@ public class NativeLoader {
         }
     }
 
-    public String loadNative(String libName) throws UnsupportedPlatformException {
-        val libNameSys = currentTriple.toLibName(libName);
+    public String unpackNativeOS(String libName) throws UnsupportedPlatformException {
+        val libNameSys = currentTriple.toLibName(libName, null);
+        val libNameArchive = libName + "-" + currentTriple.os.getName();
         val libFile = nativesDir.resolve(libNameSys);
         try {
-            unpacker.unpack(libName, libFile);
+            unpacker.unpack(libNameArchive, libFile);
+        } catch (IOException e) {
+            throw new UnsupportedPlatformException(e);
+        }
+        return libNameArchive;
+    }
+
+    public String loadNativeOS(String libName) throws UnsupportedPlatformException {
+        val libNameSys = currentTriple.toLibName(libName, null);
+        val libNameArchive = libName + "-" + currentTriple.os.getName();
+        val libFile = nativesDir.resolve(libNameSys);
+        try {
+            unpacker.unpack(libNameArchive, libFile);
+        } catch (IOException e) {
+            throw new UnsupportedPlatformException(e);
+        }
+        val absolutePath = libFile.toAbsolutePath().toString();
+        try {
+            System.load(absolutePath);
+        } catch (UnsatisfiedLinkError e) {
+            throw new UnsupportedPlatformException(e);
+        }
+        return absolutePath;
+    }
+
+    public String unpackNative(String libName, String cpu) throws UnsupportedPlatformException {
+        val libNameSys = currentTriple.toLibName(libName, cpu);
+        val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
+        val libFile = nativesDir.resolve(libNameSys);
+        try {
+            unpacker.unpack(libNameArchive, libFile);
+        } catch (IOException e) {
+            throw new UnsupportedPlatformException(e);
+        }
+        return libNameArchive;
+    }
+
+    public String loadNative(String libName, String cpu) throws UnsupportedPlatformException {
+        val libNameSys = currentTriple.toLibName(libName, cpu);
+        val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
+        val libFile = nativesDir.resolve(libNameSys);
+        try {
+            unpacker.unpack(libNameArchive, libFile);
         } catch (IOException e) {
             throw new UnsupportedPlatformException(e);
         }
@@ -102,7 +138,7 @@ public class NativeLoader {
         private final OS os;
         private final LibC libc;
 
-        public String toLibName(String libName) {
+        public String toLibName(String libName, String cpu) {
             val nameBuilder = new StringBuilder();
             switch (os) {
                 case Linux:
@@ -111,6 +147,9 @@ public class NativeLoader {
             }
             nameBuilder.append(libName);
             nameBuilder.append('-').append(arch.getName()).append('-').append(os.getName()).append('-').append(libc.getName());
+            if (cpu != null) {
+                nameBuilder.append('-').append(cpu);
+            }
             switch (os) {
                 case Windows: {
                     nameBuilder.append(".dll");
@@ -126,6 +165,10 @@ public class NativeLoader {
                 }
             }
             return nameBuilder.toString();
+        }
+
+        public String toName() {
+            return arch.getName() + "-" + os.getName() + "-" + libc.getName();
         }
     }
 

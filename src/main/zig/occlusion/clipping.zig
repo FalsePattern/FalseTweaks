@@ -29,7 +29,7 @@ pub const Impl = struct {
     var fZ_: Vec6 = undefined;
     var fW_: Vec6 = undefined;
 
-    pub export fn setFrustum(frust: [*]const f32) void {
+    pub fn setFrustum(frust: [*]const f32) callconv(.c) void {
         fX_ = frust[0..6].*;
         fY_ = frust[6..12].*;
         fZ_ = frust[12..18].*;
@@ -49,7 +49,7 @@ pub const Impl = struct {
     const Vec6 = @Vector(6, f32);
     const Vec6bool = @Vector(6, bool);
 
-    pub export fn isBoxInFrustum(minX: f32, minY: f32, minZ: f32, maxX: f32, maxY: f32, maxZ: f32) bool {
+    pub fn isBoxInFrustum(minX: f32, minY: f32, minZ: f32, maxX: f32, maxY: f32, maxZ: f32) callconv(.c) bool {
         @setFloatMode(.optimized);
         const fX = fX_;
         const fY = fY_;
@@ -99,8 +99,8 @@ pub const JNI = struct {
         defer env.releaseStringUTFChars(lib_path_jstr, lib_path);
         const len = std.mem.len(lib_path);
         lib = std.DynLib.open(lib_path[0..len]) catch return 0;
-        setFrustum = lib.lookup(@TypeOf(setFrustum), "setFrustum") orelse return 0;
-        isBoxInFrustum = lib.lookup(@TypeOf(isBoxInFrustum), "isBoxInFrustum") orelse return 0;
+        setFrustum = lib.lookup(@TypeOf(setFrustum), "falsetweaks.Clipping::setFrustum") orelse return 0;
+        isBoxInFrustum = lib.lookup(@TypeOf(isBoxInFrustum), "falsetweaks.Clipping::isBoxInFrustum") orelse return 0;
         return 1;
     }
 

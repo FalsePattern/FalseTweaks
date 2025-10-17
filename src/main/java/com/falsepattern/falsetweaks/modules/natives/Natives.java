@@ -26,20 +26,35 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.natives.camera.Clipping;
 import lombok.Getter;
 import lombok.val;
+import stubpackage.com.falsepattern.falsetweaks.modules.natives.panama.Init;
 
 import static com.falsepattern.falsetweaks.Share.log;
 
 public class Natives {
     @Getter
-    private static boolean isLoaded = false;
+    private static boolean isJNI = false;
+    @Getter
+    private static boolean isPanama = false;
 
     public static void load() throws UnsupportedPlatformException {
-        log.info("Initializing natives");
+        //Detecting panama
+        try {
+            Class.forName("com.falsepattern.falsetweaks.modules.natives.panama.Init");
+            loadPanama();
+            isPanama = true;
+            return;
+        } catch (Throwable ignored) {}
+        loadJNI();
+        isJNI = true;
+    }
+
+    public static void loadJNI() throws UnsupportedPlatformException {
+        log.info("Initializing natives (JNI)");
         val loader = new NativeLoader(CPUID.class);
         log.info("Loading JNI stubs");
-        loader.loadNative("jni");
+        loader.loadNativeOS("jni");
         log.info("Loading CPUID natives");
-        val libCPUID = loader.loadNative("cpuid");
+        val libCPUID = loader.loadNative("cpuid", "x86_64");
         log.info("Linking CPUID natives");
         CPUID.link(libCPUID);
         log.info("Fetching CPU arch");
@@ -48,7 +63,7 @@ public class Natives {
         String libFT = null;
         if (ModuleConfig.CLIPPING_HELPER_OPTS) {
             log.info("Loading FalseTweaks natives");
-            libFT = loader.loadNative("FalseTweaks-" + arch);
+            libFT = loader.loadNative("FalseTweaks", arch);
         }
         if (ModuleConfig.CLIPPING_HELPER_OPTS) {
             log.info("Linking native clipping helper");
@@ -57,6 +72,9 @@ public class Natives {
             }
         }
         log.info("Natives initialized!");
-        isLoaded = true;
+    }
+
+    private static void loadPanama() throws UnsupportedPlatformException {
+        Init.load();
     }
 }

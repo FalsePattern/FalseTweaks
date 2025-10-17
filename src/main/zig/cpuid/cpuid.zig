@@ -61,7 +61,7 @@ pub const Impl = struct {
         return &x86_util.cpu.x86_64;
     }
 
-    export fn getX86Version(buf: [*]u8) [*:0]const u8 {
+    pub fn getX86Version(buf: [*]u8) callconv(.c) [*:0]const u8 {
         const model = getModel();
         @memcpy(buf[0..model.name.len], model.name);
         buf[model.name.len] = 0;
@@ -82,7 +82,7 @@ pub const JNI = struct {
         defer env.releaseStringUTFChars(lib_path_jstr, lib_path);
         const len = std.mem.len(lib_path);
         lib = std.DynLib.open(lib_path[0..len]) catch return 0;
-        getX86Version = lib.lookup(@TypeOf(getX86Version), "getX86Version") orelse return 0;
+        getX86Version = lib.lookup(@TypeOf(getX86Version), "falsetweaks.CpuID::getX86Version") orelse return 0;
         return 1;
     }
 

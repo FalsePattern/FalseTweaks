@@ -1,0 +1,30 @@
+{
+  "identifier": "falsepatternlib_dependencies",
+  "minJava": 25,
+  "repositories": [
+    "https://repo1.maven.org/maven2/"
+  ],
+  "dependencies": {
+    "always": {
+      "common": [],
+      "client": [
+        "com.falsepattern:zanama-rt:0.2.0"
+      ],
+      "server": []
+    },
+    "obf": {
+      "common": [],
+      "client": [
+        "com.falsepattern:falsetweaks-panama:1.0.0"
+      ],
+      "server": []
+    },
+    "dev": {
+      "common": [],
+      "client": [
+        "com.falsepattern:falsetweaks-panama:1.0.0:dev"
+      ],
+      "server": []
+    }
+  }
+}

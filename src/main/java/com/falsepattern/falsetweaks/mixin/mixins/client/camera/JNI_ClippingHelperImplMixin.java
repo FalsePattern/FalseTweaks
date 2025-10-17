@@ -36,7 +36,7 @@ import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 
 @Mixin(value = ClippingHelperImpl.class,
        priority = 1100)
-public abstract class Native_ClippingHelperImplMixin extends ClippingHelper {
+public abstract class JNI_ClippingHelperImplMixin extends ClippingHelper {
     @Unique
     private float[] ft$nativeUploadFrustumArray;
 
@@ -44,20 +44,18 @@ public abstract class Native_ClippingHelperImplMixin extends ClippingHelper {
             at = @At("RETURN"),
             require = 1)
     private void upload(CallbackInfo ci) {
-        if (Natives.isLoaded()) {
-            val frustum = this.frustum;
-            final float[] frust;
-            if (this.ft$nativeUploadFrustumArray == null) {
-                this.ft$nativeUploadFrustumArray = frust = new float[24];
-            } else {
-                frust = this.ft$nativeUploadFrustumArray;
-            }
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 6; j++) {
-                    frust[i * 6 + j] = frustum[j][i];
-                }
-            }
-            Clipping.setFrustum(frust);
+        val frustum = this.frustum;
+        final float[] frust;
+        if (this.ft$nativeUploadFrustumArray == null) {
+            this.ft$nativeUploadFrustumArray = frust = new float[24];
+        } else {
+            frust = this.ft$nativeUploadFrustumArray;
         }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                frust[i * 6 + j] = frustum[j][i];
+            }
+        }
+        Clipping.setFrustum(frust);
     }
 }

@@ -20,22 +20,12 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.mixin.mixins.client.camera;
+package stubpackage.com.falsepattern.falsetweaks.modules.natives.panama;
 
-import com.falsepattern.falsetweaks.modules.natives.camera.Clipping;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import com.falsepattern.falsetweaks.modules.natives.UnsupportedPlatformException;
 
-import net.minecraft.client.renderer.culling.ClippingHelper;
+public class Init {
+    public static void load() throws UnsupportedPlatformException {
 
-@Mixin(ClippingHelper.class)
-public abstract class Native_ClippingHelperMixin {
-    /**
-     * @author FalsePattern
-     * @reason Native optimization
-     */
-    @Overwrite
-    public boolean isBoxInFrustum(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return Clipping.isBoxInFrustum((float) minX, (float) minY, (float) minZ, (float) maxX, (float) maxY, (float) maxZ);
-    }
+    };
 }
