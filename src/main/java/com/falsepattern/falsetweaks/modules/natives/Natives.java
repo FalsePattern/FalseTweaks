@@ -52,9 +52,9 @@ public class Natives {
         log.info("Initializing natives (JNI)");
         val loader = new NativeLoader(CPUID.class);
         log.info("Loading JNI stubs");
-        loader.loadNative("jni", "x86_64");
+        loader.loadNative("jni", null);
         log.info("Loading CPUID natives");
-        val libCPUID = loader.loadNative("cpuid", "x86_64");
+        val libCPUID = loader.loadNative("cpuid", null);
         log.info("Linking CPUID natives");
         CPUID.link(libCPUID);
         log.info("Fetching CPU arch");

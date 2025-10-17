@@ -45,7 +45,7 @@ public class Init {
         log.info("Initializing panama context");
         CTX = NativeContext.create(loader.nativesDir);
         log.info("Unpacking CPUID natives");
-        val libCPUID = loader.unpackNative("cpuid", "x86_64");
+        val libCPUID = loader.unpackNative("cpuid", null);
         log.info("Loading CPUID natives");
         try {
             CpuID_z_init.lib = CTX.load(CpuID_z_init.class, libCPUID);
