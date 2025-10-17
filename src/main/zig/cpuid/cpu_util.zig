@@ -34,38 +34,36 @@ pub const max_name_length_current = switch (builtin.cpu.arch) {
 };
 
 fn getSupportedModelsX86() []const *const CpuModel {
-    comptime {
-        const cpu = std.Target.x86.cpu;
-        const decls = @typeInfo(cpu).@"struct".decls;
-        var result: []const *const CpuModel = &[0]*const CpuModel{};
-        var i = 0;
-        for (decls) |decl| {
-            const cpuModel: *const CpuModel = &@field(cpu, decl.name);
-            if (cpuModel == &cpu.generic) {
-                continue;
-            }
-            var features = cpuModel.features;
-            features.populateDependencies(&std.Target.x86.all_features);
-            if (features.isEnabled(@intFromEnum(std.Target.x86.Feature.@"64bit"))) {
-                result = result ++ &[_]*const CpuModel{cpuModel};
-                i += 1;
-            }
-        }
-        return result;
-    }
+    const cpu = std.Target.x86.cpu;
+    return &.{
+        &cpu.x86_64,
+        &cpu.x86_64_v2,
+        &cpu.x86_64_v3,
+        &cpu.x86_64_v4,
+    };
+    // comptime {
+    //     const cpu = std.Target.x86.cpu;
+    //     const decls = @typeInfo(cpu).@"struct".decls;
+    //     var result: []const *const CpuModel = &[0]*const CpuModel{};
+    //     var i = 0;
+    //     for (decls) |decl| {
+    //         const cpuModel: *const CpuModel = &@field(cpu, decl.name);
+    //         if (cpuModel == &cpu.generic) {
+    //             continue;
+    //         }
+    //         var features = cpuModel.features;
+    //         features.populateDependencies(&std.Target.x86.all_features);
+    //         if (features.isEnabled(@intFromEnum(std.Target.x86.Feature.@"64bit"))) {
+    //             result = result ++ &[_]*const CpuModel{cpuModel};
+    //             i += 1;
+    //         }
+    //     }
+    //     return result;
+    // }
 }
 
 fn getSupportedModelsAarch64() []const *const CpuModel {
-    comptime {
-        const cpu = std.Target.aarch64.cpu;
-        const decls = @typeInfo(cpu).@"struct".decls;
-        var result: []const *const CpuModel = &[0]*const CpuModel{};
-        for (decls) |decl| {
-            const cpuModel: *const CpuModel = &@field(cpu, decl.name);
-            result = result ++ &[_]*const CpuModel{cpuModel};
-        }
-        return result;
-    }
+    return &.{&std.Target.aarch64.cpu.generic};
 }
 
 fn maxNameLength(models: []const *const CpuModel) usize {

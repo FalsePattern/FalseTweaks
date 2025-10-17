@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.var;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,6 +57,7 @@ public class NativeLoader {
             Files.createDirectories(nativesDir);
         } catch (IOException ignored) {
         }
+        nativesDir.toFile().deleteOnExit();
         val arch = Arch.getCurrent();
         val os = OS.getCurrent();
         val libc = os.libc();
@@ -74,6 +76,7 @@ public class NativeLoader {
 
     public String unpackNative(String libName, String cpu) throws UnsupportedPlatformException {
         val libNameSys = currentTriple.toLibName(libName, cpu);
+        cpu = cpu == null ? currentTriple.arch.baselineModel : cpu;
         val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
         val libFile = nativesDir.resolve(libNameSys);
         try {
@@ -81,11 +84,13 @@ public class NativeLoader {
         } catch (IOException e) {
             throw new UnsupportedPlatformException(e);
         }
+        libFile.toFile().deleteOnExit();
         return libNameArchive;
     }
 
     public String loadNative(String libName, String cpu) throws UnsupportedPlatformException {
         val libNameSys = currentTriple.toLibName(libName, cpu);
+        cpu = cpu == null ? currentTriple.arch.baselineModel : cpu;
         val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
         val libFile = nativesDir.resolve(libNameSys);
         try {
@@ -99,6 +104,7 @@ public class NativeLoader {
         } catch (UnsatisfiedLinkError e) {
             throw new UnsupportedPlatformException(e);
         }
+        libFile.toFile().deleteOnExit();
         return absolutePath;
     }
 

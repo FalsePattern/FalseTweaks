@@ -58,7 +58,7 @@ public class Unpacker {
         return result;
     }
 
-    public boolean unpack(String blobName, Path into) throws IOException {
+    public void unpack(String blobName, Path into) throws IOException {
         @Cleanup val in = data.openStream();
         @Cleanup val dIn = new DataInputStream(in);
         val count = dIn.readInt();
@@ -74,9 +74,9 @@ public class Unpacker {
             }
             @Cleanup val output = new BufferedOutputStream(Files.newOutputStream(into));
             copy(dIn, output, length);
-            return true;
+            return;
         }
-        return false;
+        throw new IOException("Blob " + blobName + " not found in pak file!");
     }
 
     private void copy(InputStream input, OutputStream output, int bytes) throws IOException {

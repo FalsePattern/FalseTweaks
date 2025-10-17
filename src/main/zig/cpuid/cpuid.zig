@@ -38,40 +38,39 @@ pub const Impl = struct {
     }
 
     fn getModel() *const CpuModel {
-        const target = std.zig.system.resolveTargetQuery(.{
-            .os_tag = builtin.os.tag,
-            .cpu_arch = builtin.target.cpu.arch,
-            .cpu_model = .native,
-            .abi = .gnu,
-        }) catch return builtin.target.cpu.model;
-        const cpu = target.cpu;
-        const model = cpu.model;
         switch (builtin.cpu.arch) {
             .x86_64 => {
+                const target = std.zig.system.resolveTargetQuery(.{
+                    .os_tag = builtin.os.tag,
+                    .cpu_arch = builtin.target.cpu.arch,
+                    .cpu_model = .native,
+                    .abi = .gnu,
+                }) catch return builtin.target.cpu.model;
+                const cpu = target.cpu;
                 const x86_cpu = std.Target.x86.cpu;
-                if (model == &x86_cpu.x86_64) {
-                    var version = &x86_cpu.x86_64;
-                    if (has(cpu.features, &.{ .cx16, .sahf, .popcnt, .sse3, .sse4_1, .sse4_2, .ssse3 })) {
-                        version = &x86_cpu.x86_64_v2;
-                    } else return version;
-                    if (has(cpu.features, &.{ .avx, .avx2, .bmi, .bmi2, .f16c, .fma, .lzcnt, .movbe, .xsave })) {
-                        version = &x86_cpu.x86_64_v3;
-                    } else return version;
-                    if (has(cpu.features, &.{ .avx512f, .avx512bw, .avx512cd, .avx512dq, .avx512vl })) {
-                        version = &x86_cpu.x86_64_v4;
-                    } else return version;
-                }
-                for (cpu_util.supported_models_x86) |supp_model| {
-                    if (supp_model == model) {
-                        return model;
-                    }
-                }
-                return &x86_cpu.x86_64;
+                // if (model == &x86_cpu.x86_64) {
+                var version = &x86_cpu.x86_64;
+                if (has(cpu.features, &.{ .cx16, .sahf, .popcnt, .sse3, .sse4_1, .sse4_2, .ssse3 })) {
+                    version = &x86_cpu.x86_64_v2;
+                } else return version;
+                if (has(cpu.features, &.{ .avx, .avx2, .bmi, .bmi2, .f16c, .fma, .lzcnt, .movbe, .xsave })) {
+                    version = &x86_cpu.x86_64_v3;
+                } else return version;
+                if (has(cpu.features, &.{ .avx512f, .avx512bw, .avx512cd, .avx512dq, .avx512vl })) {
+                    version = &x86_cpu.x86_64_v4;
+                } else return version;
+                // }
+                // for (cpu_util.supported_models_x86) |supp_model| {
+                //     if (supp_model == model) {
+                //         return model;
+                //     }
+                // }
+                return version;
             },
             .aarch64 => {
-                return model;
+                return &std.Target.aarch64.cpu.generic;
             },
-            else => @compileError("Unsupported CPU arch " ++ @tagName(cpu.arch)),
+            else => @compileError("Unsupported CPU arch " ++ @tagName(builtin.cpu.arch)),
         }
     }
 
@@ -88,7 +87,7 @@ pub const Impl = struct {
 };
 
 pub const JNI = struct {
-    var getCpuModel: *const fn(buf: [*]u8) callconv(.c) [*:0]const u8 = undefined;
+    var getCpuModel: *const fn (buf: [*]u8) callconv(.c) [*:0]const u8 = undefined;
 
     var lib: std.DynLib = undefined;
 

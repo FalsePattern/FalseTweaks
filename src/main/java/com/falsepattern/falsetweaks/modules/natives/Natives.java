@@ -26,7 +26,11 @@ import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.natives.camera.Clipping;
 import lombok.Getter;
 import lombok.val;
+import org.apache.commons.io.FileUtils;
 import stubpackage.com.falsepattern.falsetweaks.modules.natives.panama.Init;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static com.falsepattern.falsetweaks.Share.log;
 
@@ -51,6 +55,12 @@ public class Natives {
     public static void loadJNI() throws UnsupportedPlatformException {
         log.info("Initializing natives (JNI)");
         val loader = new NativeLoader(CPUID.class);
+        try {
+            FileUtils.deleteDirectory(loader.nativesDir.toFile());
+            Files.createDirectories(loader.nativesDir);
+        } catch (IOException e) {
+            throw new UnsupportedPlatformException(e);
+        }
         log.info("Loading JNI stubs");
         loader.loadNative("jni", null);
         log.info("Loading CPUID natives");
