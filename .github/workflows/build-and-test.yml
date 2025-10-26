@@ -15,3 +15,4 @@ jobs:
       timeout: 90
       workspace: setupCIWorkspace
       client-only: false
+      zig-version: "0.15.2"

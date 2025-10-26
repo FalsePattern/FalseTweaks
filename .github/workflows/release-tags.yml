@@ -13,6 +13,7 @@ jobs:
     uses: FalsePattern/fpgradle-workflows/.github/workflows/release-tags.yml@master
     with:
       workspace: "setupCIWorkspace"
+      zig-version: "0.15.2"
     secrets:
       MAVEN_DEPLOY_USER: ${{ secrets.MAVEN_DEPLOY_USER }}
       MAVEN_DEPLOY_PASSWORD: ${{ secrets.MAVEN_DEPLOY_PASSWORD }}
