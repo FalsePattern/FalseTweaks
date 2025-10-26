@@ -4,7 +4,7 @@ import com.falsepattern.zigbuild.tasks.ZigBuildTask
 import com.falsepattern.zigbuild.toolchain.ZigVersion
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "2.1.0"
+    id("com.falsepattern.fpgradle-mc") version "2.1.1"
     id("com.falsepattern.zanama") version "0.2.0"
     id("com.falsepattern.zigbuild")
 }
