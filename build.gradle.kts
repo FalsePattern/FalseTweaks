@@ -6,7 +6,7 @@ import com.falsepattern.zigbuild.toolchain.ZigVersion
 plugins {
     id("com.falsepattern.fpgradle-mc") version "2.1.0"
     id("com.falsepattern.zanama") version "0.2.0"
-    id("com.falsepattern.zigbuild") version "0.1.1"
+    id("com.falsepattern.zigbuild")
 }
 
 group = "com.falsepattern"
@@ -72,7 +72,7 @@ minecraft_fp {
 
 zig {
     toolchain {
-        version = ZigVersion.of("0.15.1")
+        version = ZigVersion.of("0.15.2")
     }
     defaultCacheDirs = false
 }
