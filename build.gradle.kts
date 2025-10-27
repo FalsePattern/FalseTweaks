@@ -132,7 +132,7 @@ tasks.processResources.configure {
     into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/") {
         from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } })
     }
-    into(minecraft_fp.mod.rootPkg.map { "/" + it.replace('.', '/') + "/modules/natives" } ) {
+    into(minecraft_fp.mod.rootPkg.map { "/assets/falsetweaks" } ) {
         from(zigPrefix.map { it.dir("lib") }) {
             include("*.pak")
         }

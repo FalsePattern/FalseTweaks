@@ -62,7 +62,7 @@ public class NativeLoader {
         val os = OS.getCurrent();
         val libc = os.libc();
         currentTriple = new Triple(arch, os, libc);
-        val res = root.getResource("natives.pak");
+        val res = root.getResource("/assets/falsetweaks/natives.pak");
         if (res == null) {
             throw new UnsupportedPlatformException("No resource package found!");
         }
