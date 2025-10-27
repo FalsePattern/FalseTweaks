@@ -31,7 +31,6 @@ const base_targets = [_]std.Target.Query{
 };
 
 pub fn build(b: *std.Build) void {
-    const packer = createPackerTask(b);
     const targets = getTargets(b);
 
     //JNI stubs
@@ -56,11 +55,16 @@ pub fn build(b: *std.Build) void {
             .name = name,
             .root_module = libjni_mod,
         });
-        packer.addArg(name);
-        packer.addFileArg(libjni.getEmittedBin());
+        const inst = b.addInstallArtifact(libjni, .{
+            .dest_dir = .{ .override = .lib },
+            .h_dir = .disabled,
+            .implib_dir = .disabled,
+            .pdb_dir = .disabled,
+        });
+        b.getInstallStep().dependOn(&inst.step);
     }
 
-    const zanamaBuilder = ZanamaLibBuilder.init(b, packer);
+    const zanamaBuilder = ZanamaLibBuilder.init(b);
 
     zanamaBuilder.addZanamaLibs(
         "cpuid",
@@ -81,22 +85,6 @@ pub fn build(b: *std.Build) void {
         }),
         targets.all,
     );
-}
-
-fn createPackerTask(b: *std.Build) *std.Build.Step.Run {
-    const packer = b.addExecutable(.{
-        .name = "packer",
-        .root_module = b.addModule("packer", .{
-            .root_source_file = b.path("zig-util/packer.zig"),
-            .target = b.graph.host,
-        }),
-    });
-    const run_packer = b.addRunArtifact(packer);
-    const natives_file = "natives.pak";
-    const output_natives_file = run_packer.addOutputFileArg(natives_file);
-    const install_pack = b.addInstallLibFile(output_natives_file, natives_file);
-    b.getInstallStep().dependOn(&install_pack.step);
-    return run_packer;
 }
 
 fn getTargets(b: *std.Build) struct { baseline: []std.Build.ResolvedTarget, all: []std.Build.ResolvedTarget } {
@@ -125,18 +113,16 @@ fn getTargets(b: *std.Build) struct { baseline: []std.Build.ResolvedTarget, all:
 
 const ZanamaLibBuilder = struct {
     b: *std.Build,
-    packer: *std.Build.Step.Run,
     zanama_dep: *std.Build.Dependency,
     zanama_api: *std.Build.Module,
     zb: zanama.Build,
 
-    pub fn init(b: *std.Build, packer: *std.Build.Step.Run) ZanamaLibBuilder {
+    pub fn init(b: *std.Build) ZanamaLibBuilder {
         const zanama_dep = b.dependency("zanama", .{});
         const zanama_api = zanama_dep.module("api");
         const zb = zanama.Build.init(b, .ReleaseFast, zanama_dep);
         return .{
             .b = b,
-            .packer = packer,
             .zanama_dep = zanama_dep,
             .zanama_api = zanama_api,
             .zb = zb,
@@ -146,12 +132,18 @@ const ZanamaLibBuilder = struct {
     fn addZanamaLibs(self: *const ZanamaLibBuilder, name: []const u8, module: *std.Build.Module, targets: []std.Build.ResolvedTarget) void {
         module.addImport("zanama", self.zanama_api);
         const libs = self.zb.createZanamaLibsResolved(name, module, targets);
+        const install_step = self.b.getInstallStep();
         for (libs.artifacts) |artifact| {
-            self.packer.addArg(artifact.name);
-            self.packer.addFileArg(artifact.getEmittedBin());
+            const inst = self.b.addInstallArtifact(artifact, .{
+                .dest_dir = .{ .override = .lib },
+                .h_dir = .disabled,
+                .implib_dir = .disabled,
+                .pdb_dir = .disabled,
+            });
+            install_step.dependOn(&inst.step);
         }
-        const install_json = self.b.addInstallFile(libs.json, std.mem.concat(self.b.allocator, u8, &.{name, ".json"}) catch @panic("OOM"));
+        const install_json = self.b.addInstallFile(libs.json, std.mem.concat(self.b.allocator, u8, &.{ name, ".json" }) catch @panic("OOM"));
         install_json.step.dependOn(libs.json_step);
-        self.b.getInstallStep().dependOn(&install_json.step);
+        install_step.dependOn(&install_json.step);
     }
 };

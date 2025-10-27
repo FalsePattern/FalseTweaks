@@ -62,7 +62,7 @@ public class NativeLoader {
         val os = OS.getCurrent();
         val libc = os.libc();
         currentTriple = new Triple(arch, os, libc);
-        val res = root.getResource("/assets/falsetweaks/natives.pak");
+        val res = root.getResource("/assets/falsetweaks/natives.zip");
         if (res == null) {
             throw new UnsupportedPlatformException("No resource package found!");
         }
@@ -80,7 +80,7 @@ public class NativeLoader {
         val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
         val libFile = nativesDir.resolve(libNameSys);
         try {
-            unpacker.unpack(libNameArchive, libFile);
+            unpacker.unpack(libNameSys, libFile);
         } catch (IOException e) {
             throw new UnsupportedPlatformException(e);
         }
@@ -91,10 +91,9 @@ public class NativeLoader {
     public String loadNative(String libName, String cpu) throws UnsupportedPlatformException {
         val libNameSys = currentTriple.toLibName(libName, cpu);
         cpu = cpu == null ? currentTriple.arch.baselineModel : cpu;
-        val libNameArchive = libName + "-" + currentTriple.toName() + "-" + cpu;
         val libFile = nativesDir.resolve(libNameSys);
         try {
-            unpacker.unpack(libNameArchive, libFile);
+            unpacker.unpack(libNameSys, libFile);
         } catch (IOException e) {
             throw new UnsupportedPlatformException(e);
         }

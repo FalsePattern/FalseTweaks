@@ -26,7 +26,6 @@ import lombok.Cleanup;
 import lombok.val;
 
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +33,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Unpacker {
     private final URL data;
@@ -43,46 +45,34 @@ public class Unpacker {
 
     public String[] names() throws IOException {
         @Cleanup val in = data.openStream();
-        @Cleanup val dIn = new DataInputStream(in);
-        val count = dIn.readInt();
-        val result = new String[count];
-        for (int i = 0; i < count; i++) {
-            val nameLength = dIn.readUnsignedByte();
-            val nameBuf = new byte[nameLength];
-            dIn.readFully(nameBuf);
-            val name = new String(nameBuf);
-            result[i] = name;
-            val length = dIn.readInt();
-            dIn.skipBytes(length);
+        @Cleanup val zipIn = new ZipInputStream(in);
+        ZipEntry entry;
+        val result = new ArrayList<String>();
+        while ((entry = zipIn.getNextEntry()) != null) {
+            result.add(entry.getName());
         }
-        return result;
+        return result.toArray(new String[0]);
     }
 
     public void unpack(String blobName, Path into) throws IOException {
         @Cleanup val in = data.openStream();
-        @Cleanup val dIn = new DataInputStream(in);
-        val count = dIn.readInt();
-        for (int i = 0; i < count; i++) {
-            val nameLength = dIn.readUnsignedByte();
-            val nameBuf = new byte[nameLength];
-            dIn.readFully(nameBuf);
-            val name = new String(nameBuf);
-            val length = dIn.readInt();
-            if (!blobName.equals(name)) {
-                dIn.skipBytes(length);
-                continue;
+        @Cleanup val zipIn = new ZipInputStream(in);
+        ZipEntry entry;
+        while ((entry = zipIn.getNextEntry()) != null) {
+            if (entry.getName().equals(blobName)) {
+                val size = entry.getSize();
+                @Cleanup val output = new BufferedOutputStream(Files.newOutputStream(into));
+                copy(zipIn, output, size);
+                return;
             }
-            @Cleanup val output = new BufferedOutputStream(Files.newOutputStream(into));
-            copy(dIn, output, length);
-            return;
         }
         throw new IOException("Blob " + blobName + " not found in pak file!");
     }
 
-    private void copy(InputStream input, OutputStream output, int bytes) throws IOException {
-        val buf = new byte[Math.min(bytes, 4096)];
+    private void copy(InputStream input, OutputStream output, long bytes) throws IOException {
+        val buf = new byte[(int) Math.min(bytes, 4096)];
         while (bytes > 0) {
-            val toRead = Math.min(buf.length, bytes);
+            val toRead = (int)Math.min(buf.length, bytes);
             val read = input.read(buf, 0, toRead);
             if (read < 0) {
                 throw new EOFException();

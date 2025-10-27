@@ -1,5 +1,4 @@
 import com.falsepattern.zanama.tasks.ZanamaTranslate
-import com.falsepattern.zigbuild.options.ZigBuildOptions
 import com.falsepattern.zigbuild.tasks.ZigBuildTask
 import com.falsepattern.zigbuild.toolchain.ZigVersion
 
@@ -127,15 +126,22 @@ tasks.named<JavaCompile>(panamaNatives.compileJavaTaskName) {
 
 panamaNatives.java.srcDirs(translateJavaSourcesCpuID, translateJavaSourcesFalseTweaks)
 
-tasks.processResources.configure {
+val packNatives = tasks.register<Zip>("packNatives") {
+    this.archiveFileName = "natives.zip"
+    from(zigPrefix.map { it.dir("lib") }) {
+        include("*.so", "*.dll", "*.dylib")
+    }
+    this.entryCompression = ZipEntryCompression.STORED
     dependsOn(zigBuildTask)
+}
+
+tasks.processResources.configure {
+    dependsOn(zigBuildTask, packNatives)
     into("META-INF/falsepatternlib_repo/mega/megatraceservice/1.2.0/") {
         from(configurations.compileClasspath.map { it.filter { file -> file.name.contains("megatraceservice") } })
     }
     into(minecraft_fp.mod.rootPkg.map { "/assets/falsetweaks" } ) {
-        from(zigPrefix.map { it.dir("lib") }) {
-            include("*.pak")
-        }
+        from(packNatives.map { it.outputs.files })
     }
 }
 
