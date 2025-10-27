@@ -27,7 +27,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class ClippingExtras {
-    private static final Arena arena = Arena.ofConfined();
+    private static final Arena arena = Arena.ofShared();
     private static final MemorySegment frust = arena.allocate(ValueLayout.JAVA_FLOAT, 24);
     public static void setFrustum(float[][] frustum) {
         for (int i = 0; i < 4; i++) {
