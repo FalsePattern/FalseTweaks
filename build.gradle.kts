@@ -165,7 +165,7 @@ dependencies {
     compileOnly("org.joml:joml:1.10.8")
     compileOnly("it.unimi.dsi:fastutil:8.5.16")
     compileOnly("mega:megatraceservice:1.2.0")
-    compileOnly("com.ventooth:swansong-mc1.7.10:1.2.1:dev")
+    compileOnly("com.ventooth:swansong-mc1.7.10:1.2.5:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
     add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.2.0")
 

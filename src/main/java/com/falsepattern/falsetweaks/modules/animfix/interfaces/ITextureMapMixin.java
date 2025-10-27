@@ -28,4 +28,14 @@ public interface ITextureMapMixin {
     void initializeBatcher(int offsetX, int offsetY, int width, int height);
 
     IAnimationUpdateBatcher getBatcher();
+
+    /**
+     * Only valid when swansong is present
+     */
+    IAnimationUpdateBatcher ft$getBatcherNorm();
+
+    /**
+     * Only valid when swansong is present
+     */
+    IAnimationUpdateBatcher ft$getBatcherSpec();
 }

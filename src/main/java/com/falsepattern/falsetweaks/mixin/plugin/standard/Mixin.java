@@ -293,6 +293,10 @@ public enum Mixin implements IMixins {
                              "animfix.fastcraft.DynamicTextureMixin",
                              "animfix.fastcraft.TextureMapMixin",
                              "animfix.fastcraft.TextureUtilMixin")),
+    AnimFix_SwanSong(Phase.EARLY,
+                     () -> ModuleConfig.TEXTURE_OPTIMIZATIONS,
+                     require(SwanSong),
+                     client("animfix.swansong.PBRTextureEngineMixin")),
 
     Voxelizer(Phase.EARLY,
               () -> ModuleConfig.VOXELIZER,

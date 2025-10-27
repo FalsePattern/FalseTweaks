@@ -31,7 +31,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.texture.TextureMap;
 
-@Mixin(TextureMap.class)
+@Mixin(value = TextureMap.class,
+       priority = 1100) // Swansong compat)
 public abstract class TextureMap_UnprofiledMixin implements ITextureMapMixin {
 
     @Inject(method = "updateAnimations",

@@ -47,7 +47,8 @@ import javax.swing.JOptionPane;
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
      dependencies = "required-after:falsepatternlib@[1.9.1,);" +
-                    "after:gtnhlib@[0.5.21,);")
+                    "after:gtnhlib@[0.5.21,);" +
+                    "after:swansong@[1.2.5,);")
 public class FalseTweaks {
 
     @SidedProxy(clientSide = Tags.ROOT_PKG + ".proxy.ClientProxy",

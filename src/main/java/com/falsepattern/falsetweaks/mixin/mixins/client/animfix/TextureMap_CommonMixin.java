@@ -22,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.mixin.mixins.client.animfix;
 
+import com.falsepattern.falsetweaks.Compat;
 import com.falsepattern.falsetweaks.api.animfix.IAnimationUpdateBatcher;
 import com.falsepattern.falsetweaks.modules.animfix.AnimationUpdateBatcherRegistry;
 import com.falsepattern.falsetweaks.modules.animfix.interfaces.ITextureMapMixin;
@@ -29,6 +30,7 @@ import lombok.Getter;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -49,6 +51,20 @@ public abstract class TextureMap_CommonMixin implements ITextureMapMixin {
     private String basePath;
     @Getter
     private IAnimationUpdateBatcher batcher;
+    @Unique
+    private IAnimationUpdateBatcher ft$batcherNorm;
+    @Unique
+    private IAnimationUpdateBatcher ft$batcherSpec;
+
+    @Override
+    public IAnimationUpdateBatcher ft$getBatcherNorm() {
+        return ft$batcherNorm;
+    }
+
+    @Override
+    public IAnimationUpdateBatcher ft$getBatcherSpec() {
+        return ft$batcherSpec;
+    }
 
     @Inject(method = "loadTexture",
             at = @At(value = "HEAD"),
@@ -90,7 +106,30 @@ public abstract class TextureMap_CommonMixin implements ITextureMapMixin {
     public void initializeBatcher(int xOffset, int yOffset, int width, int height) {
         if (batcher != null) {
             batcher.terminate();
+            batcher = null;
         }
-        batcher = AnimationUpdateBatcherRegistry.newBatcher(xOffset, yOffset, width, height, mipmapLevels);
+        if (ft$batcherNorm != null) {
+            ft$batcherNorm.terminate();
+            ft$batcherNorm = null;
+        }
+        if (ft$batcherSpec != null) {
+            ft$batcherSpec.terminate();
+            ft$batcherSpec = null;
+        }
+        if (width * height > 0) {
+            batcher = AnimationUpdateBatcherRegistry.newBatcher(xOffset, yOffset, width, height, mipmapLevels);
+            if (Compat.swanSongInstalled()) {
+                ft$batcherNorm = AnimationUpdateBatcherRegistry.newBatcher(xOffset,
+                                                                           yOffset,
+                                                                           width,
+                                                                           height,
+                                                                           mipmapLevels);
+                ft$batcherSpec = AnimationUpdateBatcherRegistry.newBatcher(xOffset,
+                                                                           yOffset,
+                                                                           width,
+                                                                           height,
+                                                                           mipmapLevels);
+            }
+        }
     }
 }
