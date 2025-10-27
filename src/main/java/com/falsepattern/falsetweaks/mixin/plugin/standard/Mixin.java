@@ -130,6 +130,10 @@ public enum Mixin implements IMixins {
                                () -> ModuleConfig.TRIANGULATOR,
                                require(RedstonePaste),
                                client("triangulator.redstonepaste.RedstonePasteHighlighterMixin")),
+    Triangulator_SwanSong(Phase.EARLY,
+                          () -> ModuleConfig.TRIANGULATOR,
+                          require(SwanSong),
+                          client("triangulator.swansong.ShaderTessMixin")),
 
     CrackFix(Phase.EARLY,
              () -> ModuleConfig.blockCrackFix,
