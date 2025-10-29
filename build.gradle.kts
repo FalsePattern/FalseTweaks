@@ -1,9 +1,14 @@
+import com.falsepattern.jtweaker.readZipInputStreamFor
 import com.falsepattern.zanama.tasks.ZanamaTranslate
 import com.falsepattern.zigbuild.tasks.ZigBuildTask
 import com.falsepattern.zigbuild.toolchain.ZigVersion
+import com.gtnewhorizons.retrofuturagradle.mcp.ReobfuscatedJar
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.outputStream
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "2.1.1"
+    id("com.falsepattern.fpgradle-mc") version "2.2.1"
     id("com.falsepattern.zanama") version "0.2.0"
     id("com.falsepattern.zigbuild")
 }
@@ -118,7 +123,6 @@ val panamaNatives = jarInJar_fp("panama") {
     this.javaCompatibility = modern
     this.javaVersion = JavaVersion.VERSION_25
     this.artifactName = "falsetweaks-panama"
-    this.artifactVersion = "1.0.0"
 }
 tasks.named<JavaCompile>(panamaNatives.compileJavaTaskName) {
     dependsOn(zigTranslateCpuID, zigTranslateFalseTweaks)
@@ -143,7 +147,78 @@ tasks.processResources.configure {
     into(minecraft_fp.mod.rootPkg.map { "/assets/falsetweaks" } ) {
         from(packNatives.map { it.outputs.files })
     }
+    val ver = minecraft_fp.mod.version
+    filesMatching("META-INF/deps_modern.json") {
+        expand("modVersion" to ver.get())
+    }
 }
+
+//region curseforge jank
+
+publishing {
+    publications {
+        val mvn = minecraft_fp.publish.maven
+        val jar = tasks.named<Jar>(panamaNatives.jarTaskName)
+        val reobfJar = tasks.named<ReobfuscatedJar>("reobf${panamaNatives.jarTaskName}")
+        create<MavenPublication>("mavenPanama") {
+            setArtifacts(emptyList<Any>())
+            artifact(jar)
+            artifact(reobfJar)
+            groupId = mvn.group.get()
+            artifactId = jar.flatMap { it.archiveBaseName }.get()
+            version = mvn.version.get()
+        }
+    }
+}
+
+val reobfJarTask = tasks.reobfJar
+
+abstract class CurseStripJar @Inject constructor(project: Project): Jar() {
+    @get:Inject
+    abstract val archive: ArchiveOperations
+
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
+
+    @TaskAction
+    fun run() {
+        inputFile.asFile.get().toPath().readZipInputStreamFor("META-INF/MANIFEST.MF", false) { inp ->
+            // write to temp file
+            val inpTmp = temporaryDir.resolve("input-manifest.MF").toPath()
+            inpTmp.outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use { out ->
+                inp.copyTo(out)
+            }
+            this.manifest {
+                this@manifest.from(inpTmp)
+            }
+        }
+
+        from(archive.zipTree(inputFile)) {
+            exclude("META-INF/falsepatternlib_repo/com/falsepattern/falsetweaks-panama/**/*")
+        }
+        copy()
+    }
+
+    init {
+        this.destinationDirectory.set(project.layout.buildDirectory.dir("libs-cf"))
+    }
+}
+
+val cfJar = tasks.register<CurseStripJar>("curseforgeJar") {
+    inputFile = reobfJarTask.flatMap { it.archiveFile }
+    dependsOn(reobfJarTask)
+    archiveFileName = reobfJarTask.flatMap { it.archiveFileName }
+}
+
+afterEvaluate {
+    tasks.named<TaskPublishCurseForge>("curseforge") {
+        dependsOn(cfJar)
+    }
+}
+
+minecraft_fp.publish.curseforge.toUpload.set(cfJar.map { it.archiveFile })
+
+// endregion
 
 repositories {
     cursemavenEX()

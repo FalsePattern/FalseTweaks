@@ -2,7 +2,8 @@
   "identifier": "falsepatternlib_dependencies",
   "minJava": 25,
   "repositories": [
-    "https://repo1.maven.org/maven2/"
+    "https://repo1.maven.org/maven2/",
+    "https://mvn.falsepattern.com/releases/"
   ],
   "dependencies": {
     "always": {
@@ -15,14 +16,14 @@
     "obf": {
       "common": [],
       "client": [
-        "com.falsepattern:falsetweaks-panama:1.0.0"
+        "com.falsepattern:falsetweaks-panama:${modVersion}"
       ],
       "server": []
     },
     "dev": {
       "common": [],
       "client": [
-        "com.falsepattern:falsetweaks-panama:1.0.0:dev"
+        "com.falsepattern:falsetweaks-panama:${modVersion}:dev"
       ],
       "server": []
     }
