@@ -1,0 +1,17 @@
+name: Main
+description: Report an issue with the mod
+title: "[Issue]: "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: Describe your issue
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: fml_client_latest.log, and crash reports, if any.
+      description: Select this text box and drag+drop the log file here. Your issue will be automatically closed without the correct log files.
+    validations:
+      required: true
