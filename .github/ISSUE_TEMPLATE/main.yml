@@ -12,6 +12,22 @@ body:
   - type: textarea
     attributes:
       label: fml_client_latest.log, and crash reports, if any.
-      description: Select this text box and drag+drop the log file here. Your issue will be automatically closed without the correct log files.
+      description: Select this text box and drag+drop the log files here.
+        FML_CLIENT_LATEST.LOG IS REQUIRED EVEN IF THERE IS NO CRASH.
+        FML_CLIENT_LATEST.LOG IS REQUIRED EVEN IF THERE IS NO CRASH.
+        FML_CLIENT_LATEST.LOG IS REQUIRED EVEN IF THERE IS NO CRASH.
+        Your issue will be automatically closed without the correct log files.
+        Your issue will be automatically closed without the correct log files.
+        Your issue will be automatically closed without the correct log files.
+        Your issue will be automatically closed without the correct log files.
+        Your issue will be automatically closed without the correct log files.
     validations:
       required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: I have submitted the required files
+      description: By submitting this issue, you confirm that the section above contains either fml_client_latest.log, or a crash report file.
+      options:
+        - label: I confirm that i have attached the required log files as a github attachment, and not as a pastebin/mclogs link.
+          required: true

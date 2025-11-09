@@ -1,0 +1,19 @@
+name: Enhancement
+description: Request an enhancement or feature. THIS IS NOT FOR BUG REPORTS
+title: "[Enhancement]: "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: Describe your request
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: This is not a bug report
+      description: By submitting this issue, you confirm that this is not a bug report.
+      options:
+        - label: I confirm that this is not a bug report, and that this issue can be deleted without notice if this is a bug report.
+          required: true
