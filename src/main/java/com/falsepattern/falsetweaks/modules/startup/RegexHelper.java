@@ -31,7 +31,8 @@ public class RegexHelper {
         return toMatch.endsWith(".class") &&
                !toMatch.startsWith("$") &&
                !toMatch.endsWith("$.class") &&
-               !toMatch.equals("module-info.class");
+               !toMatch.equals("module-info.class") &&
+               !toMatch.endsWith("/module-info.class");
     }
 
     public static boolean modClassRegex(String toMatch) {
