@@ -30,7 +30,9 @@ public abstract class TessellatorMixin_RequireFoamFix implements ITriangulatorTe
     @Dynamic
     @Redirect(method = "getVertexState_foamfix_old",
               at = @At(value = "NEW",
-                       target = "([IFFF)Lnet/minecraft/client/util/QuadComparator;"),
+                       target = "([IFFF)Lnet/minecraft/client/util/QuadComparator;",
+                       remap = true),
+              remap = false,
               require = 1)
     private QuadComparator hackQuadComparator(int[] vertexData, float x, float y, float z) {
         if (this.drawingTris()) {

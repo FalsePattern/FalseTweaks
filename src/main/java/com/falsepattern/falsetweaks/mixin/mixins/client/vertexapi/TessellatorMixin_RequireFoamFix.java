@@ -23,6 +23,7 @@ public abstract class TessellatorMixin_RequireFoamFix {
     @Dynamic
     @ModifyConstant(method = "getVertexState_foamfix_old",
                     constant = @Constant(intValue = 32),
+                    remap = false,
                     require = 1)
     private int hackStride(int constant) {
         return VertexInfo.recomputeVertexInfo(constant >>> 2, 4);

@@ -42,6 +42,7 @@ public abstract class BlockReinforcedIronBarsMixin extends BlockPane {
     @Redirect(method = "<init>",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/common/ObfuscationReflectionHelper;setPrivateValue(Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Object;I)V"),
+              remap = false,
               require = 0,
               expect = 0)
     private <T, E> void fixPriv(Class<T> classToAccess, T instance, E value, int index) {

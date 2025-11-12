@@ -44,7 +44,8 @@ public abstract class BlockCacheMixin {
     @Redirect(method = "getIcon(Lnet/minecraft/world/IBlockAccess;IIII)Lnet/minecraft/util/IIcon;",
               at = @At(value = "FIELD",
                        opcode = Opcodes.GETSTATIC,
-                       target = "Lcofh/core/block/BlockCoFHBase;renderPass:I"),
+                       target = "Lcofh/core/block/BlockCoFHBase;renderPass:I",
+                       remap = false),
               require = 1)
     private int redirectGetRenderPass() {
         return ThermalExpansionCompat.getCofhBlockRenderPass();

@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.Tessellator;
 
 @Mixin(Tessellator.class)
 public abstract class TessellatorVanillaHookMixin implements ITriangulatorTessellator {
-    @Shadow
+    @Shadow(remap = false)
     private int rawBufferSize;
 
     @Override

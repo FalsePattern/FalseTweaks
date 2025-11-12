@@ -38,7 +38,8 @@ import net.minecraftforge.client.IItemRenderer;
 public abstract class ItemRendererMixin {
     @WrapOperation(method = "renderItemInFirstPerson",
                    at = @At(value = "INVOKE",
-                            target = "Lnet/minecraftforge/client/IItemRenderer;renderItem(Lnet/minecraftforge/client/IItemRenderer$ItemRenderType;Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V"),
+                            target = "Lnet/minecraftforge/client/IItemRenderer;renderItem(Lnet/minecraftforge/client/IItemRenderer$ItemRenderType;Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V",
+                            remap = false),
                    require = 0,
                    expect = 1)
     private void wrapRenderItem(IItemRenderer instance,

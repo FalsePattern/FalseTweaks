@@ -42,6 +42,7 @@ public abstract class BlockReinforcedGlassPaneMixin extends BlockPane {
     @Redirect(method = "<init>",
               at = @At(value = "INVOKE",
                        target = "Lcpw/mods/fml/relauncher/ReflectionHelper;setPrivateValue(Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Object;I)V"),
+              remap = false,
               require = 0,
               expect = 0)
     private <T, E> void fixPriv(Class<T> classToAccess, T instance, E value, int index) {
