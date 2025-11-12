@@ -55,10 +55,6 @@ public class MixinCompatHackTweaker implements ITweaker {
         val f = LaunchClassLoader.class.getDeclaredField("transformers");
         f.setAccessible(true);
         val transformers = (List<IClassTransformer>) f.get(Launch.classLoader);
-        try {
-            ASMFixerUtility.removeGTNHLibHook(transformers);
-        } catch (Throwable ignored) {
-        }
         transformers.add(CoreLoadingPlugin.FIELD_HACK_TF);
         return new String[0];
     }

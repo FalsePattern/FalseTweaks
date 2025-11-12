@@ -23,14 +23,25 @@
 package com.falsepattern.falsetweaks.modules.threadedupdates;
 
 import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
+import com.gtnewhorizon.gtnhlib.api.CapturingTesselator;
 import lombok.val;
 
 import net.minecraft.client.renderer.Tessellator;
+import cpw.mods.fml.common.Loader;
 
 public class ThreadTessellator {
     private static final ThreadLocal<Tessellator> TESS = ThreadLocal.withInitial(Tessellator::new);
+    private static final boolean GTNHLIB_PRESENT = Loader.isModLoaded("gtnhlib");
 
     public static Tessellator getThreadTessellator() {
+        if (GTNHLIB_PRESENT) {
+            return GTNHLibInterop.getThreadTessellator();
+        } else {
+            return getThreadTessellatorRaw();
+        }
+    }
+
+    private static Tessellator getThreadTessellatorRaw() {
         if (MainThreadContainer.isMainThread()) {
             return mainThreadTessellator();
         } else {
@@ -46,5 +57,14 @@ public class ThreadTessellator {
         val old = Tessellator.instance;
         Tessellator.instance = tess;
         return old;
+    }
+
+    private static class GTNHLibInterop {
+        public static Tessellator getThreadTessellator() {
+            if (CapturingTesselator.isCapturing()) {
+                return CapturingTesselator.getThreadTesselator();
+            }
+            return getThreadTessellatorRaw();
+        }
     }
 }

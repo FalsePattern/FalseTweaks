@@ -39,6 +39,7 @@ import org.spongepowered.asm.launch.GlobalProperties;
 import org.spongepowered.asm.service.mojang.MixinServiceLaunchWrapper;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
@@ -63,8 +64,12 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
         if (isClient) {
             if (ModuleConfig.THREADED_CHUNK_UPDATES) {
+                try {
+                    val f = LaunchClassLoader.class.getDeclaredField("transformers");
+                    f.setAccessible(true);
+                    ASMFixerUtility.removeGTNHLibThreadingHook(f);
+                } catch (Throwable ignores) {}
                 ThreadingCompat.executeConfigFixes();
-                pleaseDontBreakMyThreadedRendering();
             }
 
             if (ModuleConfig.TEXTURE_OPTIMIZATIONS) {
@@ -78,19 +83,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
                     Share.log.error("Failed to load natives", e);
                 }
             }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void pleaseDontBreakMyThreadedRendering() {
-        // Evil hack
-        try {
-            val theClass = Class.forName("com.gtnewhorizon.gtnhlib.core.transformer.TessellatorRedirectorTransformer");
-            val exclusionsField = theClass.getDeclaredField("TransformerExclusions");
-            exclusionsField.setAccessible(true);
-            val exclusions = (List<String>) exclusionsField.get(null);
-            exclusions.set(0, "");
-        } catch (Throwable ignored) {
         }
     }
 
