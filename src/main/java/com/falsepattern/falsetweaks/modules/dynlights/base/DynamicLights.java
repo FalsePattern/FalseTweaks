@@ -42,6 +42,7 @@ import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMagmaCube;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -326,12 +327,16 @@ public class DynamicLights implements DynamicLightsDriver {
             }
 
             if (entity instanceof EntityLivingBase) {
-                EntityLivingBase player = (EntityLivingBase) entity;
-                ItemStack stackMain = player.getHeldItem();
+                EntityLivingBase living = (EntityLivingBase) entity;
+                ItemStack stackMain = living.getHeldItem();
                 int levelMain = getLightLevel(stackMain);
-                ItemStack stackHead = player.getEquipmentInSlot(4);
+                ItemStack stackHead = living.getEquipmentInSlot(4);
                 int levelHead = getLightLevel(stackHead);
-                return Math.max(levelMain, levelHead);
+                int level = Math.max(levelMain, levelHead);
+                if (entity instanceof EntityPlayer) {
+                    level = Math.max(level, getLightLevel(OffhandMod.CURRENT.getOffhandItem((EntityPlayer) entity)));
+                }
+                return level;
             } else if (entity instanceof EntityItem) {
                 EntityItem entityItem = (EntityItem) entity;
                 ItemStack itemStack = getItemStack(entityItem);

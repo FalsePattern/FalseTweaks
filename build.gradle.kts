@@ -302,4 +302,7 @@ dependencies {
     // LittleTiles 1.2.0
     compileOnly(deobfCurse("littletiles-257818:2462370"))
 //    runtimeOnlyNonPublishable(deobfCurse("creativecore-257814:2462369"))
+    compileOnly(deobfModrinth("backhand:1.4.1"))
+    compileOnly(deobfCurse("mb-battlegear-2-59710:2286765"))
+    compileOnly("com.github.GTNewHorizons:Battlegear2:1.4.3:dev")
 }

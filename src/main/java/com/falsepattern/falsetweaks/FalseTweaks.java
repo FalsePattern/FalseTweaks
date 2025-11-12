@@ -27,6 +27,7 @@ import com.falsepattern.falsetweaks.proxy.CommonProxy;
 import lombok.val;
 import lombok.var;
 
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -110,6 +111,12 @@ public class FalseTweaks {
                     "Remove the DynamicLights mod and restart the game!\n" +
                     "FalseTweaks has built-in dynamic lights support.");
         }
+        try {
+            if (Launch.classLoader.getClassBytes("cn.tesseract.offhandlights.OffhandLights") != null) {
+                createSidedException("Remove the OffhandLights mod and restart the game!\n" +
+                                     "FalseTweaks has built-in offhand lights support.");
+            }
+        } catch (Throwable ignored) {}
         proxy.preInit(e);
     }
 
