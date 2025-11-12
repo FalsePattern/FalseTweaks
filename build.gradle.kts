@@ -8,7 +8,7 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.outputStream
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "2.2.1"
+    id("com.falsepattern.fpgradle-mc") version "3.1.0"
     id("com.falsepattern.zanama") version "0.2.0"
     id("com.falsepattern.zigbuild")
 }
@@ -126,6 +126,14 @@ val panamaNatives = jarInJar_fp("panama") {
 }
 tasks.named<JavaCompile>(panamaNatives.compileJavaTaskName) {
     dependsOn(zigTranslateCpuID, zigTranslateFalseTweaks)
+}
+
+tasks.named<Jar>(panamaNatives.jarTaskName) {
+    destinationDirectory = layout.buildDirectory.dir("tmp/panama-libs")
+}
+
+tasks.named<ReobfuscatedJar>("reobf${panamaNatives.jarTaskName}") {
+    destinationDirectory = layout.buildDirectory.dir("tmp/panama-libs")
 }
 
 panamaNatives.java.srcDirs(translateJavaSourcesCpuID, translateJavaSourcesFalseTweaks)
