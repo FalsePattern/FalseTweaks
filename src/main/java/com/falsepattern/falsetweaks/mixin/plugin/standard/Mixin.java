@@ -141,7 +141,8 @@ public enum Mixin implements IMixins {
 
     AOFix_Universal(Phase.EARLY,
                     () -> ModuleConfig.aoFix && AOFixConfig.universalPatch,
-                    client("ao.RenderBlocksUniversalMixin")),
+                    client("ao.RenderBlocksUniversalMixin",
+                           "ao.ChunkCacheMixin")),
     AOFix_Compat(Phase.EARLY,
                  () -> ModuleConfig.aoFix && AOFixConfig.renderHookCompatMode,
                  client("ao.RenderBlocksCompatMixin")),

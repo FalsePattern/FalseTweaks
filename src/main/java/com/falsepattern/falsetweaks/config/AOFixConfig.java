@@ -49,6 +49,14 @@ public class AOFixConfig {
     @Config.RequiresMcRestart
     public static boolean patchLittleTiles;
 
+    @Config.Comment({
+            "Stairs and slabs need additional AO workarounds to look good.",
+            "You can toggle these fixes here (requires f3+a world renderer refresh to see the changes)"
+    })
+    @Config.LangKey
+    @Config.DefaultBoolean(true)
+    public static boolean stairAOFix;
+
     static {
         ConfigurationManager.selfInit();
     }

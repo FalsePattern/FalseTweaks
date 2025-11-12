@@ -23,6 +23,7 @@
 package com.falsepattern.falsetweaks.modules.ao;
 
 import com.falsepattern.falsetweaks.Compat;
+import com.falsepattern.falsetweaks.config.AOFixConfig;
 import com.falsepattern.falsetweaks.modules.triangulator.renderblocks.Facing;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +45,12 @@ import static com.falsepattern.falsetweaks.modules.ao.BrightnessMath.lerpBrightn
 @RequiredArgsConstructor
 public class AmbientOcclusionRenderer implements AORenderer {
     private static final Facing.Direction[] dirs = Facing.Direction.values();
-    private final float[] ao = new float[3 * 3 * 3];
-    private final int[] light = new int[3 * 3 * 3];
-    private final float[] inset = new float[dirs.length];
+    private static final int SECTION_SIZE = 3 * 3 * 3;
+    private static final int LIGHT_OFFSET = SECTION_SIZE;
+    private static final int INSET_OFFSET = LIGHT_OFFSET + SECTION_SIZE;
+    private static final int TRANSPARENCY_OFFSET = INSET_OFFSET + dirs.length;
+    private static final int TOTAL_SIZE = TRANSPARENCY_OFFSET + 1;
+    private final int[] data = new int[TOTAL_SIZE];
     private float r;
     private float g;
     private float b;
@@ -63,23 +67,38 @@ public class AmbientOcclusionRenderer implements AORenderer {
 
     @Override
     public boolean renderWithAO(RenderBlocks rb, Block block, int x, int y, int z, float r, float g, float b) {
-        rb.enableAO = true;
-        Compat.tessellator().setBrightness(0x00f000f0);
-        fetchLightingData(rb, block, x, y, z);
-        val useColor = !(rb.getBlockIcon(block).getIconName()
-                       .equals("grass_top") || rb.hasOverrideBlockTexture());
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        boolean drewSomething;
-        drewSomething = renderFace(rb, Facing.YNEG, block, x, y, z, useColor);
-        drewSomething |= renderFace(rb, Facing.YPOS, block, x, y, z, useColor);
-        drewSomething |= renderFace(rb, Facing.ZNEG, block, x, y, z, useColor);
-        drewSomething |= renderFace(rb, Facing.ZPOS, block, x, y, z, useColor);
-        drewSomething |= renderFace(rb, Facing.XNEG, block, x, y, z, useColor);
-        drewSomething |= renderFace(rb, Facing.XPOS, block, x, y, z, useColor);
-        rb.enableAO = false;
-        return drewSomething;
+        final AOChunkCache aocc;
+        if (rb.blockAccess instanceof AOChunkCache) {
+            aocc = (AOChunkCache) rb.blockAccess;
+            aocc.ft$setUseNeighborBrightness(false);
+        } else {
+            aocc = null;
+        }
+        try {
+            rb.enableAO = true;
+            Compat.tessellator()
+                  .setBrightness(0x00f000f0);
+            fetchLightingData(rb, block, x, y, z);
+            val useColor = !(rb.getBlockIcon(block)
+                               .getIconName()
+                               .equals("grass_top") || rb.hasOverrideBlockTexture());
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            boolean drewSomething;
+            drewSomething = renderFace(rb, Facing.YNEG, block, x, y, z, useColor);
+            drewSomething |= renderFace(rb, Facing.YPOS, block, x, y, z, useColor);
+            drewSomething |= renderFace(rb, Facing.ZNEG, block, x, y, z, useColor);
+            drewSomething |= renderFace(rb, Facing.ZPOS, block, x, y, z, useColor);
+            drewSomething |= renderFace(rb, Facing.XNEG, block, x, y, z, useColor);
+            drewSomething |= renderFace(rb, Facing.XPOS, block, x, y, z, useColor);
+            rb.enableAO = false;
+            return drewSomething;
+        } finally {
+            if (aocc != null) {
+                aocc.ft$setUseNeighborBrightness(true);
+            }
+        }
     }
 
     private boolean renderFace(RenderBlocks rb, Facing facing, Block block, int x, int y, int z, boolean useColor) {
@@ -90,30 +109,101 @@ public class AmbientOcclusionRenderer implements AORenderer {
         val isInset = inset != 0;
 
         fetchMixedAO(facing, true);
+        fetchMixedBrightness(facing, true);
         if (isInset) {
             float aoTopLeftOut = this.aoTopLeft;
             float aoTopRightOut = this.aoTopRight;
             float aoBottomLeftOut = this.aoBottomLeft;
             float aoBottomRightOut = this.aoBottomRight;
-            int brightnessTopLeftOut = this.brightnessTopLeft;
-            int brightnessTopRightOut = this.brightnessTopRight;
-            int brightnessBottomLeftOut = this.brightnessBottomLeft;
-            int brightnessBottomRightOut = this.brightnessBottomRight;
             fetchMixedAO(facing, false);
 
             this.aoTopLeft = lerpAO(aoTopLeftOut, this.aoTopLeft, inset);
             this.aoTopRight = lerpAO(aoTopRightOut, this.aoTopRight, inset);
             this.aoBottomLeft = lerpAO(aoBottomLeftOut, this.aoBottomLeft, inset);
             this.aoBottomRight = lerpAO(aoBottomRightOut, this.aoBottomRight, inset);
-            this.brightnessTopLeft = lerpBrightness(brightnessTopLeftOut, this.brightnessTopLeft, inset);
-            this.brightnessTopRight = lerpBrightness(brightnessTopRightOut, this.brightnessTopRight, inset);
-            this.brightnessBottomLeft = lerpBrightness(brightnessBottomLeftOut, this.brightnessBottomLeft, inset);
-            this.brightnessBottomRight = lerpBrightness(brightnessBottomRightOut, this.brightnessBottomRight, inset);
+            if (!AOFixConfig.stairAOFix) {
+                int brightnessTopLeftOut = this.brightnessTopLeft;
+                int brightnessTopRightOut = this.brightnessTopRight;
+                int brightnessBottomLeftOut = this.brightnessBottomLeft;
+                int brightnessBottomRightOut = this.brightnessBottomRight;
+                fetchMixedBrightness(facing, false);
+                this.brightnessTopLeft = lerpBrightness(brightnessTopLeftOut, this.brightnessTopLeft, inset);
+                this.brightnessTopRight = lerpBrightness(brightnessTopRightOut, this.brightnessTopRight, inset);
+                this.brightnessBottomLeft = lerpBrightness(brightnessBottomLeftOut, this.brightnessBottomLeft, inset);
+                this.brightnessBottomRight = lerpBrightness(brightnessBottomRightOut, this.brightnessBottomRight, inset);
+            }
         }
 
         dispatchRender(rb, facing, block, x, y, z, useColor);
 
         return true;
+    }
+
+    private void fetchMixedBrightness(Facing facing, boolean front) {
+        final int x, y, z;
+        if (front) {
+            x = 1 + facing.front.x();
+            y = 1 + facing.front.y();
+            z = 1 + facing.front.z();
+        } else {
+            x = 1;
+            y = 1;
+            z = 1;
+        }
+
+        val brightnessCenter = getBrightness(x, y, z);
+        val brightnessLeft = getBrightness(x, y, z, facing.left);
+        val brightnessRight = getBrightness(x, y, z, facing.right);
+        val brightnessBottom = getBrightness(x, y, z, facing.bottom);
+        val brightnessTop = getBrightness(x, y, z, facing.top);
+
+        val bTransparentLeft = getBrightnessTransparency(x, y, z, facing.left);
+        val bTransparentRight = getBrightnessTransparency(x, y, z, facing.right);
+        val bTransparentBottom = getBrightnessTransparency(x, y, z, facing.bottom);
+        val bTransparentTop = getBrightnessTransparency(x, y, z, facing.top);
+
+        final int brightnessTopLeft;
+        if (!bTransparentLeft && !bTransparentTop) {
+            brightnessTopLeft = averageBrightness(brightnessLeft, brightnessTop);
+        } else {
+            brightnessTopLeft = getBrightness(x, y, z, facing.topLeft);
+        }
+
+        final int brightnessTopRight;
+        if (!bTransparentRight && !bTransparentTop) {
+            brightnessTopRight = averageBrightness(brightnessRight, brightnessTop);
+        } else {
+            brightnessTopRight = getBrightness(x, y, z, facing.topRight);
+        }
+
+        final int brightnessBottomRight;
+        if (!bTransparentRight && !bTransparentBottom) {
+            brightnessBottomRight = averageBrightness(brightnessRight, brightnessBottom);
+        } else {
+            brightnessBottomRight = getBrightness(x, y, z, facing.bottomRight);
+        }
+
+        final int brightnessBottomLeft;
+        if (!bTransparentLeft && !bTransparentBottom) {
+            brightnessBottomLeft = averageBrightness(brightnessLeft, brightnessBottom);
+        } else {
+            brightnessBottomLeft = getBrightness(x, y, z, facing.bottomLeft);
+        }
+
+        val brightnessTopLeftRaw = averageBrightness(brightnessLeft, brightnessTopLeft, brightnessTop, brightnessCenter);
+        val brightnessBottomLeftRaw = averageBrightness(brightnessBottomLeft, brightnessLeft, brightnessBottom, brightnessCenter);
+        val brightnessBottomRightRaw = averageBrightness(brightnessBottom, brightnessBottomRight, brightnessRight, brightnessCenter);
+        val brightnessTopRightRaw = averageBrightness(brightnessTop, brightnessRight, brightnessTopRight, brightnessCenter);
+
+        val insetLeft = getInset(facing.leftFace);
+        val insetRight = getInset(facing.rightFace);
+        val insetTop = getInset(facing.topFace);
+        val insetBottom = getInset(facing.bottomFace);
+
+        this.brightnessTopLeft = biLerpBrightness(brightnessTopLeftRaw, brightnessTopRightRaw, brightnessBottomLeftRaw, brightnessBottomRightRaw, insetLeft, insetTop);
+        this.brightnessTopRight = biLerpBrightness(brightnessTopRightRaw, brightnessTopLeftRaw, brightnessBottomRightRaw, brightnessBottomLeftRaw, insetRight, insetTop);
+        this.brightnessBottomLeft = biLerpBrightness(brightnessBottomLeftRaw, brightnessBottomRightRaw, brightnessTopLeftRaw, brightnessTopRightRaw, insetLeft, insetBottom);
+        this.brightnessBottomRight = biLerpBrightness(brightnessBottomRightRaw, brightnessBottomLeftRaw, brightnessTopRightRaw, brightnessTopLeftRaw, insetRight, insetBottom);
     }
 
     private void fetchMixedAO(Facing facing, boolean front) {
@@ -133,66 +223,44 @@ public class AmbientOcclusionRenderer implements AORenderer {
         val aoRight = getAO(x, y, z, facing.right);
         val aoBottom = getAO(x, y, z, facing.bottom);
         val aoTop = getAO(x, y, z, facing.top);
-        val brightnessCenter = getBrightness(x, y, z);
-        val brightnessLeft = getBrightness(x, y, z, facing.left);
-        val brightnessRight = getBrightness(x, y, z, facing.right);
-        val brightnessBottom = getBrightness(x, y, z, facing.bottom);
-        val brightnessTop = getBrightness(x, y, z, facing.top);
 
-        val transparentLeft = aoLeft == 1;
-        val transparentRight = aoRight == 1;
-        val transparentBottom = aoBottom == 1;
-        val transparentTop = aoTop == 1;
+        val aoTransparentLeft = aoLeft == 1;
+        val aoTransparentRight = aoRight == 1;
+        val aoTransparentBottom = aoBottom == 1;
+        val aoTransparentTop = aoTop == 1;
 
         final float lightTopLeft;
-        final int brightnessTopLeft;
-        if (!transparentLeft && !transparentTop) {
+        if (!aoTransparentLeft && !aoTransparentTop) {
             lightTopLeft = averageAO(aoLeft, aoTop);
-            brightnessTopLeft = averageBrightness(brightnessLeft, brightnessTop);
         } else {
             lightTopLeft = getAO(x, y, z, facing.topLeft);
-            brightnessTopLeft = getBrightness(x, y, z, facing.topLeft);
         }
 
         final float lightTopRight;
-        final int brightnessTopRight;
-        if (!transparentRight && !transparentTop) {
+        if (!aoTransparentRight && !aoTransparentTop) {
             lightTopRight = averageAO(aoRight, aoTop);
-            brightnessTopRight = averageBrightness(brightnessRight, brightnessTop);
         } else {
             lightTopRight = getAO(x, y, z, facing.topRight);
-            brightnessTopRight = getBrightness(x, y, z, facing.topRight);
         }
 
         final float lightBottomRight;
-        final int brightnessBottomRight;
-        if (!transparentRight && !transparentBottom) {
+        if (!aoTransparentRight && !aoTransparentBottom) {
             lightBottomRight = averageAO(aoRight, aoBottom);
-            brightnessBottomRight = averageBrightness(brightnessRight, brightnessBottom);
         } else {
             lightBottomRight = getAO(x, y, z, facing.bottomRight);
-            brightnessBottomRight = getBrightness(x, y, z, facing.bottomRight);
         }
 
         final float lightBottomLeft;
-        final int brightnessBottomLeft;
-        if (!transparentLeft && !transparentBottom) {
+        if (!aoTransparentLeft && !aoTransparentBottom) {
             lightBottomLeft = averageAO(aoLeft, aoBottom);
-            brightnessBottomLeft = averageBrightness(brightnessLeft, brightnessBottom);
         } else {
             lightBottomLeft = getAO(x, y, z, facing.bottomLeft);
-            brightnessBottomLeft = getBrightness(x, y, z, facing.bottomLeft);
         }
 
         val aoTopLeftRaw = averageAO(aoLeft, lightTopLeft, aoCenter, aoTop);
         val aoTopRightRaw = averageAO(aoCenter, aoTop, aoRight, lightTopRight);
         val aoBottomRightRaw = averageAO(aoBottom, aoCenter, lightBottomRight, aoRight);
         val aoBottomLeftRaw = averageAO(lightBottomLeft, aoLeft, aoBottom, aoCenter);
-
-        val brightnessTopLeftRaw = averageBrightness(brightnessLeft, brightnessTopLeft, brightnessTop, brightnessCenter);
-        val brightnessBottomLeftRaw = averageBrightness(brightnessBottomLeft, brightnessLeft, brightnessBottom, brightnessCenter);
-        val brightnessBottomRightRaw = averageBrightness(brightnessBottom, brightnessBottomRight, brightnessRight, brightnessCenter);
-        val brightnessTopRightRaw = averageBrightness(brightnessTop, brightnessRight, brightnessTopRight, brightnessCenter);
 
         val insetLeft = getInset(facing.leftFace);
         val insetRight = getInset(facing.rightFace);
@@ -203,14 +271,10 @@ public class AmbientOcclusionRenderer implements AORenderer {
         this.aoTopRight = biLerpAO(aoTopRightRaw, aoTopLeftRaw, aoBottomRightRaw, aoBottomLeftRaw, insetRight, insetTop);
         this.aoBottomLeft = biLerpAO(aoBottomLeftRaw, aoBottomRightRaw, aoTopLeftRaw, aoTopRightRaw, insetLeft, insetBottom);
         this.aoBottomRight = biLerpAO(aoBottomRightRaw, aoBottomLeftRaw, aoTopRightRaw, aoTopLeftRaw, insetRight, insetBottom);
-        this.brightnessTopLeft = biLerpBrightness(brightnessTopLeftRaw, brightnessTopRightRaw, brightnessBottomLeftRaw, brightnessBottomRightRaw, insetLeft, insetTop);
-        this.brightnessTopRight = biLerpBrightness(brightnessTopRightRaw, brightnessTopLeftRaw, brightnessBottomRightRaw, brightnessBottomLeftRaw, insetRight, insetTop);
-        this.brightnessBottomLeft = biLerpBrightness(brightnessBottomLeftRaw, brightnessBottomRightRaw, brightnessTopLeftRaw, brightnessTopRightRaw, insetLeft, insetBottom);
-        this.brightnessBottomRight = biLerpBrightness(brightnessBottomRightRaw, brightnessBottomLeftRaw, brightnessTopRightRaw, brightnessTopLeftRaw, insetRight, insetBottom);
     }
 
     private float getInset(Facing.Direction dir) {
-        return this.inset[dir.ordinal()];
+        return Float.intBitsToFloat(this.data[INSET_OFFSET + dir.ordinal()]);
     }
 
     private void dispatchRender(RenderBlocks rb, Facing facing, Block block, int x, int y, int z, boolean useColor) {
@@ -306,7 +370,7 @@ public class AmbientOcclusionRenderer implements AORenderer {
 
     private float getAO(int x, int y, int z) {
         val index = toIndex(x, y, z);
-        return ao[index];
+        return Float.intBitsToFloat(this.data[index]);
     }
 
     private int getBrightness(int x, int y, int z, Vector3ic offset) {
@@ -317,7 +381,20 @@ public class AmbientOcclusionRenderer implements AORenderer {
     }
     private int getBrightness(int x, int y, int z) {
         val index = toIndex(x, y, z);
-        return light[index];
+        return data[LIGHT_OFFSET + index];
+    }
+
+
+    private boolean getBrightnessTransparency(int x, int y, int z, Vector3ic offset) {
+        x += offset.x();
+        y += offset.y();
+        z += offset.z();
+        return getBrightnessTransparency(x, y, z);
+    }
+    private boolean getBrightnessTransparency(int x, int y, int z) {
+        val index = toIndex(x, y, z);
+        val i = this.data[TRANSPARENCY_OFFSET];
+        return ((i >>> index) & 1) != 0;
     }
 
 
@@ -335,6 +412,7 @@ public class AmbientOcclusionRenderer implements AORenderer {
 
     private void fetchLightingData(RenderBlocks rb, Block block, int x, int y, int z) {
         //Sample surroundings
+        int lt = 0;
         for (int xNear = 0; xNear < 3; xNear++) {
             for (int yNear = 0; yNear < 3; yNear++) {
                 for (int zNear = 0; zNear < 3; zNear++) {
@@ -343,11 +421,13 @@ public class AmbientOcclusionRenderer implements AORenderer {
                     val zOff = z + zNear - 1;
                     val index = toIndex(xNear, yNear, zNear);
                     val nearBlock = xNear == 1 && yNear == 1 && zNear == 1 ? block : rb.blockAccess.getBlock(xOff, yOff, zOff);
-                    ao[index] = fetchAOAt(rb, nearBlock, xOff, yOff, zOff);
-                    light[index] = fetchLightAt(rb, nearBlock, xOff, yOff, zOff);
+                    data[index] = Float.floatToRawIntBits(fetchAOAt(rb, nearBlock, xOff, yOff, zOff));
+                    data[LIGHT_OFFSET + index] = fetchLightAt(rb, nearBlock, xOff, yOff, zOff);
+                    lt |= (fetchLightTransparencyAt(rb, nearBlock, xOff, yOff, zOff) ? 1 : 0) << index;
                 }
             }
         }
+        data[TRANSPARENCY_OFFSET] = lt;
         for (val dir: dirs) {
             double inset;
             switch (dir) {
@@ -372,7 +452,7 @@ public class AmbientOcclusionRenderer implements AORenderer {
                 default:
                     inset = 0;
             }
-            this.inset[dir.ordinal()] = (float) MathUtil.clamp(inset, 0, 1);
+            data[INSET_OFFSET + dir.ordinal()] = Float.floatToRawIntBits((float) MathUtil.clamp(inset, 0, 1));
         }
     }
 
@@ -382,6 +462,11 @@ public class AmbientOcclusionRenderer implements AORenderer {
 
     private int fetchLightAt(RenderBlocks rb, Block block, int x, int y, int z) {
         return rb.blockAccess.getLightBrightnessForSkyBlocks(x, y, z, block.getLightValue(rb.blockAccess, x, y, z));
+    }
+
+    private boolean fetchLightTransparencyAt(RenderBlocks rb, Block block, int x, int y, int z) {
+        val op = block.getLightOpacity(rb.blockAccess, x, y, z);
+        return op < 15;
     }
 
     private int toIndex(int x, int y, int z) {
