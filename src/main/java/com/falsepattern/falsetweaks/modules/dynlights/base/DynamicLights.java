@@ -334,7 +334,10 @@ public class DynamicLights implements DynamicLightsDriver {
                 int levelHead = getLightLevel(stackHead);
                 int level = Math.max(levelMain, levelHead);
                 if (entity instanceof EntityPlayer) {
-                    level = Math.max(level, getLightLevel(OffhandMod.CURRENT.getOffhandItem((EntityPlayer) entity)));
+                    for (val offhand: OffhandMod.CURRENT) {
+                        level = Math.max(level,
+                                         getLightLevel(offhand.getOffhandItem((EntityPlayer) entity)));
+                    }
                 }
                 return level;
             } else if (entity instanceof EntityItem) {

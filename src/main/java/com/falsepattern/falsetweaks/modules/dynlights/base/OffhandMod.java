@@ -22,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.modules.dynlights.base;
 
+import lombok.val;
 import mods.battlegear2.api.core.IInventoryPlayerBattle;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import xonin.backhand.api.core.BackhandUtils;
@@ -31,8 +32,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Loader;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public enum OffhandMod {
-    None,
     Backhand {
         @Override
         public ItemStack getOffhandItem(EntityPlayer player) {
@@ -52,25 +56,28 @@ public enum OffhandMod {
         }
     };
 
-    public static final OffhandMod CURRENT = detectCurrent();
+    public static final List<OffhandMod> CURRENT = detectCurrent();
 
-    private static OffhandMod detectCurrent() {
+    private static List<OffhandMod> detectCurrent() {
+        val result = new ArrayList<OffhandMod>();
         if (Loader.isModLoaded("battlegear2")) {
             try {
                 if (Launch.classLoader.getClassBytes("mods.battlegear2.api.core.InventoryPlayerBattle") != null) {
-                    return OffhandMod.Battlegear2;
+                    result.add(Battlegear2);
                 }
             } catch (Throwable ignored) {
             }
-            return OffhandMod.Battlegear2GTNH;
+            try {
+                if (Launch.classLoader.getClassBytes("mods.battlegear2.api.core.IInventoryPlayerBattle") != null) {
+                    result.add(Battlegear2GTNH);
+                }
+            } catch (Throwable ignored) {}
         }
         if (Loader.isModLoaded("backhand")) {
-            return OffhandMod.Backhand;
+            result.add(Backhand);
         }
-        return None;
+        return Collections.unmodifiableList(result);
     }
 
-    public ItemStack getOffhandItem(EntityPlayer player) {
-        return null;
-    }
+    public abstract ItemStack getOffhandItem(EntityPlayer player);
 }
