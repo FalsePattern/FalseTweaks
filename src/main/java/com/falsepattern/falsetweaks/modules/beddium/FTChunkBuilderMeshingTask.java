@@ -26,7 +26,7 @@ import com.falsepattern.falsetweaks.api.PassTrackingTessellator;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadTessellator;
 import com.falsepattern.falsetweaks.modules.threadedupdates.ThreadedUpdateHooks;
-import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.ThreadedBlockSafetyRegistry;
+import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.IBlockExt;
 import com.ventooth.beddium.api.task.SimpleChunkBuilderMeshingTask;
 import com.ventooth.beddium.api.task.WorldRenderRegion;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -99,12 +99,8 @@ public abstract class FTChunkBuilderMeshingTask extends SimpleChunkBuilderMeshin
 
         @Override
         protected boolean canRenderOffThread(int pass, Block block, int x, int y, int z) {
-            val rt = block.getRenderType();
-            // Vanilla render types end at 42
-            if (rt < 42) {
-                return true;
-            }
-            return ThreadedBlockSafetyRegistry.canBlockRenderOffThread(block);
+            return IBlockExt.of(block)
+                            .ft$isThreadSafe();
         }
 
         @Override

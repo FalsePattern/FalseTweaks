@@ -39,7 +39,7 @@ public abstract class RenderingRegistryMixin implements IRenderingRegistryExt {
     private Map<Integer, ISimpleBlockRenderingHandler> blockRenderers;
 
     @Override
-    public ISimpleBlockRenderingHandler getISBRH(Block block) {
+    public ISimpleBlockRenderingHandler ft$getRenderer(Block block) {
         return blockRenderers.get(block.getRenderType());
     }
 }

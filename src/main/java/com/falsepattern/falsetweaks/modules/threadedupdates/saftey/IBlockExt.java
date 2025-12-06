@@ -23,15 +23,14 @@
 package com.falsepattern.falsetweaks.modules.threadedupdates.saftey;
 
 import net.minecraft.block.Block;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 
-// Ported from Angelica
-public interface IRenderingRegistryExt {
+public interface IBlockExt {
     @SuppressWarnings("CastToIncompatibleInterface")
-    static IRenderingRegistryExt of(RenderingRegistry thiz) {
-        return (IRenderingRegistryExt) thiz;
+    static IBlockExt of(Block thiz) {
+        return (IBlockExt) thiz;
     }
 
-    ISimpleBlockRenderingHandler ft$getRenderer(Block block);
+    void ft$isThreadSafe(boolean value);
+
+    boolean ft$isThreadSafe();
 }

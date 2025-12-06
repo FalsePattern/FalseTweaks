@@ -26,11 +26,15 @@ import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.var;
 import org.apache.logging.log4j.LogManager;
 
+import net.minecraft.block.Block;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -115,6 +119,46 @@ public class ThreadSafeBlockRendererMap implements Map<Integer, ISimpleBlockRend
         }
         logger.error("Open the log file to view detailed stacktraces.");
         logger.error(Strings.repeat("+=", 25));
+    }
+
+    public static void markThreadsafeBlocks() {
+        val logger = LOG_ISBRH_ERRORS ? LogManager.getLogger("FT|THREAD SAFETY") : null;
+
+        //noinspection deprecation
+        val renderingRegistry = IRenderingRegistryExt.of(RenderingRegistry.instance());
+        //noinspection unchecked
+        val blockRegistry = (Iterable<Block>) GameData.getBlockRegistry();
+        for (val block : blockRegistry) {
+            val isThreadsafe = isBlockThreadsafe(renderingRegistry, block);
+            IBlockExt.of(block)
+                     .ft$isThreadSafe(isThreadsafe);
+            if (logger != null) {
+                val blockId = GameRegistry.findUniqueIdentifierFor(block);
+                final String blockName;
+                if (blockId == null) {
+                    //noinspection ObjectToString
+                    blockName = "UNKNOWN(" + block + ")";
+                } else {
+                    blockName = "(" + blockId + ")";
+                }
+
+                if (isThreadsafe) {
+                    logger.debug("Block Threadsafe: {}", blockName);
+                } else {
+                    logger.warn("Block NOT Threadsafe: {}", blockName);
+                }
+            }
+        }
+    }
+
+    private static boolean isBlockThreadsafe(IRenderingRegistryExt renderingRegistry, Block block) {
+        val renderType = block.getRenderType();
+        // Vanilla render types end at 42
+        if (renderType < 42) {
+            return true;
+        }
+        val renderer = renderingRegistry.ft$getRenderer(block);
+        return renderer instanceof ThreadSafeBlockRenderer;
     }
 
     @Override

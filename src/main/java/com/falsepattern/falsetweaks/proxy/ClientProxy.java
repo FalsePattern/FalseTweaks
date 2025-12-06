@@ -174,6 +174,7 @@ public class ClientProxy extends CommonProxy {
     public void loadComplete(FMLLoadCompleteEvent e) {
         super.loadComplete(e);
         ThreadSafeBlockRendererMap.logBrokenISBRHs();
+        ThreadSafeBlockRendererMap.markThreadsafeBlocks();
     }
 
     @SubscribeEvent

@@ -20,18 +20,26 @@
  * along with FalseTweaks. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.falsetweaks.modules.threadedupdates.saftey;
+package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates;
+
+import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.IBlockExt;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.block.Block;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 
-// Ported from Angelica
-public interface IRenderingRegistryExt {
-    @SuppressWarnings("CastToIncompatibleInterface")
-    static IRenderingRegistryExt of(RenderingRegistry thiz) {
-        return (IRenderingRegistryExt) thiz;
+@Mixin(Block.class)
+public abstract class BlockMixin implements IBlockExt {
+    @Unique
+    private boolean ft$isThreadSafe = false;
+
+    @Override
+    public void ft$isThreadSafe(boolean value) {
+        ft$isThreadSafe = value;
     }
 
-    ISimpleBlockRenderingHandler ft$getRenderer(Block block);
+    @Override
+    public boolean ft$isThreadSafe() {
+        return ft$isThreadSafe;
+    }
 }

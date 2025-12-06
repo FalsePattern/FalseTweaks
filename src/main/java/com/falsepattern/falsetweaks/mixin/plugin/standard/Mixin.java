@@ -192,6 +192,7 @@ public enum Mixin implements IMixins {
                            "threadedupdates.RenderingRegistryMixin",
                            "threadedupdates.TessellatorMixin",
                            "threadedupdates.ChunkCacheMixin",
+                           "threadedupdates.BlockMixin",
                            "threadedupdates.blockbounds.BlockMixin_Root",
                            "threadedupdates.blockbounds.BlockMixin_Impl")),
     ThreadedUpdates_blockBounds(Phase.EARLY,
