@@ -252,7 +252,7 @@ dependencies {
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
     add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.2.0")
 
-    val beddiumVersion = "1.0.4"
+    val beddiumVersion = "1.2.1"
     val beddiumVersionJ21 = "$beddiumVersion-j21"
     val beddiumVersionJ8 = "$beddiumVersion-j8"
     compileOnly("com.ventooth:beddium-mc1.7.10:$beddiumVersionJ8:dev")
