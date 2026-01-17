@@ -61,7 +61,6 @@ public class FalseTweaksTransformer extends MergeableTurboTransformer {
             if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
                 transformers.add(new RenderGlobalDeOptimizer());
                 transformers.add(new Threading_AngelicaCompatFixer());
-                transformers.add(new Threading_TessellatorUseReplacement());
                 transformers.add(new Threading_ThreadSafeBlockRendererInjector());
             }
         }

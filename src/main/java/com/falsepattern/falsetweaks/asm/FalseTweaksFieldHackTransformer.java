@@ -22,6 +22,7 @@
 
 package com.falsepattern.falsetweaks.asm;
 
+import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_TessellatorUseReplacement;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_BlockMinMax;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.block.Threading_BlockMinMaxRedirector;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.settings.Threading_GameSettings;
@@ -49,6 +50,7 @@ public class FalseTweaksFieldHackTransformer extends MergeableTurboTransformer {
             transformers.add(new Threading_GameSettingsRedirector());
             transformers.add(new Threading_BlockMinMax());
             transformers.add(new Threading_BlockMinMaxRedirector());
+            transformers.add(new Threading_TessellatorUseReplacement());
         }
         return transformers;
     }
