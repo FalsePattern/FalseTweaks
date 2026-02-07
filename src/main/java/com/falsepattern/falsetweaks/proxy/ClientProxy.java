@@ -173,8 +173,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void loadComplete(FMLLoadCompleteEvent e) {
         super.loadComplete(e);
-        ThreadSafeBlockRendererMap.logBrokenISBRHs();
-        ThreadSafeBlockRendererMap.markThreadsafeBlocks();
+        if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            ThreadSafeBlockRendererMap.logBrokenISBRHs();
+            ThreadSafeBlockRendererMap.markThreadsafeBlocks();
+        }
     }
 
     @SubscribeEvent
