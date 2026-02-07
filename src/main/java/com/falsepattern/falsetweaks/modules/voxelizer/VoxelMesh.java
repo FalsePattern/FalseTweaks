@@ -28,6 +28,8 @@ import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSp
 import com.falsepattern.falsetweaks.modules.voxelizer.strategy.MergingStrategy;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.val;
+import lombok.var;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -35,6 +37,7 @@ import org.joml.Vector3f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,7 +55,8 @@ public class VoxelMesh {
     private final float[] zOffsets;
     private final VoxelCompiler compiler;
     private Map<VoxelType, List<Face>> faceCache;
-    private String cacheIdentity = null;
+    private VoxelMeshIdentity compiledIdentity = null;
+    private SoftReference<VoxelMeshIdentity> cachedIdentity = null;
 
     public VoxelMesh(MergingStrategy strategy, Layer... layers) {
         this.strategy = strategy;
@@ -217,34 +221,60 @@ public class VoxelMesh {
     }
 
     public void compile() {
-        String currentIdentity = getIdentity(0, false);
-        if (!Objects.equals(cacheIdentity, currentIdentity)) {
+        val currentIdentity = getIdentity(0, false);
+        if (!Objects.equals(compiledIdentity, currentIdentity)) {
             if (VoxelizerConfig.DEBUG_MESH_COMPILATION) {
-                Share.log.info("Starting compilation for mesh \"" + currentIdentity + "\"");
+                Share.log.info("Starting compilation for mesh \"{}\"", currentIdentity);
             }
             faceCache = compiler.compile(strategy);
             if (VoxelizerConfig.DEBUG_MESH_COMPILATION) {
-                Share.log.info("Compiled mesh \"" + currentIdentity + "\" with " + faceCache.size() + " faces!");
+                var size = 0;
+                for (val entry: faceCache.entrySet()) {
+                    size += entry.getValue().size();
+                }
+                Share.log.info("Compiled mesh \"{}\" with {} faces!", currentIdentity, size);
             }
-            cacheIdentity = currentIdentity;
+            compiledIdentity = currentIdentity;
         }
     }
 
-    public String getIdentity(int overlayLayer, boolean remapUV) {
-        val result = new StringBuilder();
-        if (remapUV) {
-            result.append("remap_uv!");
+    public VoxelMeshIdentity getIdentity(int overlayLayer, boolean remapUV) {
+        val cached = cachedIdentity;
+        if (cached == null) {
+            return createNewIdentity(overlayLayer, remapUV);
         }
-        if (overlayLayer > 0) {
-            result.append("overlay")
-                  .append(overlayLayer)
-                  .append("!");
+        val id = cached.get();
+        if (id == null) {
+            return createNewIdentity(overlayLayer, remapUV);
         }
-        for (val layer : layers) {
-            result.append(layer.textureIdentity())
-                  .append('&');
+        if (!id.partialEquals(overlayLayer, remapUV)) {
+            return createNewIdentity(overlayLayer, remapUV);
         }
-        return result.toString();
+        val layers = getLayerIdentities();
+        if (!id.partialEquals(layers)) {
+            return createNewIdentity(overlayLayer, remapUV, layers);
+        }
+        return id;
+    }
+
+    private @NotNull VoxelMeshIdentity createNewIdentity(int overlayLayer, boolean remapUV) {
+        return createNewIdentity(overlayLayer, remapUV, getLayerIdentities());
+    }
+
+    private @NotNull VoxelMeshIdentity createNewIdentity(int overlayLayer, boolean remapUv, @NotNull LayerIdentity @NotNull[] layers) {
+        val id = new VoxelMeshIdentity(remapUv, overlayLayer, layers);
+        cachedIdentity = new SoftReference<>(id);
+        return id;
+    }
+
+    private @NotNull LayerIdentity @NotNull[] getLayerIdentities() {
+        val layers = this.layers;
+        val layerCount = layers.length;
+        val layerIdentities = new LayerIdentity[layerCount];
+        for (int i = 0; i < layerCount; i++) {
+            layerIdentities[i] = layers[i].textureIdentity();
+        }
+        return layerIdentities;
     }
 
 }

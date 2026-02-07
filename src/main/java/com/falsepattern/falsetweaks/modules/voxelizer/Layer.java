@@ -25,13 +25,20 @@ package com.falsepattern.falsetweaks.modules.voxelizer;
 import com.falsepattern.falsetweaks.modules.voxelizer.interfaces.ITextureAtlasSpriteMixin;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import lombok.var;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
+import java.lang.ref.SoftReference;
 
 @RequiredArgsConstructor
 public class Layer {
     public final TextureAtlasSprite texture;
     public final float thickness;
+
+    private SoftReference<LayerIdentity> cachedIdentity = null;
 
     private ITextureAtlasSpriteMixin tex() {
         return (ITextureAtlasSpriteMixin) texture;
@@ -72,7 +79,37 @@ public class Layer {
         return (float) MathUtil.clampedLerp(min, max, a / A);
     }
 
-    public String textureIdentity() {
-        return texture.getIconName() + '|' + tex().frameCounter();
+    public @NotNull LayerIdentity textureIdentity() {
+        val cached = cachedIdentity;
+        if (cached == null) {
+            return createNewIdentity();
+        }
+        val id = cached.get();
+        if (id == null) {
+            return createNewIdentity();
+        }
+        var name = texture.getIconName();
+        if (name == null) {
+            name = "";
+        }
+        val counter = tex().frameCounter();
+        if (!id.equals(name, counter)) {
+            return createNewIdentity(name, counter);
+        }
+        return id;
+    }
+
+    private @NotNull LayerIdentity createNewIdentity() {
+        var n = texture.getIconName();
+        if (n == null) {
+            n = "";
+        }
+        return createNewIdentity(n, tex().frameCounter());
+    }
+
+    private @NotNull LayerIdentity createNewIdentity(@NotNull String name, int frameCounter) {
+        val id = new LayerIdentity(name, frameCounter);
+        cachedIdentity = new SoftReference<>(id);
+        return id;
     }
 }

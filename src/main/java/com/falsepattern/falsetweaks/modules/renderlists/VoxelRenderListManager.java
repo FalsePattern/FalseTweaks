@@ -25,6 +25,11 @@ package com.falsepattern.falsetweaks.modules.renderlists;
 import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.config.RenderListConfig;
 import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMesh;
+import com.falsepattern.falsetweaks.modules.voxelizer.VoxelMeshIdentity;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -34,37 +39,47 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VoxelRenderListManager implements IResourceManagerReloadListener {
     public static final VoxelRenderListManager INSTANCE = new VoxelRenderListManager();
 
-    private final Map<String, Integer> theMap = new HashMap<>();
-    private final List<String> identityList = new ArrayList<>();
+    private final Object2IntMap<VoxelMeshIdentity> theMap = new Object2IntOpenHashMap<>(RenderListConfig.MAX_BUFFER_SIZE, 0.25f);
+    private final ObjectList<VoxelMeshIdentity> identityList = new ObjectArrayList<>();
     private int list = 0;
 
+    {
+        theMap.defaultReturnValue(0);
+    }
+
     public boolean pre(VoxelMesh mesh, int overlayLayer, boolean remapUV) {
+        val map = theMap;
         val identity = mesh.getIdentity(overlayLayer, remapUV);
-        if (theMap.containsKey(identity)) {
-            val list = theMap.get(identity);
-            identityList.add(identityList.remove(identityList.indexOf(identity)));
-            GL11.glCallList(list);
+        val _list = map.getInt(identity);
+        if (_list != 0) {
+            lru(identity);
+            GL11.glCallList(_list);
             return true;
         } else {
-            if (identityList.size() >= RenderListConfig.MAX_BUFFER_SIZE) {
-                val oldIden = identityList.remove(0);
-                GLAllocation.deleteDisplayLists(theMap.remove(oldIden));
+            val idList = identityList;
+            if (idList.size() >= RenderListConfig.MAX_BUFFER_SIZE) {
+                val oldIden = idList.remove(0);
+                val deleteId = map.removeInt(oldIden);
+                if (deleteId != 0) {
+                    GLAllocation.deleteDisplayLists(deleteId);
+                }
             }
-            list = GLAllocation.generateDisplayLists(1);
-            identityList.add(identity);
-            theMap.put(identity, list);
-            GL11.glNewList(list, GL11.GL_COMPILE);
+            val newList = GLAllocation.generateDisplayLists(1);
+            list = newList;
+            idList.add(identity);
+            map.put(identity, newList);
+            GL11.glNewList(newList, GL11.GL_COMPILE);
             return false;
         }
+    }
+
+    private void lru(VoxelMeshIdentity identity) {
+        identityList.remove(identity);
+        identityList.add(identity);
     }
 
     public void post() {
