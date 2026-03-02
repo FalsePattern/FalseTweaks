@@ -159,6 +159,15 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
         if (cn == null) {
             return false;
         }
+
+        if (cn.invisibleAnnotations != null) {
+            for (val ann : cn.invisibleAnnotations) {
+                if ("Lcom/falsepattern/falsetweaks/api/threading/BypassTessReplacement;".equals(ann.desc)) {
+                    return false;
+                }
+            }
+        }
+
         boolean modified = false;
         val methods = cn.methods;
         for (val classMethod : methods) {
