@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
 /**
  * Marks this class as "knowing what it's doing" touching the {@link Tessellator#instance} field directly and doesn't touch it.
  */
-@ApiStatus.Experimental
+@ApiStatus.AvailableSince("4.4.0")
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface BypassTessReplacement {
