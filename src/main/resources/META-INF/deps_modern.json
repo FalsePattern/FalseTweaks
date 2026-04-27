@@ -9,7 +9,7 @@
     "always": {
       "common": [],
       "client": [
-        "com.falsepattern:zanama-rt:0.2.0"
+        "com.falsepattern:zanama-rt:0.3.0"
       ],
       "server": []
     },

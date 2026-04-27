@@ -8,8 +8,8 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.outputStream
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "3.1.0"
-    id("com.falsepattern.zanama") version "0.2.0"
+    id("com.falsepattern.fpgradle-mc") version "4.0.2"
+    id("com.falsepattern.zanama") version "0.3.0"
     id("com.falsepattern.zigbuild")
 }
 
@@ -250,7 +250,7 @@ dependencies {
     compileOnly("mega:megatraceservice:1.3.0")
     compileOnly("com.ventooth:swansong-mc1.7.10:1.2.5:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
-    add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.2.0")
+    add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.3.0")
 
     val beddiumVersion = "1.2.1"
     val beddiumVersionJ21 = "$beddiumVersion-j21"
