@@ -64,6 +64,18 @@ myItem_2.png
 
 Any bug reports concerning the known problems listed in this table will be closed without response. Read before you open issues.
 
+## Strict No LLM / No AI Policy
+
+No LLMs for issues.
+
+No LLMs for patches / pull requests.
+
+No LLMs for comments on the bug tracker, including translation.
+
+English is encouraged, but not required. You are welcome to post in your native
+language and rely on others to have their own translation tools of choice to
+interpret your words.
+
 ## Dependencies
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
 - [UniMixins](https://github.com/LegacyModdingMC/UniMixins)
