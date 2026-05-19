@@ -38,10 +38,6 @@ public abstract class RenderTankMixin {
                        target = "Lcofh/core/block/BlockCoFHBase;renderPass:I"),
               require = 1)
     private int redirectGetRenderPass() {
-        org.lwjgl.opengl.GL11.glPushMatrix();
-        // Their code here
-        org.lwjgl.opengl.GL11.glPopMatrix();
-
         return ThermalExpansionCompat.getCofhBlockRenderPass();
     }
 }
