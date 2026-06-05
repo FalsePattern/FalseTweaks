@@ -244,11 +244,11 @@ repositories {
 }
 
 dependencies {
-    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.11.0")
+    implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.12.2")
     compileOnly("org.joml:joml:1.10.8")
     compileOnly("it.unimi.dsi:fastutil:8.5.18")
     compileOnly("mega:megatraceservice:1.3.0")
-    compileOnly("com.ventooth:swansong-mc1.7.10:1.2.5:dev")
+    compileOnly("com.ventooth:swansong-mc1.7.10:1.3.4:dev")
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
     add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.3.0")
 
@@ -265,7 +265,7 @@ dependencies {
     compileOnly(deobf("optifine:optifine:1.7.10_hd_u_e7"))
 
     compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
-    compileOnly("com.github.GTNewHorizons:GTNHLib:0.8.4")
+    compileOnly("com.github.GTNewHorizons:GTNHLib:0.11.4")
 
     compileOnly("com.github.basdxz:Apparatus:2.12.3:dev") { excludeDeps() }
     compileOnly("com.github.jss2a98aj:NotFine:0.2.5:dev") { excludeDeps() }

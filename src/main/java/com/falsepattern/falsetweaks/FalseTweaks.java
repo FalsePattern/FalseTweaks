@@ -47,9 +47,9 @@ import javax.swing.JOptionPane;
      acceptedMinecraftVersions = "[1.7.10]",
      guiFactory = Tags.ROOT_PKG + ".config.FalseTweaksGuiFactory",
      acceptableRemoteVersions = "*",
-     dependencies = "required-after:falsepatternlib@[1.9.1,);" +
-                    "after:gtnhlib@[0.5.21,);" +
-                    "after:swansong@[1.2.5,);")
+     dependencies = "required-after:falsepatternlib@[1.12.2,);" +
+                    "after:gtnhlib@[0.11.4,);" +
+                    "after:swansong@[1.3.4,);")
 public class FalseTweaks {
 
     @SidedProxy(clientSide = Tags.ROOT_PKG + ".proxy.ClientProxy",
