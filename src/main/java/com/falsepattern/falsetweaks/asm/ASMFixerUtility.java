@@ -43,7 +43,8 @@ public class ASMFixerUtility {
 
     private static boolean isForbidden(Object obj) {
         val n = obj.getClass().getName();
-        return n.startsWith("com.gtnewhorizon.gtnhlib") && n.endsWith("TessellatorRedirectorTransformer");
+        return n.startsWith("com.gtnewhorizon.gtnhlib") &&
+               (n.endsWith("TessellatorRedirectorTransformer") || n.endsWith("FMLTessellatorRedirectorWrapper"));
     }
 
     @RequiredArgsConstructor
