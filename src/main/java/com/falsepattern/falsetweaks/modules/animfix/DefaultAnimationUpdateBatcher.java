@@ -176,7 +176,8 @@ public class DefaultAnimationUpdateBatcher implements IAnimationUpdateBatcher {
         int xOffset = dims[2];
         int yOffset = dims[3];
         int w = this.width;
-        for (int mipMapLevel = 0; mipMapLevel < texture.length; mipMapLevel++) {
+        int l = Math.min(texture.length, mipLevels + 1);
+        for (int mipMapLevel = 0; mipMapLevel < l; mipMapLevel++) {
             int base = offsets[mipMapLevel] + yOffset * w + xOffset;
             for (int i = 0; i < height; i++) {
                 memory.position(base + i * w);
