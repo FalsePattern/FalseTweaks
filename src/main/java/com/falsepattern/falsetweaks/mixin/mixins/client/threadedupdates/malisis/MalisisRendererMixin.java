@@ -23,7 +23,6 @@
 package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.malisis;
 
 import com.falsepattern.falsetweaks.api.threading.ThreadSafeBlockRenderer;
-import net.malisis.core.renderer.IRenderWorldLast;
 import net.malisis.core.renderer.MalisisRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
@@ -46,8 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Mixin(MalisisRenderer.class)
-public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
-        implements ISimpleBlockRenderingHandler, IItemRenderer, IRenderWorldLast, ThreadSafeBlockRenderer {
+public abstract class MalisisRendererMixin implements ThreadSafeBlockRenderer {
     @Unique
     private static final ReentrantLock ft$lock = new ReentrantLock();
     @Unique
@@ -111,7 +108,7 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
     @Inject(method = "renderWorldLastEvent",
             at = @At("HEAD"),
             remap = false,
-            require = 1)
+            require = 0)
     private void beginRWLE(RenderWorldLastEvent event, IBlockAccess world, CallbackInfo ci) {
         ft$lock();
     }
@@ -157,13 +154,13 @@ public abstract class MalisisRendererMixin extends TileEntitySpecialRenderer
     @Inject(method = "renderWorldLastEvent",
             at = @At("RETURN"),
             remap = false,
-            require = 1)
+            require = 0)
     private void endRWLE(RenderWorldLastEvent event, IBlockAccess world, CallbackInfo ci) {
         ft$unlock();
     }
 
     @Override
     public ISimpleBlockRenderingHandler forCurrentThread() {
-        return this;
+        return (ISimpleBlockRenderingHandler) this;
     }
 }
