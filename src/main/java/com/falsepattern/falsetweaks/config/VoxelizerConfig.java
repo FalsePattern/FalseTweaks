@@ -94,6 +94,14 @@ public class VoxelizerConfig {
     @Config.DefaultStringList({"avaritia:infinity"})
     public static String[] EXCLUSION_LIST;
 
+
+    @Config.Comment({"Skips voxelization for multi-layered item textures (spawn eggs, leather armor, etc.)",
+                     "You should leave this enabled unless you have a resource pack with voxelized textures for these."})
+    @Config.LangKey
+    @Config.Name("skipMultiLayerItems")
+    @Config.DefaultBoolean(true)
+    public static boolean SKIP_MULTI_LAYER_ITEMS;
+
     @Config.Comment({"Classes to disable voxelization for. Used to fix issues with certain items.",
                      "This is an instanceof check, so superclasses are also checked.",
                      "Needs a game restart to apply changes (cached for performance)."})

@@ -53,6 +53,7 @@ config.falsetweaks.item_render_lists.max_buffer_size=Maximum buffer size
 config.falsetweaks.voxelizer=Voxelizer
 config.falsetweaks.voxelizer.tooltip=3D item rendering framework
 config.falsetweaks.voxelizer.forcedLayers=Forced layers
+config.falsetweaks.voxelizer.skipMultiLayerItems=Skip multi-layer items
 config.falsetweaks.voxelizer.optimizationStrategy=Mesh optimization strategy
 config.falsetweaks.voxelizer.rails3D=3D rails
 config.falsetweaks.voxelizer.debugMeshCompilation=Debug mesh compilation
