@@ -87,6 +87,7 @@ public class VoxelizerConfig {
     @Config.Comment({"Item textures to disable voxelization for. Used to fix issues with certain items.",
                      "This is a PREFIX check, so you can also just specify a mod ID, and all items from it will skip getting voxelized.",
                      "Needs a game restart to apply changes (cached for performance).",
+                     "NOTE: This is the TEXTURE id, NOT the ITEM id. Use the debugMeshCompilation debug option to see these IDs!",
                      "Syntax: modid:texturename"})
     @Config.LangKey
     @Config.Name(value = "exclusionList",
