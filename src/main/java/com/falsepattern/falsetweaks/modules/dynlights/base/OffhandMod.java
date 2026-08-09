@@ -23,6 +23,7 @@
 package com.falsepattern.falsetweaks.modules.dynlights.base;
 
 import lombok.val;
+import lombok.var;
 import mods.battlegear2.api.core.IInventoryPlayerBattle;
 import mods.battlegear2.api.core.InventoryPlayerBattle;
 import xonin.backhand.api.core.BackhandUtils;
@@ -56,9 +57,27 @@ public enum OffhandMod {
         }
     };
 
-    public static final List<OffhandMod> CURRENT = detectCurrent();
+    private static final List<OffhandMod> CANDIDATES = detectCandidates();
 
-    private static List<OffhandMod> detectCurrent() {
+    private static List<OffhandMod> compatible;
+
+    public static List<OffhandMod> getCompatible(EntityPlayer player) {
+        var compat = compatible;
+        if (compat != null)
+            return compat;
+        compat = new ArrayList<>();
+        for (val current: CANDIDATES) {
+            try {
+                current.getOffhandItem(player);
+                compat.add(current);
+            } catch (Throwable ignored) {}
+        }
+        compat = Collections.unmodifiableList(compat);
+        compatible = compat;
+        return compat;
+    }
+
+    private static List<OffhandMod> detectCandidates() {
         val result = new ArrayList<OffhandMod>();
         if (Loader.isModLoaded("battlegear2")) {
             try {
