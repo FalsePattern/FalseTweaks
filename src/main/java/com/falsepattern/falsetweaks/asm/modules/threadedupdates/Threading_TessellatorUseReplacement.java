@@ -21,6 +21,7 @@
  */
 package com.falsepattern.falsetweaks.asm.modules.threadedupdates;
 
+import com.falsepattern.falsetweaks.Share;
 import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.falsetweaks.config.ThreadingConfig;
 import com.falsepattern.lib.turboasm.ClassNodeHandle;
@@ -111,9 +112,16 @@ public class Threading_TessellatorUseReplacement implements TurboClassTransforme
     //@formatter:on
 
     static {
-        addAll(HARDCODED);
-        addAll(ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS);
-        REPLACE_EVERYTHING = ThreadingConfig.TESSELLATOR_REPLACE_EVERYTHING;
+        val disabled = System.getProperty("falsetweaks.global_thread_safety.disabled");
+        if ("i_know_what_i_am_doing".equals(disabled)) {
+            Share.log.fatal("FalseTweaks Global Thread Safety has been disabled. Do not report bugs, you are on your own.");
+            REPLACE_EVERYTHING = false;
+            addAll(HARDCODED);
+            addAll(ThreadingConfig.TESSELLATOR_USE_REPLACEMENT_TARGETS);
+        } else {
+            Share.log.info("FalseTweaks Global Thread Safety active.");
+            REPLACE_EVERYTHING = true;
+        }
     }
 
     public static void addAll(String... names) {

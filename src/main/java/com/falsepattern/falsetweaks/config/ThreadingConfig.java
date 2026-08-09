@@ -61,7 +61,12 @@ public class ThreadingConfig {
     @Config.Comment({"Classes added here will be automatically patched to use the threaded Tessellator.",
                      "FalseTweaks also includes an internal hardcoded list of patched classes.",
                      "Use * at the end of a line for a wildcard match (useful for targeting whole packages!)",
-                     "This patch covers most edge cases, however some implementations will still require manual patches."})
+                     "This patch covers most edge cases, however some implementations will still require manual patches.",
+                     "NOTE: As of FalseTweaks 4.4.6, this list is ignored and thread safety patches are applied globally,",
+                     "      unless you opt out of global patching with a JVM argument. You can find the specific JVM argument",
+                     "      in the FalseTweaks source code. Running with disabled patching is unsupported and should only",
+                     "      ever be used for debugging purposes. This config option will be removed in the near future."
+    })
     @Config.LangKey
     @Config.Name(value = "tessellatorReplacementTargets",
                  migrations = "")
@@ -70,14 +75,6 @@ public class ThreadingConfig {
     @Config.DefaultStringList({})
     @Config.RequiresMcRestart
     public static String[] TESSELLATOR_USE_REPLACEMENT_TARGETS;
-
-    @Config.Comment("Patches every class with the thread safe tessellator code. Overrides TESSELLATOR_USE_REPLACEMENT_TARGETS")
-    @Config.LangKey
-    @Config.Name(value = "tessellatorReplaceEverything",
-                 migrations = "")
-    @Config.DefaultBoolean(true)
-    @Config.RequiresMcRestart
-    public static boolean TESSELLATOR_REPLACE_EVERYTHING;
 
     @Config.Comment({"ISimpleBlockRenderingHandler classes added here will be treated as thread-safe.",
                      "In many cases, these classes should also be included in TESSELLATOR_USE_REPLACEMENT_TARGETS.",
