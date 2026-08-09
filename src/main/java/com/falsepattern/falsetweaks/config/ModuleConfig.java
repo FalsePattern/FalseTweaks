@@ -34,6 +34,7 @@ import com.falsepattern.lib.config.ConfigurationManager;
 public class ModuleConfig {
     @Config.Comment({"Optimizes the way forge scans the classpath during launch.",
                      "Not compatible with some badly-written mods.",
+                     "Not compatible with jar_discoverer_cache from CoreTweaks",
                      "FPS impact: None, but makes startup a bit faster"})
     @Config.LangKey
     @Config.Name(value = "startupOptimizations")
