@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release-tags:
-    uses: FalsePattern/fpgradle-workflows/.github/workflows/release-tags.yml@master
+    uses: FalsePattern/fpgradle-workflows/.github/workflows/release-tags-2.yml@master
     with:
       workspace: "setupCIWorkspace"
       zig-version: "0.15.2"

@@ -8,7 +8,7 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.outputStream
 
 plugins {
-    id("com.falsepattern.fpgradle-mc") version "4.0.2"
+    id("com.falsepattern.fpgradle-mc") version "4.1.0"
     id("com.falsepattern.zanama") version "0.3.0"
     id("com.falsepattern.zigbuild")
 }
@@ -51,6 +51,7 @@ minecraft_fp {
         }
         curseforge {
             projectId = "665744"
+            side = Both
             dependencies {
                 required("fplib")
                 optional("mcpatcher")
